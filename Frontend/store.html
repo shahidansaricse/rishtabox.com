@@ -1,0 +1,1396 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>RishtaBox</title>
+
+    <link rel="icon" href="images/logo.jpeg">
+    <link rel="stylesheet" href="store.css">
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+
+<body>
+    <!-- ================= HEADER ================= -->
+    <header class="header">
+        <div class="nav-container">
+<div class="logo-section">
+
+    <a href="#" class="logo"
+       onclick="showPage('home'); return false;">
+
+        <img src="images/logo.jpeg" alt="RishtaBox Logo">
+
+    </a>
+
+    <a href="#" class="home-btn"
+       onclick="showPage('home'); return false;">
+
+        <div class="logo-text">
+            <span>rishta</span>
+            <span>box</span>
+        </div>
+
+    </a>
+   
+
+</div>   <!-- Search -->
+            <div class="search-bar">
+
+                <input type="search" id="searchInput" name="search" placeholder="Search Product.." autocomplete="off">
+
+                <button type="button" onclick="searchProducts()">
+                    Search
+                </button>
+
+            </div>
+
+            <!-- Navigation Actions -->
+            <div class="nav-actions">
+
+                <!-- Account -->
+                <a href="#" class="nav-btn" onclick="openAccount(); return false;">
+                    👤 <span id="accountNavText">Account</span>
+                </a>
+
+                <!-- Cart -->
+                <a href="#" class="nav-btn" onclick="showPage('cart'); return false;">
+                    🛒 Cart (<span id="cartCount">0</span>)
+                </a>
+
+                <!-- Orders -->
+       <a href="#" class="nav-btn"
+   onclick="showPage('orders'); return false;">
+    📦 Orders
+</a>
+
+            </div>
+
+            <!-- Mobile Menu -->
+            <button type="button" class="mobile-menu-btn" onclick="toggleSidebar()" aria-label="Open menu">
+                ☰
+            </button>
+
+        </div>
+        <div class="panel">
+
+    <div class="panel-all">
+        <i class="fa-solid fa-bars"></i>
+        All Gifts
+    </div>
+
+    <div class="panel-ops">
+        <p>Birthday</p>
+        <p>Anniversary</p>
+        <p>Wedding</p>
+        <p>For Couples</p>
+        <p>Personalized</p>
+    </div>
+
+    <div class="panel-deals">
+        🎁 Special Offers
+    </div>
+
+</div>
+    </header>
+
+
+    <!-- ================= MAIN CONTENT ================= -->
+    <main class="main-content">
+
+
+        <!-- ================= HOME PAGE ================= -->
+<section id="homePage" class="page">
+
+            <!-- Hero Slider -->
+           <section class="hero">
+
+    <div class="hero-slider">
+
+        <!-- Slide 1 -->
+        <div class="hero-slide active">
+
+            <img src="images/RB.jpeg"
+                 alt="RishtaBox Shopping"
+                 class="hero-image">
+
+            <div class="hero-overlay"></div>
+
+            <div class="hero-content">
+                <h1>Welcome to RishtaBox</h1>
+
+                <p>
+                    Discover thoughtful gifts and
+                    beautiful surprises at RishtaBox.
+                </p>
+            </div>
+
+            <div class="hero-content1">
+                <a href="#categories" class="hero-btn">
+                    Shop Now
+                </a>
+            </div>
+
+        </div>
+
+
+        <!-- Slide 2 -->
+        <div class="hero-slide">
+
+            <img src="images/RB2.jpeg"
+                 alt="RishtaBox Gifts"
+                 class="hero-image">
+
+            <div class="hero-overlay"></div>
+
+            <div class="hero-content1">
+                <a href="#categories" class="hero-btn">
+                    Shop Now
+                </a>
+            </div>
+
+        </div>
+        <div class="hero-slide">
+
+            <img src="images/RB3.png"
+                 alt="RishtaBox Gifts"
+                 class="hero-image">
+
+            <div class="hero-overlay"></div>
+
+            <div class="hero-content1">
+                <a href="#categories" class="hero-btn">
+                    Shop Now
+                </a>
+            </div>
+
+        </div>
+                <div class="hero-slide">
+
+            <img src="images/RB4.png"
+                 alt="RishtaBox Gifts"
+                 class="hero-image">
+
+            <div class="hero-overlay"></div>
+
+            <div class="hero-content1">
+                <a href="#categories" class="hero-btn">
+                    Shop Now
+                </a>
+            </div>
+
+        </div>
+
+        <!-- Previous Button -->
+        <button type="button"
+                class="slider-btn slider-prev"
+                onclick="changeSlide(-1)"
+                aria-label="Previous slide">
+            ❮
+        </button>
+
+
+        <!-- Next Button -->
+        <button type="button"
+                class="slider-btn slider-next"
+                onclick="changeSlide(1)"
+                aria-label="Next slide">
+            ❯
+        </button>
+
+
+        <!-- Slider Dots -->
+        <div class="slider-dots">
+
+            <button type="button"
+                    class="slider-dot active"
+                    onclick="goToSlide(0)"
+                    aria-label="Go to slide 1">
+            </button>
+
+            <button type="button"
+                    class="slider-dot"
+                    onclick="goToSlide(1)"
+                    aria-label="Go to slide 2">
+            </button>
+                    <button type="button"
+                    class="slider-dot"
+                    onclick="goToSlide(2)"
+                    aria-label="Go to slide 3">
+            </button>
+            <button type="button"
+                    class="slider-dot"
+                    onclick="goToSlide(3)"
+                    aria-label="Go to slide 4">
+            </button>
+        </div>
+
+    </div>
+
+</section>
+    <!-- ================================================= -->
+    <!-- ============== 1. SHOP BY RELATIONSHIP ========== -->
+    <!-- ================================================= -->
+
+    <section class="categories relationship-section"
+             id="relationships">
+
+        <div class="container">
+
+            <h2>
+                Shop by Relationship
+            </h2>
+
+        </div>
+
+        <div class="category-grid"
+             id="relationshipGrid">
+
+            <!-- Relationship cards populated by JavaScript -->
+
+        </div>
+
+    </section>
+
+
+    <!-- ================================================= -->
+    <!-- ================ 2. SHOP BY FESTIVAL ============ -->
+    <!-- ================================================= -->
+
+    <section class="categories festivals"
+             id="festivals">
+
+        <div class="container">
+
+            <h2>
+                Shop by Festival
+            </h2>
+
+        </div>
+
+        <div class="category-grid"
+             id="festivalGrid">
+
+            <!-- Festivals populated by JavaScript -->
+
+        </div>
+
+    </section>
+
+
+    <!-- ================================================= -->
+    <!-- ================ 3. SHOP BY CATEGORY ============ -->
+    <!-- ================================================= -->
+
+    <section class="categories"
+             id="categories">
+
+        <div class="container">
+
+            <h2>
+                Shop by Category
+            </h2>
+
+        </div>
+
+        <div class="category-grid"
+             id="categoryGrid">
+
+            <!-- Categories populated by JavaScript -->
+
+        </div>
+
+    </section>
+
+</section>
+<!-- ================= END HOME PAGE ================= -->
+
+
+
+    
+        <!-- ================= CATEGORY PAGE ================= -->
+        <div id="categoryPage" class="page hidden">
+
+            <div class="container">
+
+                <h1 id="categoryTitle">
+                    Products
+                </h1>
+
+
+                <!-- Filter Section -->
+                <div class="filter-section">
+
+                    <div class="filter-row">
+
+
+                        <!-- Sort -->
+                        <div class="filter-group">
+
+                            <label for="sortBy">
+                                Sort By:
+                            </label>
+
+                            <select id="sortBy" onchange="applyFilters()">
+
+                                <option value="relevance">
+                                    Relevance
+                                </option>
+
+                                <option value="price-low">
+                                    Price: Low to High
+                                </option>
+
+                                <option value="price-high">
+                                    Price: High to Low
+                                </option>
+
+                                <option value="rating">
+                                    Rating
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- Price -->
+                        <div class="filter-group">
+
+                            <label for="priceRange">
+                                Max Price:
+                            </label>
+
+                            <input type="range" id="priceRange" min="0" max="10000" value="10000"
+                                oninput="applyFilters()">
+
+                            <span id="priceValue">
+                                ₹10000
+                            </span>
+
+                        </div>
+
+
+                        <!-- Brand -->
+                        <div class="filter-group">
+
+                            <label for="brandFilter">
+                                Brand:
+                            </label>
+
+                            <select id="brandFilter" onchange="applyFilters()">
+
+                                <option value="">
+                                    All Brands
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Products -->
+                <div class="product-grid" id="productGrid">
+
+                    <!-- Products populated by JavaScript -->
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ================= PRODUCT DETAILS PAGE ================= -->
+        <div id="productPage" class="page hidden">
+
+            <div class="container">
+
+                <!-- Back Button -->
+                <button type="button" class="btn-secondary" onclick="showPage('category')">
+
+                    ← Back to Products
+
+                </button>
+
+
+                <!-- Product Details -->
+                <div class="product-detail" id="productDetails">
+
+                    <!-- Product details populated by JavaScript -->
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ================= CART PAGE ================= -->
+        <div id="cartPage" class="page hidden">
+
+            <div class="container">
+
+                <h1>
+                    My Cart
+                </h1>
+
+
+
+                <!-- Cart Items -->
+                <div id="cartItems">
+
+                    <!-- Cart items populated by JavaScript -->
+
+                </div>
+
+
+                <!-- Cart Summary -->
+                <div class="cart-summary" id="cartSummary">
+
+                    <!-- Cart summary populated by JavaScript -->
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= PLACE ORDER PAGE ================= -->
+<div id="orderPage" class="page hidden">
+
+    <div class="container">
+
+        <h1>
+            Place Order
+        </h1>
+
+        <div id="orderSteps">
+            <!-- Order steps populated by JavaScript -->
+        </div>
+
+    </div>
+
+</div>
+
+
+        <!-- ================= MY ORDERS PAGE ================= -->
+        <div id="ordersPage" class="page hidden">
+
+            <div class="container">
+
+                <h1>
+                    My Orders
+                </h1>
+
+
+                <div id="ordersList">
+
+                    <!-- Orders populated by JavaScript -->
+
+                </div>
+
+            </div>
+
+        </div>
+        <!-- ================= LOGIN / SIGNUP PAGE ================= -->
+
+        <section id="loginPage" class="page hidden">
+
+            <div class="auth-container">
+
+                <!-- ================= LEFT SIDE ================= -->
+
+                <div class="auth-welcome">
+
+                    <div class="auth-gift-icon">
+                        🎁
+                    </div>
+
+                    <h2>Make Every Moment Special</h2>
+
+                    <p>
+                        Discover thoughtful gifts for every special
+                        relationship and occasion.
+                    </p>
+
+                    <div class="auth-features">
+
+                        <div>
+                            <span>💝</span>
+                            Gifts for Every Relationship
+                        </div>
+
+                        <div>
+                            <span>✨</span>
+                            Beautiful Personalized Gifts
+                        </div>
+
+                        <div>
+                            <span>🚚</span>
+                            Fast & Reliable Delivery
+                        </div>
+
+                        <div>
+                            <span>🔒</span>
+                            Safe & Secure Shopping
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ================= RIGHT SIDE ================= -->
+
+                <div class="auth-box">
+
+
+                    <!-- ================= SIGN IN ================= -->
+
+                    <div id="loginSection">
+
+                        <div class="auth-heading">
+
+                            <h1>Welcome Back!</h1>
+
+                            <p>
+                                Sign in to continue shopping
+                            </p>
+
+                        </div>
+
+
+                        <form id="loginForm">
+
+
+                            <!-- Email / Mobile -->
+
+                            <div class="auth-input-group">
+
+                                <label for="loginEmail">
+                                    Email or Mobile Number
+                                </label>
+
+                                <div class="auth-input">
+
+                                    <span>👤</span>
+
+                                    <input
+                                            type="text"
+                                            id="loginEmail"
+                                            placeholder="Enter email or mobile number"
+                                            autocomplete="username"
+                                    >
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Password -->
+
+                            <div class="auth-input-group">
+
+                                <div class="auth-label-row">
+
+                                    <label for="loginPassword">
+                                        Password
+                                    </label>
+
+                                    <a href="#"
+                                       onclick="forgotPassword(event)">
+                                        Forgot password?
+                                    </a>
+
+                                </div>
+
+
+                                <div class="auth-input">
+
+                                    <span>🔒</span>
+
+                                    <input
+                                            type="password"
+                                            id="loginPassword"
+                                            placeholder="Enter your password"
+                                            autocomplete="current-password"
+                                    >
+
+                                    <button
+                                            type="button"
+                                            onclick="togglePassword('loginPassword', this)"
+                                            class="password-toggle">
+
+                                        Show
+
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Remember Me -->
+
+                            <label class="remember-me">
+
+                                <input
+                                        type="checkbox"
+                                        id="rememberMe"
+                                >
+
+                                Remember me
+
+                            </label>
+
+
+                            <!-- Login -->
+
+                            <button
+                                    type="submit"
+                                    class="auth-main-btn">
+
+                                Sign In
+
+                            </button>
+
+
+                            <div
+                                    id="loginMessage"
+                                    class="auth-message">
+                            </div>
+
+                        </form>
+
+
+                        <!-- Create Account -->
+
+                        <div class="auth-switch">
+
+                            <div class="auth-divider">
+                                <span>New to RishtaBox?</span>
+                            </div>
+
+                            <button
+                                    type="button"
+                                    class="auth-outline-btn"
+                                    onclick="showSignup()">
+
+                                Create your RishtaBox account
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- ================= SIGN UP ================= -->
+
+                    <div id="signupSection" class="hidden">
+
+                        <div class="auth-heading">
+
+                            <h1>Create Account</h1>
+
+                            <p>
+                                Join RishtaBox and start gifting
+                            </p>
+
+                        </div>
+
+
+                        <form id="signupForm">
+
+
+                            <!-- Name -->
+
+                            <div class="auth-input-group">
+
+                                <label for="signupName">
+                                    Your Name
+                                </label>
+
+                                <div class="auth-input">
+
+                                    <span>👤</span>
+
+                                    <input
+                                            type="text"
+                                            id="signupName"
+                                            placeholder="Enter your full name"
+                                    >
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Mobile -->
+
+                            <div class="auth-input-group">
+
+                                <label for="signupMobile">
+                                    Mobile Number
+                                </label>
+
+                                <div class="auth-input">
+
+                                    <span>📱</span>
+
+                                    <input
+                                            type="tel"
+                                            id="signupMobile"
+                                            placeholder="Enter 10-digit mobile number"
+                                            maxlength="10"
+                                    >
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Email -->
+
+                            <div class="auth-input-group">
+
+                                <label for="signupEmail">
+                                    Email Address
+                                </label>
+
+                                <div class="auth-input">
+
+                                    <span>✉️</span>
+
+                                    <input
+                                            type="email"
+                                            id="signupEmail"
+                                            placeholder="Enter your email"
+                                    >
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Password -->
+
+                            <div class="auth-input-group">
+
+                                <label for="signupPassword">
+                                    Password
+                                </label>
+
+                                <div class="auth-input">
+
+                                    <span>🔒</span>
+
+                                    <input
+                                            type="password"
+                                            id="signupPassword"
+                                            placeholder="At least 6 characters"
+                                    >
+
+                                    <button
+                                            type="button"
+                                            onclick="togglePassword('signupPassword', this)"
+                                            class="password-toggle">
+
+                                        Show
+
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Confirm Password -->
+
+                            <div class="auth-input-group">
+
+                                <label for="confirmPassword">
+                                    Confirm Password
+                                </label>
+
+                                <div class="auth-input">
+
+                                    <span>🔒</span>
+
+                                    <input
+                                            type="password"
+                                            id="confirmPassword"
+                                            placeholder="Re-enter your password"
+                                    >
+
+                                </div>
+
+                            </div>
+
+
+                            <p class="password-hint">
+                                🔐 Password must contain at least 6 characters.
+                            </p>
+
+
+                            <!-- Signup -->
+
+                            <button
+                                    type="submit"
+                                    class="auth-main-btn">
+
+                                Create Account
+
+                            </button>
+
+
+                            <div
+                                    id="signupMessage"
+                                    class="auth-message">
+                            </div>
+
+                        </form>
+
+
+                        <!-- Login -->
+
+                        <div class="auth-switch">
+
+                            <div class="auth-divider">
+                                <span>Already have an account?</span>
+                            </div>
+
+                            <button
+                                    type="button"
+                                    class="auth-outline-btn"
+                                    onclick="showLogin()">
+
+                                Sign In
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- ================= END LOGIN / SIGNUP ================= -->
+<!-- ================= ACCOUNT PAGE ================= -->
+<div id="accountPage" class="page hidden">
+
+    <div class="container">
+
+        <h1>My Account</h1>
+
+        <div class="account-form">
+
+            <h2>Personal Information</h2>
+
+            <!-- Name -->
+            <div class="form-group">
+                <label for="userName">Name:</label>
+
+                <input
+                    type="text"
+                    id="userName"
+                    name="userName"
+                    placeholder="Enter your name"
+                    autocomplete="name"
+                >
+            </div>
+
+            <!-- Email -->
+            <div class="form-group">
+                <label for="userEmail">Email:</label>
+
+                <input
+                    type="email"
+                    id="userEmail"
+                    name="userEmail"
+                    placeholder="Enter your email"
+                    autocomplete="email"
+                >
+            </div>
+
+            <!-- Phone -->
+            <div class="form-group">
+                <label for="userPhone">Phone:</label>
+
+                <input
+                    type="tel"
+                    id="userPhone"
+                    name="userPhone"
+                    placeholder="Enter your phone"
+                    autocomplete="tel"
+                >
+            </div>
+
+            <!-- Address -->
+            <div class="form-group">
+                <label for="userAddress">Address:</label>
+
+                <textarea
+                    id="userAddress"
+                    name="userAddress"
+                    placeholder="Enter your delivery address"
+                    autocomplete="street-address"
+                    rows="4"
+                ></textarea>
+            </div>
+
+            <!-- Save Button -->
+            <button
+                type="button"
+                class="btn-primary"
+                onclick="saveUserInfo()"
+            >
+                Save Information
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+    </main>
+    <!-- ==================== TESTIMONIALS SECTION ==================== -->
+
+<section class="testimonials-section">
+
+    <div class="section-heading">
+        <h2>What Our Customers Say</h2>
+        <p>Loved by our customers ❤️</p>
+    </div>
+
+    <div class="testimonials-container">
+
+        <!-- Testimonial 1 -->
+        <div class="testimonial-card">
+
+            <div class="customer-info">
+                <img 
+                    src="https://i.pravatar.cc/100?img=12" 
+                    alt="Rahul Sharma"
+                >
+
+                <div>
+                    <h3>Rahul Sharma</h3>
+                    <div class="rating">★★★★★</div>
+                </div>
+            </div>
+
+            <p class="testimonial-text">
+                "The groom mala was beautiful and the quality was
+                excellent. Highly recommended!"
+            </p>
+
+            <span class="verified">✓ Verified Customer</span>
+
+        </div>
+
+
+        <!-- Testimonial 2 -->
+        <div class="testimonial-card">
+
+            <div class="customer-info">
+                <img 
+                    src="https://i.pravatar.cc/100?img=47" 
+                    alt="Priya Singh"
+                >
+
+                <div>
+                    <h3>Priya Singh</h3>
+                    <div class="rating">★★★★★</div>
+                </div>
+            </div>
+
+            <p class="testimonial-text">
+                "I ordered a personalized mug for my anniversary.
+                It was exactly as shown in the picture."
+            </p>
+
+            <span class="verified">✓ Verified Customer</span>
+
+        </div>
+
+
+        <!-- Testimonial 3 -->
+        <div class="testimonial-card">
+
+            <div class="customer-info">
+                <img 
+                    src="https://i.pravatar.cc/100?img=33" 
+                    alt="Amit Kumar"
+                >
+
+                <div>
+                    <h3>Amit Kumar</h3>
+                    <div class="rating">★★★★☆</div>
+                </div>
+            </div>
+
+            <p class="testimonial-text">
+                "Good product quality, reasonable prices and
+                quick delivery."
+            </p>
+
+            <span class="verified">✓ Verified Customer</span>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ==================== BLOG SECTION ==================== -->
+
+<section class="blog-section">
+
+    <div class="section-heading">
+        <h2>From Our Blog</h2>
+        <p>Ideas, Tips & Inspiration ✨</p>
+    </div>
+
+
+    <div class="blogs-container">
+
+        <!-- Blog 1 -->
+        <div class="blog-card">
+
+            <img 
+                src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=800"
+                alt="Wedding Gift Ideas"
+            >
+
+            <div class="blog-content">
+
+                <span class="blog-date">
+                    September 10, 2026
+                </span>
+
+                <h3>
+                    10 Best Wedding Gift Ideas for Couples
+                </h3>
+
+                <p>
+                    Discover thoughtful and memorable wedding
+                    gifts for newly married couples.
+                </p>
+
+    <button class="read-more-btn" onclick="showBlogDetails(1)">
+    Read More →
+</button>
+
+            </div>
+
+        </div>
+
+
+        <!-- Blog 2 -->
+        <div class="blog-card">
+
+            <img 
+                src="https://images.unsplash.com/photo-1512909006721-3d6018887383?w=800"
+                alt="Personalized Gifts"
+            >
+
+            <div class="blog-content">
+
+                <span class="blog-date">
+                    September 8, 2026
+                </span>
+
+                <h3>
+                    Best Personalized Gifts for Your Loved Ones
+                </h3>
+
+                <p>
+                    Make your special moments memorable with
+                    beautiful personalized gifts.
+                </p>
+<button class="read-more-btn" onclick="showBlogDetails(2)">
+    Read More →
+</button>
+
+            </div>
+
+        </div>
+
+
+        <!-- Blog 3 -->
+        <div class="blog-card">
+
+            <img 
+                src="https://images.unsplash.com/photo-1464349153735-7db50ed83c84?w=800"
+                alt="Birthday Gifts"
+            >
+
+            <div class="blog-content">
+
+                <span class="blog-date">
+                    September 5, 2026
+                </span>
+
+                <h3>
+                    Best Birthday Gifts for Someone Special
+                </h3>
+
+                <p>
+                    Find unique and thoughtful birthday gift
+                    ideas for your loved ones.
+                </p>
+
+   <button class="read-more-btn" onclick="showBlogDetails(3)">
+    Read More →
+</button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+<section id="blogDetailsSection" class="blog-details-section" style="display: none;">
+
+    <div id="blogDetailsContent"></div>
+
+</section>
+<footer class="footer">
+
+    <div class="container">
+
+        <div class="footer-content">
+
+            <!-- BRAND -->
+            <div class="footer-section footer-brand">
+
+                   <h2>
+        <img src="images/logo.jpeg" alt="RishtaBox Logo" class="footer-logo">
+        RishtaBox
+    </h2>
+
+                <p>
+                    Thoughtful gifts for every special relationship.
+                    Make every occasion memorable with RishtaBox.
+                </p>
+
+                <div class="footer-features">
+                    <span>🎁 Unique Gifts</span>
+                    <span>🚚 Fast Delivery</span>
+                    <span>💝 Made With Love</span>
+                </div>
+
+            </div>
+
+
+            <!-- QUICK LINKS -->
+            <div class="footer-section">
+
+                <h3>Quick Links</h3>
+
+                <ul>
+                  <li>
+    <a href="#" onclick="footerHome(); return false;">
+        Home
+    </a>
+</li>
+
+<li>
+    <a href="#" onclick="footerShop(); return false;">
+        Shop Gifts
+    </a>
+</li>
+
+<li>
+    <a href="#" onclick="footerCart(); return false;">
+        My Cart
+    </a>
+</li>
+
+<li>
+    <a href="#" onclick="footerOrders(); return false;">
+        My Orders
+    </a>
+</li>
+
+<li>
+    <a href="#" onclick="footerAccount(); return false;">
+        My Account
+    </a>
+</li>
+                </ul>
+
+            </div>
+
+
+            <!-- CUSTOMER SERVICE -->
+            <div class="footer-section">
+
+                <h3>Customer Care</h3>
+
+                <ul>
+                    <li>
+                        <a href="#">Contact Us</a>
+                    </li>
+
+                    <li>
+                        <a href="#">FAQs</a>
+                    </li>
+
+                    <li>
+                        <a href="#">Shipping Information</a>
+                    </li>
+
+                    <li>
+                        <a href="#">Return & Refund</a>
+                    </li>
+
+                    <li>
+                        <a href="#">Privacy Policy</a>
+                    </li>
+                </ul>
+
+            </div>
+
+
+            <!-- GIFT GUIDE -->
+            <div class="footer-section">
+
+                <h3>Gift Ideas</h3>
+
+                <ul>
+                    <li>
+                        <a href="#">Birthday Gifts</a>
+                    </li>
+
+                    <li>
+                        <a href="#">Anniversary Gifts</a>
+                    </li>
+
+                    <li>
+                        <a href="#">Wedding Gifts</a>
+                    </li>
+
+                    <li>
+                        <a href="#">Gifts for Couples</a>
+                    </li>
+
+                    <li>
+                        <a href="#">Personalized Gifts</a>
+                    </li>
+                </ul>
+
+            </div>
+
+
+            <!-- FOLLOW US -->
+            <div class="footer-section">
+
+                <h3>Follow Us</h3>
+
+                <p class="footer-follow-text">
+                    Follow RishtaBox for gift inspiration,
+                    offers and new arrivals.
+                </p>
+
+                <div class="social-links">
+
+                    <a href="#" aria-label="Facebook">
+                        <i class="fa-brands fa-facebook-f"></i>
+                    </a>
+
+                    <a href="#" aria-label="Instagram">
+                        <i class="fa-brands fa-instagram"></i>
+                    </a>
+
+                    <a href="#" aria-label="Twitter">
+                        <i class="fa-brands fa-x-twitter"></i>
+                    </a>
+
+                    <a href="#" aria-label="YouTube">
+                        <i class="fa-brands fa-youtube"></i>
+                    </a>
+
+                </div>
+
+                <p class="footer-payment">
+                    💳 Secure Payments
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- NEWSLETTER -->
+        <div class="footer-newsletter">
+
+            <div>
+                <h3>🎁 Get Gift Inspiration</h3>
+
+                <p>
+                    Discover special gifts and exclusive offers.
+                </p>
+            </div>
+
+            <div class="newsletter-form">
+
+                <input
+                    type="email"
+                    placeholder="Enter your email"
+                    aria-label="Email address"
+                >
+
+                <button type="button">
+                    Subscribe
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- BOTTOM -->
+        <div class="footer-bottom">
+
+            <p>
+                © 2026 <strong>RishtaBox</strong>.
+                All Rights Reserved by PUCHO Limelight.
+            </p>
+
+            <div class="footer-bottom-links">
+                <a href="#">Terms & Conditions</a>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Refund Policy</a>
+            </div>
+
+        </div>
+
+    </div>
+
+</footer>
+    <!-- ================= JAVASCRIPT ================= -->
+    <script src="store.js"></script>
+
+</body>
+
+</html>

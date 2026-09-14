@@ -1,0 +1,1003 @@
+{
+  "categories": [
+    {
+      "id": "groom-mala",
+      "name": "Groom Mala",
+      "description": "Beautiful malas for the groom",
+      "image": "images/elegant-man-in-wedding-attire-with-jewelry-2026-03-18-08-22-05-utc.jpg"
+    },
+    {
+      "id": "customize-coffee-mug",
+      "name": "Customize Coffee Mug",
+      "description": "Personalized coffee mugs for every occasion",
+      "image": "images/coffee-mug-cookies-and-relaxing-morning-treat-2026-03-13-01-56-37-utc.jpg"
+    },
+    {
+      "id": "artificial-jewellery",
+      "name": "Artificial Jewellery",
+      "description": "Stylish artificial jewellery for every occasion",
+      "image": "images/colorful-gemstone-jewelry-rings-and-beads-collecti-2026-01-08-05-53-11-utc.jpg"
+    },
+    {
+      "id": "birthday-return-gifts",
+      "name": "Birthday Return Gifts",
+      "description": "Special return gifts for birthday celebrations",
+      "image": "images/colorful-wrapped-gift-boxes-with-ribbons-and-bows-2026-03-25-03-59-11-utc.jpg"
+    }
+  ]
+,
+  "products": [
+    {
+      "id": "groom-mala-1",
+      "name": "Royal Groom Mala",
+      "category": "groom-mala",
+      "brand": "RishtaBox",
+      "price": 1299,
+      "originalPrice": 1599,
+      "discount": 19,
+      "rating": 4.5,
+      "image": "https://images.unsplash.com/photo-1594736797933-d0501ba2fe65?w=600&h=400&fit=crop"
+    },
+    {
+      "id": "groom-mala-2",
+      "name": "Premium Groom Mala",
+      "category": "groom-mala",
+      "brand": "Wedding Collection",
+      "price": 999,
+      "originalPrice": 1299,
+      "discount": 23,
+      "rating": 4.3,
+      "image": "https://images.unsplash.com/photo-1594736797933-d0501ba2fe65?w=600&h=400&fit=crop"
+    },
+    {
+      "id": "groom-mala-3",
+      "name": "Elegant Floral Groom Mala",
+      "category": "groom-mala",
+      "brand": "Shaadi Special",
+      "price": 1499,
+      "originalPrice": 1899,
+      "discount": 21,
+      "rating": 4.7,
+      "image": "https://images.unsplash.com/photo-1594736797933-d0501ba2fe65?w=600&h=400&fit=crop"
+    },
+    {
+      "id": "groom-mala-4",
+      "name": "Traditional Groom Mala",
+      "category": "groom-mala",
+      "brand": "Wedding Collection",
+      "price": 799,
+      "originalPrice": 999,
+      "discount": 20,
+      "rating": 4.4,
+      "image": "https://images.unsplash.com/photo-1594736797933-d0501ba2fe65?w=600&h=400&fit=crop"
+    },
+    {
+      "id": "mug-1",
+      "name": "Customize Coffee Mug",
+      "category": "customize-coffee-mug",
+      "brand": "GiftCraft",
+      "price": 499,
+      "originalPrice": 699,
+      "discount": 29,
+      "rating": 4.6,
+      "image": "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=600&h=400&fit=crop"
+    },
+    {
+      "id": "mug-2",
+      "name": "Couple Photo Personalized Mug",
+      "category": "customize-coffee-mug",
+      "brand": "RishtaBox",
+      "price": 399,
+      "originalPrice": 599,
+      "discount": 33,
+      "rating": 4.7,
+      "image": "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=600&h=400&fit=crop"
+    },
+    {
+      "id": "mug-3",
+      "name": "Best Friend Custom Mug",
+      "category": "customize-coffee-mug",
+      "brand": "GiftCraft",
+      "price": 349,
+      "originalPrice": 499,
+      "discount": 30,
+      "rating": 4.5,
+      "image": "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=600&h=400&fit=crop"
+    },
+    {
+      "id": "mug-4",
+      "name": "Love Quote Personalized Mug",
+      "category": "customize-coffee-mug",
+      "brand": "Love Gifts",
+      "price": 449,
+      "originalPrice": 649,
+      "discount": 31,
+      "rating": 4.8,
+      "image": "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=600&h=400&fit=crop"
+    },
+    {
+      "id": "jewellery-1",
+      "name": "Elegant Pearl Necklace Set",
+      "category": "artificial-jewellery",
+      "brand": "RishtaBox",
+      "price": 899,
+      "originalPrice": 1299,
+      "discount": 31,
+      "rating": 4.6,
+      "image": "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600&h=400&fit=crop"
+    },
+    {
+      "id": "jewellery-2",
+      "name": "Golden Designer Earrings",
+      "category": "artificial-jewellery",
+      "brand": "Fashion Jewels",
+      "price": 599,
+      "originalPrice": 899,
+      "discount": 33,
+      "rating": 4.5,
+      "image": "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600&h=400&fit=crop"
+    },
+    {
+      "id": "jewellery-3",
+      "name": "Bridal Artificial Jewellery Set",
+      "category": "artificial-jewellery",
+      "brand": "Bridal Collection",
+      "price": 1599,
+      "originalPrice": 2199,
+      "discount": 27,
+      "rating": 4.8,
+      "image": "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600&h=400&fit=crop"
+    },
+    {
+      "id": "jewellery-4",
+      "name": "Rose Gold Bracelet",
+      "category": "artificial-jewellery",
+      "brand": "Fashion Jewels",
+      "price": 699,
+      "originalPrice": 999,
+      "discount": 30,
+      "rating": 4.4,
+      "image": "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600&h=400&fit=crop"
+    },
+    {
+      "id": "birthday-gift-1",
+      "name": "Cute Birthday Gift Hamper",
+      "category": "birthday-return-gifts",
+      "brand": "RishtaBox",
+      "price": 599,
+      "originalPrice": 799,
+      "discount": 25,
+      "rating": 4.7,
+      "image": "https://images.unsplash.com/photo-1512909006721-3d6018887383?w=600&h=400&fit=crop"
+    },
+    {
+      "id": "birthday-gift-2",
+      "name": "Mini Birthday Gift Box",
+      "category": "birthday-return-gifts",
+      "brand": "GiftCraft",
+      "price": 449,
+      "originalPrice": 599,
+      "discount": 25,
+      "rating": 4.5,
+      "image": "https://images.unsplash.com/photo-1512909006721-3d6018887383?w=600&h=400&fit=crop"
+    },
+    {
+      "id": "birthday-gift-3",
+      "name": "Kids Birthday Return Gift Set",
+      "category": "birthday-return-gifts",
+      "brand": "Happy Gifts",
+      "price": 299,
+      "originalPrice": 399,
+      "discount": 25,
+      "rating": 4.4,
+      "image": "https://images.unsplash.com/photo-1512909006721-3d6018887383?w=600&h=400&fit=crop"
+    },
+    {
+      "id": "birthday-gift-4",
+      "name": "Premium Birthday Return Gift",
+      "category": "birthday-return-gifts",
+      "brand": "RishtaBox Premium",
+      "price": 749,
+      "originalPrice": 999,
+      "discount": 25,
+      "rating": 4.8,
+      "image": "https://images.unsplash.com/photo-1512909006721-3d6018887383?w=600&h=400&fit=crop"
+    }
+  ]
+,
+
+  "festivals": [
+    {
+      "id": "diwali",
+      "name": "Diwali",
+      "description": "Special gifts and products for Diwali celebrations",
+      "image": "images/diwali.jpg"
+    },
+    {
+      "id": "holi",
+      "name": "Holi",
+      "description": "Colorful gifts and products for Holi celebrations",
+      "image": "images/holi.jpg"
+    },
+    {
+      "id": "dussehra",
+      "name": "Dussehra",
+      "description": "Special gifts for Dussehra celebrations",
+      "image": "images/dussehra.jpg"
+    },
+    {
+      "id": "navratri",
+      "name": "Navratri",
+      "description": "Festive gifts and products for Navratri",
+      "image": "images/navratri.jpg"
+    },
+    {
+      "id": "ganesh-chaturthi",
+      "name": "Ganesh Chaturthi",
+      "description": "Special gifts for Ganesh Chaturthi celebrations",
+      "image": "images/ganesh-chaturthi.jpg"
+    },
+    {
+      "id": "chhath-puja",
+      "name": "Chhath Puja",
+      "description": "Traditional gifts and products for Chhath Puja",
+      "image": "images/chhath-puja.jpg"
+    },
+    {
+      "id": "eid-ul-fitr",
+      "name": "Eid-ul-Fitr",
+      "description": "Special gifts for Eid-ul-Fitr celebrations",
+      "image": "images/eid-ul-fitr.jpg"
+    },
+    {
+      "id": "eid-ul-adha",
+      "name": "Eid-ul-Adha",
+      "description": "Special gifts for Eid-ul-Adha celebrations",
+      "image": "images/eid-ul-adha.jpg"
+    },
+    {
+      "id": "ramadan",
+      "name": "Ramadan",
+      "description": "Thoughtful gifts and products for Ramadan",
+      "image": "images/ramadan.jpg"
+    },
+    {
+      "id": "vaisakhi",
+      "name": "Vaisakhi",
+      "description": "Special gifts for Vaisakhi celebrations",
+      "image": "images/vaisakhi.jpg"
+    },
+    {
+      "id": "lohri",
+      "name": "Lohri",
+      "description": "Festive gifts and products for Lohri celebrations",
+      "image": "images/lohri.jpg"
+    },
+    {
+      "id": "christmas",
+      "name": "Christmas",
+      "description": "Special gifts for Christmas celebrations",
+      "image": "images/christmas.jpg"
+    },
+    {
+      "id": "navroz",
+      "name": "Navroz",
+      "description": "Special gifts for Navroz celebrations",
+      "image": "images/navroz.jpg"
+    },
+    {
+      "id": "new-year",
+      "name": "New Year",
+      "description": "Special gifts for New Year celebrations",
+      "image": "images/new-year.jpg"
+    }
+  ]
+,
+  
+ 
+  "festivalProducts": [
+    {
+      "id": "diwali-gift-1",
+      "name": "Diwali Premium Gift Hamper",
+      "festival": "diwali",
+      "brand": "RishtaBox",
+      "price": 899,
+      "originalPrice": 1199,
+      "discount": 25,
+      "rating": 4.8,
+      "image": "https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?w=600&h=400&fit=crop&q=85"
+    },
+    {
+      "id": "diwali-gift-2",
+      "name": "Diwali Dry Fruit Gift Box",
+      "festival": "diwali",
+      "brand": "GiftCraft",
+      "price": 699,
+      "originalPrice": 899,
+      "discount": 22,
+      "rating": 4.7,
+      "image": "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=600&h=400&fit=crop&q=85"
+    },
+    {
+      "id": "diwali-gift-3",
+      "name": "Diwali Decorative Gift Set",
+      "festival": "diwali",
+      "brand": "Festive Gifts",
+      "price": 549,
+      "originalPrice": 749,
+      "discount": 27,
+      "rating": 4.6,
+      "image": "https://images.unsplash.com/photo-1577083288073-40892c0860a4?w=600&h=400&fit=crop&q=85"
+    },
+
+    {
+      "id": "holi-gift-1",
+      "name": "Holi Celebration Gift Pack",
+      "festival": "holi",
+      "brand": "RishtaBox",
+      "price": 399,
+      "originalPrice": 599,
+      "discount": 33,
+      "rating": 4.6,
+      "image": "https://images.unsplash.com/photo-1582562124811-c09040d0a901?w=600&h=400&fit=crop&q=85"
+    },
+    {
+      "id": "holi-gift-2",
+      "name": "Holi Color Gift Set",
+      "festival": "holi",
+      "brand": "Festive Gifts",
+      "price": 299,
+      "originalPrice": 449,
+      "discount": 33,
+      "rating": 4.5,
+      "image": "https://images.unsplash.com/photo-1553356084-58ef4a67b2a7?w=600&h=400&fit=crop&q=85"
+    },
+    {
+      "id": "holi-gift-3",
+      "name": "Holi Party Gift Hamper",
+      "festival": "holi",
+      "brand": "GiftCraft",
+      "price": 599,
+      "originalPrice": 799,
+      "discount": 25,
+      "rating": 4.7,
+      "image": "https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=600&h=400&fit=crop&q=85"
+    },
+
+    {
+      "id": "dussehra-gift-1",
+      "name": "Dussehra Celebration Gift Box",
+      "festival": "dussehra",
+      "brand": "RishtaBox",
+      "price": 599,
+      "originalPrice": 799,
+      "discount": 25,
+      "rating": 4.7,
+      "image": "https://images.unsplash.com/photo-1603905179139-db12ab5354ec?w=600&h=400&fit=crop&q=85"
+    },
+    {
+      "id": "dussehra-gift-2",
+      "name": "Dussehra Traditional Gift Set",
+      "festival": "dussehra",
+      "brand": "GiftCraft",
+      "price": 449,
+      "originalPrice": 599,
+      "discount": 25,
+      "rating": 4.6,
+      "image": "https://images.unsplash.com/photo-1512909006721-3d6018887383?w=600&h=400&fit=crop&q=85"
+    },
+    {
+      "id": "dussehra-gift-3",
+      "name": "Dussehra Family Gift Hamper",
+      "festival": "dussehra",
+      "brand": "Festive Gifts",
+      "price": 749,
+      "originalPrice": 999,
+      "discount": 25,
+      "rating": 4.8,
+      "image": "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=600&h=400&fit=crop&q=85"
+    },
+
+    {
+      "id": "navratri-gift-1",
+      "name": "Navratri Puja Gift Set",
+      "festival": "navratri",
+      "brand": "RishtaBox",
+      "price": 499,
+      "originalPrice": 699,
+      "discount": 29,
+      "rating": 4.7,
+      "image": "https://images.unsplash.com/photo-1606293926075-69a00dbfde81?w=600&h=400&fit=crop&q=85"
+    },
+    {
+      "id": "navratri-gift-2",
+      "name": "Navratri Festive Hamper",
+      "festival": "navratri",
+      "brand": "GiftCraft",
+      "price": 649,
+      "originalPrice": 849,
+      "discount": 24,
+      "rating": 4.6,
+      "image": "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=600&h=400&fit=crop&q=85"
+    },
+    {
+      "id": "navratri-gift-3",
+      "name": "Navratri Celebration Gift Box",
+      "festival": "navratri",
+      "brand": "Festive Gifts",
+      "price": 799,
+      "originalPrice": 999,
+      "discount": 20,
+      "rating": 4.8,
+      "image": "https://images.unsplash.com/photo-1527529482837-4698179dc6ce?w=600&h=400&fit=crop&q=85"
+    },
+
+    {
+      "id": "ganesh-gift-1",
+      "name": "Ganesh Chaturthi Gift Hamper",
+      "festival": "ganesh-chaturthi",
+      "brand": "RishtaBox",
+      "price": 599,
+      "originalPrice": 799,
+      "discount": 25,
+      "rating": 4.8,
+      "image": "https://images.unsplash.com/photo-1567591414240-e22d4b0a0e8f?w=600&h=400&fit=crop&q=85"
+    },
+    {
+      "id": "ganesh-gift-2",
+      "name": "Ganesh Puja Gift Set",
+      "festival": "ganesh-chaturthi",
+      "brand": "GiftCraft",
+      "price": 449,
+      "originalPrice": 599,
+      "discount": 25,
+      "rating": 4.6,
+      "image": "https://images.unsplash.com/photo-1604608672516-f1b9b1b7c2f3?w=600&h=400&fit=crop&q=85"
+    },
+    {
+      "id": "ganesh-gift-3",
+      "name": "Ganesh Festival Celebration Box",
+      "festival": "ganesh-chaturthi",
+      "brand": "Festive Gifts",
+      "price": 699,
+      "originalPrice": 899,
+      "discount": 22,
+      "rating": 4.7,
+      "image": "https://images.unsplash.com/photo-1606293926075-69a00dbfde81?w=600&h=400&fit=crop&q=85"
+    },
+
+    {
+      "id": "chhath-gift-1",
+      "name": "Chhath Puja Traditional Gift Set",
+      "festival": "chhath-puja",
+      "brand": "RishtaBox",
+      "price": 499,
+      "originalPrice": 649,
+      "discount": 23,
+      "rating": 4.7,
+      "image": "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=600&h=400&fit=crop&q=85"
+    },
+    {
+      "id": "chhath-gift-2",
+      "name": "Chhath Puja Celebration Hamper",
+      "festival": "chhath-puja",
+      "brand": "GiftCraft",
+      "price": 599,
+      "originalPrice": 799,
+      "discount": 25,
+      "rating": 4.8,
+      "image": "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=600&h=400&fit=crop&q=85"
+    },
+    {
+      "id": "chhath-gift-3",
+      "name": "Chhath Family Gift Box",
+      "festival": "chhath-puja",
+      "brand": "Festive Gifts",
+      "price": 749,
+      "originalPrice": 999,
+      "discount": 25,
+      "rating": 4.6,
+      "image": "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=600&h=400&fit=crop&q=85"
+    },
+
+    {
+      "id": "eid-fitr-gift-1",
+      "name": "Eid-ul-Fitr Premium Gift Hamper",
+      "festival": "eid-ul-fitr",
+      "brand": "RishtaBox",
+      "price": 799,
+      "originalPrice": 999,
+      "discount": 20,
+      "rating": 4.8,
+      "image": "https://images.unsplash.com/photo-1603905179139-db12ab5354ec?w=600&h=400&fit=crop&q=85"
+    },
+    {
+      "id": "eid-fitr-gift-2",
+      "name": "Eid-ul-Fitr Sweet Gift Box",
+      "festival": "eid-ul-fitr",
+      "brand": "Sweet Gifts",
+      "price": 549,
+      "originalPrice": 699,
+      "discount": 21,
+      "rating": 4.7,
+      "image": "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=600&h=400&fit=crop&q=85"
+    },
+    {
+      "id": "eid-fitr-gift-3",
+      "name": "Eid-ul-Fitr Celebration Set",
+      "festival": "eid-ul-fitr",
+      "brand": "GiftCraft",
+      "price": 899,
+      "originalPrice": 1199,
+      "discount": 25,
+      "rating": 4.8,
+      "image": "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=600&h=400&fit=crop&q=85"
+    },
+
+    {
+      "id": "eid-adha-gift-1",
+      "name": "Eid-ul-Adha Premium Gift Box",
+      "festival": "eid-ul-adha",
+      "brand": "RishtaBox",
+      "price": 749,
+      "originalPrice": 999,
+      "discount": 25,
+      "rating": 4.7,
+      "image": "https://images.unsplash.com/photo-1512909006721-3d6018887383?w=600&h=400&fit=crop&q=85"
+    },
+    {
+      "id": "eid-adha-gift-2",
+      "name": "Eid-ul-Adha Family Hamper",
+      "festival": "eid-ul-adha",
+      "brand": "GiftCraft",
+      "price": 899,
+      "originalPrice": 1199,
+      "discount": 25,
+      "rating": 4.8,
+      "image": "https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?w=600&h=400&fit=crop&q=85"
+    },
+    {
+      "id": "eid-adha-gift-3",
+      "name": "Eid-ul-Adha Celebration Gift Set",
+      "festival": "eid-ul-adha",
+      "brand": "Festive Gifts",
+      "price": 599,
+      "originalPrice": 799,
+      "discount": 25,
+      "rating": 4.6,
+      "image": "https://images.unsplash.com/photo-1577083288073-40892c0860a4?w=600&h=400&fit=crop&q=85"
+    },
+
+    {
+      "id": "ramadan-gift-1",
+      "name": "Ramadan Blessings Gift Hamper",
+      "festival": "ramadan",
+      "brand": "RishtaBox",
+      "price": 699,
+      "originalPrice": 899,
+      "discount": 22,
+      "rating": 4.8,
+      "image": "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=600&h=400&fit=crop&q=85"
+    },
+    {
+      "id": "ramadan-gift-2",
+      "name": "Ramadan Family Gift Box",
+      "festival": "ramadan",
+      "brand": "GiftCraft",
+      "price": 549,
+      "originalPrice": 699,
+      "discount": 21,
+      "rating": 4.7,
+      "image": "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=600&h=400&fit=crop&q=85"
+    },
+    {
+      "id": "ramadan-gift-3",
+      "name": "Ramadan Premium Celebration Set",
+      "festival": "ramadan",
+      "brand": "Festive Gifts",
+      "price": 799,
+      "originalPrice": 999,
+      "discount": 20,
+      "rating": 4.8,
+      "image": "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=600&h=400&fit=crop&q=85"
+    },
+
+    {
+      "id": "vaisakhi-gift-1",
+      "name": "Vaisakhi Celebration Gift Hamper",
+      "festival": "vaisakhi",
+      "brand": "RishtaBox",
+      "price": 599,
+      "originalPrice": 799,
+      "discount": 25,
+      "rating": 4.7,
+      "image": "https://images.unsplash.com/photo-1527529482837-4698179dc6ce?w=600&h=400&fit=crop&q=85"
+    },
+    {
+      "id": "vaisakhi-gift-2",
+      "name": "Vaisakhi Traditional Gift Box",
+      "festival": "vaisakhi",
+      "brand": "GiftCraft",
+      "price": 449,
+      "originalPrice": 599,
+      "discount": 25,
+      "rating": 4.6,
+      "image": "https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=600&h=400&fit=crop&q=85"
+    },
+    {
+      "id": "vaisakhi-gift-3",
+      "name": "Vaisakhi Family Gift Set",
+      "festival": "vaisakhi",
+      "brand": "Festive Gifts",
+      "price": 749,
+      "originalPrice": 999,
+      "discount": 25,
+      "rating": 4.8,
+      "image": "https://images.unsplash.com/photo-1606293926075-69a00dbfde81?w=600&h=400&fit=crop&q=85"
+    },
+
+    {
+      "id": "lohri-gift-1",
+      "name": "Lohri Celebration Gift Hamper",
+      "festival": "lohri",
+      "brand": "RishtaBox",
+      "price": 499,
+      "originalPrice": 699,
+      "discount": 29,
+      "rating": 4.7,
+      "image": "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=600&h=400&fit=crop&q=85"
+    },
+    {
+      "id": "lohri-gift-2",
+      "name": "Lohri Traditional Gift Box",
+      "festival": "lohri",
+      "brand": "GiftCraft",
+      "price": 399,
+      "originalPrice": 549,
+      "discount": 27,
+      "rating": 4.6,
+      "image": "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=600&h=400&fit=crop&q=85"
+    },
+    {
+      "id": "lohri-gift-3",
+      "name": "Lohri Family Celebration Set",
+      "festival": "lohri",
+      "brand": "Festive Gifts",
+      "price": 649,
+      "originalPrice": 849,
+      "discount": 24,
+      "rating": 4.8,
+      "image": "https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?w=600&h=400&fit=crop&q=85"
+    },
+
+    {
+      "id": "christmas-gift-1",
+      "name": "Christmas Premium Gift Hamper",
+      "festival": "christmas",
+      "brand": "RishtaBox",
+      "price": 799,
+      "originalPrice": 999,
+      "discount": 20,
+      "rating": 4.8,
+      "image": "https://images.unsplash.com/photo-1512389142860-9c449e58a543?w=600&h=400&fit=crop&q=85"
+    },
+    {
+      "id": "christmas-gift-2",
+      "name": "Christmas Surprise Gift Box",
+      "festival": "christmas",
+      "brand": "GiftCraft",
+      "price": 599,
+      "originalPrice": 799,
+      "discount": 25,
+      "rating": 4.7,
+      "image": "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=600&h=400&fit=crop&q=85"
+    },
+    {
+      "id": "christmas-gift-3",
+      "name": "Christmas Family Celebration Set",
+      "festival": "christmas",
+      "brand": "Festive Gifts",
+      "price": 899,
+      "originalPrice": 1199,
+      "discount": 25,
+      "rating": 4.9,
+      "image": "https://images.unsplash.com/photo-1482517967863-00e15c9b44be?w=600&h=400&fit=crop&q=85"
+    },
+
+    {
+      "id": "navroz-gift-1",
+      "name": "Navroz Celebration Gift Hamper",
+      "festival": "navroz",
+      "brand": "RishtaBox",
+      "price": 699,
+      "originalPrice": 899,
+      "discount": 22,
+      "rating": 4.7,
+      "image": "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=600&h=400&fit=crop&q=85"
+    },
+    {
+      "id": "navroz-gift-2",
+      "name": "Navroz Traditional Gift Box",
+      "festival": "navroz",
+      "brand": "GiftCraft",
+      "price": 549,
+      "originalPrice": 699,
+      "discount": 21,
+      "rating": 4.6,
+      "image": "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=600&h=400&fit=crop&q=85"
+    },
+    {
+      "id": "navroz-gift-3",
+      "name": "Navroz Family Celebration Set",
+      "festival": "navroz",
+      "brand": "Festive Gifts",
+      "price": 799,
+      "originalPrice": 999,
+      "discount": 20,
+      "rating": 4.8,
+      "image": "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=600&h=400&fit=crop&q=85"
+    },
+
+    {
+      "id": "new-year-gift-1",
+      "name": "New Year Celebration Gift Hamper",
+      "festival": "new-year",
+      "brand": "RishtaBox",
+      "price": 699,
+      "originalPrice": 899,
+      "discount": 22,
+      "rating": 4.8,
+      "image": "https://images.unsplash.com/photo-1481391032119-d89fee407e44?w=600&h=400&fit=crop&q=85"
+    },
+    {
+      "id": "new-year-gift-2",
+      "name": "New Year Party Gift Box",
+      "festival": "new-year",
+      "brand": "GiftCraft",
+      "price": 499,
+      "originalPrice": 649,
+      "discount": 23,
+      "rating": 4.6,
+      "image": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600&h=400&fit=crop&q=85"
+    },
+    {
+      "id": "new-year-gift-3",
+      "name": "New Year Premium Celebration Set",
+      "festival": "new-year",
+      "brand": "Festive Gifts",
+      "price": 899,
+      "originalPrice": 1199,
+      "discount": 25,
+      "rating": 4.9,
+      "image": "https://images.unsplash.com/photo-1547592180-85f173990554?w=600&h=400&fit=crop&q=85"
+    }
+  ]
+,
+"relationships": [
+  {
+    "id": "friend",
+    "name": "Gifts for Friends",
+    "description": "Special gifts for your best friends",
+    "image": "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600"
+  },
+  {
+    "id": "sister",
+    "name": "Gifts for Sister",
+    "description": "Beautiful gifts for your loving sister",
+    "image": "https://images.unsplash.com/photo-1511988617509-a57c8a288659?w=600"
+  },
+  {
+    "id": "brother",
+    "name": "Gifts for Brother",
+    "description": "Cool and thoughtful gifts for brother",
+    "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600"
+  },
+  {
+    "id": "mom",
+    "name": "Gifts for Mom",
+    "description": "Heartwarming gifts for your mom",
+    "image": "https://images.unsplash.com/photo-1492725764893-90b379c2b6e7?w=600"
+  },
+  {
+    "id": "dad",
+    "name": "Gifts for Dad",
+    "description": "Meaningful gifts for your dad",
+    "image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600"
+  },
+  {
+    "id": "couples",
+    "name": "Gifts for Couples",
+    "description": "Perfect gifts for special couples",
+    "image": "https://images.unsplash.com/photo-1519741497674-611481863552?w=600"
+  },
+  {
+    "id": "husband",
+    "name": "Gifts for Husband",
+    "description": "Special gifts for your husband",
+    "image": "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=600"
+  },
+  {
+    "id": "wife",
+    "name": "Gifts for Wife",
+    "description": "Beautiful gifts for your wife",
+    "image": "https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=600"
+  }
+],
+
+"relationshipProducts": [
+  {
+    "id": "sister-1",
+    "name": "Personalized Sister Mug",
+    "price": 399,
+    "originalPrice": 599,
+    "relationship": "sister",
+    "image": "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=600"
+  },
+  {
+    "id": "sister-2",
+    "name": "Elegant Sister Gift Box",
+    "price": 699,
+    "originalPrice": 899,
+    "relationship": "sister",
+    "image": "https://images.unsplash.com/photo-1602173574767-37ac01994b2a?w=600"
+  },
+  {
+    "id": "sister-3",
+    "name": "Personalized Sister Bracelet",
+    "price": 599,
+    "originalPrice": 799,
+    "relationship": "sister",
+    "image": "https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=600"
+  },
+
+  {
+    "id": "brother-1",
+    "name": "Best Brother Personalized Mug",
+    "price": 399,
+    "originalPrice": 599,
+    "relationship": "brother",
+    "image": "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=600"
+  },
+  {
+    "id": "brother-2",
+    "name": "Brother Wallet Gift",
+    "price": 699,
+    "originalPrice": 899,
+    "relationship": "brother",
+    "image": "https://images.unsplash.com/photo-1627123424574-724758594e93?w=600"
+  },
+  {
+    "id": "brother-3",
+    "name": "Brother Gift Combo",
+    "price": 899,
+    "originalPrice": 1199,
+    "relationship": "brother",
+    "image": "https://images.unsplash.com/photo-1544816155-12df9643f363?w=600"
+  },
+
+  {
+    "id": "mom-1",
+    "name": "Best Mom Personalized Mug",
+    "price": 399,
+    "originalPrice": 599,
+    "relationship": "mom",
+    "image": "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=600"
+  },
+  {
+    "id": "mom-2",
+    "name": "Mom Love Photo Frame",
+    "price": 549,
+    "originalPrice": 749,
+    "relationship": "mom",
+    "image": "https://images.unsplash.com/photo-1513883049090-d0b7439799bf?w=600"
+  },
+  {
+    "id": "mom-3",
+    "name": "Mom Special Gift Hamper",
+    "price": 999,
+    "originalPrice": 1299,
+    "relationship": "mom",
+    "image": "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=600"
+  },
+
+  {
+    "id": "dad-1",
+    "name": "Best Dad Personalized Mug",
+    "price": 399,
+    "originalPrice": 599,
+    "relationship": "dad",
+    "image": "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=600"
+  },
+  {
+    "id": "dad-2",
+    "name": "Classic Dad Wallet",
+    "price": 699,
+    "originalPrice": 899,
+    "relationship": "dad",
+    "image": "https://images.unsplash.com/photo-1627123424574-724758594e93?w=600"
+  },
+  {
+    "id": "dad-3",
+    "name": "Dad Special Gift Set",
+    "price": 899,
+    "originalPrice": 1199,
+    "relationship": "dad",
+    "image": "https://images.unsplash.com/photo-1544816155-12df9643f363?w=600"
+  },
+
+  {
+    "id": "couples-1",
+    "name": "Couple Personalized Mug Set",
+    "price": 599,
+    "originalPrice": 799,
+    "relationship": "couples",
+    "image": "https://images.unsplash.com/photo-1519741497674-611481863552?w=600"
+  },
+  {
+    "id": "couples-2",
+    "name": "Couple Photo Frame",
+    "price": 699,
+    "originalPrice": 899,
+    "relationship": "couples",
+    "image": "https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=600"
+  },
+  {
+    "id": "couples-3",
+    "name": "Couple Gift Hamper",
+    "price": 999,
+    "originalPrice": 1299,
+    "relationship": "couples",
+    "image": "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=600"
+  },
+
+  {
+    "id": "husband-1",
+    "name": "Best Husband Personalized Mug",
+    "price": 399,
+    "originalPrice": 599,
+    "relationship": "husband",
+    "image": "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=600"
+  },
+  {
+    "id": "husband-2",
+    "name": "Husband Premium Wallet",
+    "price": 799,
+    "originalPrice": 999,
+    "relationship": "husband",
+    "image": "https://images.unsplash.com/photo-1627123424574-724758594e93?w=600"
+  },
+  {
+    "id": "husband-3",
+    "name": "Husband Special Gift Set",
+    "price": 999,
+    "originalPrice": 1299,
+    "relationship": "husband",
+    "image": "https://images.unsplash.com/photo-1544816155-12df9643f363?w=600"
+  },
+
+  {
+    "id": "wife-1",
+    "name": "Best Wife Personalized Mug",
+    "price": 399,
+    "originalPrice": 599,
+    "relationship": "wife",
+    "image": "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=600"
+  },
+  {
+    "id": "wife-2",
+    "name": "Elegant Wife Bracelet",
+    "price": 699,
+    "originalPrice": 899,
+    "relationship": "wife",
+    "image": "https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=600"
+  },
+  {
+    "id": "wife-3",
+    "name": "Wife Special Gift Hamper",
+    "price": 999,
+    "originalPrice": 1299,
+    "relationship": "wife",
+    "image": "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=600"
+  }
+]
+}
