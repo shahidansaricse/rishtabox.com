@@ -204,28 +204,144 @@ function updateCartCount() {
 /* =========================================================
    LOAD DATA
 ========================================================= */
+//async function loadData() {
+//    try {
+//        const response = await fetch("data.json");
+//        if (!response.ok) {
+//            throw new Error(
+//                "HTTP Error: " + response.status
+//            );
+//        }
+//        const data = await response.json();
+//        console.log("DATA:", data);
+//        categories = data.categories || [];
+//        products = data.products || [];
+//        festivalProducts = data.festivalProducts || [];
+//        relationshipProducts = data.relationshipProducts || [];
+//
+//        initializeApp();
+//    } catch (error) {
+//        console.error("DATA LOAD ERROR:",error);
+//        document.body.innerHTML = `
+//            <div style="text-align:center;padding:50px;">
+//                <h2>Error loading data</h2>
+//                <p>${error.message}</p>
+//            </div>
+//        `;
+//    }
+//}
+
 async function loadData() {
     try {
-        const response = await fetch("data.json");
-        if (!response.ok) {
+
+        // ================= BACKEND CATEGORIES =================
+        const categoryResponse =
+            await fetch("http://localhost:8080/api/categories");
+
+        if (!categoryResponse.ok) {
             throw new Error(
-                "HTTP Error: " + response.status
+                "Category API Error: " +
+                categoryResponse.status
             );
         }
-        const data = await response.json();
-        console.log("DATA:", data);
-        categories = data.categories || [];
-        products = data.products || [];
-        festivalProducts = data.festivalProducts || [];
-        relationshipProducts = data.relationshipProducts || [];
 
+        categories =
+            await categoryResponse.json();
+
+
+        // ================= BACKEND PRODUCTS =================
+        const productResponse =
+            await fetch("http://localhost:8080/api/products");
+
+        if (!productResponse.ok) {
+            throw new Error(
+                "Product API Error: " +
+                productResponse.status
+            );
+        }
+
+        const backendProducts =
+            await productResponse.json();
+
+        products = backendProducts.map(product => ({
+            id: product.id,
+            name: product.name,
+            description: product.description,
+            price: product.price,
+            originalPrice: product.originalPrice,
+            image: product.image,
+            stock: product.stock,
+
+            category: product.category
+                ? product.category.id
+                : null,
+
+            brand: product.brand || "",
+            rating: product.rating || 0,
+            discount: product.discount || 0
+        }));
+
+
+        // ================= FESTIVAL & RELATIONSHIP =================
+        // Keep these temporarily from data.json
+        const response = await fetch("data.json");
+
+        if (!response.ok) {
+            throw new Error(
+                "data.json Error: " +
+                response.status
+            );
+        }
+
+        const data = await response.json();
+
+        festivalProducts =
+            data.festivalProducts || [];
+
+        relationshipProducts =
+            data.relationshipProducts || [];
+
+
+        // ================= DEBUG =================
+        console.log(
+            "BACKEND CATEGORIES:",
+            categories
+        );
+
+        console.log(
+            "BACKEND PRODUCTS:",
+            products
+        );
+
+        console.log(
+            "FESTIVAL PRODUCTS:",
+            festivalProducts
+        );
+
+        console.log(
+            "RELATIONSHIP PRODUCTS:",
+            relationshipProducts
+        );
+
+
+        // ================= START APP =================
         initializeApp();
+
     } catch (error) {
-        console.error("DATA LOAD ERROR:",error);
+
+        console.error(
+            "DATA LOAD ERROR:",
+            error
+        );
+
         document.body.innerHTML = `
             <div style="text-align:center;padding:50px;">
-                <h2>Error loading data</h2>
+                <h2>Data Loading Error</h2>
                 <p>${error.message}</p>
+                <p>
+                    Make sure Spring Boot is running
+                    on port 8080.
+                </p>
             </div>
         `;
     }
@@ -4520,4 +4636,27 @@ function payWithRazorpay(amount) {
     });
 
     razorpay.open();
+}
+
+function trackShipment() {
+
+    const courier = document.getElementById("trackingCourier").value;
+
+    if (courier === "shiprocket") {
+
+        window.open(
+            "https://www.shiprocket.in/shipment-tracking/",
+            "_blank"
+        );
+
+    } else if (courier === "goswift") {
+
+        alert(
+            "GoSwift Tracking\n\n" +
+            "Tracking ID: GS123456789\n\n" +
+            "GoSwift shipment tracking will open here."
+        );
+
+    }
+
 }

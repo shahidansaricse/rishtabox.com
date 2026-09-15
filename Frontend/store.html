@@ -499,6 +499,180 @@
 
                 </div>
 
+                <!-- ================= TRACKING UI PREVIEW ================= -->
+                <div class="tracking-preview">
+
+                    <div class="tracking-header">
+                        <div>
+                            <h2>Track Your Order</h2>
+                            <p>Order #RB1001</p>
+                        </div>
+
+                        <span class="tracking-status shipped">
+                    Shipped
+                </span>
+                    </div>
+
+
+                    <!-- Courier Selection -->
+                    <div class="tracking-courier-section">
+
+                        <label for="trackingCourier">
+                            Delivery Partner
+                        </label>
+
+                        <select id="trackingCourier">
+
+                            <option value="shiprocket">
+                                Shiprocket
+                            </option>
+
+                            <option value="goswift">
+                                GoSwift
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- Tracking Information -->
+                    <div class="tracking-info-grid">
+
+                        <div class="tracking-info-box">
+
+                    <span class="tracking-label">
+                        Courier
+                    </span>
+
+                            <strong id="courierName">
+                                Shiprocket
+                            </strong>
+
+                        </div>
+
+
+                        <div class="tracking-info-box">
+
+                    <span class="tracking-label">
+                        Tracking ID
+                    </span>
+
+                            <strong>
+                                SR123456789
+                            </strong>
+
+                        </div>
+
+
+                        <div class="tracking-info-box">
+
+                    <span class="tracking-label">
+                        Current Status
+                    </span>
+
+                            <strong>
+                                Shipped
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Tracking Timeline -->
+                    <div class="tracking-timeline">
+
+                        <div class="tracking-step completed">
+
+                            <div class="tracking-icon">
+                                ✓
+                            </div>
+
+                            <div class="tracking-step-content">
+
+                                <strong>Order Placed</strong>
+
+                                <span>
+                            Your order has been confirmed
+                        </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="tracking-step completed">
+
+                            <div class="tracking-icon">
+                                ✓
+                            </div>
+
+                            <div class="tracking-step-content">
+
+                                <strong>Shipped</strong>
+
+                                <span>
+                            Your order has been shipped
+                        </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="tracking-step current">
+
+                            <div class="tracking-icon">
+                                🚚
+                            </div>
+
+                            <div class="tracking-step-content">
+
+                                <strong>Out for Delivery</strong>
+
+                                <span>
+                            Your order is on the way
+                        </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="tracking-step">
+
+                            <div class="tracking-icon">
+                                ✓
+                            </div>
+
+                            <div class="tracking-step-content">
+
+                                <strong>Delivered</strong>
+
+                                <span>
+                            Waiting for delivery
+                        </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Track Button -->
+                    <button
+                            type="button"
+                            class="track-shipment-btn"
+                            onclick="trackShipment()">
+
+                        🚚 Track Shipment
+
+                    </button>
+
+                </div>
+
             </div>
 
         </div>
@@ -513,7 +687,8 @@
                 <div class="auth-welcome">
 
                     <div class="auth-gift-icon">
-                        🎁
+                        <img src="images/logo.jpeg" alt="RishtaBox Logo" >
+
                     </div>
 
                     <h2>Make Every Moment Special</h2>
