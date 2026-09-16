@@ -3579,3 +3579,18 @@ overflow-x: auto;
     }
 
 }
+
+.logout-btn {
+    margin-top: 12px;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    background: #d9534f;
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.logout-btn:hover {
+    opacity: 0.9;
+}

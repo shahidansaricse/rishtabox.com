@@ -31,7 +31,9 @@ public class ProductController {
                         request.getOriginalPrice(),
                         request.getImage(),
                         request.getStock(),
-                        request.getCategoryId()
+                        request.getCategoryId(),
+                        request.getFestivalId(),
+                        request.getRelationshipId()
                 )
         );
     }

@@ -8,7 +8,10 @@ public class ProductRequest {
     private Double originalPrice;
     private String image;
     private Integer stock;
-    private Long categoryId;
+
+    private String categoryId;
+    private String festivalId;
+    private Long relationshipId;
 
     public String getName() {
         return name;
@@ -58,11 +61,27 @@ public class ProductRequest {
         this.stock = stock;
     }
 
-    public Long getCategoryId() {
+    public String getCategoryId() {
         return categoryId;
     }
 
-    public void setCategoryId(Long categoryId) {
+    public void setCategoryId(String categoryId) {
         this.categoryId = categoryId;
+    }
+
+    public String getFestivalId() {
+        return festivalId;
+    }
+
+    public void setFestivalId(String festivalId) {
+        this.festivalId = festivalId;
+    }
+
+    public Long getRelationshipId() {
+        return relationshipId;
+    }
+
+    public void setRelationshipId(Long relationshipId) {
+        this.relationshipId = relationshipId;
     }
 }

@@ -16,6 +16,7 @@ let categories = [];
 let products = [];
 let festivalProducts = [];
 let relationshipProducts = [];
+let festivals=[];
 
 let currentUser = {
     name: "",
@@ -260,26 +261,26 @@ async function loadData() {
             );
         }
 
-        const backendProducts =
-            await productResponse.json();
+  const backendProducts = await productResponse.json();
 
-        products = backendProducts.map(product => ({
-            id: product.id,
-            name: product.name,
-            description: product.description,
-            price: product.price,
-            originalPrice: product.originalPrice,
-            image: product.image,
-            stock: product.stock,
+products = backendProducts.map(product => ({
+    id: product.id,
+    name: product.name,
+    description: product.description,
+    price: product.price,
+    originalPrice: product.originalPrice,
+    image: product.image,
+    stock: product.stock,
 
-            category: product.category
-                ? product.category.id
-                : null,
+    category: product.category
+        ? product.category.id
+        : null,
 
-            brand: product.brand || "",
-            rating: product.rating || 0,
-            discount: product.discount || 0
-        }));
+    brand: product.brand || "",
+    rating: product.rating || 0,
+    discount: product.discount || 0
+}));
+
 
 
         // ================= FESTIVAL & RELATIONSHIP =================
@@ -357,6 +358,7 @@ function initializeApp() {
 
     renderCategories();
     renderFestivals();
+     renderProducts(products);
     
     updateCartCount();
 
@@ -393,6 +395,7 @@ document.addEventListener("DOMContentLoaded",() => {
         }
     }
 );
+
 /* =========================================================
    SHOW PAGE
 ========================================================= */
@@ -541,6 +544,49 @@ function searchProducts() {
     populateFilters();
     renderProducts();
     showPage("category");
+}
+/* =========================================================
+   IMAGE PATH
+========================================================= */
+function getImagePath(image) {
+    if (!image) {
+        return "images/logo.jpeg";
+    }
+
+    if (image.startsWith("images/")) {
+        return image;
+    }
+
+    return "images/" + image;
+}
+/* =========================================================
+   LOAD CATEGORIES FROM BACKEND
+========================================================= */
+async function loadCategories() {
+    try {
+        const response = await fetch(
+            "http://localhost:8080/api/categories"
+        );
+
+        console.log("Category API status:", response.status);
+
+        const data = await response.text();
+
+        console.log("Category API response:", data);
+
+        if (!response.ok) {
+            throw new Error(
+                `Category API Error: ${response.status}`
+            );
+        }
+
+        categories = JSON.parse(data);
+
+        renderCategories();
+
+    } catch (error) {
+        console.error("Category loading error:", error);
+    }
 }
 /* =========================================================
    RENDER CATEGORIES
@@ -3164,117 +3210,7 @@ document.addEventListener(
 /* =========================================================
    SHOW FESTIVAL
 ========================================================= */
-const festivals = [
-
-    // Hindu
-    {
-        id: "diwali",
-        name: "Diwali",
-        description: "Festival of lights and celebrations",
-        image: "diwali-celebration-with-lights-and-festive-treats-2026-03-17-00-44-28-utc.jpg"
-    },
-    {
-        id: "holi",
-        name: "Holi",
-        description: "Festival of colors, joy and togetherness",
-        image: "colorful-powder-bowls-for-celebration-background-2026-01-07-00-20-08-utc.jpg"
-    },
-    {
-        id: "dussehra",
-        name: "Dussehra",
-        description: "Festival celebrating the victory of good over evil",
-        image: "khon-is-art-culture-thailand-dancing-in-masked-tos-2026-01-09-06-16-02-utc.jpg"
-    },
-    {
-        id: "navratri",
-        name: "Navratri",
-        description: "Nine nights of devotion and celebration",
-        image: "hands-offering-festive-sweets-on-intricate-cloth-2026-03-24-04-51-01-utc.jpg"
-    },
-    {
-        id: "ganesh-chaturthi",
-        name: "Ganesh Chaturthi",
-        description: "Festival celebrating Lord Ganesha",
-        image: "lord-ganesha-with-modak-sweets-and-red-flowers-2026-03-16-03-30-26-utc.jpg"
-    },
-    {
-    id: "chhath-puja",
-    name: "Chhath Puja",
-    description: "Traditional gifts for Chhath Puja celebrations",
-    image: "festive-illuminated-floral-offerings-floating-at-n-2026-03-20-04-48-06-utc.jpg"
-},
-
-    // Muslim
-    {
-        id: "eid-ul-fitr",
-        name: "Eid-ul-Fitr",
-        description: "Festival celebrated at the end of Ramadan",
-        image: "ramadan-lantern-and-dates-under-crescent-moon-2026-03-19-10-35-33-utc.jpg"
-    },
-    {
-        id: "eid-ul-adha",
-        name: "Eid-ul-Adha",
-        description: "Festival of sacrifice, sharing and togetherness",
-        image: "men-sharing-a-meal-together-outdoors-2026-01-07-06-27-44-utc.jpg"
-    },
-    {
-        id: "ramadan",
-        name: "Ramadan",
-        description: "Holy month of fasting, prayer and reflection",
-        image: "ramadan-treats-and-prayers-at-home-2026-01-06-10-26-22-utc.jpg"
-    },
-
-    // Sikh
-    
-    {
-        id: "lohri",
-        name: "Lohri",
-        description: "Popular winter harvest festival",
-        image: "plate-of-sesame-seeds-sweet-treats-dessert-2026-03-17-01-28-26-utc.jpg"
-    },
-
-    // Christian
-    {
-        id: "christmas",
-        name: "Christmas",
-        description: "Celebration of the birth of Jesus Christ",
-        image: "festive-holiday-still-life-with-decorations-and-la-2026-03-26-00-03-19-utc.jpg"
-    },
-
-
-    // // Buddhist
-    // {
-    //     id: "buddha-purnima",
-    //     name: "Buddha Purnima",
-    //     description: "Celebration of the life and teachings of Buddha",
-    //     image: "buddha-purnima.jpg"
-    // },
-
-    // // Jain
-    // {
-    //     id: "mahavir-jayanti",
-    //     name: "Mahavir Jayanti",
-    //     description: "Celebration of Lord Mahavira",
-    //     image: "mahavir-jayanti.jpg"
-    // },
-
-    // Parsi
-    {
-        id: "navroz",
-        name: "Navroz",
-        description: "Parsi New Year celebration",
-        image: "barbados-pride-flower-or-dwarf-poinciana-flower-f-2026-03-24-05-59-59-utc.jpg"
-    },
-
-    // Other major celebrations
-    {
-        id: "new-year",
-        name: "New Year",
-        description: "Celebrate the beginning of a new year",
-        image: "champagne-toast-with-colorful-fireworks-new-year-s-2026-03-24-23-11-07-utc.jpg"
-    }
-  
-];function renderFestivals() {
+function renderFestivals() {
 
     const festivalGrid = document.getElementById("festivalGrid");
 
@@ -3336,7 +3272,24 @@ const festivals = [
 
         });
 }
+async function loadFestivals() {
+    try {
+        const response = await fetch(
+            "http://localhost:8080/api/festivals"
+        );
 
+        if (!response.ok) {
+            throw new Error("Failed to load festivals");
+        }
+
+        festivals = await response.json();
+
+        renderFestivals();
+
+    } catch (error) {
+        console.error("Festival loading error:", error);
+    }
+}
 function showFestival(festivalId) {
 
     const festival = festivals.find(
@@ -3362,8 +3315,8 @@ applyFilters();
 }
 document.addEventListener("DOMContentLoaded", function () {
 
-    renderCategories();
-    renderFestivals();
+    loadCategories();
+    loadFestivals();
 
 });
 
@@ -4596,7 +4549,7 @@ function payWithRazorpay(amount) {
     }
 
     const options = {
-        key: "rzp_test_YOUR_ACTUAL_KEY_ID",
+        key: "rzp_test_TcGIuj6KWkDynr",
         amount: Math.round(amount * 100),
         currency: "INR",
         name: "RishtaBox",
@@ -4660,3 +4613,93 @@ function trackShipment() {
     }
 
 }
+
+
+document.getElementById("signupForm").addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    const name = document.getElementById("signupName").value.trim();
+    const mobile = document.getElementById("signupMobile").value.trim();
+    const email = document.getElementById("signupEmail").value.trim();
+    const password = document.getElementById("signupPassword").value;
+    const confirmPassword = document.getElementById("confirmPassword").value;
+
+    const message = document.getElementById("signupMessage");
+
+    if (password !== confirmPassword) {
+        message.textContent = "Passwords do not match.";
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/auth/register`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                name: name,
+                mobile: mobile,
+                email: email,
+                password: password
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            message.textContent = data.message || "Registration failed.";
+            return;
+        }
+
+        message.textContent = "Account created successfully.";
+
+        showLogin();
+
+    } catch (error) {
+        console.error(error);
+        message.textContent = "Backend server is not running.";
+    }
+});
+document.getElementById("loginForm").addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    const login = document.getElementById("loginEmail").value.trim();
+    const password = document.getElementById("loginPassword").value;
+
+    const message = document.getElementById("loginMessage");
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/auth/login`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                login: login,
+                password: password
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            message.textContent = data.message || "Invalid login.";
+            return;
+        }
+
+        // Save login information
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("userData", JSON.stringify(data.user));
+
+        message.textContent = "Login successful.";
+
+        updateAccountNavigation();
+
+        showPage("home");
+
+    } catch (error) {
+        console.error(error);
+        message.textContent = "Unable to connect to backend.";
+    }
+});

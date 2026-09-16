@@ -23,7 +23,6 @@ public class OrderService {
     private final UserRepository userRepository;
     private final CartRepository cartRepository;
 
-
     public OrderService(
             OrderRepository orderRepository,
             UserRepository userRepository,
@@ -34,99 +33,130 @@ public class OrderService {
         this.cartRepository = cartRepository;
     }
 
-
     @Transactional
     public Order createOrder(OrderRequest request) {
 
-        // 1. Find user
+        // 1. Check payment method
+        if (request.getPaymentMethod() == null
+                || (!request.getPaymentMethod().equalsIgnoreCase("COD")
+                && !request.getPaymentMethod().equalsIgnoreCase("RAZORPAY"))) {
+
+            throw new RuntimeException("Invalid payment method");
+        }
+
+        // 2. Find user
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() ->
                         new RuntimeException("User not found"));
 
-
-        // 2. Find user's cart
+        // 3. Find user's cart
         Cart cart = cartRepository.findByUserId(user.getId())
                 .orElseThrow(() ->
                         new RuntimeException("Cart not found"));
 
-
-        // 3. Check cart
-        if (cart.getItems().isEmpty()) {
+        // 4. Check cart
+        if (cart.getItems() == null || cart.getItems().isEmpty()) {
             throw new RuntimeException("Cart is empty");
         }
-
-
-        // 4. Only COD for Day 6A
-        if (!request.getPaymentMethod()
-                .equalsIgnoreCase("COD")) {
-
-            throw new RuntimeException(
-                    "Only COD payment is available currently"
-            );
-        }
-
 
         // 5. Create order
         Order order = new Order();
 
         order.setUser(user);
-        order.setPaymentMethod("COD");
-        order.setPaymentStatus("PENDING");
-        order.setOrderStatus("PLACED");
+
+        // Store payment method
+        String paymentMethod =
+                request.getPaymentMethod().toUpperCase();
+
+        order.setPaymentMethod(paymentMethod);
+
+        /*
+         * COD:
+         * Payment is not required online,
+         * so order can be placed directly.
+         */
+        if (paymentMethod.equals("COD")) {
+            order.setOrderStatus("PLACED");
+        } else {
+
+            /*
+             * Razorpay payment has not succeeded yet.
+             */
+            order.setOrderStatus("PAYMENT_PENDING");
+        }
+
         order.setCreatedAt(LocalDateTime.now());
 
-
-        // 6. Copy cart items to order
-        double totalAmount = 0;
-
+        // 6. Calculate total using Double
+        double totalAmount = 0.0;
 
         for (CartItem cartItem : cart.getItems()) {
 
             OrderItem orderItem = new OrderItem();
 
+            // Connect order
             orderItem.setOrder(order);
+
+            // Connect product
             orderItem.setProduct(cartItem.getProduct());
+
+            // Product quantity
             orderItem.setQuantity(cartItem.getQuantity());
 
-            double price = cartItem.getProduct().getPrice();
+            // Product price
+            Double price =
+                    cartItem.getProduct().getPrice();
+
+            if (price == null) {
+                throw new RuntimeException(
+                        "Product price is missing");
+            }
 
             orderItem.setPrice(price);
 
+            // Calculate item total
+            double itemTotal =
+                    price * cartItem.getQuantity();
 
-            totalAmount =
-                    totalAmount +
-                            (price * cartItem.getQuantity());
+            // Add to order total
+            totalAmount += itemTotal;
 
-
+            // Add item to order
             order.getItems().add(orderItem);
         }
 
-
-        // 7. Set total
+        // 7. Set total amount
         order.setTotalAmount(totalAmount);
 
-
         // 8. Save order
-        Order savedOrder = orderRepository.save(order);
+        Order savedOrder =
+                orderRepository.save(order);
 
+        /*
+         * COD:
+         * Order is already placed, so clear cart.
+         *
+         * Razorpay:
+         * DO NOT clear cart here.
+         * Clear it only after successful Razorpay payment.
+         */
+        if (paymentMethod.equals("COD")) {
 
-        // 9. Clear cart
-        cart.getItems().clear();
+            cart.getItems().clear();
+            cartRepository.save(cart);
+        }
 
-        cartRepository.save(cart);
-
-
-        // 10. Return order
+        // 9. Return saved order
         return savedOrder;
     }
 
-
+    // Get all orders of a user
     public List<Order> getUserOrders(Long userId) {
 
         return orderRepository.findByUserId(userId);
     }
 
-
+    // Get single order
     public Order getOrder(Long orderId) {
 
         return orderRepository.findById(orderId)

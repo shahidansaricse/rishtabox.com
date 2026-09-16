@@ -23,7 +23,19 @@ public class CategoryService {
             );
         }
 
-        Category category = new Category(name);
+        // Create ID from category name
+        String id = name
+                .trim()
+                .toLowerCase()
+                .replaceAll("[^a-z0-9]+", "-")
+                .replaceAll("(^-|-$)", "");
+
+        Category category = new Category(
+                id,
+                name,
+                null,
+                null
+        );
 
         return categoryRepository.save(category);
     }
