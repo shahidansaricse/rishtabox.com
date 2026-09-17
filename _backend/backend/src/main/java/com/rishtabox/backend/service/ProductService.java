@@ -32,6 +32,7 @@ public class ProductService {
         this.relationshipRepository = relationshipRepository;
     }
 
+    // CREATE PRODUCT
     public Product createProduct(
             String name,
             String description,
@@ -41,15 +42,13 @@ public class ProductService {
             Integer stock,
             String categoryId,
             String festivalId,
-            Long relationshipId) {
+            String relationshipId) {
 
         // Find category
         Category category = categoryRepository
                 .findById(categoryId)
                 .orElseThrow(() ->
-                        new RuntimeException(
-                                "Category not found"
-                        ));
+                        new RuntimeException("Category not found"));
 
         // Find festival
         Festival festival = null;
@@ -58,21 +57,17 @@ public class ProductService {
             festival = festivalRepository
                     .findById(festivalId)
                     .orElseThrow(() ->
-                            new RuntimeException(
-                                    "Festival not found"
-                            ));
+                            new RuntimeException("Festival not found"));
         }
 
         // Find relationship
         Relationship relationship = null;
 
-        if (relationshipId != null) {
+        if (relationshipId != null && !relationshipId.isBlank()) {
             relationship = relationshipRepository
                     .findById(relationshipId)
                     .orElseThrow(() ->
-                            new RuntimeException(
-                                    "Relationship not found"
-                            ));
+                            new RuntimeException("Relationship not found"));
         }
 
         // Create product
@@ -91,22 +86,22 @@ public class ProductService {
         return productRepository.save(product);
     }
 
+    // GET ALL PRODUCTS
     public List<Product> getAllProducts() {
         return productRepository.findAll();
     }
 
+    // GET PRODUCT BY ID
     public Product getProductById(Long id) {
 
         return productRepository
                 .findById(id)
                 .orElseThrow(() ->
-                        new RuntimeException(
-                                "Product not found"
-                        ));
+                        new RuntimeException("Product not found"));
     }
 
-    public List<Product> getProductsByCategory(
-            Long categoryId) {
+    // GET PRODUCTS BY CATEGORY
+    public List<Product> getProductsByCategory(Long categoryId) {
 
         return productRepository
                 .findByCategoryId(categoryId);

@@ -1,10 +1,10 @@
-package com.rishtabox.backend.controller;
+ package com.rishtabox.backend.controller;
 
 import com.rishtabox.backend.entity.Relationship;
 import com.rishtabox.backend.repository.RelationshipRepository;
 import org.springframework.web.bind.annotation.*;
 
-        import java.util.List;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/relationships")
@@ -17,19 +17,28 @@ public class RelationshipController {
         this.relationshipRepository = relationshipRepository;
     }
 
+    // GET ALL RELATIONSHIPS
     @GetMapping
     public List<Relationship> getAllRelationships() {
         return relationshipRepository.findAll();
     }
 
+    // CREATE RELATIONSHIP
     @PostMapping
-    public Relationship createRelationship(@RequestBody Relationship relationship) {
+    public Relationship createRelationship(
+            @RequestBody Relationship relationship) {
+
         return relationshipRepository.save(relationship);
     }
 
+    // GET RELATIONSHIP BY STRING ID
     @GetMapping("/{id}")
-    public Relationship getRelationshipById(@PathVariable Long id) {
+    public Relationship getRelationshipById(
+            @PathVariable String id) {
+
         return relationshipRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Relationship not found"));
+                .orElseThrow(() ->
+                        new RuntimeException("Relationship not found"));
     }
 }
+

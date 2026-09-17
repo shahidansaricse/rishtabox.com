@@ -1,7 +1,7 @@
-package com.rishtabox.backend.entity;
+ package com.rishtabox.backend.entity;
 
 import jakarta.persistence.*;
-        import lombok.*;
+import lombok.*;
 
 @Entity
 @Table(name = "relationships")
@@ -12,11 +12,12 @@ import jakarta.persistence.*;
 public class Relationship {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(length = 100)
+    private String id;
 
     @Column(nullable = false, unique = true)
     private String name;
 
     private String image;
 }
+

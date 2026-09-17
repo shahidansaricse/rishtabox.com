@@ -231,102 +231,152 @@ function updateCartCount() {
 //        `;
 //    }
 //}
-
 async function loadData() {
     try {
 
-        // ================= BACKEND CATEGORIES =================
+        // =====================================================
+        // LOAD CATEGORIES FROM BACKEND
+        // =====================================================
+
         const categoryResponse =
             await fetch("http://localhost:8080/api/categories");
 
         if (!categoryResponse.ok) {
             throw new Error(
-                "Category API Error: " +
-                categoryResponse.status
+                "Category API Error: " + categoryResponse.status
             );
         }
 
-        categories =
-            await categoryResponse.json();
+        categories = await categoryResponse.json();
+
+        console.log("BACKEND CATEGORIES:", categories);
 
 
-        // ================= BACKEND PRODUCTS =================
+        // =====================================================
+        // LOAD FESTIVALS FROM BACKEND
+        // =====================================================
+
+        const festivalResponse =
+            await fetch("http://localhost:8080/api/festivals");
+
+        if (!festivalResponse.ok) {
+            throw new Error(
+                "Festival API Error: " + festivalResponse.status
+            );
+        }
+
+        festivals = await festivalResponse.json();
+
+        console.log("BACKEND FESTIVALS:", festivals);
+
+
+        // =====================================================
+        // LOAD PRODUCTS FROM BACKEND
+        // =====================================================
+
         const productResponse =
             await fetch("http://localhost:8080/api/products");
 
         if (!productResponse.ok) {
             throw new Error(
-                "Product API Error: " +
-                productResponse.status
+                "Product API Error: " + productResponse.status
             );
         }
 
-  const backendProducts = await productResponse.json();
-
-products = backendProducts.map(product => ({
-    id: product.id,
-    name: product.name,
-    description: product.description,
-    price: product.price,
-    originalPrice: product.originalPrice,
-    image: product.image,
-    stock: product.stock,
-
-    category: product.category
-        ? product.category.id
-        : null,
-
-    brand: product.brand || "",
-    rating: product.rating || 0,
-    discount: product.discount || 0
-}));
+        const backendProducts =
+            await productResponse.json();
 
 
+        // =====================================================
+        // CONVERT BACKEND PRODUCTS
+        // =====================================================
+        products = backendProducts.map(product => ({
+            id: product.id,
+            name: product.name,
+            description: product.description,
+            price: product.price,
+            originalPrice: product.originalPrice,
+            image: product.image,
+            stock: product.stock,
 
-        // ================= FESTIVAL & RELATIONSHIP =================
-        // Keep these temporarily from data.json
-        const response = await fetch("data.json");
+            category: product.category
+                ? product.category.id
+                : null,
 
-        if (!response.ok) {
-            throw new Error(
-                "data.json Error: " +
-                response.status
-            );
-        }
+            categoryName: product.category
+                ? product.category.name
+                : null,
 
-        const data = await response.json();
+            festival: product.festival
+                ? product.festival.id
+                : null,
 
-        festivalProducts =
-            data.festivalProducts || [];
+            festivalName: product.festival
+                ? product.festival.name
+                : null,
 
-        relationshipProducts =
-            data.relationshipProducts || [];
+            relationship: product.relationship
+                ? product.relationship.id
+                : null,
+
+            relationshipName: product.relationship
+                ? product.relationship.name
+                : null,
+
+            brand: product.brand || "",
+            rating: product.rating || 0,
+            discount: product.discount || 0
+        }));
+
+        // =====================================================
+        // OLD DATA.JSON PRODUCTS
+        // =====================================================
+
+        // Keep empty because products now come from backend
+        festivalProducts = [];
+
+        relationshipProducts = [];
 
 
-        // ================= DEBUG =================
+        // =====================================================
+        // DEBUG
+        // =====================================================
+
         console.log(
-            "BACKEND CATEGORIES:",
+            "================================="
+        );
+
+        console.log(
+            "CATEGORIES:",
             categories
         );
 
         console.log(
-            "BACKEND PRODUCTS:",
+            "FESTIVALS:",
+            festivals
+        );
+
+        console.log(
+            "PRODUCTS:",
             products
         );
 
         console.log(
-            "FESTIVAL PRODUCTS:",
-            festivalProducts
+            "PRODUCT COUNT:",
+            products.length
         );
 
         console.log(
-            "RELATIONSHIP PRODUCTS:",
-            relationshipProducts
+            "================================="
         );
 
 
-        // ================= START APP =================
+        // =====================================================
+        // INITIALIZE APPLICATION
+        // =====================================================
+
         initializeApp();
+
 
     } catch (error) {
 
@@ -336,13 +386,21 @@ products = backendProducts.map(product => ({
         );
 
         document.body.innerHTML = `
-            <div style="text-align:center;padding:50px;">
+            <div style="
+                text-align:center;
+                padding:50px;
+                font-family:Arial;
+            ">
+
                 <h2>Data Loading Error</h2>
+
                 <p>${error.message}</p>
+
                 <p>
-                    Make sure Spring Boot is running
-                    on port 8080.
+                    Make sure your Spring Boot backend
+                    is running on port 8080.
                 </p>
+
             </div>
         `;
     }
@@ -351,6 +409,7 @@ products = backendProducts.map(product => ({
    INITIALIZE APP
 ========================================================= */
 function initializeApp() {
+
     loadUserData();
     loadCartData();
     loadOrdersData();
@@ -358,8 +417,16 @@ function initializeApp() {
 
     renderCategories();
     renderFestivals();
-     renderProducts(products);
-    
+
+    filteredProducts = [...products];
+
+    console.log(
+        "ALL PRODUCTS:",
+        products
+    );
+
+    renderProducts(filteredProducts);
+
     updateCartCount();
 
     showPage("home");
@@ -553,10 +620,17 @@ function getImagePath(image) {
         return "images/logo.jpeg";
     }
 
+    // Backend se complete URL aaye
+    if (image.startsWith("http://") || image.startsWith("https://")) {
+        return image;
+    }
+
+    // Already complete local path hai
     if (image.startsWith("images/")) {
         return image;
     }
 
+    // Sirf filename ho
     return "images/" + image;
 }
 /* =========================================================
@@ -768,56 +842,140 @@ function renderProducts(
    SHOW CATEGORY
 ========================================================= */
 function showCategory(categoryId) {
-    if (
-        categoryId ===
-        "recently-viewed"
-    ) {
-        filteredProducts =
-            products.filter(product =>
-                recentlyViewed.includes(
-                    product.id
-                )
-            );
-       const categoryTitle =
-            document.getElementById(
-                "categoryTitle"
-            );
+
+    console.log("=================================");
+    console.log("CLICKED CATEGORY:", categoryId);
+    console.log("=================================");
+
+    // Recently viewed
+    if (categoryId === "recently-viewed") {
+
+        filteredProducts = products.filter(product =>
+            recentlyViewed.some(
+                id => String(id) === String(product.id)
+            )
+        );
+
+        const categoryTitle =
+            document.getElementById("categoryTitle");
+
         if (categoryTitle) {
-          categoryTitle.textContent =
+            categoryTitle.textContent =
                 "Recently Viewed Products";
         }
+
     } else {
-        filteredProducts =
-            products.filter(product =>
-            product.category === categoryId
+
+        const selectedId =
+            String(categoryId).trim().toLowerCase();
+
+        // Find selected category
+        const selectedCategory = categories.find(
+            category =>
+                String(category.id)
+                    .trim()
+                    .toLowerCase() === selectedId
+        );
+
+        console.log(
+            "SELECTED CATEGORY:",
+            selectedCategory
+        );
+
+
+        const selectedCategoryName =
+            selectedCategory
+                ? String(selectedCategory.name)
+                    .trim()
+                    .toLowerCase()
+                : "";
+
+
+        console.log(
+            "SELECTED CATEGORY NAME:",
+            selectedCategoryName
+        );
+
+
+        // Filter products
+        filteredProducts = products.filter(product => {
+
+            const productCategoryId =
+                product.category != null
+                    ? String(product.category)
+                        .trim()
+                        .toLowerCase()
+                    : "";
+
+            const productCategoryName =
+                product.categoryName != null
+                    ? String(product.categoryName)
+                        .trim()
+                        .toLowerCase()
+                    : "";
+
+
+            console.log(
+                "PRODUCT:",
+                product.name,
+                "| CATEGORY ID:",
+                productCategoryId,
+                "| CATEGORY NAME:",
+                productCategoryName
             );
-        const category =
-            categories.find(
-                cart =>
-                    cart.id == categoryId
+
+
+            // Match by ID OR by category name
+            return (
+                productCategoryId === selectedId ||
+                productCategoryName === selectedCategoryName
             );
-       const categoryTitle =
-            document.getElementById(
-                "categoryTitle"
-            );
-        if (
-            category &&
-            categoryTitle
-        ) {
+        });
+
+
+        console.log(
+            "================================="
+        );
+
+        console.log(
+            "FILTERED PRODUCTS:",
+            filteredProducts
+        );
+
+        console.log(
+            "FILTERED PRODUCT COUNT:",
+            filteredProducts.length
+        );
+
+        console.log(
+            "================================="
+        );
+
+
+        // Category title
+        const categoryTitle =
+            document.getElementById("categoryTitle");
+
+        if (categoryTitle) {
+
             categoryTitle.textContent =
-                category.name;
+                selectedCategory
+                    ? selectedCategory.name
+                    : "Products";
         }
     }
+
+
+    // Update brand filter
     populateFilters();
 
+
+    // Open category page
     showPage("category");
 
-    applyFilters();
 
-    console.log(
-        "Filtered Products:",
-        filteredProducts
-    );
+    // Apply price/sort/brand filters
+    applyFilters();
 }
 /* =========================================================
    POPULATE BRAND FILTER
@@ -3690,60 +3848,36 @@ const blogDetails = {
 
 
 // ===============================
-// SHOP BY RELATIONSHIP
+// LOAD RELATIONSHIPS FROM BACKEND
 // ===============================
 
-const relationships = [
-    {
-        id: "friend",
-        name: "Gifts for Friends",
-        description: "Special gifts for your best friends",
-        image: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600"
-    },
-    {
-        id: "sister",
-        name: "Gifts for Sister",
-        description: "Beautiful gifts for your loving sister",
-        image: "https://images.unsplash.com/photo-1511988617509-a57c8a288659?w=600"
-    },
-    {
-        id: "brother",
-        name: "Gifts for Brother",
-        description: "Cool and thoughtful gifts for brother",
-        image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600"
-    },
-    {
-        id: "mom",
-        name: "Gifts for Mom",
-        description: "Heartwarming gifts for your mom",
-        image: "https://images.unsplash.com/photo-1492725764893-90b379c2b6e7?w=600"
-    },
-    {
-        id: "dad",
-        name: "Gifts for Dad",
-        description: "Meaningful gifts for your dad",
-        image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600"
-    },
-    {
-        id: "couples",
-        name: "Gifts for Couples",
-        description: "Perfect gifts for special couples",
-        image: "https://images.unsplash.com/photo-1519741497674-611481863552?w=600"
-    },
-    {
-        id: "husband",
-        name: "Gifts for Husband",
-        description: "Special gifts for your husband",
-        image: "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=600"
-    },
-    {
-        id: "wife",
-        name: "Gifts for Wife",
-        description: "Beautiful gifts for your wife",
-        image: "https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=600"
-    }
-];
+async function loadRelationships() {
 
+    try {
+
+        const response = await fetch(
+            "http://localhost:8080/api/relationships"
+        );
+
+        if (!response.ok) {
+            throw new Error("Failed to load relationships");
+        }
+
+        relationships = await response.json();
+
+        console.log("Relationships loaded:", relationships);
+
+        renderRelationships();
+
+    } catch (error) {
+
+        console.error(
+            "Relationship loading error:",
+            error
+        );
+
+    }
+}
 
 // ===============================
 // RENDER RELATIONSHIPS
@@ -3800,28 +3934,52 @@ function renderRelationships() {
 // ===============================
 // RELATIONSHIP CLICK
 // ===============================
+// ===============================
+// RELATIONSHIP CLICK
+// ===============================
 
 function showRelationshipProducts(relationshipId) {
 
     console.log("Selected relationship:", relationshipId);
 
-    filteredProducts = relationshipProducts.filter(function(product) {
-        return product.relationship === relationshipId;
+    // Filter products coming from MySQL backend
+    filteredProducts = products.filter(function(product) {
+
+        return product.relationship &&
+            String(product.relationship).toLowerCase() ===
+            String(relationshipId).toLowerCase();
+
     });
 
     console.log("Relationship Products:", filteredProducts);
 
-    const categoryTitle = document.getElementById("categoryTitle");
+    const relationship = relationships.find(function(r) {
+
+        return String(r.id).toLowerCase() ===
+            String(relationshipId).toLowerCase();
+
+    });
+
+    const categoryTitle =
+        document.getElementById("categoryTitle");
 
     if (categoryTitle) {
-        categoryTitle.textContent = "Gifts for " + relationshipId;
+
+        if (relationship) {
+            categoryTitle.textContent = relationship.name;
+        } else {
+            categoryTitle.textContent =
+                "Gifts for " + relationshipId;
+        }
+
     }
 
     populateFilters();
 
     showPage("category");
 
-    renderProducts(filteredProducts);
+    applyFilters();
+
 }
 
 // ===============================
@@ -3830,7 +3988,7 @@ function showRelationshipProducts(relationshipId) {
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    renderRelationships();
+    loadRelationships();
 
 });
 
@@ -4703,3 +4861,30 @@ document.getElementById("loginForm").addEventListener("submit", async function (
         message.textContent = "Unable to connect to backend.";
     }
 });
+function showFestival(festivalId) {
+
+    console.log("Selected Festival ID:", festivalId);
+
+    filteredProducts = products.filter(product =>
+        product.festival !== null &&
+        String(product.festival) === String(festivalId)
+    );
+
+    console.log("Festival Products:", filteredProducts);
+
+    const festival = festivals.find(
+        f => String(f.id) === String(festivalId)
+    );
+
+    if (festival) {
+        const titleElement = document.getElementById("categoryTitle");
+
+        if (titleElement) {
+            titleElement.textContent = festival.name;
+        }
+    }
+
+    populateFilters();
+    showPage("category");
+    applyFilters();
+}

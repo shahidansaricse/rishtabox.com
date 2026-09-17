@@ -1,4 +1,4 @@
-package com.rishtabox.backend.entity;
+ package com.rishtabox.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -40,7 +40,6 @@ public class Product {
     @JoinColumn(name = "relationship_id")
     private Relationship relationship;
 
-    // Constructor for creating product
     public Product(
             String name,
             String description,

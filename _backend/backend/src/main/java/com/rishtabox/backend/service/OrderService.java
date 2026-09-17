@@ -44,50 +44,51 @@ public class OrderService {
             throw new RuntimeException("Invalid payment method");
         }
 
-        // 2. Find user
+        // 2. Check user ID
+        if (request.getUserId() == null) {
+            throw new RuntimeException("User ID is required");
+        }
+
+        // 3. Find user
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() ->
                         new RuntimeException("User not found"));
 
-        // 3. Find user's cart
+        // 4. Find user's cart
         Cart cart = cartRepository.findByUserId(user.getId())
                 .orElseThrow(() ->
                         new RuntimeException("Cart not found"));
 
-        // 4. Check cart
+        // 5. Check cart
         if (cart.getItems() == null || cart.getItems().isEmpty()) {
             throw new RuntimeException("Cart is empty");
         }
 
-        // 5. Create order
+        // 6. Create order
         Order order = new Order();
 
         order.setUser(user);
 
-        // Store payment method
         String paymentMethod =
                 request.getPaymentMethod().toUpperCase();
 
         order.setPaymentMethod(paymentMethod);
 
-        /*
-         * COD:
-         * Payment is not required online,
-         * so order can be placed directly.
-         */
+        // IMPORTANT:
+        // Payment has not been completed yet.
+        order.setPaymentStatus("PENDING");
+
+        // COD can be placed immediately.
+        // Razorpay waits for successful payment.
         if (paymentMethod.equals("COD")) {
             order.setOrderStatus("PLACED");
         } else {
-
-            /*
-             * Razorpay payment has not succeeded yet.
-             */
             order.setOrderStatus("PAYMENT_PENDING");
         }
 
         order.setCreatedAt(LocalDateTime.now());
 
-        // 6. Calculate total using Double
+        // 7. Calculate total
         double totalAmount = 0.0;
 
         for (CartItem cartItem : cart.getItems()) {
@@ -100,12 +101,11 @@ public class OrderService {
             // Connect product
             orderItem.setProduct(cartItem.getProduct());
 
-            // Product quantity
+            // Quantity
             orderItem.setQuantity(cartItem.getQuantity());
 
             // Product price
-            Double price =
-                    cartItem.getProduct().getPrice();
+            Double price = cartItem.getProduct().getPrice();
 
             if (price == null) {
                 throw new RuntimeException(
@@ -114,39 +114,31 @@ public class OrderService {
 
             orderItem.setPrice(price);
 
-            // Calculate item total
+            // Item total
             double itemTotal =
                     price * cartItem.getQuantity();
 
-            // Add to order total
             totalAmount += itemTotal;
 
             // Add item to order
             order.getItems().add(orderItem);
         }
 
-        // 7. Set total amount
+        // 8. Set total
         order.setTotalAmount(totalAmount);
 
-        // 8. Save order
+        // 9. Save order
         Order savedOrder =
                 orderRepository.save(order);
 
-        /*
-         * COD:
-         * Order is already placed, so clear cart.
-         *
-         * Razorpay:
-         * DO NOT clear cart here.
-         * Clear it only after successful Razorpay payment.
-         */
+        // 10. Clear cart only for COD
         if (paymentMethod.equals("COD")) {
 
             cart.getItems().clear();
             cartRepository.save(cart);
         }
 
-        // 9. Return saved order
+        // 11. Return saved order
         return savedOrder;
     }
 

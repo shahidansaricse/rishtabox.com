@@ -4,14 +4,21 @@ public class ProductRequest {
 
     private String name;
     private String description;
+
     private Double price;
     private Double originalPrice;
+
     private String image;
     private Integer stock;
 
     private String categoryId;
     private String festivalId;
-    private Long relationshipId;
+    private String relationshipId;
+
+
+    // =========================
+    // Name
+    // =========================
 
     public String getName() {
         return name;
@@ -21,6 +28,11 @@ public class ProductRequest {
         this.name = name;
     }
 
+
+    // =========================
+    // Description
+    // =========================
+
     public String getDescription() {
         return description;
     }
@@ -28,6 +40,11 @@ public class ProductRequest {
     public void setDescription(String description) {
         this.description = description;
     }
+
+
+    // =========================
+    // Price
+    // =========================
 
     public Double getPrice() {
         return price;
@@ -37,6 +54,11 @@ public class ProductRequest {
         this.price = price;
     }
 
+
+    // =========================
+    // Original Price
+    // =========================
+
     public Double getOriginalPrice() {
         return originalPrice;
     }
@@ -44,6 +66,11 @@ public class ProductRequest {
     public void setOriginalPrice(Double originalPrice) {
         this.originalPrice = originalPrice;
     }
+
+
+    // =========================
+    // Image
+    // =========================
 
     public String getImage() {
         return image;
@@ -53,6 +80,11 @@ public class ProductRequest {
         this.image = image;
     }
 
+
+    // =========================
+    // Stock
+    // =========================
+
     public Integer getStock() {
         return stock;
     }
@@ -60,6 +92,11 @@ public class ProductRequest {
     public void setStock(Integer stock) {
         this.stock = stock;
     }
+
+
+    // =========================
+    // Category ID
+    // =========================
 
     public String getCategoryId() {
         return categoryId;
@@ -69,6 +106,11 @@ public class ProductRequest {
         this.categoryId = categoryId;
     }
 
+
+    // =========================
+    // Festival ID
+    // =========================
+
     public String getFestivalId() {
         return festivalId;
     }
@@ -77,11 +119,16 @@ public class ProductRequest {
         this.festivalId = festivalId;
     }
 
-    public Long getRelationshipId() {
+
+    // =========================
+    // Relationship ID
+    // =========================
+
+    public String getRelationshipId() {
         return relationshipId;
     }
 
-    public void setRelationshipId(Long relationshipId) {
+    public void setRelationshipId(String relationshipId) {
         this.relationshipId = relationshipId;
     }
 }
