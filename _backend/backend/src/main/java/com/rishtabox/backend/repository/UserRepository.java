@@ -1,4 +1,5 @@
 package com.rishtabox.backend.repository;
+
 import com.rishtabox.backend.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 

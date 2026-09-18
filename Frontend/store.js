@@ -12,6 +12,8 @@ function getImagePath(image) {
 /* =========================================================
    DATA
 ========================================================= */
+const API_BASE_URL = "http://localhost:8080";
+
 let categories = [];
 let products = [];
 let festivalProducts = [];
@@ -1347,59 +1349,143 @@ function showProduct(productId) {
     `;
     showPage("product");
 }
+
 /* =========================================================
    ADD TO CART
 ========================================================= */
-function addToCart(productId) {
-const allProducts = [
-    ...products,
-    ...festivalProducts,
-    ...relationshipProducts
+async function addToCart(productId) {
 
-];
+    // User must be logged in
+    if (!currentUser || !currentUser.id) {
+        alert("Please login first.");
+        showPage("login");
+        return;
+    }
 
-const product = allProducts.find(
-    product => String(product.id) === String(productId)
-);
+    const allProducts = [
+        ...products,
+        ...festivalProducts,
+        ...relationshipProducts
+    ];
+
+    const product = allProducts.find(
+        product => String(product.id) === String(productId)
+    );
+
     if (!product) {
         console.error("Product not found:", productId);
         alert("Product not found.");
         return;
     }
+
     const colorElement = document.getElementById("selectedColor");
     const sizeElement = document.getElementById("selectedSize");
 
     const selectedColor = colorElement ? colorElement.value : "";
     const selectedSize = sizeElement ? sizeElement.value : "";
 
+    // =====================================================
+    // 1. Update frontend/localStorage cart
+    // =====================================================
+
     const existingItem = cart.find(item =>
         String(item.id) === String(product.id) &&
         item.color === selectedColor &&
         item.size === selectedSize
     );
+
     if (existingItem) {
+
         existingItem.quantity =
             Number(existingItem.quantity || 0) + 1;
+
     } else {
+
         cart.push({
             id: product.id,
             name: product.name || "",
             brand: product.brand || "",
             price: Number(product.price) || 0,
+
             originalPrice:
                 Number(product.originalPrice) ||
                 Number(product.price) ||
                 0,
+
             discount: Number(product.discount) || 0,
             image: product.image || "",
+
             color: selectedColor,
             size: selectedSize,
+
             quantity: 1
         });
     }
+
     saveCartData();
     updateCartCount();
-    alert("Product added to cart");
+
+    // =====================================================
+    // 2. Save product in BACKEND / MySQL
+    // =====================================================
+
+    try {
+
+        const token = localStorage.getItem("token");
+
+        const response = await fetch(
+            "http://localhost:8080/api/cart/add",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+
+                body: JSON.stringify({
+                    userId: currentUser.id,
+                    productId: Number(product.id),
+                    quantity: 1
+                })
+            }
+        );
+
+        const responseText = await response.text();
+
+        let data = {};
+
+        try {
+            data = JSON.parse(responseText);
+        } catch (e) {
+            console.log("Backend response:", responseText);
+        }
+
+        console.log("Cart API Status:", response.status);
+        console.log("Cart API Response:", data);
+
+        if (!response.ok) {
+
+            alert(
+                "Cart could not be saved in database.\n" +
+                (data.message || responseText || "Unknown error")
+            );
+
+            return;
+        }
+
+        console.log("Product successfully saved to backend cart.");
+
+        alert("Product added to cart");
+
+    } catch (error) {
+
+        console.error("Cart API Error:", error);
+
+        alert(
+            "Product added locally, but could not connect to backend."
+        );
+    }
 }
 /* =========================================================
    BUY NOW
@@ -2000,273 +2086,427 @@ function proceedToPayment() {
 // ======================================================
 // PLACE ORDER
 // ======================================================
-function placeOrder() {
+async function placeOrder() {
 
-    // Check payment method
-    const selectedPayment =
-        document.querySelector(
-            'input[name="payment"]:checked'
-        );
+    // ==========================================
+    // 1. CHECK PAYMENT METHOD
+    // ==========================================
 
+    const selectedPayment = document.querySelector(
+        'input[name="payment"]:checked'
+    );
 
     if (!selectedPayment) {
-
-        alert(
-            "Please select a payment method."
-        );
-
+        alert("Please select a payment method.");
         return;
     }
 
 
-    // Check cart
-    if (
-        !Array.isArray(cart) ||
-        cart.length === 0
-    ) {
+    // ==========================================
+    // 2. CHECK LOGIN / USER
+    // ==========================================
 
-        alert(
-            "Your cart is empty."
-        );
+    if (!currentUser || !currentUser.id) {
+        alert("User ID not found. Please login again.");
+        return;
+    }
 
+    console.log("Current User:", currentUser);
+    console.log("User ID:", currentUser.id);
+
+
+    // ==========================================
+    // 3. CHECK CART
+    // ==========================================
+
+    if (!Array.isArray(cart) || cart.length === 0) {
+        alert("Your cart is empty.");
         return;
     }
 
 
-    // Check customer details
+    // ==========================================
+    // 4. CHECK CUSTOMER DETAILS
+    // ==========================================
+
     if (
         !currentUser.name ||
         !currentUser.phone ||
         !currentUser.address
     ) {
-
-        alert(
-            "Please enter your delivery details."
-        );
+        alert("Please enter your delivery details.");
 
         currentOrderSteps = 1;
-
         renderOrderSteps();
 
         return;
     }
 
 
-    const paymentMethod =
-        selectedPayment.value;
-
-
     // ==========================================
-    // GENERATE UNIQUE ORDER ID
+    // 5. GET PAYMENT METHOD
     // ==========================================
 
-    const orderId =
-        "ORD" +
-        Date.now() +
-        Math.floor(
-            Math.random() * 1000
-        );
+    const frontendPaymentMethod = selectedPayment.value;
+
+    console.log(
+        "Frontend Payment:",
+        frontendPaymentMethod
+    );
 
 
-    const orderDate =
-        new Date();
+    let backendPaymentMethod;
 
 
-    const deliveryDate =
-        new Date();
+    if (
+        frontendPaymentMethod === "Cash on Delivery" ||
+        frontendPaymentMethod === "COD"
+    ) {
 
-    deliveryDate.setDate(
-        deliveryDate.getDate() + 7
+        backendPaymentMethod = "COD";
+
+    } else if (
+        frontendPaymentMethod === "Online Payment" ||
+        frontendPaymentMethod === "RAZORPAY"
+    ) {
+
+        backendPaymentMethod = "RAZORPAY";
+
+    } else {
+
+        alert("Invalid payment method.");
+        return;
+    }
+
+
+    console.log(
+        "Backend Payment:",
+        backendPaymentMethod
     );
 
 
     // ==========================================
-    // CALCULATE TOTAL
+    // 6. CALCULATE TOTAL
     // ==========================================
 
-    const cartTotal =
-        cart.reduce(
-            (total, item) =>
-                total +
+    const cartTotal = cart.reduce(
+        (total, item) => {
+
+            return total +
                 Number(item.price || 0) *
-                Number(item.quantity || 0),
-            0
-        );
+                Number(item.quantity || 0);
+
+        },
+        0
+    );
 
 
     const deliveryCharges =
-        cartTotal >= 500
-            ? 0
-            : 50;
+        cartTotal >= 500 ? 0 : 50;
 
 
     const finalTotal =
         cartTotal + deliveryCharges;
-    if (paymentMethod === "Online Payment") {
-        payWithRazorpay(finalTotal);
-        return;
-    }
+
+
+    console.log(
+        "Cart Total:",
+        cartTotal
+    );
+
+    console.log(
+        "Delivery Charges:",
+        deliveryCharges
+    );
+
+    console.log(
+        "Frontend Final Total:",
+        finalTotal
+    );
+
 
     // ==========================================
-    // CREATE ORDER
+    // 7. CREATE ORDER IN MYSQL
     // ==========================================
 
-    const order = {
+    try {
 
-        id: orderId,
+        const token =
+            localStorage.getItem("token");
 
-        items: cart.map(item => ({
-            ...item
-        })),
 
-        total: cartTotal,
+        console.log(
+            "Creating database order..."
+        );
 
-        deliveryCharges: deliveryCharges,
 
-        finalTotal: finalTotal,
+        const orderResponse = await fetch(
+            "http://localhost:8080/api/orders",
+            {
+                method: "POST",
 
-        paymentMethod: paymentMethod,
+                headers: {
+                    "Content-Type": "application/json",
 
-        orderDate:
-            orderDate.toISOString(),
+                    "Authorization":
+                        `Bearer ${token}`
+                },
 
-        deliveryDate:
-            deliveryDate.toISOString(),
+                body: JSON.stringify({
 
-        status:
-            paymentMethod ===
-            "Cash on Delivery"
-                ? "confirmed"
-                : "pending",
+                    userId:
+                    currentUser.id,
 
-        name:
+                    paymentMethod:
+                    backendPaymentMethod
+                })
+            }
+        );
+
+
+        // ==========================================
+        // 8. READ ORDER RESPONSE
+        // ==========================================
+
+        const orderText =
+            await orderResponse.text();
+
+
+        let orderData = {};
+
+
+        try {
+
+            orderData =
+                JSON.parse(orderText);
+
+        } catch (e) {
+
+            console.error(
+                "Order response is not JSON:",
+                orderText
+            );
+        }
+
+
+        console.log(
+            "Order API Status:",
+            orderResponse.status
+        );
+
+
+        console.log(
+            "Order API Response:",
+            orderData
+        );
+
+
+        // ==========================================
+        // 9. CHECK ORDER API
+        // ==========================================
+
+        if (!orderResponse.ok) {
+
+            alert(
+                "Order failed: " +
+                (
+                    orderData.message ||
+                    orderText ||
+                    "Backend could not create order."
+                )
+            );
+
+            return;
+        }
+
+
+        // ==========================================
+        // 10. GET DATABASE ORDER ID
+        // ==========================================
+
+        const backendOrderId =
+            orderData.id;
+
+
+        console.log(
+            "Database Order ID:",
+            backendOrderId
+        );
+
+
+        // ==========================================
+        // 11. CHECK DATABASE ORDER ID
+        // ==========================================
+
+        if (!backendOrderId) {
+
+            alert(
+                "Order created but database Order ID was not received."
+            );
+
+            return;
+        }
+
+
+        // ==========================================
+        // 12. RAZORPAY PAYMENT
+        // ==========================================
+
+        if (
+            backendPaymentMethod === "RAZORPAY"
+        ) {
+
+            console.log(
+                "Starting Razorpay for Order:",
+                backendOrderId
+            );
+
+
+            await payWithRazorpay(
+                backendOrderId,
+                orderData
+            );
+
+
+            // IMPORTANT:
+            // Razorpay function will handle
+            // payment verification and success.
+
+            return;
+        }
+
+
+        // ==========================================
+        // 13. COD ORDER SUCCESS
+        // ==========================================
+
+        const orderId =
+            "ORD" +
+            Date.now() +
+            Math.floor(
+                Math.random() * 1000
+            );
+
+
+        const orderDate =
+            new Date();
+
+
+        const deliveryDate =
+            new Date();
+
+
+        deliveryDate.setDate(
+            deliveryDate.getDate() + 7
+        );
+
+
+        // ==========================================
+        // 14. CREATE FRONTEND COD ORDER
+        // ==========================================
+
+        const order = {
+
+            id:
+            orderId,
+
+            backendOrderId:
+            backendOrderId,
+
+            items:
+                cart.map(item => ({
+                    ...item
+                })),
+
+            total:
+            cartTotal,
+
+            deliveryCharges:
+            deliveryCharges,
+
+            finalTotal:
+            finalTotal,
+
+            paymentMethod:
+            frontendPaymentMethod,
+
+            paymentStatus:
+                "PENDING",
+
+            orderDate:
+                orderDate.toISOString(),
+
+            deliveryDate:
+                deliveryDate.toISOString(),
+
+            status:
+                "confirmed",
+
+            name:
             currentUser.name,
 
-        email:
+            email:
             currentUser.email,
 
-        phone:
+            phone:
             currentUser.phone,
 
-        address:
+            address:
             currentUser.address
-
-    };
-
-
-    // ==========================================
-    // SAVE ORDER FIRST
-    // ==========================================
-
-    orders.push(order);
-
-    saveOrdersData();
+        };
 
 
-    // ==========================================
-    // CLEAR CART ONLY AFTER SAVING ORDER
-    // ==========================================
-
-    cart = [];
-
-    saveCartData();
-
-    updateCartCount();
-
-
-    // ==========================================
-    // SHOW SUCCESS SCREEN
-    // ==========================================
-
-    const orderSteps =
-        document.getElementById(
-            "orderSteps"
+        console.log(
+            "Frontend COD Order:",
+            order
         );
 
 
-    if (!orderSteps) {
+        // ==========================================
+        // 15. SAVE COD ORDER
+        // ==========================================
+
+        orders.push(order);
+
+        saveOrdersData();
+
+
+        // ==========================================
+        // 16. CLEAR FRONTEND CART
+        // ==========================================
+
+        cart = [];
+
+        saveCartData();
+
+        updateCartCount();
+
+
+        // ==========================================
+        // 17. SHOW SUCCESS
+        // ==========================================
+
+        showOrderSuccess(
+            frontendOrderId,
+            "Online Payment",
+            finalTotal,
+            deliveryDate
+        );
+
+
+    } catch (error) {
 
         console.error(
-            "orderSteps element not found after order creation."
+            "Order API Error:",
+            error
         );
 
-        // Still allow user to see the order
-        showPage("orders");
 
-        return;
+        alert(
+            "Could not connect to the backend. " +
+            "Please make sure Spring Boot is running."
+        );
     }
-
-
-    orderSteps.innerHTML = `
-
-        <div class="order-success">
-
-            <h1>
-                🎉 Order Placed Successfully!
-            </h1>
-
-
-            <p>
-                Your order has been placed successfully.
-            </p>
-
-
-            <p>
-                Order ID:
-                <strong>
-                    ${orderId}
-                </strong>
-            </p>
-
-
-            <p>
-                Payment Method:
-                <strong>
-                    ${paymentMethod}
-                </strong>
-            </p>
-
-
-            <p>
-                Total Amount:
-                <strong>
-                    ₹${finalTotal}
-                </strong>
-            </p>
-
-
-            <p>
-                Expected Delivery:
-                <strong>
-                    ${deliveryDate.toLocaleDateString()}
-                </strong>
-            </p>
-
-
-            <div class="order-actions">
-
-                <button
-                    type="button"
-                    class="btn-primary"
-                    onclick="showPage('orders')"
-                >
-                    View My Orders
-                </button>
-
-
-                <button
-                    type="button"
-                    class="btn-secondary"
-                    onclick="showPage('home')"
-                >
-                    Continue Shopping
-                </button>
-
-            </div>
-
-        </div>
-
-    `;
 }
 // ======================================================
 // RENDER ORDERS
@@ -4331,161 +4571,161 @@ if (signupForm) {
 const loginForm =
     document.getElementById("loginForm");
 
-
-if (loginForm) {
-
-    loginForm.addEventListener(
-        "submit",
-        function (event) {
-
-            event.preventDefault();
-
-
-            const loginValue =
-                document.getElementById("loginEmail")
-                .value
-                .trim();
-
-
-            const password =
-                document.getElementById("loginPassword")
-                .value;
-
-
-            const message =
-                document.getElementById("loginMessage");
-
-
-            message.textContent = "";
-
-            message.className =
-                "auth-message";
-
-
-            if (loginValue === "") {
-
-                showLoginError(
-                    "Please enter your email or mobile number."
-                );
-
-                return;
-            }
-
-
-            if (password === "") {
-
-                showLoginError(
-                    "Please enter your password."
-                );
-
-                return;
-            }
-
-
-            /* Get users */
-
-            const users =
-                JSON.parse(
-                    localStorage.getItem(
-                        "rishtaBoxUsers"
-                    )
-                ) || [];
-
-
-            if (users.length === 0) {
-
-                showLoginError(
-                    "No account found. Please create an account first."
-                );
-
-                return;
-            }
-
-
-            /* Find user */
-
-            const user =
-                users.find(function (item) {
-
-                    return (
-
-                        item.email.toLowerCase() ===
-                        loginValue.toLowerCase()
-
-                        ||
-
-                        item.mobile ===
-                        loginValue
-
-                    );
-
-                });
-
-
-            if (!user) {
-
-                showLoginError(
-                    "Account not found. Please check your details."
-                );
-
-                return;
-            }
-
-
-            /* Password */
-
-            if (user.password !== password) {
-
-                showLoginError(
-                    "Incorrect password. Please try again."
-                );
-
-                return;
-            }
-
-
-            /* Login */
-
-            localStorage.setItem(
-                "rishtaBoxLoggedIn",
-                "true"
-            );
-
-
-            localStorage.setItem(
-                "rishtaBoxCurrentUser",
-                JSON.stringify(user)
-            );
-
-
-            /* Success */
-
-            message.textContent =
-                "Welcome back, " +
-                user.name +
-                "! ❤️";
-
-            message.className =
-                "auth-message success";
-
-
-            /* Update account */
-
-            updateAccountNav(user);
-
-
-            /* Go home */
-
-            setTimeout(function () {
-
-                showPage("home");
-
-            }, 900);
-
-        }
-    );
-
-}
+//
+// if (loginForm) {
+//
+//     loginForm.addEventListener(
+//         "submit",
+//         function (event) {
+//
+//             event.preventDefault();
+//
+//
+//             const loginValue =
+//                 document.getElementById("loginEmail")
+//                 .value
+//                 .trim();
+//
+//
+//             const password =
+//                 document.getElementById("loginPassword")
+//                 .value;
+//
+//
+//             const message =
+//                 document.getElementById("loginMessage");
+//
+//
+//             message.textContent = "";
+//
+//             message.className =
+//                 "auth-message";
+//
+//
+//             if (loginValue === "") {
+//
+//                 showLoginError(
+//                     "Please enter your email or mobile number."
+//                 );
+//
+//                 return;
+//             }
+//
+//
+//             if (password === "") {
+//
+//                 showLoginError(
+//                     "Please enter your password."
+//                 );
+//
+//                 return;
+//             }
+//
+//
+//             /* Get users */
+//
+//             const users =
+//                 JSON.parse(
+//                     localStorage.getItem(
+//                         "rishtaBoxUsers"
+//                     )
+//                 ) || [];
+//
+//
+//             if (users.length === 0) {
+//
+//                 showLoginError(
+//                     "No account found. Please create an account first."
+//                 );
+//
+//                 return;
+//             }
+//
+//
+//             /* Find user */
+//
+//             const user =
+//                 users.find(function (item) {
+//
+//                     return (
+//
+//                         item.email.toLowerCase() ===
+//                         loginValue.toLowerCase()
+//
+//                         ||
+//
+//                         item.mobile ===
+//                         loginValue
+//
+//                     );
+//
+//                 });
+//
+//
+//             if (!user) {
+//
+//                 showLoginError(
+//                     "Account not found. Please check your details."
+//                 );
+//
+//                 return;
+//             }
+//
+//
+//             /* Password */
+//
+//             if (user.password !== password) {
+//
+//                 showLoginError(
+//                     "Incorrect password. Please try again."
+//                 );
+//
+//                 return;
+//             }
+//
+//
+//             /* Login */
+//
+//             localStorage.setItem(
+//                 "rishtaBoxLoggedIn",
+//                 "true"
+//             );
+//
+//
+//             localStorage.setItem(
+//                 "rishtaBoxCurrentUser",
+//                 JSON.stringify(user)
+//             );
+//
+//
+//             /* Success */
+//
+//             message.textContent =
+//                 "Welcome back, " +
+//                 user.name +
+//                 "! ❤️";
+//
+//             message.className =
+//                 "auth-message success";
+//
+//
+//             /* Update account */
+//
+//             updateAccountNav(user);
+//
+//
+//             /* Go home */
+//
+//             setTimeout(function () {
+//
+//                 showPage("home");
+//
+//             }, 900);
+//
+//         }
+//     );
+//
+// }
 
 
 /* =========================
@@ -4523,47 +4763,31 @@ function updateAccountNav(user) {
 
 function loadLoggedInUser() {
 
-    const user =
-        JSON.parse(
-            localStorage.getItem(
-                "rishtaBoxCurrentUser"
-            )
-        );
+    const savedUser = localStorage.getItem("userData");
 
+    console.log("Saved userData:", savedUser);
 
-    if (!user) {
+    if (!savedUser) {
+        console.log("No user found in localStorage");
         return;
     }
 
+    const user = JSON.parse(savedUser);
+
+    console.log("Loaded user:", user);
+    console.log("Loaded User ID:", user.id);
+
+    currentUser = user;
 
     updateAccountNav(user);
 
+    const name = document.getElementById("userName");
+    const email = document.getElementById("userEmail");
+    const phone = document.getElementById("userPhone");
 
-    /* Fill Account page */
-
-    const name =
-        document.getElementById("userName");
-
-    const email =
-        document.getElementById("userEmail");
-
-    const phone =
-        document.getElementById("userPhone");
-
-
-    if (name) {
-        name.value = user.name || "";
-    }
-
-
-    if (email) {
-        email.value = user.email || "";
-    }
-
-
-    if (phone) {
-        phone.value = user.mobile || "";
-    }
+    if (name) name.value = user.name || "";
+    if (email) email.value = user.email || "";
+    if (phone) phone.value = user.mobile || user.phone || "";
 }
 
 
@@ -4699,54 +4923,623 @@ document.addEventListener(
 
     }
 );
-function payWithRazorpay(amount) {
+async function payWithRazorpay(backendOrderId, orderData) {
+
+    console.log("===== RAZORPAY PAYMENT START =====");
+    console.log("Backend Order ID:", backendOrderId);
 
     if (typeof Razorpay === "undefined") {
-        alert("Razorpay failed to load. Please check your internet connection.");
+        alert(
+            "Razorpay failed to load. Please check your internet connection."
+        );
         return;
     }
 
-    const options = {
-        key: "rzp_test_TcGIuj6KWkDynr",
-        amount: Math.round(amount * 100),
-        currency: "INR",
-        name: "RishtaBox",
-        description: "RishtaBox Order",
+    if (!backendOrderId) {
+        alert("Order ID not found.");
+        return;
+    }
 
-      handler: function (response) {
+    const token = localStorage.getItem("token");
 
-          alert(
-              "Payment successful!\nPayment ID: " +
-              response.razorpay_payment_id
-          );
+    // IMPORTANT:
+    // Keep cart data before any backend/local cart clearing
+    const paidCart = Array.isArray(cart)
+        ? cart.map(item => ({ ...item }))
+        : [];
 
-          saveOnlineOrder(response);
+    console.log("Paid Cart Snapshot:", paidCart);
 
-          // Show RishtaBox order success page
-          showPage("orderPage");
-      },
+    if (paidCart.length === 0) {
+        alert("Cart is empty.");
+        return;
+    }
 
-        prefill: {
-            name: currentUser.name || "",
-            email: currentUser.email || "",
-            contact: currentUser.phone || ""
-        },
+    try {
 
-        theme: {
-            color: "#e35486"
-        }
-    };
+        // =====================================================
+        // 1. CREATE RAZORPAY ORDER
+        // =====================================================
 
-    const razorpay = new Razorpay(options);
-
-    razorpay.on("payment.failed", function (response) {
-        alert(
-            "Payment failed: " +
-            response.error.description
+        console.log(
+            "Creating Razorpay order for DB Order:",
+            backendOrderId
         );
-    });
 
-    razorpay.open();
+        const paymentOrderResponse = await fetch(
+            "http://localhost:8080/api/payments/create-order",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+
+                body: JSON.stringify({
+                    orderId: backendOrderId
+                })
+            }
+        );
+
+        const paymentOrderText =
+            await paymentOrderResponse.text();
+
+        let paymentOrder = {};
+
+        try {
+            paymentOrder =
+                JSON.parse(paymentOrderText);
+        } catch (e) {
+            console.error(
+                "Payment order response is not JSON:",
+                paymentOrderText
+            );
+        }
+
+        console.log(
+            "Create Payment Status:",
+            paymentOrderResponse.status
+        );
+
+        console.log(
+            "Create Payment Response:",
+            paymentOrder
+        );
+
+        if (!paymentOrderResponse.ok) {
+
+            alert(
+                "Could not create Razorpay payment: " +
+                (
+                    paymentOrder.message ||
+                    paymentOrderText ||
+                    "Payment order creation failed."
+                )
+            );
+
+            return;
+        }
+
+        const razorpayOrderId =
+            paymentOrder.razorpayOrderId;
+
+        if (!razorpayOrderId) {
+
+            alert(
+                "Razorpay Order ID was not received from backend."
+            );
+
+            console.error(
+                "Missing Razorpay Order ID:",
+                paymentOrder
+            );
+
+            return;
+        }
+
+        console.log(
+            "Razorpay Order ID:",
+            razorpayOrderId
+        );
+
+        // =====================================================
+        // 2. PAYMENT AMOUNT
+        // =====================================================
+
+        const razorpayAmount =
+            Number(paymentOrder.amount);
+
+        if (!razorpayAmount || razorpayAmount <= 0) {
+
+            alert(
+                "Invalid payment amount received from backend."
+            );
+
+            return;
+        }
+
+        console.log(
+            "Razorpay Amount:",
+            razorpayAmount
+        );
+
+        // =====================================================
+        // 3. RAZORPAY CHECKOUT
+        // =====================================================
+
+        const options = {
+
+            key: "rzp_test_TcGIuj6KWkDynr",
+
+            amount:
+                Math.round(
+                    razorpayAmount * 100
+                ),
+
+            currency: "INR",
+
+            name: "RishtaBox",
+
+            description:
+                "RishtaBox Order",
+
+            order_id:
+            razorpayOrderId,
+
+            handler: async function (response) {
+
+                console.log(
+                    "===== RAZORPAY PAYMENT SUCCESS ====="
+                );
+
+                console.log(
+                    "Razorpay Response:",
+                    response
+                );
+
+                // =================================================
+                // 4. VERIFY PAYMENT
+                // =================================================
+
+                try {
+
+                    console.log(
+                        "Sending payment verification to backend..."
+                    );
+
+                    const verifyResponse =
+                        await fetch(
+                            "http://localhost:8080/api/payments/verify",
+                            {
+                                method: "POST",
+
+                                headers: {
+                                    "Content-Type":
+                                        "application/json",
+
+                                    "Authorization":
+                                        `Bearer ${token}`
+                                },
+
+                                body: JSON.stringify({
+
+                                    orderId:
+                                    backendOrderId,
+
+                                    razorpayOrderId:
+                                    response.razorpay_order_id,
+
+                                    razorpayPaymentId:
+                                    response.razorpay_payment_id,
+
+                                    razorpaySignature:
+                                    response.razorpay_signature
+                                })
+                            }
+                        );
+
+                    const verifyText =
+                        await verifyResponse.text();
+
+                    let verifyData = {};
+
+                    try {
+
+                        verifyData =
+                            JSON.parse(verifyText);
+
+                    } catch (e) {
+
+                        console.error(
+                            "Verify response is not JSON:",
+                            verifyText
+                        );
+                    }
+
+                    console.log(
+                        "Verify Status:",
+                        verifyResponse.status
+                    );
+
+                    console.log(
+                        "Verify Response:",
+                        verifyData
+                    );
+
+                    // =================================================
+                    // PAYMENT VERIFICATION FAILED
+                    // =================================================
+
+                    if (!verifyResponse.ok) {
+
+                        console.error(
+                            "BACKEND PAYMENT VERIFICATION FAILED"
+                        );
+
+                        alert(
+                            "Payment verification failed: " +
+                            (
+                                verifyData.message ||
+                                verifyText ||
+                                "Payment verification failed."
+                            )
+                        );
+
+                        return;
+                    }
+
+                    // =================================================
+                    // PAYMENT VERIFIED
+                    // =================================================
+
+                    console.log(
+                        "===================================="
+                    );
+
+                    console.log(
+                        "PAYMENT VERIFIED SUCCESSFULLY"
+                    );
+
+                    console.log(
+                        "Database Order ID:",
+                        backendOrderId
+                    );
+
+                    console.log(
+                        "Razorpay Payment ID:",
+                        response.razorpay_payment_id
+                    );
+
+                    console.log(
+                        "===================================="
+                    );
+
+
+                    // =================================================
+                    // 5. CLEAR BACKEND CART
+                    // =================================================
+
+                    try {
+
+                        const clearCartResponse =
+                            await fetch(
+                                `http://localhost:8080/api/cart/clear/${currentUser.id}`,
+                                {
+                                    method: "DELETE",
+
+                                    headers: {
+                                        "Authorization":
+                                            `Bearer ${token}`
+                                    }
+                                }
+                            );
+
+                        console.log(
+                            "Backend Cart Clear Status:",
+                            clearCartResponse.status
+                        );
+
+                    } catch (cartError) {
+
+                        console.error(
+                            "Backend Cart Clear Error:",
+                            cartError
+                        );
+
+                        // Don't stop order success
+                    }
+
+
+                    // =================================================
+                    // 6. CREATE FRONTEND ORDER
+                    // =================================================
+
+                    console.log(
+                        "Creating frontend order..."
+                    );
+
+                    const frontendOrderId =
+                        "ORD" +
+                        Date.now() +
+                        Math.floor(
+                            Math.random() * 1000
+                        );
+
+                    const orderDate =
+                        new Date();
+
+                    const deliveryDate =
+                        new Date();
+
+                    deliveryDate.setDate(
+                        deliveryDate.getDate() + 7
+                    );
+
+
+                    // Calculate from paidCart
+                    const cartTotal =
+                        paidCart.reduce(
+                            (total, item) =>
+                                total +
+                                Number(item.price || 0) *
+                                Number(item.quantity || 0),
+                            0
+                        );
+
+
+                    const deliveryCharges =
+                        cartTotal >= 500
+                            ? 0
+                            : 50;
+
+
+                    const finalTotal =
+                        cartTotal +
+                        deliveryCharges;
+
+
+                    console.log(
+                        "Cart Total:",
+                        cartTotal
+                    );
+
+                    console.log(
+                        "Delivery Charges:",
+                        deliveryCharges
+                    );
+
+                    console.log(
+                        "Final Total:",
+                        finalTotal
+                    );
+
+
+                    const frontendOrder = {
+
+                        id:
+                        frontendOrderId,
+
+                        backendOrderId:
+                        backendOrderId,
+
+                        items:
+                            paidCart.map(item => ({
+                                ...item
+                            })),
+
+                        total:
+                        cartTotal,
+
+                        deliveryCharges:
+                        deliveryCharges,
+
+                        finalTotal:
+                        finalTotal,
+
+                        paymentMethod:
+                            "Online Payment",
+
+                        paymentStatus:
+                            "PAID",
+
+                        razorpayOrderId:
+                        response.razorpay_order_id,
+
+                        razorpayPaymentId:
+                        response.razorpay_payment_id,
+
+                        orderDate:
+                            orderDate.toISOString(),
+
+                        deliveryDate:
+                            deliveryDate.toISOString(),
+
+                        status:
+                            "confirmed",
+
+                        name:
+                        currentUser.name,
+
+                        email:
+                        currentUser.email,
+
+                        phone:
+                        currentUser.phone,
+
+                        address:
+                        currentUser.address
+                    };
+
+
+                    console.log(
+                        "Frontend Order Object:",
+                        frontendOrder
+                    );
+
+
+                    // =================================================
+                    // 7. SAVE FRONTEND ORDER
+                    // =================================================
+
+                    if (!Array.isArray(orders)) {
+                        orders = [];
+                    }
+
+                    orders.push(frontendOrder);
+
+                    saveOrdersData();
+
+                    console.log(
+                        "Frontend order saved successfully."
+                    );
+
+
+                    // =================================================
+                    // 8. CLEAR FRONTEND CART
+                    // =================================================
+
+                    cart = [];
+
+                    saveCartData();
+
+                    updateCartCount();
+
+                    console.log(
+                        "Frontend cart cleared."
+                    );
+
+
+                    // =================================================
+                    // 9. SHOW SUCCESS
+                    // =================================================
+
+                    console.log(
+                        "Showing order success..."
+                    );
+
+                    showOrderSuccess(
+                        frontendOrderId,
+                        "Online Payment",
+                        finalTotal,
+                        deliveryDate
+                    );
+
+                    console.log(
+                        "===== ORDER COMPLETED ====="
+                    );
+
+                } catch (errorAfterPayment) {
+
+                    // IMPORTANT:
+                    // This is NOT payment verification failure.
+                    // Backend already verified the payment.
+
+                    console.error(
+                        "ERROR AFTER PAYMENT VERIFICATION:",
+                        errorAfterPayment
+                    );
+
+                    console.error(
+                        "Error Name:",
+                        errorAfterPayment.name
+                    );
+
+                    console.error(
+                        "Error Message:",
+                        errorAfterPayment.message
+                    );
+
+                    console.error(
+                        "Error Stack:",
+                        errorAfterPayment.stack
+                    );
+
+                    alert(
+                        "Payment successful. Order was saved in database, but there was a frontend display error. Please check My Orders."
+                    );
+                }
+            },
+
+
+            // =====================================================
+            // CUSTOMER DETAILS
+            // =====================================================
+
+            prefill: {
+
+                name:
+                    currentUser.name || "",
+
+                email:
+                    currentUser.email || "",
+
+                contact:
+                    currentUser.phone || ""
+            },
+
+
+            theme: {
+                color: "#e35486"
+            }
+        };
+
+
+        // =====================================================
+        // 10. CREATE RAZORPAY INSTANCE
+        // =====================================================
+
+        const razorpay =
+            new Razorpay(options);
+
+
+        // =====================================================
+        // 11. PAYMENT FAILED
+        // =====================================================
+
+        razorpay.on(
+            "payment.failed",
+            function (response) {
+
+                console.error(
+                    "Razorpay Payment Failed:",
+                    response
+                );
+
+                alert(
+                    "Payment failed: " +
+                    (
+                        response.error?.description ||
+                        "Unknown payment error."
+                    )
+                );
+            }
+        );
+
+
+        // =====================================================
+        // 12. OPEN CHECKOUT
+        // =====================================================
+
+        razorpay.open();
+
+    } catch (error) {
+
+        console.error(
+            "Razorpay Error:",
+            error
+        );
+
+        console.error(
+            "Error Message:",
+            error.message
+        );
+
+        alert(
+            "Could not connect to the payment server. " +
+            "Please make sure Spring Boot is running."
+        );
+    }
 }
 
 function trackShipment() {
@@ -4772,95 +5565,336 @@ function trackShipment() {
 
 }
 
+// =====================================================
+// SIGNUP
+// =====================================================
 
-document.getElementById("signupForm").addEventListener("submit", async function (event) {
-    event.preventDefault();
+document.addEventListener("DOMContentLoaded", function () {
 
-    const name = document.getElementById("signupName").value.trim();
-    const mobile = document.getElementById("signupMobile").value.trim();
-    const email = document.getElementById("signupEmail").value.trim();
-    const password = document.getElementById("signupPassword").value;
-    const confirmPassword = document.getElementById("confirmPassword").value;
+    const signupForm = document.getElementById("signupForm");
 
-    const message = document.getElementById("signupMessage");
+    if (signupForm) {
 
-    if (password !== confirmPassword) {
-        message.textContent = "Passwords do not match.";
-        return;
-    }
+        signupForm.addEventListener("submit", async function (event) {
 
-    try {
-        const response = await fetch(`${API_BASE_URL}/auth/register`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
+            event.preventDefault();
+
+            console.log("=================================");
+            console.log("SIGNUP FORM SUBMITTED");
+            console.log("=================================");
+
+            const name =
+                document.getElementById("signupName").value.trim();
+
+            const mobile =
+                document.getElementById("signupMobile").value.trim();
+
+            const email =
+                document.getElementById("signupEmail").value.trim();
+
+            const password =
+                document.getElementById("signupPassword").value;
+
+            const confirmPassword =
+                document.getElementById("confirmPassword").value;
+
+            const message =
+                document.getElementById("signupMessage");
+
+            // -----------------------------
+            // VALIDATION
+            // -----------------------------
+
+            if (!name || !mobile || !email || !password) {
+
+                message.textContent =
+                    "Please fill all fields.";
+
+                return;
+            }
+
+            if (password !== confirmPassword) {
+
+                message.textContent =
+                    "Passwords do not match.";
+
+                return;
+            }
+
+            // -----------------------------
+            // REQUEST DATA
+            // -----------------------------
+
+            const requestData = {
                 name: name,
-                mobile: mobile,
                 email: email,
+                phone: mobile,
                 password: password
-            })
+            };
+
+            console.log(
+                "REGISTER REQUEST:",
+                requestData
+            );
+
+            try {
+
+                const response = await fetch(
+                    `${API_BASE_URL}/api/auth/register`,
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+
+                        body: JSON.stringify(requestData)
+                    }
+                );
+
+                console.log(
+                    "REGISTER STATUS:",
+                    response.status
+                );
+
+                const responseText =
+                    await response.text();
+
+                console.log(
+                    "REGISTER RESPONSE:",
+                    responseText
+                );
+
+                let data = {};
+
+                try {
+                    data = JSON.parse(responseText);
+                } catch (e) {
+                    console.log(
+                        "Response is not JSON"
+                    );
+                }
+
+                // -----------------------------
+                // BACKEND ERROR
+                // -----------------------------
+
+                if (!response.ok) {
+
+                    message.textContent =
+                        data.message ||
+                        responseText ||
+                        "Registration failed.";
+
+                    return;
+                }
+
+                // -----------------------------
+                // SUCCESS
+                // -----------------------------
+
+                console.log(
+                    "USER REGISTERED SUCCESSFULLY"
+                );
+
+                message.textContent =
+                    "Account created successfully.";
+
+                // Clear signup form
+                signupForm.reset();
+
+                // Go to login
+                setTimeout(() => {
+
+                    showLogin();
+
+                }, 1000);
+
+            } catch (error) {
+
+                console.error(
+                    "REGISTER ERROR:",
+                    error
+                );
+
+                message.textContent =
+                    "Unable to connect to backend.";
+
+            }
+
         });
 
-        const data = await response.json();
+    } else {
 
-        if (!response.ok) {
-            message.textContent = data.message || "Registration failed.";
-            return;
-        }
+        console.error(
+            "ERROR: signupForm not found"
+        );
 
-        message.textContent = "Account created successfully.";
-
-        showLogin();
-
-    } catch (error) {
-        console.error(error);
-        message.textContent = "Backend server is not running.";
     }
-});
-document.getElementById("loginForm").addEventListener("submit", async function (event) {
-    event.preventDefault();
 
-    const login = document.getElementById("loginEmail").value.trim();
-    const password = document.getElementById("loginPassword").value;
 
-    const message = document.getElementById("loginMessage");
+    // =====================================================
+    // LOGIN
+    // =====================================================
 
-    try {
-        const response = await fetch(`${API_BASE_URL}/auth/login`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                login: login,
-                password: password
-            })
+    const loginForm =
+        document.getElementById("loginForm");
+
+    if (loginForm) {
+
+        loginForm.addEventListener("submit", async function (event) {
+
+            event.preventDefault();
+
+            console.log("=================================");
+            console.log("LOGIN FORM SUBMITTED");
+            console.log("=================================");
+
+            const email =
+                document.getElementById("loginEmail")
+                    .value.trim();
+
+            const password =
+                document.getElementById("loginPassword")
+                    .value;
+
+            const message =
+                document.getElementById("loginMessage");
+
+            try {
+
+                const response = await fetch(
+                    `${API_BASE_URL}/api/auth/login`,
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+
+                        body: JSON.stringify({
+                            email: email,
+                            password: password
+                        })
+                    }
+                );
+
+                console.log(
+                    "LOGIN STATUS:",
+                    response.status
+                );
+
+                const responseText =
+                    await response.text();
+
+                console.log(
+                    "LOGIN RESPONSE:",
+                    responseText
+                );
+
+                let data = {};
+
+                try {
+                    data = JSON.parse(responseText);
+                } catch (e) {
+                    console.log(
+                        "Response is not JSON"
+                    );
+                }
+
+                if (!response.ok) {
+
+                    message.textContent =
+                        data.message ||
+                        responseText ||
+                        "Invalid login.";
+
+                    return;
+                }
+
+                // -----------------------------
+                // SAVE JWT
+                // -----------------------------
+
+                localStorage.setItem(
+                    "token",
+                    data.token
+                );
+
+                // -----------------------------
+                // CREATE USER DATA
+                // -----------------------------
+
+                const user = {
+
+                    id: data.userId,
+
+                    name: data.name,
+
+                    email: data.email,
+
+                    phone: "",
+
+                    address: ""
+                };
+
+                // -----------------------------
+                // SAVE USER DATA
+                // -----------------------------
+
+                localStorage.setItem(
+                    "userData",
+                    JSON.stringify(user)
+                );
+
+                // IMPORTANT
+                localStorage.setItem(
+                    "rishtaBoxLoggedIn",
+                    "true"
+                );
+
+                currentUser = user;
+
+                console.log(
+                    "CURRENT USER:",
+                    currentUser
+                );
+
+                console.log(
+                    "CURRENT USER ID:",
+                    currentUser.id
+                );
+
+                message.textContent =
+                    "Login successful.";
+
+
+                showPage("home");
+
+            } catch (error) {
+
+                console.error(
+                    "LOGIN ERROR:",
+                    error
+                );
+
+                message.textContent =
+                    "Login error: " +
+                    error.message;
+            }
+
         });
 
-        const data = await response.json();
+    } else {
 
-        if (!response.ok) {
-            message.textContent = data.message || "Invalid login.";
-            return;
-        }
+        console.error(
+            "ERROR: loginForm not found"
+        );
 
-        // Save login information
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("userData", JSON.stringify(data.user));
-
-        message.textContent = "Login successful.";
-
-        updateAccountNavigation();
-
-        showPage("home");
-
-    } catch (error) {
-        console.error(error);
-        message.textContent = "Unable to connect to backend.";
     }
+
 });
+
 function showFestival(festivalId) {
 
     console.log("Selected Festival ID:", festivalId);

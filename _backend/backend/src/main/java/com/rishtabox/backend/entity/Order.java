@@ -33,7 +33,7 @@ public class Order {
     @Column(nullable = false)
     private String orderStatus;
 
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @OneToMany(
             mappedBy = "order",

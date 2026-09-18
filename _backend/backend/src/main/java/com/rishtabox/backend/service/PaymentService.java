@@ -156,10 +156,8 @@ public class PaymentService {
         );
 
         payment.setStatus("SUCCESS");
-
-
         order.setPaymentStatus("PAID");
-
+        order.setOrderStatus("PLACED");
         orderRepository.save(order);
 
 

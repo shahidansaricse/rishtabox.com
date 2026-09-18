@@ -125,6 +125,10 @@ public class OrderService {
         }
 
         // 8. Set total
+        double deliveryCharges = totalAmount >= 500 ? 0.0 : 50.0;
+
+        totalAmount += deliveryCharges;
+
         order.setTotalAmount(totalAmount);
 
         // 9. Save order
