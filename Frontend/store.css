@@ -23,9 +23,9 @@
     --success-color: #10b981;
 
     --card-shadow: 0 4px 6px -1px rgba(0,0,0,.1),
-                   0 2px 4px -1px rgba(0,0,0,.06);
+    0 2px 4px -1px rgba(0,0,0,.06);
     --card-shadow-hover: 0 20px 25px -5px rgba(0,0,0,.1),
-                         0 10px 10px -5px rgba(0,0,0,.04);
+    0 10px 10px -5px rgba(0,0,0,.04);
     --border-radius: 12px;
     --border-radius-sm: 8px;
     --border-radius-lg: 16px;
@@ -44,7 +44,7 @@ html {
 }
 body {
     font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
-        Roboto, sans-serif;
+    Roboto, sans-serif;
     line-height: 1.6;
     color: var(--gray-800);
     background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
@@ -149,6 +149,12 @@ h1,h2,h3,h4,h5,h6 {
     color: rgba(217, 63, 117, 1);
 }
 /* color footer */
+h2 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
 .footer-logo {
     width: 80px;
     height: 80px;
@@ -194,9 +200,9 @@ h1,h2,h3,h4,h5,h6 {
     border: none;
     border-radius: 50px;
     background: linear-gradient(
-        135deg,
-        var(--primary-color),
-        var(--primary-light)
+            135deg,
+            var(--primary-color),
+            var(--primary-light)
     );
     color: var(--white);
     cursor: pointer;
@@ -215,7 +221,7 @@ h1,h2,h3,h4,h5,h6 {
 .nav-sections {
     display: flex;
     align-items: center;
-     gap: 10px;
+    gap: 10px;
     flex-shrink: 0;
 }
 .nav-btn {
@@ -226,9 +232,9 @@ h1,h2,h3,h4,h5,h6 {
     padding: 12px 16px;
     border-radius: var(--border-radius-sm);
     background: linear-gradient(
-        135deg,
-        var(--gray-900),
-        var(--gray-800)
+            135deg,
+            var(--gray-900),
+            var(--gray-800)
     );
     color: var(--white);
     text-decoration: none;
@@ -392,9 +398,9 @@ h1,h2,h3,h4,h5,h6 {
     padding: 14px 32px;
     border-radius: 50px;
     background: linear-gradient(
-        135deg,
-        var(--primary-color),
-        var(--primary-light)
+            135deg,
+            var(--primary-color),
+            var(--primary-light)
     );
     color: var(--white);
     text-decoration: none;
@@ -515,9 +521,9 @@ h1,h2,h3,h4,h5,h6 {
     padding: 12px 20px;
     border-radius: 50px;
     background: linear-gradient(
-        135deg,
-        var(--primary-color),
-        var(--primary-light)
+            135deg,
+            var(--primary-color),
+            var(--primary-light)
     );
     color: var(--white);
     text-align: center;
@@ -607,9 +613,9 @@ h1,h2,h3,h4,h5,h6 {
     left: 0;
     right: 0;
     background: linear-gradient(
-        135deg,
-        rgba(37, 99, 235, 0.03),
-        rgba(139, 92,246,0.03 )
+            135deg,
+            rgba(37, 99, 235, 0.03),
+            rgba(139, 92,246,0.03 )
     );
     opacity: 0;
     transition: var(--transition);
@@ -667,9 +673,9 @@ h1,h2,h3,h4,h5,h6 {
 }
 .discount {
     background: linear-gradient(
-        135deg,
-        var(--danger-color),
-        #dc2626
+            135deg,
+            var(--danger-color),
+            #dc2626
     );
     color: var(--white);
     padding: 4px 12px;
@@ -804,7 +810,7 @@ h1,h2,h3,h4,h5,h6 {
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 /* =========================================================
- ADDRESS / BUTTONS / CART 
+ ADDRESS / BUTTONS / CART
  ========================================================= */
 .address-section {
     background: linear-gradient(135deg, var(--gray-50), var(--white));
@@ -841,26 +847,26 @@ h1,h2,h3,h4,h5,h6 {
     /* background: linear-gradient(135deg, var(--primary-color), var(--primary-light)); */
     color: white;
 }.btn-primary {
-    background: linear-gradient(
-        135deg,
-        var(--primary-color),
-        var(--primary-light)
-    );
-    color: var(--white);
-    padding: 16px 32px;
-    border: none;
-    border-radius: var(--border-radius-sm);
-    font-size: 16px;
-    font-weight: 700;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-block;
-    text-align: center;
-    transition: var(--transition);
-    box-shadow: 0 4px 12px rgba(114, 84, 227, .3);
-    text-transform: uppercase;
-    letter-spacing: .5px;
-}
+     background: linear-gradient(
+             135deg,
+             var(--primary-color),
+             var(--primary-light)
+     );
+     color: var(--white);
+     padding: 16px 32px;
+     border: none;
+     border-radius: var(--border-radius-sm);
+     font-size: 16px;
+     font-weight: 700;
+     cursor: pointer;
+     text-decoration: none;
+     display: inline-block;
+     text-align: center;
+     transition: var(--transition);
+     box-shadow: 0 4px 12px rgba(114, 84, 227, .3);
+     text-transform: uppercase;
+     letter-spacing: .5px;
+ }
 .btn-primary:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
@@ -908,7 +914,7 @@ h1,h2,h3,h4,h5,h6 {
     box-shadow: var(--card-shadow);
 }
 .cart-item-details {
-    flex:1;  
+    flex:1;
 }
 .cart-item-details h3 {
     margin-bottom: 8px;
@@ -961,8 +967,8 @@ h1,h2,h3,h4,h5,h6 {
     border-color: var(--primary-color);
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
-/* ========================================================= 
- CART SUMMARY / ORDER FORM 
+/* =========================================================
+ CART SUMMARY / ORDER FORM
  ========================================================= */
 .cart-summary {
     background: linear-gradient(135deg, var(--white), var(--gray-50));
@@ -1098,7 +1104,7 @@ h1,h2,h3,h4,h5,h6 {
     padding: 32px;
     border-radius: 16px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06),
-                0 2px 8px rgba(0, 0, 0, 0.04);
+    0 2px 8px rgba(0, 0, 0, 0.04);
     margin-bottom: 24px;
     border: 1px solid rgba(226, 232, 240, 0.8);
     position: relative;
@@ -1144,7 +1150,7 @@ h1,h2,h3,h4,h5,h6 {
     border-radius: 16px;
     margin-bottom: 24px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
- overflow: hidden;
+    overflow: hidden;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     border: 1px solid rgba(226, 232, 240, 0.8);
     position: relative;
@@ -1231,7 +1237,7 @@ h1,h2,h3,h4,h5,h6 {
 .order-card.expanded .arrow-icon {
     transform: rotate(180deg);
 }
-/* ========================================================= 
+/* =========================================================
  ORDER DETAILS
   ========================================================= */
 .order-details {
@@ -1385,7 +1391,7 @@ h1,h2,h3,h4,h5,h6 {
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
-/* ========================================================= 
+/* =========================================================
 ORDER SUMMARY
  ========================================================= */
 .order-details .cart-summary {
@@ -2174,11 +2180,6 @@ ORDER SUMMARY
         margin-top: 65px;
     }
 }
-
-
-
-
-/* -----------------------------------------------------*/
 /* =========================================================
    PANEL / SECONDARY NAVIGATION
 ========================================================= */
@@ -2187,295 +2188,374 @@ ORDER SUMMARY
     height: 45px;
     background: #4a2635;
     color: #ffffff;
+
     display: flex;
     align-items: center;
+
     padding: 0 20px;
     box-sizing: border-box;
+
     font-size: 14px;
+
     border-top: 1px solid rgba(227, 84, 134, 0.25);
     border-bottom: 1px solid rgba(227, 84, 134, 0.35);
+
+    position: relative;
+    z-index: 1000;
+
+    gap: 25px;
 }
 
-/* All button */
+
+/* =========================================================
+   ALL GIFTS
+========================================================= */
 
 .panel-all {
     height: 100%;
+
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 0 15px;
-    font-weight: 700;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: background 0.2s ease;
+
+    flex-shrink: 0;
 }
 
-.panel-all i {
-    font-size: 17px;
-}
-
-.panel-all:hover {
-    background: rgba(227, 84, 134, 0.18);
-}
-
-/* Navigation options */
-
-.panel-ops {
-    display: flex;
-    align-items: center;
-    gap: 25px;
+.panel-all a {
     height: 100%;
-    margin-left: 10px;
-}
 
-.panel-ops p {
-    margin: 0;
-    height: 100%;
     display: flex;
     align-items: center;
-    padding: 0 5px;
+
+    padding: 0 8px;
+
+    color: #ffffff;
+    text-decoration: none;
+
     font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
+    font-weight: 600;
+
     white-space: nowrap;
+
     transition:
-        color 0.2s ease,
-        background 0.2s ease;
+            color 0.2s ease,
+            background 0.2s ease;
 }
 
-.panel-ops p:hover {
-    color: var(--primary-color);
+.panel-all a:hover {
+    color: #f8a4bf;
+
     background: rgba(227, 84, 134, 0.10);
 }
 
-/* Right side deals text */
 
-.panel-deals {
-    margin-left: auto;
-    font-size: 14px;
-    font-weight: 600;
-    white-space: nowrap;
-    color: #ffd6e3;
-    width: 100%;
-    flex-wrap: nowrap;
-overflow-x: auto;
-}
 /* =========================================================
-   TABLET
+   DROPDOWN CONTAINER
 ========================================================= */
 
-@media (max-width: 900px) {
+.nav-dropdown {
+    height: 100%;
 
-    .panel {
-        padding: 0 12px;
-        height: 42px;
+    position: relative;
 
-        display: flex;
-        align-items: center;
-        flex-wrap: nowrap;
+    display: flex;
+    align-items: center;
 
-        overflow: hidden;
-    }
-
-    .panel-all {
-        flex: 0 0 auto;
-
-        padding: 0 10px;
-        font-size: 13px;
-    }
-
-    .panel-all i {
-        font-size: 15px;
-    }
-
-    .panel-ops {
-        flex: 0 0 auto;
-
-        gap: 15px;
-        margin-left: 5px;
-
-        display: flex;
-        align-items: center;
-    }
-
-    .panel-ops p {
-        flex: 0 0 auto;
-
-        font-size: 12px;
-        white-space: nowrap;
-    }
-
-    .panel-deals {
-        flex: 0 0 auto;
-
-        margin-left: auto;
-        font-size: 12px;
-        white-space: nowrap;
-    }
+    flex-shrink: 0;
 }
+
+
+/* =========================================================
+   DROPDOWN BUTTON
+========================================================= */
+
+.dropdown-btn {
+    height: 100%;
+
+    border: none;
+    outline: none;
+
+    background: transparent;
+    color: #ffffff;
+
+    padding: 0 8px;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    white-space: nowrap;
+
+    transition:
+            color 0.2s ease,
+            background 0.2s ease;
+}
+
+.dropdown-btn:hover {
+    color: #f8a4bf;
+
+    background: rgba(227, 84, 134, 0.10);
+}
+
+
+/* =========================================================
+   DROPDOWN MENU
+========================================================= */
+
+.dropdown-menu {
+    display: none;
+
+    position: absolute;
+
+    top: 45px;
+    left: 0;
+
+    min-width: 220px;
+
+    background: #ffffff;
+
+    border-radius: 0 0 8px 8px;
+
+    padding: 8px 0;
+
+    box-shadow:
+            0 8px 25px rgba(0, 0, 0, 0.18);
+
+    z-index: 9999;
+}
+
+
+/* Show dropdown when mouse is over dropdown */
+
+.nav-dropdown:hover .dropdown-menu {
+    display: block;
+}
+
+
+/* =========================================================
+   DROPDOWN LINKS
+========================================================= */
+
+.dropdown-menu a {
+    display: block;
+
+    padding: 10px 16px;
+
+    color: #333333;
+
+    text-decoration: none;
+
+    font-size: 14px;
+    font-weight: 500;
+
+    white-space: nowrap;
+
+    transition:
+            background 0.2s ease,
+            color 0.2s ease;
+}
+
+.dropdown-menu a:hover {
+    background: #fce5ed;
+
+    color: #e35486;
+}
+/* =========================================================
+   SPECIAL OFFERS
+========================================================= */
+
+.panel-deals a {
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 600;
+
+    display: flex;
+    align-items: center;
+
+    padding: 0 18px;
+    height: 52px;
+
+    transition: 0.2s ease;
+}
+
+.panel-deals a:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+
+/* =========================================================
+   SPECIAL OFFER PRODUCT CARD
+========================================================= */
+
+.product-card {
+    position: relative;
+}
+
+
+/* Discount badge */
+
+.special-offer-badge {
+    position: absolute;
+
+    top: 10px;
+    left: 10px;
+
+    z-index: 5;
+
+    background: #e35486;
+    color: #ffffff;
+
+    padding: 6px 10px;
+
+    border-radius: 6px;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    box-shadow:
+            0 3px 8px rgba(0, 0, 0, 0.18);
+}
+
+
+/* Price */
+
+.product-price {
+    display: flex;
+
+    align-items: center;
+
+    flex-wrap: wrap;
+
+    gap: 7px;
+
+    margin-top: 8px;
+}
+
+.current-price {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.original-price {
+    font-size: 14px;
+
+    color: #888888;
+
+    text-decoration: line-through;
+}
+
+.discount {
+    font-size: 12px;
+
+    color: #e35486;
+
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   SPECIAL OFFER TITLE
+========================================================= */
+
+#categoryTitle.special-offer-title {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    color: #4a2635;
+}
+
+#categoryTitle.special-offer-title::before {
+    content: "🎁";
+}
+
+
 /* =========================================================
    MOBILE
 ========================================================= */
 
-@media (max-width: 700px) {
+@media (max-width: 600px) {
+
+    .panel-deals a {
+        height: 48px;
+
+        padding: 0 12px;
+
+        font-size: 13px;
+    }
+
+    .special-offer-badge {
+        top: 7px;
+        left: 7px;
+
+        padding: 5px 7px;
+
+        font-size: 10px;
+    }
+
+    .current-price {
+        font-size: 15px;
+    }
+
+    .original-price {
+        font-size: 11px;
+    }
+
+    .discount {
+        font-size: 10px;
+    }
+
+}
+@media (max-width: 600px) {
 
     .panel {
-        height: 42px;
-        min-height: 42px;
-        padding: 0 8px;
-
+        width: 100%;
         display: flex;
-        align-items: center;
         flex-wrap: nowrap;
 
-        gap: 10px;
-
+        /* MANUAL HORIZONTAL SCROLL */
         overflow-x: auto;
         overflow-y: hidden;
 
         white-space: nowrap;
 
+        -webkit-overflow-scrolling: touch;
+
+        /* Hide scrollbar */
         scrollbar-width: none;
+        -ms-overflow-style: none;
+
+        cursor: grab;
     }
 
     .panel::-webkit-scrollbar {
         display: none;
     }
 
-
-    /* All Gifts */
-
-    .panel-all {
-        flex: 0 0 auto;
-
-        height: 32px;
-        padding: 0 8px;
-
-        display: flex;
-        align-items: center;
-
-        gap: 5px;
-
-        font-size: 12px;
-
-        white-space: nowrap;
+    .panel:active {
+        cursor: grabbing;
     }
 
-    .panel-all i {
-        font-size: 14px;
-    }
-
-
-    /* Gift Categories */
-
-    .panel-ops {
-        flex: 0 0 auto;
-
-        height: 32px;
-        margin-left: 0;
-
-        display: flex;
-        align-items: center;
-
-        gap: 14px;
-
-        overflow: visible;
-    }
-
-    .panel-ops p {
-        flex: 0 0 auto;
-
-        height: 32px;
-        padding: 0;
-
-        display: flex;
-        align-items: center;
-
-        font-size: 11px;
-
-        white-space: nowrap;
-    }
-
-
-    /* Special Offers */
-
+    .panel-all,
+    .nav-dropdown,
     .panel-deals {
+        flex: 0 0 auto;
+        white-space: nowrap;
+    }
+
+    .panel a,
+    .dropdown-btn {
+        flex: 0 0 auto;
+        white-space: nowrap;
+        height: 50px;
+        padding: 0 14px;
+
         display: flex;
         align-items: center;
         justify-content: center;
-
-        flex: 0 0 auto;
-
-        height: 32px;
-
-        margin-left: 5px;
-        padding: 0 10px;
-
-        background: rgba(227, 84, 134, 0.12);
-
-        color: var(--primary-color);
-
-        border: 1px solid rgba(227, 84, 134, 0.35);
-        border-radius: 6px;
-
-        font-size: 11px;
-        font-weight: 700;
-
-        white-space: nowrap;
-    }
-}
-
-
-/* =========================================================
-   SMALL MOBILE
-========================================================= */
-
-@media (max-width: 480px) {
-
-    .panel {
-        height: 40px;
-        min-height: 40px;
-
-        padding: 0 6px;
-
-        gap: 8px;
-    }
-
-
-    .panel-all {
-        height: 30px;
-
-        padding: 0 6px;
-
-        font-size: 11px;
-    }
-
-    .panel-all i {
-        font-size: 13px;
-    }
-
-
-    .panel-ops {
-        height: 30px;
-
-        gap: 12px;
-    }
-
-    .panel-ops p {
-        height: 30px;
-
-        font-size: 10px;
-    }
-
-
-    .panel-deals {
-        height: 30px;
-
-        margin-left: 3px;
-
-        padding: 0 8px;
-
-        font-size: 10px;
     }
 }
 /* ================= CANCEL ORDER ================= */
@@ -2506,9 +2586,9 @@ overflow-x: auto;
     cursor: pointer;
 
     transition:
-        background 0.3s ease,
-        color 0.3s ease,
-        transform 0.2s ease;
+            background 0.3s ease,
+            color 0.3s ease,
+            transform 0.2s ease;
 }
 
 .cancel-order-btn:hover {
@@ -2528,7 +2608,158 @@ overflow-x: auto;
     color: #842029;
     border: 1px solid #f1aeb5;
 }
+/* =========================================================
+   MOBILE NAV DROPDOWN - LAPTOP STYLE
+========================================================= */
 
+@media (max-width: 600px) {
+
+    /* NAV BAR */
+    .panel {
+        position: relative;
+
+        width: 100%;
+
+        display: flex;
+        align-items: center;
+
+        /* Important */
+        overflow: visible !important;
+
+        white-space: nowrap;
+
+        z-index: 10000;
+    }
+
+
+    /* NAV ITEMS */
+    .panel-all,
+    .nav-dropdown,
+    .panel-deals {
+        position: static;
+        flex-shrink: 0;
+    }
+
+
+    /* NAV BUTTON */
+    .dropdown-btn {
+        position: relative;
+
+        height: 52px;
+
+        display: flex;
+        align-items: center;
+
+        padding: 0 14px;
+
+        white-space: nowrap;
+
+        border: none;
+        background: transparent;
+    }
+
+
+    /* =====================================================
+       DROPDOWN
+       ===================================================== */
+
+    .dropdown-menu {
+        position: absolute !important;
+
+        /* EXACTLY BELOW NAV */
+        top: 100% !important;
+
+        left: auto !important;
+
+        width: 240px !important;
+        min-width: 240px !important;
+        max-width: calc(100vw - 20px) !important;
+
+        max-height: 65vh;
+
+        overflow-x: hidden;
+        overflow-y: auto;
+
+        display: none;
+
+        background: #ffffff;
+
+        border-radius: 0 0 10px 10px;
+
+        box-shadow:
+                0 8px 20px rgba(0, 0, 0, 0.22);
+
+        border: 1px solid #eeeeee;
+
+        z-index: 999999 !important;
+    }
+
+
+    /* SHOW DROPDOWN */
+
+    .nav-dropdown:hover .dropdown-menu,
+    .nav-dropdown:focus-within .dropdown-menu {
+        display: block;
+    }
+
+
+    /* DROPDOWN ITEMS */
+
+    .dropdown-menu a {
+        display: block;
+
+        width: 100%;
+
+        min-height: 48px;
+
+        padding: 13px 16px;
+
+        box-sizing: border-box;
+
+        color: #333333;
+
+        background: #ffffff;
+
+        font-size: 14px;
+
+        line-height: 20px;
+
+        text-decoration: none;
+
+        white-space: normal;
+    }
+
+
+    /* HOVER */
+
+    .dropdown-menu a:hover {
+        background: #fde5ee;
+        color: #e35486;
+    }
+
+
+    /* LAST ITEM */
+
+    .dropdown-menu a:last-child {
+        border-radius: 0 0 10px 10px;
+    }
+
+
+    /* =====================================================
+       KEEP DROPDOWN BELOW NAV, NOT INSIDE CONTENT
+    ===================================================== */
+
+    header,
+    .panel {
+        z-index: 10000;
+    }
+
+    main,
+    .main-content {
+        position: relative;
+        z-index: 1;
+    }
+}
 /* =====================================================
    TESTIMONIALS SECTION
 ===================================================== */
@@ -2886,7 +3117,7 @@ overflow-x: auto;
     width: 50px;
     height: 50px;
     object-fit: cover;
-       border-radius: 50%;
+    border-radius: 50%;
 }
 
 
@@ -3594,5 +3825,3 @@ overflow-x: auto;
 .logout-btn:hover {
     opacity: 0.9;
 }
-
-

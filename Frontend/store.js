@@ -19,6 +19,7 @@ let products = [];
 let festivalProducts = [];
 let relationshipProducts = [];
 let festivals=[];
+let backendProducts = [];
 
 let currentUser = {
     name: "",
@@ -95,9 +96,9 @@ function validatePhone(phone){
     LOCAL STORAGE
  ========================================================= */
 function saveUserData() {
-   try {
+    try {
         localStorage.setItem("userData",JSON.stringify(currentUser));
-     } catch (error) {
+    } catch (error) {
         console.error("Could not save user data:", error);
     }
 }
@@ -110,12 +111,12 @@ function loadUserData() {
         }
         if (!currentUser || typeof currentUser !== "object") {
             currentUser = {
-            name: "",
-            email: "",
-            phone: "",
-            address: ""
-        };
-      }
+                name: "",
+                email: "",
+                phone: "",
+                address: ""
+            };
+        }
     } catch (error) {
         console.error("Could not load user data:", error);
     }
@@ -124,7 +125,7 @@ function saveCartData() {
     try {
         localStorage.setItem("cart",JSON.stringify(cart));
     } catch (error) {
-    console.error("Storage not available:",error);
+        console.error("Storage not available:",error);
     }
 }
 function loadCartData() {
@@ -162,7 +163,7 @@ function loadOrdersData() {
             orders =JSON.parse(savedOrders);
         }
         if (!Array.isArray(orders)) {
-        orders = [];
+            orders = [];
         }
     } catch (error) {
         console.error("Could not load orders:",error);
@@ -203,7 +204,7 @@ function updateCartCount() {
     if (cartCountElement) {
         cartCountElement.textContent =cartCount;
     }
-} 
+}
 /* =========================================================
    LOAD DATA
 ========================================================= */
@@ -437,13 +438,13 @@ function initializeApp() {
    DOM READY
 ========================================================= */
 document.addEventListener("DOMContentLoaded",() => {
-    loadData();
-    const sortBy =
-        document.getElementById("sortBy");
-    const priceRange =
-        document.getElementById("priceRange");
-    const brandFilter =
-        document.getElementById("brandFilter");
+        loadData();
+        const sortBy =
+            document.getElementById("sortBy");
+        const priceRange =
+            document.getElementById("priceRange");
+        const brandFilter =
+            document.getElementById("brandFilter");
         if (sortBy) {
             sortBy.addEventListener(
                 "change",
@@ -518,16 +519,16 @@ function showPage(pageId) {
                 renderCart();
             }
             break;
-case "order":
-    currentOrderSteps = 1;
+        case "order":
+            currentOrderSteps = 1;
 
-    if (
-        typeof renderOrderSteps ===
-        "function"
-    ) {
-        renderOrderSteps();
-    }
-    break;
+            if (
+                typeof renderOrderSteps ===
+                "function"
+            ) {
+                renderOrderSteps();
+            }
+            break;
         case "account":
             if (
                 typeof loadUserAccountPage ===
@@ -536,16 +537,17 @@ case "order":
                 loadUserAccountPage();
             }
             break;
-            case "orders":
-    if (
-        typeof renderOrders ===
-        "function"
-    ) {
-        renderOrders();
+        case "orders":
+            if (
+                typeof renderOrders ===
+                "function"
+            ) {
+                renderOrders();
+            }
+            break;
     }
-    break;
 }
-}function toggleSidebar() {
+function toggleSidebar() {
     const sidebar = document.querySelector(".sidebar");
     const overlay = document.querySelector(".sidebar-overlay");
 
@@ -685,7 +687,7 @@ function renderCategories() {
         categoryCard.className =
             "category-card";
         categoryCard.onclick = () => {
-           showCategory(
+            showCategory(
                 category.id
             );
         };
@@ -737,7 +739,7 @@ function renderCategories() {
         `;
         categoryCard.innerHTML =
             cardContent;
-       categoryGrid.appendChild(
+        categoryGrid.appendChild(
             categoryCard
         );
     });
@@ -748,97 +750,139 @@ function renderCategories() {
 function renderProducts(
     productsToRender = filteredProducts
 ) {
+
     const productGrid =
-        document.getElementById(
-            "productGrid"
-        );
+        document.getElementById("productGrid");
+
     if (!productGrid) {
+
         console.error(
             "productGrid not found"
         );
+
         return;
     }
+
+
     productGrid.innerHTML = "";
+
+
     if (
         !productsToRender ||
         productsToRender.length === 0
     ) {
+
         productGrid.innerHTML = `
             <p>
                 No products found
                 matching your criteria.
             </p>
         `;
+
         return;
     }
-    productsToRender.forEach(product => {
+
+
+    productsToRender.forEach(function (product) {
+
         const productCard =
             document.createElement("div");
+
         productCard.className =
             "product-card";
-        productCard.onclick = () => {
+
+
+        productCard.onclick = function () {
+
             showProduct(
                 product.id
             );
+
         };
+
+
         const rating =
             Number(product.rating) || 0;
+
         const fullStars =
             Math.floor(rating);
+
         const emptyStars =
             Math.max(
                 0,
                 5 - fullStars
             );
+
+
         productCard.innerHTML = `
+
             <img
                 src="${getImagePath(product.image)}"
                 alt="${product.name || "Product"}"
             >
-            <div class="product-card-content">       
-                     <div class="product-brand">
+
+            <div class="product-card-content">
+
+                <div class="product-brand">
                     ${product.brand || ""}
                 </div>
+
                 <h3>
                     ${product.name || "Product"}
                 </h3>
-          <div class="product-rating">
-                    ${"★".repeat(fullStars)}
 
+                <div class="product-rating">
+
+                    ${"★".repeat(fullStars)}
                     ${"☆".repeat(emptyStars)}
+
                     <span>
                         ${rating}
                     </span>
+
                 </div>
-               <div class="product-price">
+
+
+                <div class="product-price">
+
                     <span class="current-price">
                         ₹${Number(product.price) || 0}
                     </span>
+
+
                     ${
-                        product.originalPrice
-                            ? `
+            product.originalPrice
+                ? `
                                 <span class="original-price">
                                     ₹${product.originalPrice}
                                 </span>
                             `
-                            : ""
-                    }
+                : ""
+        }
+
+
                     ${
-                        product.discount
-                            ? `
+            product.discount
+                ? `
                                 <span class="discount">
                                     ${product.discount}% OFF
                                 </span>
                             `
-                            : ""
-                    }
+                : ""
+        }
+
                 </div>
+
             </div>
         `;
+
+
         productGrid.appendChild(
             productCard
         );
+
     });
+
 }
 /* =========================================================
    SHOW CATEGORY
@@ -849,12 +893,52 @@ function showCategory(categoryId) {
     console.log("CLICKED CATEGORY:", categoryId);
     console.log("=================================");
 
-    // Recently viewed
-    if (categoryId === "recently-viewed") {
+    const selectedId =
+        String(categoryId)
+            .trim()
+            .toLowerCase();
+
+    // =====================================================
+    // ALL GIFTS
+    // =====================================================
+
+    if (selectedId === "all") {
+
+        console.log("SHOWING ALL GIFTS");
+
+        filteredProducts = products.slice();
+
+        const categoryTitle =
+            document.getElementById("categoryTitle");
+
+        if (categoryTitle) {
+            categoryTitle.textContent = "All Gifts";
+        }
+
+        console.log(
+            "ALL GIFTS COUNT:",
+            filteredProducts.length
+        );
+
+        showPage("category");
+
+        renderProducts(filteredProducts);
+
+        return;
+    }
+
+
+    // =====================================================
+    // RECENTLY VIEWED
+    // =====================================================
+
+    if (selectedId === "recently-viewed") {
 
         filteredProducts = products.filter(product =>
             recentlyViewed.some(
-                id => String(id) === String(product.id)
+                id =>
+                    String(id) ===
+                    String(product.id)
             )
         );
 
@@ -866,41 +950,51 @@ function showCategory(categoryId) {
                 "Recently Viewed Products";
         }
 
-    } else {
+        showPage("category");
 
-        const selectedId =
-            String(categoryId).trim().toLowerCase();
+        renderProducts(filteredProducts);
 
-        // Find selected category
-        const selectedCategory = categories.find(
+        return;
+    }
+
+
+    // =====================================================
+    // NORMAL CATEGORY
+    // =====================================================
+
+    const selectedCategory =
+        categories.find(
             category =>
                 String(category.id)
                     .trim()
-                    .toLowerCase() === selectedId
+                    .toLowerCase() ===
+                selectedId
         );
 
-        console.log(
-            "SELECTED CATEGORY:",
-            selectedCategory
-        );
+    console.log(
+        "SELECTED CATEGORY:",
+        selectedCategory
+    );
+
+    const selectedCategoryName =
+        selectedCategory
+            ? String(selectedCategory.name)
+                .trim()
+                .toLowerCase()
+            : "";
+
+    console.log(
+        "SELECTED CATEGORY NAME:",
+        selectedCategoryName
+    );
 
 
-        const selectedCategoryName =
-            selectedCategory
-                ? String(selectedCategory.name)
-                    .trim()
-                    .toLowerCase()
-                : "";
+    // =====================================================
+    // FILTER PRODUCTS
+    // =====================================================
 
-
-        console.log(
-            "SELECTED CATEGORY NAME:",
-            selectedCategoryName
-        );
-
-
-        // Filter products
-        filteredProducts = products.filter(product => {
+    filteredProducts =
+        products.filter(product => {
 
             const productCategoryId =
                 product.category != null
@@ -916,7 +1010,6 @@ function showCategory(categoryId) {
                         .toLowerCase()
                     : "";
 
-
             console.log(
                 "PRODUCT:",
                 product.name,
@@ -926,58 +1019,53 @@ function showCategory(categoryId) {
                 productCategoryName
             );
 
-
-            // Match by ID OR by category name
             return (
                 productCategoryId === selectedId ||
-                productCategoryName === selectedCategoryName
+                productCategoryName ===
+                selectedCategoryName
             );
         });
 
 
-        console.log(
-            "================================="
+    console.log(
+        "================================="
+    );
+
+    console.log(
+        "FILTERED PRODUCTS:",
+        filteredProducts
+    );
+
+    console.log(
+        "FILTERED PRODUCT COUNT:",
+        filteredProducts.length
+    );
+
+    console.log(
+        "================================="
+    );
+
+
+    // =====================================================
+    // CATEGORY TITLE
+    // =====================================================
+
+    const categoryTitle =
+        document.getElementById(
+            "categoryTitle"
         );
 
-        console.log(
-            "FILTERED PRODUCTS:",
-            filteredProducts
-        );
-
-        console.log(
-            "FILTERED PRODUCT COUNT:",
-            filteredProducts.length
-        );
-
-        console.log(
-            "================================="
-        );
-
-
-        // Category title
-        const categoryTitle =
-            document.getElementById("categoryTitle");
-
-        if (categoryTitle) {
-
-            categoryTitle.textContent =
-                selectedCategory
-                    ? selectedCategory.name
-                    : "Products";
-        }
+    if (categoryTitle) {
+        categoryTitle.textContent =
+            selectedCategory
+                ? selectedCategory.name
+                : "Products";
     }
 
 
-    // Update brand filter
-    populateFilters();
-
-
-    // Open category page
     showPage("category");
 
-
-    // Apply price/sort/brand filters
-    applyFilters();
+    renderProducts(filteredProducts);
 }
 /* =========================================================
    POPULATE BRAND FILTER
@@ -1133,8 +1221,8 @@ function showProduct(productId) {
     }
 
     if (!recentlyViewed.includes(product.id)) {
-     recentlyViewed.unshift(product.id);
-     if (
+        recentlyViewed.unshift(product.id);
+        if (
             recentlyViewed.length > 10
         ) {
             recentlyViewed.pop();
@@ -1187,15 +1275,15 @@ function showProduct(productId) {
             </div>
             <div class="product-rating">
                 ${"★".repeat(
-                    Math.floor(rating)
-                )}
+        Math.floor(rating)
+    )}
                 ${"☆".repeat(
-                    Math.max(
-                        0,
-                        5 -
-                        Math.floor(rating)
-                    )
-                )}
+        Math.max(
+            0,
+            5 -
+            Math.floor(rating)
+        )
+    )}
                 ${rating}/5
             </div>
             <div class="product-price">
@@ -1203,31 +1291,31 @@ function showProduct(productId) {
                     ₹${Number(product.price) || 0}
                 </span>
                 ${
-                    product.originalPrice
-                        ? `
+        product.originalPrice
+            ? `
                             <span class="original-price">
                                 ₹${product.originalPrice}
                             </span>
                         `
-                        : ""
-                }
+            : ""
+    }
                 ${
-                    product.discount
-                        ? `
+        product.discount
+            ? `
                             <span class="discount">
                                 ${product.discount}% OFF
                             </span>
                         `
-                        : ""
-                }
+            : ""
+    }
             </div>
             <div class="description">
                 ${product.description || ""}
             </div>
             <div class="product-option">
                 ${
-                    colors.length > 0
-                        ? `
+        colors.length > 0
+            ? `
                             <div class="option-group">
                                 <label>
                                     Color:
@@ -1236,25 +1324,25 @@ function showProduct(productId) {
                                     id="selectedColor"
                                 >
                                     ${colors
-                                        .map(
-                                            color =>
-                                                `
+                .map(
+                    color =>
+                        `
                                                 <option
                                                     value="${color}"
                                                 >
                                                     ${color}
                                                 </option>
                                                 `
-                                        )
-                                        .join("")}
+                )
+                .join("")}
                                 </select>
                             </div>
                         `
-                        : ""
-                }
+            : ""
+    }
                 ${
-                    sizes.length > 0
-                        ? `
+        sizes.length > 0
+            ? `
                             <div class="option-group">
                                 <label>
                                     Size:
@@ -1263,30 +1351,30 @@ function showProduct(productId) {
                                     id="selectedSize"
                                 >
                                     ${sizes
-                                        .map(
-                                            size =>
-                                                `
+                .map(
+                    size =>
+                        `
                                                 <option
                                                     value="${size}"
                                                 >
                                                     ${size}
                                                 </option>
                                                 `
-                                        )
-                                        .join("")}
+                )
+                .join("")}
                                 </select>
                             </div>
                         `
-                        : ""
-                }
+            : ""
+    }
             </div>
             <div class="address-section">
                 <h3>
                     Delivery Address
                 </h3>
                 ${
-                    currentUser.address
-                        ? `
+        currentUser.address
+            ? `
                             <p>
                                 ${currentUser.address}
                             </p>
@@ -1299,7 +1387,7 @@ function showProduct(productId) {
                                 Change Address
                             </button>
                         `
-                        : `
+            : `
                             <p>
                                 No address added
                             </p>
@@ -1312,7 +1400,7 @@ function showProduct(productId) {
                                 Add Address
                             </button>
                         `
-                }
+    }
             </div>
             <div class="delivery-info">
                 <h4>
@@ -1510,10 +1598,10 @@ function renderCart() {
         console.error(
             "cartItems or cartSummary not found"
         );
-       return;
+        return;
     }
-   if (cart.length === 0) {
-       cartItems.innerHTML = `
+    if (cart.length === 0) {
+        cartItems.innerHTML = `
             <p>
                Your cart is empty.
                <a
@@ -1527,14 +1615,14 @@ function renderCart() {
                 </a>
            </p>
        `;
-       cartSummary.innerHTML = "";
-       return;
+        cartSummary.innerHTML = "";
+        return;
     }
     cartItems.innerHTML = "";
-   let totalOriginal = 0;
+    let totalOriginal = 0;
 
     let totalDiscounted = 0;
-  cart.forEach(
+    cart.forEach(
         (item, index) => {
 
             const price =
@@ -1547,7 +1635,7 @@ function renderCart() {
                 Number(
                     item.quantity
                 ) || 1;
-          const itemTotal =
+            const itemTotal =
                 price * quantity;
             const itemOriginalTotal =
                 originalPrice *
@@ -1556,7 +1644,7 @@ function renderCart() {
                 itemOriginalTotal;
             totalDiscounted +=
                 itemTotal;
-          const cartItem =
+            const cartItem =
                 document.createElement(
                     "div"
                 );
@@ -1575,47 +1663,47 @@ function renderCart() {
                         ${item.brand || ""}
                     </div>
                     ${
-                        item.color
-                            ? `
+                item.color
+                    ? `
                                 <p>
                                     Color:
                                     ${item.color}
                                 </p>
                             `
-                            : ""
-                    }
+                    : ""
+            }
                     ${
-                        item.size
-                            ? `
+                item.size
+                    ? `
                                 <p>
                                     Size:
                                     ${item.size}
                                 </p>
                             `
-                            : ""
-                    }
+                    : ""
+            }
                     <div class="product-price">
                         <span class="current-price">
                             ₹${price}
                         </span>
                         ${
-                            originalPrice > price
-                                ? `
+                originalPrice > price
+                    ? `
                                     <span class="original-price">
                                         ₹${originalPrice}
                                     </span>
                                 `
-                                : ""
-                        }
+                    : ""
+            }
                         ${
-                            item.discount
-                                ? `
+                item.discount
+                    ? `
                                     <span class="discount">
                                         ${item.discount}% OFF
                                     </span>
                                 `
-                                : ""
-                        }
+                    : ""
+            }
                     </div>
                     <div class="quantity-controls">
                         <button
@@ -1701,9 +1789,9 @@ function renderCart() {
             </span>
             <span>
                 ₹${
-                    totalOriginal -
-                    totalDiscounted
-                }
+        totalOriginal -
+        totalDiscounted
+    }
             </span>
         </div>
         <div class="summary-row">
@@ -1712,11 +1800,11 @@ function renderCart() {
             </span>
             <span>
                 ${
-                    deliveryCharges === 0
-                        ? "FREE"
-                        : "₹" +
-                          deliveryCharges
-                }
+        deliveryCharges === 0
+            ? "FREE"
+            : "₹" +
+            deliveryCharges
+    }
             </span>
         </div>
         <div class="summary-divider"></div>
@@ -1825,9 +1913,9 @@ function renderOrderSteps() {
 // ==================================================
 // STEP 2: ORDER SUMMARY
 // ==================================================
-else if (currentOrderSteps === 2) {
-    const cartTotal = cart.reduce(
-        (total, item) =>
+    else if (currentOrderSteps === 2) {
+        const cartTotal = cart.reduce(
+            (total, item) =>
                 total + Number(item.price) * Number(item.quantity),
             0
         );
@@ -1847,15 +1935,15 @@ else if (currentOrderSteps === 2) {
                             ${item.brand || ""}
                         </div>
                         ${
-                            item.color
-                                ? `<p>Color: ${item.color}</p>`
-                                : ""
-                        }
+                item.color
+                    ? `<p>Color: ${item.color}</p>`
+                    : ""
+            }
                         ${
-                            item.size
-                                ? `<p>Size: ${item.size}</p>`
-                                : ""
-                        }
+                item.size
+                    ? `<p>Size: ${item.size}</p>`
+                    : ""
+            }
                         <p>
                             Quantity: ${item.quantity}
                         </p>
@@ -1893,10 +1981,10 @@ else if (currentOrderSteps === 2) {
                         <span>Delivery Charges:</span>
                         <span>
                             ${
-                                deliveryCharges === 0
-                                    ? "FREE"
-                                    : "₹" + deliveryCharges
-                            }
+            deliveryCharges === 0
+                ? "FREE"
+                : "₹" + deliveryCharges
+        }
                         </span>
                     </div>
                     <div class="summary-divider"></div>
@@ -1916,8 +2004,8 @@ else if (currentOrderSteps === 2) {
             </div>
         `;
     }
-    // ==================================================
-    // STEP 3: PAYMENT
+        // ==================================================
+        // STEP 3: PAYMENT
     // ==================================================
     else if (currentOrderSteps === 3) {
         orderSteps.innerHTML = `
@@ -2567,15 +2655,15 @@ function renderOrders() {
                             ${item.brand || ""}
                         </div>
                         ${
-                            item.color
-                                ? `<p>Color: ${item.color}</p>`
-                                : ""
-                        }
+                item.color
+                    ? `<p>Color: ${item.color}</p>`
+                    : ""
+            }
                         ${
-                            item.size
-                                ? `<p>Size: ${item.size}</p>`
-                                : ""
-                        }
+                item.size
+                    ? `<p>Size: ${item.size}</p>`
+                    : ""
+            }
                         <p>
                             Quantity:
                             ${item.quantity}
@@ -2600,20 +2688,20 @@ function renderOrders() {
                     </h3>
               <span
     class="status-badge ${
-        order.status === "Cancelled"
-            ? "cancelled"
-            : isDelivered
-                ? "delivered"
-                : "on-way"
-    }"
+            order.status === "Cancelled"
+                ? "cancelled"
+                : isDelivered
+                    ? "delivered"
+                    : "on-way"
+        }"
 >
     ${
-        order.status === "Cancelled"
-            ? "Cancelled"
-            : isDelivered
-                ? "Delivered"
-                : "On the way"
-    }
+            order.status === "Cancelled"
+                ? "Cancelled"
+                : isDelivered
+                    ? "Delivered"
+                    : "On the way"
+        }
 </span>
                 </div>
                 <div class="order-meta">
@@ -2629,9 +2717,9 @@ function renderOrders() {
                             Total:
                         </strong>
                         ₹${
-                            Number(order.total) +
-                            Number(order.deliveryCharges)
-                        }
+            Number(order.total) +
+            Number(order.deliveryCharges)
+        }
                     </p>
                     <p>
                         <strong>
@@ -2639,10 +2727,10 @@ function renderOrders() {
                         </strong>
                         ${order.items.length}
                         ${
-                            order.items.length > 1
-                                ? "items"
-                                : "item"
-                        }
+            order.items.length > 1
+                ? "items"
+                : "item"
+        }
                     </p>
                     <div class="dropdown-arrow">
                         <span class="arrow-icon">
@@ -2701,10 +2789,10 @@ function renderOrders() {
                             </span>
                             <span>
                                 ${
-                                    Number(order.deliveryCharges) === 0
-                                        ? "FREE"
-                                        : "₹" + order.deliveryCharges
-                                }
+            Number(order.deliveryCharges) === 0
+                ? "FREE"
+                : "₹" + order.deliveryCharges
+        }
                             </span>
                         </div>
                         <div class="summary-divider"></div>
@@ -2714,9 +2802,9 @@ function renderOrders() {
                             </span>
                             <span>
                                 ₹${
-                                    Number(order.total) +
-                                    Number(order.deliveryCharges)
-                                }
+            Number(order.total) +
+            Number(order.deliveryCharges)
+        }
                             </span>
                         </div>
   <div class="order-actions">
@@ -3437,9 +3525,9 @@ function renderOrderSteps() {
 
                                 <strong>
                                     ₹${
-                                        Number(item.price || 0) *
-                                        Number(item.quantity || 0)
-                                    }
+            Number(item.price || 0) *
+            Number(item.quantity || 0)
+        }
                                 </strong>
 
                             </div>
@@ -3472,10 +3560,10 @@ function renderOrderSteps() {
 
                             <span>
                                 ${
-                                    deliveryCharges === 0
-                                        ? "FREE"
-                                        : "₹" + deliveryCharges
-                                }
+            deliveryCharges === 0
+                ? "FREE"
+                : "₹" + deliveryCharges
+        }
                             </span>
 
                         </div>
@@ -3626,10 +3714,10 @@ function renderOrderSteps() {
 
                             <span>
                                 ${
-                                    deliveryCharges === 0
-                                        ? "FREE"
-                                        : "₹" + deliveryCharges
-                                }
+            deliveryCharges === 0
+                ? "FREE"
+                : "₹" + deliveryCharges
+        }
                             </span>
 
                         </div>
@@ -3999,7 +4087,9 @@ async function loadFestivals() {
 function showFestival(festivalId) {
 
     const festival = festivals.find(
-        festival => festival.id === festivalId
+        festival =>
+            String(festival.id).toLowerCase() ===
+            String(festivalId).toLowerCase()
     );
 
     if (!festival) {
@@ -4007,15 +4097,25 @@ function showFestival(festivalId) {
         return;
     }
 
-    filteredProducts = festivalProducts.filter(
-        product => product.festival === festivalId
-    );
+    filteredProducts = products.filter(function(product) {
 
-    document.getElementById("categoryTitle").textContent =
-        festival.name;
-showPage("category");
-populateFilters();
-applyFilters();
+        return product.festival != null &&
+            String(product.festival).toLowerCase() ===
+            String(festivalId).toLowerCase();
+
+    });
+
+    console.log("Selected festival:", festivalId);
+    console.log("Festival Products:", filteredProducts);
+
+    const categoryTitle =
+        document.getElementById("categoryTitle");
+
+    if (categoryTitle) {
+        categoryTitle.textContent = festival.name;
+    }
+
+    showPage("category");
 
     renderProducts(filteredProducts);
 }
@@ -4477,11 +4577,6 @@ function renderRelationships() {
 
     });
 }
-
-
-// ===============================
-// RELATIONSHIP CLICK
-// ===============================
 // ===============================
 // RELATIONSHIP CLICK
 // ===============================
@@ -4665,30 +4760,30 @@ if (signupForm) {
 
             const name =
                 document.getElementById("signupName")
-                .value
-                .trim();
+                    .value
+                    .trim();
 
 
             const mobile =
                 document.getElementById("signupMobile")
-                .value
-                .trim();
+                    .value
+                    .trim();
 
 
             const email =
                 document.getElementById("signupEmail")
-                .value
-                .trim();
+                    .value
+                    .trim();
 
 
             const password =
                 document.getElementById("signupPassword")
-                .value;
+                    .value;
 
 
             const confirmPassword =
                 document.getElementById("confirmPassword")
-                .value;
+                    .value;
 
 
             const message =
@@ -6785,4 +6880,714 @@ function showFestival(festivalId) {
     populateFilters();
     showPage("category");
     applyFilters();
+}
+
+
+function renderRelationshipMenu() {
+
+    const menu =
+        document.getElementById("relationshipMenu");
+
+    if (!menu) {
+        return;
+    }
+
+    menu.innerHTML = "";
+
+    if (
+        !relationships ||
+        relationships.length === 0
+    ) {
+
+        menu.innerHTML = `
+            <div class="dropdown-empty">
+                No relationships available
+            </div>
+        `;
+
+        return;
+    }
+
+
+    relationships.forEach(function (relationship) {
+
+        const link =
+            document.createElement("a");
+
+        link.href = "#";
+
+        link.textContent =
+            relationship.name;
+
+        link.onclick = function (event) {
+
+            event.preventDefault();
+
+            showRelationshipProducts(relationship.id);
+
+
+        };
+
+        menu.appendChild(link);
+
+    });
+
+}
+function renderFestivalMenu() {
+
+    const menu =
+        document.getElementById("festivalMenu");
+
+    if (!menu) {
+        return;
+    }
+
+    menu.innerHTML = "";
+
+    if (
+        !festivals ||
+        festivals.length === 0
+    ) {
+
+        menu.innerHTML = `
+            <div class="dropdown-empty">
+                No festivals available
+            </div>
+        `;
+
+        return;
+    }
+
+
+    festivals.forEach(function (festival) {
+
+        const link =
+            document.createElement("a");
+
+        link.href = "#";
+
+        link.textContent =
+            festival.name;
+
+        link.onclick = function (event) {
+
+            event.preventDefault();
+
+            showFestival(festival.id);
+
+        };
+
+        menu.appendChild(link);
+
+    });
+
+}
+function renderCategoryMenu() {
+
+    const menu =
+        document.getElementById("categoryMenu");
+
+    if (!menu) {
+        return;
+    }
+
+    menu.innerHTML = "";
+
+    if (
+        !categories ||
+        categories.length === 0
+    ) {
+
+        menu.innerHTML = `
+            <div class="dropdown-empty">
+                No categories available
+            </div>
+        `;
+
+        return;
+    }
+
+
+    categories.forEach(function (category) {
+
+        const link =
+            document.createElement("a");
+
+        link.href = "#";
+
+        link.textContent =
+            category.name;
+
+        link.onclick = function (event) {
+
+            event.preventDefault();
+
+            showCategory(category.id);
+
+
+        };
+
+        menu.appendChild(link);
+
+    });
+
+}
+function renderNavigationMenus() {
+
+    console.log("Rendering navigation menus...");
+
+
+    /* =====================================================
+       RELATIONSHIPS
+       ===================================================== */
+
+    const relationshipMenu =
+        document.getElementById("relationshipMenu");
+
+    if (relationshipMenu) {
+
+        relationshipMenu.innerHTML = "";
+
+        if (
+            typeof relationships !== "undefined" &&
+            Array.isArray(relationships) &&
+            relationships.length > 0
+        ) {
+
+            relationships.forEach(function (relationship) {
+
+                const link =
+                    document.createElement("a");
+
+                link.href = "#";
+
+                link.textContent =
+                    relationship.name;
+
+                link.addEventListener(
+                    "click",
+                    function (event) {
+
+                        event.preventDefault();
+                        event.stopPropagation();
+
+                        console.log(
+                            "RELATIONSHIP DROPDOWN CLICKED:",
+                            relationship.id,
+                            relationship.name
+                        );
+
+                        showRelationshipProducts(
+                            relationship.id
+                        );
+
+                    }
+                );
+
+                relationshipMenu.appendChild(link);
+
+            });
+
+        } else {
+
+            relationshipMenu.innerHTML =
+                `<div class="dropdown-empty">
+                    No relationships available
+                </div>`;
+
+        }
+    }
+
+
+    /* =====================================================
+       FESTIVALS
+       ===================================================== */
+
+    const festivalMenu =
+        document.getElementById("festivalMenu");
+
+    if (festivalMenu) {
+
+        festivalMenu.innerHTML = "";
+
+        if (
+            typeof festivals !== "undefined" &&
+            Array.isArray(festivals) &&
+            festivals.length > 0
+        ) {
+
+            festivals.forEach(function (festival) {
+
+                const link =
+                    document.createElement("a");
+
+                link.href = "#";
+
+                link.textContent =
+                    festival.name;
+
+                link.addEventListener(
+                    "click",
+                    function (event) {
+
+                        event.preventDefault();
+                        event.stopPropagation();
+
+                        console.log(
+                            "FESTIVAL DROPDOWN CLICKED:",
+                            festival.id,
+                            festival.name
+                        );
+
+                        showFestival(
+                            festival.id
+                        );
+
+                    }
+                );
+
+                festivalMenu.appendChild(link);
+
+            });
+
+        } else {
+
+            festivalMenu.innerHTML =
+                `<div class="dropdown-empty">
+                    No festivals available
+                </div>`;
+
+        }
+    }
+
+
+    /* =====================================================
+       CATEGORIES
+       ===================================================== */
+
+    const categoryMenu =
+        document.getElementById("categoryMenu");
+
+    if (categoryMenu) {
+
+        categoryMenu.innerHTML = "";
+
+        if (
+            typeof categories !== "undefined" &&
+            Array.isArray(categories) &&
+            categories.length > 0
+        ) {
+
+            categories.forEach(function (category) {
+
+                const link =
+                    document.createElement("a");
+
+                link.href = "#";
+
+                link.textContent =
+                    category.name;
+
+                link.addEventListener(
+                    "click",
+                    function (event) {
+
+                        event.preventDefault();
+                        event.stopPropagation();
+
+                        console.log(
+                            "CATEGORY DROPDOWN CLICKED:",
+                            category.id,
+                            category.name
+                        );
+
+                        showCategory(
+                            category.id
+                        );
+
+                    }
+                );
+
+                categoryMenu.appendChild(link);
+
+            });
+
+        } else {
+
+            categoryMenu.innerHTML =
+                `<div class="dropdown-empty">
+                    No categories available
+                </div>`;
+
+        }
+    }
+
+
+    console.log(
+        "Navigation menus rendered successfully."
+    );
+
+}
+function renderShopDropdowns() {
+
+    // ================= RELATIONSHIPS =================
+
+    const relationshipMenu =
+        document.getElementById("relationshipMenu");
+
+    if (relationshipMenu) {
+
+        relationshipMenu.innerHTML = "";
+
+        if (Array.isArray(relationships)) {
+
+            relationships.forEach(function (relationship) {
+
+                const link =
+                    document.createElement("a");
+
+                link.href = "#";
+
+                link.textContent =
+                    relationship.name;
+
+                link.onclick = function (event) {
+
+                    event.preventDefault();
+
+                    console.log(
+                        "Relationship selected:",
+                        relationship
+                    );
+
+                    // Temporary: use your existing product page
+                    showPage("category");
+
+                    filteredProducts =
+                        products.filter(function (product) {
+
+                            return String(
+                                product.relationshipId ??
+                                product.relationship_id ??
+                                product.relationship?.id
+                            ) === String(
+                                relationship.id
+                            );
+
+                        });
+
+                    renderProducts(filteredProducts);
+                };
+
+                relationshipMenu.appendChild(link);
+            });
+        }
+    }
+
+
+    // ================= FESTIVALS =================
+
+    const festivalMenu =
+        document.getElementById("festivalMenu");
+
+    if (festivalMenu) {
+
+        festivalMenu.innerHTML = "";
+
+        if (Array.isArray(festivals)) {
+
+            festivals.forEach(function (festival) {
+
+                const link =
+                    document.createElement("a");
+
+                link.href = "#";
+
+                link.textContent =
+                    festival.name;
+
+                link.onclick = function (event) {
+
+                    event.preventDefault();
+
+                    console.log(
+                        "Festival selected:",
+                        festival
+                    );
+
+                    showPage("category");
+
+                    filteredProducts =
+                        products.filter(function (product) {
+
+                            return String(
+                                product.festivalId ??
+                                product.festival_id ??
+                                product.festival?.id
+                            ) === String(
+                                festival.id
+                            );
+
+                        });
+
+                    renderProducts(filteredProducts);
+                };
+
+                festivalMenu.appendChild(link);
+            });
+        }
+    }
+
+
+    // ================= CATEGORIES =================
+
+    const categoryMenu =
+        document.getElementById("categoryMenu");
+
+    if (categoryMenu) {
+
+        categoryMenu.innerHTML = "";
+
+        if (Array.isArray(categories)) {
+
+            categories.forEach(function (category) {
+
+                const link =
+                    document.createElement("a");
+
+                link.href = "#";
+
+                link.textContent =
+                    category.name;
+
+                link.onclick = function (event) {
+
+                    event.preventDefault();
+
+                    console.log(
+                        "Category selected:",
+                        category
+                    );
+
+                    showPage("category");
+
+                    filteredProducts =
+                        products.filter(function (product) {
+
+                            return String(
+                                product.categoryId ??
+                                product.category_id ??
+                                product.category?.id
+                            ) === String(
+                                category.id
+                            );
+
+                        });
+
+                    renderProducts(filteredProducts);
+                };
+
+                categoryMenu.appendChild(link);
+            });
+        }
+    }
+}
+
+/* =========================================================
+   SHOP NAVIGATION DROPDOWN MENUS
+========================================================= */
+function renderShopNavigationMenus() {
+
+    /* ================= RELATIONSHIP ================= */
+
+    const relationshipMenu =
+        document.getElementById("relationshipMenu");
+
+    if (
+        relationshipMenu &&
+        Array.isArray(relationships)
+    ) {
+
+        relationshipMenu.innerHTML = "";
+
+        relationships.forEach(function (relationship) {
+
+            const link =
+                document.createElement("a");
+
+            link.href = "#";
+
+            link.textContent =
+                relationship.name;
+
+            link.onclick = function (event) {
+
+                event.preventDefault();
+                event.stopPropagation();
+
+                console.log(
+                    "Relationship clicked:",
+                    relationship
+                );
+
+                showRelationshipProducts(
+                    relationship.id
+                );
+
+            };
+
+            relationshipMenu.appendChild(link);
+
+        });
+    }
+
+
+    /* ================= FESTIVAL ================= */
+
+    const festivalMenu =
+        document.getElementById("festivalMenu");
+
+    if (
+        festivalMenu &&
+        Array.isArray(festivals)
+    ) {
+
+        festivalMenu.innerHTML = "";
+
+        festivals.forEach(function (festival) {
+
+            const link =
+                document.createElement("a");
+
+            link.href = "#";
+
+            link.textContent =
+                festival.name;
+
+            link.onclick = function (event) {
+
+                event.preventDefault();
+                event.stopPropagation();
+
+                console.log(
+                    "Festival clicked:",
+                    festival
+                );
+
+                showFestival(
+                    festival.id
+                );
+
+            };
+
+            festivalMenu.appendChild(link);
+
+        });
+    }
+
+
+    /* ================= CATEGORY ================= */
+
+    const categoryMenu =
+        document.getElementById("categoryMenu");
+
+    if (
+        categoryMenu &&
+        Array.isArray(categories)
+    ) {
+
+        categoryMenu.innerHTML = "";
+
+        categories.forEach(function (category) {
+
+            const link =
+                document.createElement("a");
+
+            link.href = "#";
+
+            link.textContent =
+                category.name;
+
+            link.onclick = function (event) {
+
+                event.preventDefault();
+                event.stopPropagation();
+
+                console.log(
+                    "Category clicked:",
+                    category
+                );
+
+                showCategory(
+                    category.id
+                );
+
+            };
+
+            categoryMenu.appendChild(link);
+
+        });
+    }
+
+}
+
+
+/* =========================================================
+   WAIT FOR EXISTING DATA
+========================================================= */
+
+const shopMenuLoader =
+    setInterval(function () {
+
+        if (
+            Array.isArray(relationships) &&
+            Array.isArray(festivals) &&
+            Array.isArray(categories)
+        ) {
+
+            renderShopNavigationMenus();
+
+            clearInterval(shopMenuLoader);
+
+            console.log(
+                "Shop navigation menus loaded"
+            );
+        }
+
+    }, 500);
+function openAllGifts() {
+
+    console.log("========== ALL GIFTS CLICKED ==========");
+
+    // Take ALL products directly
+    const allProducts = Array.isArray(products)
+        ? products.slice()
+        : [];
+
+    console.log("ALL PRODUCTS:", allProducts);
+    console.log("ALL PRODUCT COUNT:", allProducts.length);
+
+    if (allProducts.length === 0) {
+        console.error("NO PRODUCTS AVAILABLE");
+        return;
+    }
+
+    // Set filtered products to ALL products
+    filteredProducts = allProducts;
+
+    // Change title
+    const categoryTitle =
+        document.getElementById("categoryTitle");
+
+    if (categoryTitle) {
+        categoryTitle.textContent = "All Gifts";
+    }
+
+    // Open category page
+    showPage("category");
+
+    // Render ALL products
+    renderProducts(allProducts);
+
+    console.log("========== ALL GIFTS DONE ==========");
 }
