@@ -49,14 +49,39 @@ public class PaymentController {
         );
     }
 
-
     @PostMapping("/verify")
-    public ResponseEntity<Payment> verifyPayment(
-            @RequestBody PaymentVerifyRequest request)
-            throws Exception {
+    public ResponseEntity<?> verifyPayment(
+            @RequestBody PaymentVerifyRequest request) {
 
-        return ResponseEntity.ok(
-                paymentService.verifyPayment(request)
-        );
+        System.out.println("========== RAZORPAY VERIFY ==========");
+        System.out.println("Order ID: " + request.getOrderId());
+        System.out.println("Razorpay Order ID: " + request.getRazorpayOrderId());
+        System.out.println("Razorpay Payment ID: " + request.getRazorpayPaymentId());
+        System.out.println("Signature received: "
+                + (request.getRazorpaySignature() != null));
+
+        try {
+
+            Payment payment = paymentService.verifyPayment(request);
+
+            System.out.println("========== PAYMENT VERIFIED SUCCESS ==========");
+            System.out.println("Payment DB ID: " + payment.getId());
+            System.out.println("Status: " + payment.getStatus());
+
+            return ResponseEntity.ok(payment);
+
+        } catch (Exception e) {
+
+            System.out.println("========== PAYMENT VERIFY FAILED ==========");
+            e.printStackTrace();
+
+            return ResponseEntity
+                    .badRequest()
+                    .body(Map.of(
+                            "message", e.getMessage() != null
+                                    ? e.getMessage()
+                                    : "Payment verification failed"
+                    ));
+        }
     }
 }

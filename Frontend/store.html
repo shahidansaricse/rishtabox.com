@@ -676,6 +676,75 @@
             </div>
 
         </div>
+        <!-- ================= ORDER SUCCESS PAGE ================= -->
+        <section id="orderSuccessPage" class="page hidden">
+
+            <div class="container">
+
+                <div class="order-success-container">
+
+                    <div class="success-icon">✓</div>
+
+                    <h1>Congratulations! 🎉</h1>
+
+                    <h2>Your order has been placed successfully</h2>
+
+                    <p class="success-message">
+                        Thank you for shopping with RishtaBox.
+                        Your payment was successful and your order is confirmed.
+                    </p>
+
+                    <div class="success-order-details">
+
+                        <div class="success-detail-row">
+                            <span>Order ID</span>
+                            <strong id="successOrderId">-</strong>
+                        </div>
+
+                        <div class="success-detail-row">
+                            <span>Payment Method</span>
+                            <strong id="successPaymentMethod">-</strong>
+                        </div>
+
+                        <div class="success-detail-row">
+                            <span>Total Amount</span>
+                            <strong>₹<span id="successOrderTotal">0</span></strong>
+                        </div>
+
+                        <div class="success-detail-row">
+                            <span>Expected Delivery</span>
+                            <strong id="successDeliveryDate">-</strong>
+                        </div>
+
+                        <div class="success-detail-row">
+                            <span>Payment Status</span>
+                            <strong id="successPaymentStatus">-</strong>
+                        </div>
+
+                    </div>
+
+                    <div class="success-buttons">
+
+                        <button type="button"
+                                class="btn-primary"
+                                onclick="showPage('orders'); return false;">
+                            📦 View My Orders
+                        </button>
+
+                        <button type="button"
+                                class="btn-secondary"
+                                onclick="showPage('home'); return false;">
+                            🛍️ Continue Shopping
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+        <!-- ================= END ORDER SUCCESS PAGE ================= -->
         <!-- ================= LOGIN / SIGNUP PAGE ================= -->
 
         <section id="loginPage" class="page hidden">

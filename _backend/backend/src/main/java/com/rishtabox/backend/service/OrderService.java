@@ -151,7 +151,6 @@ public class OrderService {
 
         return orderRepository.findByUserId(userId);
     }
-
     // Get single order
     public Order getOrder(Long orderId) {
 
@@ -159,4 +158,27 @@ public class OrderService {
                 .orElseThrow(() ->
                         new RuntimeException("Order not found"));
     }
+
+
+    // Cancel Order
+    @Transactional
+    public Order cancelOrder(Long orderId) {
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() ->
+                        new RuntimeException("Order not found"));
+
+        if ("CANCELLED".equalsIgnoreCase(
+                order.getOrderStatus())) {
+
+            throw new RuntimeException(
+                    "Order is already cancelled"
+            );
+        }
+
+        order.setOrderStatus("CANCELLED");
+
+        return orderRepository.save(order);
+    }
+
 }

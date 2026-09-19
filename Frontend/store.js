@@ -2485,26 +2485,29 @@ async function placeOrder() {
         // ==========================================
         // 17. SHOW SUCCESS
         // ==========================================
+        console.log("========== BEFORE COD SUCCESS PAGE ==========");
+        console.log("orderId:", orderId);
+        console.log("finalTotal:", finalTotal);
+        console.log("deliveryDate:", deliveryDate);
+        console.log("showOrderSuccess:", typeof showOrderSuccess);
 
         showOrderSuccess(
-            frontendOrderId,
-            "Online Payment",
+            orderId,
+            "Cash on Delivery",
             finalTotal,
             deliveryDate
         );
 
-
     } catch (error) {
 
-        console.error(
-            "Order API Error:",
-            error
-        );
-
+        console.error("========== FRONTEND ORDER ERROR ==========");
+        console.error("Error:", error);
+        console.error("Message:", error.message);
+        console.error("Stack:", error.stack);
 
         alert(
-            "Could not connect to the backend. " +
-            "Please make sure Spring Boot is running."
+            "Payment successful, but frontend display failed.\n\n" +
+            "Error: " + error.message
         );
     }
 }
@@ -2716,22 +2719,41 @@ function renderOrders() {
                                 }
                             </span>
                         </div>
-                        ${
-    !isDelivered
-        ? `
-            <div class="order-actions">
+  <div class="order-actions">
 
+    ${
+            !isDelivered && order.status !== "Cancelled"
+                ? `
                 <button
                     type="button"
                     class="cancel-order-btn"
-                    onclick="cancelOrder('${order.id}')">
+                    onclick="cancelOrder('${order.id}'); event.stopPropagation();">
                     ❌ Cancel Order
                 </button>
+            `
+                : ""
+        }
 
-            </div>
-          `
-        : ""
-}
+    ${
+            order.status !== "Cancelled"
+                ? `
+                <button
+                    type="button"
+                    class="track-order-btn"
+                    onclick="showOrderTracking('${order.id}'); event.stopPropagation();">
+                    🚚 Track Order
+                </button>
+            `
+                : ""
+        }
+
+</div>
+
+<div
+    id="tracking-${order.id}"
+    class="order-tracking"
+    style="display:none;">
+</div>
                     </div>
                 </div>
             </div>
@@ -2739,8 +2761,182 @@ function renderOrders() {
         ordersList.appendChild(orderDiv);
     });
 }
-/*--------------------------------------------------*/ 
-function cancelOrder(orderId) {
+function showOrderTracking(orderId) {
+
+    const order =
+        orders.find(o => o.id === orderId);
+
+    if (!order) {
+        alert("Order not found.");
+        return;
+    }
+
+    const trackingElement =
+        document.getElementById(
+            `tracking-${orderId}`
+        );
+
+    if (!trackingElement) return;
+
+    // Toggle
+    if (trackingElement.style.display === "block") {
+        trackingElement.style.display = "none";
+        trackingElement.innerHTML = "";
+        return;
+    }
+
+    const orderDate =
+        new Date(order.orderDate);
+
+    const deliveryDate =
+        new Date(order.deliveryDate);
+
+    const currentDate =
+        new Date();
+
+    const totalTime =
+        deliveryDate.getTime() -
+        orderDate.getTime();
+
+    const elapsedTime =
+        currentDate.getTime() -
+        orderDate.getTime();
+
+    let progress =
+        totalTime > 0
+            ? elapsedTime / totalTime
+            : 1;
+
+    progress =
+        Math.max(0, Math.min(1, progress));
+
+    let currentStep = 1;
+
+    if (order.status === "Cancelled") {
+        currentStep = -1;
+    } else if (progress >= 1) {
+        currentStep = 4;
+    } else if (progress >= 0.70) {
+        currentStep = 3;
+    } else if (progress >= 0.35) {
+        currentStep = 2;
+    }
+
+    const steps = [
+        {
+            title: "Order Placed",
+            icon: "✓"
+        },
+        {
+            title: "Confirmed",
+            icon: "✓"
+        },
+        {
+            title: "Shipped",
+            icon: "🚚"
+        },
+        {
+            title: "Out for Delivery",
+            icon: "🚚"
+        },
+        {
+            title: "Delivered",
+            icon: "✓"
+        }
+    ];
+
+    let stepsHTML = "";
+
+    steps.forEach((step, index) => {
+
+        const stepNumber = index;
+
+        let className = "";
+
+        if (currentStep === -1) {
+            className = "cancelled";
+        } else if (stepNumber < currentStep) {
+            className = "completed";
+        } else if (stepNumber === currentStep) {
+            className = "current";
+        }
+
+        stepsHTML += `
+            <div class="tracking-step ${className}">
+
+                <div class="tracking-icon">
+                    ${step.icon}
+                </div>
+
+                <div class="tracking-step-content">
+
+                    <strong>
+                        ${step.title}
+                    </strong>
+
+                    <span>
+                        ${
+            stepNumber === 0
+                ? "Your order has been placed"
+                : stepNumber === 1
+                    ? "Your order has been confirmed"
+                    : stepNumber === 2
+                        ? "Your order has been shipped"
+                        : stepNumber === 3
+                            ? "Your order is out for delivery"
+                            : "Your order has been delivered"
+        }
+                    </span>
+
+                </div>
+
+            </div>
+        `;
+    });
+
+    trackingElement.innerHTML = `
+
+        <div class="order-tracking-box">
+
+            <h3>
+                🚚 Track Order
+            </h3>
+
+            <p>
+                <strong>Order ID:</strong>
+                ${order.id}
+            </p>
+
+            <p>
+                <strong>Expected Delivery:</strong>
+                ${deliveryDate.toLocaleDateString()}
+            </p>
+
+            ${
+        order.status === "Cancelled"
+            ? `
+                        <div class="tracking-cancelled">
+                            ❌ This order has been cancelled.
+                        </div>
+                    `
+            : `
+                        <div class="tracking-timeline">
+                            ${stepsHTML}
+                        </div>
+                    `
+    }
+
+        </div>
+    `;
+
+    trackingElement.style.display = "block";
+}
+/*--------------------------------------------------*/
+/*--------------------------------------------------*/
+/* CANCEL ORDER */
+/*--------------------------------------------------*/
+
+async function cancelOrder(orderId) {
 
     const confirmCancel = confirm(
         "Are you sure you want to cancel this order?"
@@ -2759,9 +2955,12 @@ function cancelOrder(orderId) {
         return;
     }
 
+    const order = orders[orderIndex];
+
     const currentDate = new Date();
+
     const deliveryDate =
-        new Date(orders[orderIndex].deliveryDate);
+        new Date(order.deliveryDate);
 
     // Don't allow cancellation after delivery date
     if (currentDate >= deliveryDate) {
@@ -2771,19 +2970,128 @@ function cancelOrder(orderId) {
         return;
     }
 
-    orders[orderIndex].status = "Cancelled";
+    // ==========================================
+    // BACKEND ORDER ID CHECK
+    // ==========================================
 
-    orders[orderIndex].cancelledDate =
-        new Date().toISOString();
+    if (!order.backendOrderId) {
 
-    localStorage.setItem(
-        "orders",
-        JSON.stringify(orders)
-    );
+        alert(
+            "Backend Order ID not found."
+        );
 
-    alert("Order cancelled successfully.");
+        console.error(
+            "backendOrderId missing:",
+            order
+        );
 
-    renderOrders();
+        return;
+    }
+
+    try {
+
+        const token =
+            localStorage.getItem("token");
+
+        // ==========================================
+        // CANCEL ORDER IN MYSQL
+        // ==========================================
+
+        const response = await fetch(
+            `http://localhost:8080/api/orders/${order.backendOrderId}/cancel`,
+            {
+                method: "PUT",
+
+                headers: {
+                    "Content-Type": "application/json",
+
+                    "Authorization":
+                        `Bearer ${token}`
+                }
+            }
+        );
+
+        const responseText =
+            await response.text();
+
+        let responseData = {};
+
+        try {
+            responseData =
+                JSON.parse(responseText);
+        } catch (e) {
+            console.log(
+                "Backend response:",
+                responseText
+            );
+        }
+
+        console.log(
+            "Cancel API Status:",
+            response.status
+        );
+
+        console.log(
+            "Cancel API Response:",
+            responseData
+        );
+
+        // ==========================================
+        // CHECK BACKEND RESPONSE
+        // ==========================================
+
+        if (!response.ok) {
+
+            alert(
+                responseData.message ||
+                responseText ||
+                "Order cancellation failed."
+            );
+
+            return;
+        }
+
+        // ==========================================
+        // UPDATE FRONTEND ORDER
+        // ==========================================
+
+        orders[orderIndex].status =
+            "Cancelled";
+
+        orders[orderIndex].cancelledDate =
+            new Date().toISOString();
+
+        // ==========================================
+        // SAVE LOCAL STORAGE
+        // ==========================================
+
+        localStorage.setItem(
+            "orders",
+            JSON.stringify(orders)
+        );
+
+        alert(
+            "Order cancelled successfully."
+        );
+
+        // ==========================================
+        // REFRESH ORDERS
+        // ==========================================
+
+        renderOrders();
+
+    } catch (error) {
+
+        console.error(
+            "Cancel Order Error:",
+            error
+        );
+
+        alert(
+            "Unable to cancel order.\n\n" +
+            error.message
+        );
+    }
 }
 // ======================================================
 // TOGGLE ORDER DETAILS
@@ -4922,49 +5230,77 @@ document.addEventListener(
         }
 
     }
-);
-async function payWithRazorpay(backendOrderId, orderData) {
+);async function payWithRazorpay(backendOrderId, orderData) {
 
     console.log("===== RAZORPAY PAYMENT START =====");
     console.log("Backend Order ID:", backendOrderId);
 
+    // =====================================================
+    // 1. CHECK RAZORPAY
+    // =====================================================
+
     if (typeof Razorpay === "undefined") {
+
         alert(
             "Razorpay failed to load. Please check your internet connection."
         );
+
         return;
     }
 
     if (!backendOrderId) {
+
         alert("Order ID not found.");
+
         return;
     }
 
+
+    // =====================================================
+    // 2. TOKEN
+    // =====================================================
+
     const token = localStorage.getItem("token");
 
-    // IMPORTANT:
-    // Keep cart data before any backend/local cart clearing
+    if (!token) {
+
+        alert("Please login again.");
+
+        return;
+    }
+
+
+    // =====================================================
+    // 3. SAVE CART SNAPSHOT
+    // =====================================================
+
     const paidCart = Array.isArray(cart)
         ? cart.map(item => ({ ...item }))
         : [];
 
+
     console.log("Paid Cart Snapshot:", paidCart);
 
+
     if (paidCart.length === 0) {
+
         alert("Cart is empty.");
+
         return;
     }
+
 
     try {
 
         // =====================================================
-        // 1. CREATE RAZORPAY ORDER
+        // 4. CREATE RAZORPAY ORDER
         // =====================================================
 
         console.log(
             "Creating Razorpay order for DB Order:",
             backendOrderId
         );
+
 
         const paymentOrderResponse = await fetch(
             "http://localhost:8080/api/payments/create-order",
@@ -4977,35 +5313,44 @@ async function payWithRazorpay(backendOrderId, orderData) {
                 },
 
                 body: JSON.stringify({
-                    orderId: backendOrderId
+                    orderId: Number(backendOrderId)
                 })
             }
         );
 
+
         const paymentOrderText =
             await paymentOrderResponse.text();
 
+
         let paymentOrder = {};
 
+
         try {
+
             paymentOrder =
                 JSON.parse(paymentOrderText);
+
         } catch (e) {
+
             console.error(
                 "Payment order response is not JSON:",
                 paymentOrderText
             );
         }
 
+
         console.log(
             "Create Payment Status:",
             paymentOrderResponse.status
         );
 
+
         console.log(
             "Create Payment Response:",
             paymentOrder
         );
+
 
         if (!paymentOrderResponse.ok) {
 
@@ -5013,6 +5358,7 @@ async function payWithRazorpay(backendOrderId, orderData) {
                 "Could not create Razorpay payment: " +
                 (
                     paymentOrder.message ||
+                    paymentOrder.error ||
                     paymentOrderText ||
                     "Payment order creation failed."
                 )
@@ -5021,8 +5367,14 @@ async function payWithRazorpay(backendOrderId, orderData) {
             return;
         }
 
+
+        // =====================================================
+        // 5. GET RAZORPAY ORDER ID
+        // =====================================================
+
         const razorpayOrderId =
             paymentOrder.razorpayOrderId;
+
 
         if (!razorpayOrderId) {
 
@@ -5030,48 +5382,65 @@ async function payWithRazorpay(backendOrderId, orderData) {
                 "Razorpay Order ID was not received from backend."
             );
 
+
             console.error(
                 "Missing Razorpay Order ID:",
                 paymentOrder
             );
 
+
             return;
         }
+
 
         console.log(
             "Razorpay Order ID:",
             razorpayOrderId
         );
 
+
         // =====================================================
-        // 2. PAYMENT AMOUNT
+        // 6. PAYMENT AMOUNT
         // =====================================================
 
         const razorpayAmount =
             Number(paymentOrder.amount);
 
-        if (!razorpayAmount || razorpayAmount <= 0) {
+
+        if (
+            Number.isNaN(razorpayAmount) ||
+            razorpayAmount <= 0
+        ) {
 
             alert(
                 "Invalid payment amount received from backend."
             );
 
+            console.error(
+                "Invalid Razorpay amount:",
+                paymentOrder.amount
+            );
+
             return;
         }
+
 
         console.log(
             "Razorpay Amount:",
             razorpayAmount
         );
 
+
         // =====================================================
-        // 3. RAZORPAY CHECKOUT
+        // 7. RAZORPAY CHECKOUT OPTIONS
         // =====================================================
 
         const options = {
 
+            // Your TEST key
             key: "rzp_test_TcGIuj6KWkDynr",
 
+            // Razorpay expects paise
             amount:
                 Math.round(
                     razorpayAmount * 100
@@ -5087,26 +5456,60 @@ async function payWithRazorpay(backendOrderId, orderData) {
             order_id:
             razorpayOrderId,
 
+
+            // =================================================
+            // 8. PAYMENT SUCCESS
+            // =================================================
+
             handler: async function (response) {
 
                 console.log(
                     "===== RAZORPAY PAYMENT SUCCESS ====="
                 );
 
+
                 console.log(
                     "Razorpay Response:",
                     response
                 );
 
-                // =================================================
-                // 4. VERIFY PAYMENT
-                // =================================================
+
+                // =============================================
+                // CHECK RESPONSE
+                // =============================================
+
+                if (
+                    !response ||
+                    !response.razorpay_order_id ||
+                    !response.razorpay_payment_id ||
+                    !response.razorpay_signature
+                ) {
+
+                    console.error(
+                        "Invalid Razorpay success response:",
+                        response
+                    );
+
+
+                    alert(
+                        "Payment response is incomplete. Please contact support."
+                    );
+
+
+                    return;
+                }
+
+
+                // =============================================
+                // 9. VERIFY PAYMENT
+                // =============================================
 
                 try {
 
                     console.log(
                         "Sending payment verification to backend..."
                     );
+
 
                     const verifyResponse =
                         await fetch(
@@ -5125,7 +5528,7 @@ async function payWithRazorpay(backendOrderId, orderData) {
                                 body: JSON.stringify({
 
                                     orderId:
-                                    backendOrderId,
+                                        Number(backendOrderId),
 
                                     razorpayOrderId:
                                     response.razorpay_order_id,
@@ -5139,10 +5542,13 @@ async function payWithRazorpay(backendOrderId, orderData) {
                             }
                         );
 
+
                     const verifyText =
                         await verifyResponse.text();
 
+
                     let verifyData = {};
+
 
                     try {
 
@@ -5157,19 +5563,22 @@ async function payWithRazorpay(backendOrderId, orderData) {
                         );
                     }
 
+
                     console.log(
                         "Verify Status:",
                         verifyResponse.status
                     );
+
 
                     console.log(
                         "Verify Response:",
                         verifyData
                     );
 
-                    // =================================================
-                    // PAYMENT VERIFICATION FAILED
-                    // =================================================
+
+                    // =========================================
+                    // VERIFICATION FAILED
+                    // =========================================
 
                     if (!verifyResponse.ok) {
 
@@ -5177,39 +5586,47 @@ async function payWithRazorpay(backendOrderId, orderData) {
                             "BACKEND PAYMENT VERIFICATION FAILED"
                         );
 
+
                         alert(
                             "Payment verification failed: " +
                             (
                                 verifyData.message ||
+                                verifyData.error ||
                                 verifyText ||
                                 "Payment verification failed."
                             )
                         );
 
+
                         return;
                     }
 
-                    // =================================================
+
+                    // =========================================
                     // PAYMENT VERIFIED
-                    // =================================================
+                    // =========================================
 
                     console.log(
                         "===================================="
                     );
 
+
                     console.log(
                         "PAYMENT VERIFIED SUCCESSFULLY"
                     );
+
 
                     console.log(
                         "Database Order ID:",
                         backendOrderId
                     );
 
+
                     console.log(
                         "Razorpay Payment ID:",
                         response.razorpay_payment_id
                     );
+
 
                     console.log(
                         "===================================="
@@ -5217,47 +5634,13 @@ async function payWithRazorpay(backendOrderId, orderData) {
 
 
                     // =================================================
-                    // 5. CLEAR BACKEND CART
-                    // =================================================
-
-                    try {
-
-                        const clearCartResponse =
-                            await fetch(
-                                `http://localhost:8080/api/cart/clear/${currentUser.id}`,
-                                {
-                                    method: "DELETE",
-
-                                    headers: {
-                                        "Authorization":
-                                            `Bearer ${token}`
-                                    }
-                                }
-                            );
-
-                        console.log(
-                            "Backend Cart Clear Status:",
-                            clearCartResponse.status
-                        );
-
-                    } catch (cartError) {
-
-                        console.error(
-                            "Backend Cart Clear Error:",
-                            cartError
-                        );
-
-                        // Don't stop order success
-                    }
-
-
-                    // =================================================
-                    // 6. CREATE FRONTEND ORDER
+                    // 10. CREATE FRONTEND ORDER
                     // =================================================
 
                     console.log(
                         "Creating frontend order..."
                     );
+
 
                     const frontendOrderId =
                         "ORD" +
@@ -5266,24 +5649,38 @@ async function payWithRazorpay(backendOrderId, orderData) {
                             Math.random() * 1000
                         );
 
+
                     const orderDate =
                         new Date();
 
+
                     const deliveryDate =
                         new Date();
+
 
                     deliveryDate.setDate(
                         deliveryDate.getDate() + 7
                     );
 
 
-                    // Calculate from paidCart
+                    // =================================================
+                    // 11. CALCULATE TOTAL
+                    // =================================================
+
                     const cartTotal =
                         paidCart.reduce(
-                            (total, item) =>
-                                total +
-                                Number(item.price || 0) *
-                                Number(item.quantity || 0),
+                            (total, item) => {
+
+                                const price =
+                                    Number(item.price || 0);
+
+                                const quantity =
+                                    Number(item.quantity || 0);
+
+                                return total +
+                                    (price * quantity);
+                            },
+
                             0
                         );
 
@@ -5304,16 +5701,39 @@ async function payWithRazorpay(backendOrderId, orderData) {
                         cartTotal
                     );
 
+
                     console.log(
                         "Delivery Charges:",
                         deliveryCharges
                     );
+
 
                     console.log(
                         "Final Total:",
                         finalTotal
                     );
 
+
+                    // =================================================
+                    // 12. CUSTOMER DETAILS SAFELY
+                    // =================================================
+
+                    const customerName =
+                        currentUser?.name || "";
+
+                    const customerEmail =
+                        currentUser?.email || "";
+
+                    const customerPhone =
+                        currentUser?.phone || "";
+
+                    const customerAddress =
+                        currentUser?.address || "";
+
+
+                    // =================================================
+                    // 13. FRONTEND ORDER OBJECT
+                    // =================================================
 
                     const frontendOrder = {
 
@@ -5349,6 +5769,9 @@ async function payWithRazorpay(backendOrderId, orderData) {
                         razorpayPaymentId:
                         response.razorpay_payment_id,
 
+                        razorpaySignature:
+                        response.razorpay_signature,
+
                         orderDate:
                             orderDate.toISOString(),
 
@@ -5359,16 +5782,16 @@ async function payWithRazorpay(backendOrderId, orderData) {
                             "confirmed",
 
                         name:
-                        currentUser.name,
+                        customerName,
 
                         email:
-                        currentUser.email,
+                        customerEmail,
 
                         phone:
-                        currentUser.phone,
+                        customerPhone,
 
                         address:
-                        currentUser.address
+                        customerAddress
                     };
 
 
@@ -5379,122 +5802,363 @@ async function payWithRazorpay(backendOrderId, orderData) {
 
 
                     // =================================================
-                    // 7. SAVE FRONTEND ORDER
+                    // 14. SAVE FRONTEND ORDER
                     // =================================================
 
-                    if (!Array.isArray(orders)) {
-                        orders = [];
+                    try {
+
+                        if (!Array.isArray(orders)) {
+
+                            orders = [];
+                        }
+
+
+                        orders.push(
+                            frontendOrder
+                        );
+
+
+                        if (
+                            typeof saveOrdersData ===
+                            "function"
+                        ) {
+
+                            saveOrdersData();
+
+                        } else {
+
+                            localStorage.setItem(
+                                "orders",
+                                JSON.stringify(orders)
+                            );
+                        }
+
+
+                        console.log(
+                            "Frontend order saved successfully."
+                        );
+
+
+                    } catch (orderSaveError) {
+
+                        console.error(
+                            "Frontend order save error:",
+                            orderSaveError
+                        );
+
+
+                        // Direct localStorage backup
+                        try {
+
+                            localStorage.setItem(
+                                "orders",
+                                JSON.stringify(orders)
+                            );
+
+
+                            console.log(
+                                "Order saved using localStorage backup."
+                            );
+
+                        } catch (backupError) {
+
+                            console.error(
+                                "localStorage order backup failed:",
+                                backupError
+                            );
+                        }
                     }
 
-                    orders.push(frontendOrder);
 
-                    saveOrdersData();
+                    // =================================================
+                    // 15. CLEAR BACKEND CART
+                    // =================================================
 
-                    console.log(
-                        "Frontend order saved successfully."
-                    );
+                    try {
+
+                        if (
+                            currentUser &&
+                            currentUser.id
+                        ) {
+
+                            const clearCartResponse =
+                                await fetch(
+                                    `http://localhost:8080/api/cart/clear/${currentUser.id}`,
+                                    {
+                                        method: "DELETE",
+
+                                        headers: {
+                                            "Authorization":
+                                                `Bearer ${token}`
+                                        }
+                                    }
+                                );
+
+
+                            console.log(
+                                "Backend Cart Clear Status:",
+                                clearCartResponse.status
+                            );
+
+
+                            if (!clearCartResponse.ok) {
+
+                                console.warn(
+                                    "Backend cart could not be cleared."
+                                );
+                            }
+
+
+                        } else {
+
+                            console.warn(
+                                "Current user ID not available. Backend cart was not cleared."
+                            );
+                        }
+
+
+                    } catch (cartError) {
+
+                        console.error(
+                            "Backend Cart Clear Error:",
+                            cartError
+                        );
+
+
+                        // IMPORTANT:
+                        // Payment is already verified.
+                        // Cart error must not cancel success.
+                    }
 
 
                     // =================================================
-                    // 8. CLEAR FRONTEND CART
+                    // 16. CLEAR FRONTEND CART
                     // =================================================
 
-                    cart = [];
+                    try {
 
-                    saveCartData();
+                        cart = [];
 
-                    updateCartCount();
 
-                    console.log(
-                        "Frontend cart cleared."
-                    );
+                        if (
+                            typeof saveCartData ===
+                            "function"
+                        ) {
+
+                            saveCartData();
+
+                        } else {
+
+                            localStorage.setItem(
+                                "cart",
+                                JSON.stringify([])
+                            );
+                        }
+
+
+                        if (
+                            typeof updateCartCount ===
+                            "function"
+                        ) {
+
+                            updateCartCount();
+                        }
+
+
+                        console.log(
+                            "Frontend cart cleared."
+                        );
+
+
+                    } catch (cartSaveError) {
+
+                        console.error(
+                            "Frontend cart clear error:",
+                            cartSaveError
+                        );
+
+
+                        // Force localStorage clear
+                        try {
+
+                            localStorage.setItem(
+                                "cart",
+                                JSON.stringify([])
+                            );
+
+                        } catch (e) {
+
+                            console.error(
+                                "Could not clear local cart:",
+                                e
+                            );
+                        }
+                    }
 
 
                     // =================================================
-                    // 9. SHOW SUCCESS
+                    // 17. SHOW SUCCESS PAGE
                     // =================================================
 
                     console.log(
                         "Showing order success..."
                     );
 
-                    showOrderSuccess(
-                        frontendOrderId,
-                        "Online Payment",
-                        finalTotal,
-                        deliveryDate
-                    );
+
+                    try {
+
+                        if (
+                            typeof showOrderSuccess ===
+                            "function"
+                        ) {
+
+                            showOrderSuccess(
+                                frontendOrderId,
+                                "Online Payment",
+                                finalTotal,
+                                deliveryDate
+                            );
+
+
+                            console.log(
+                                "Order success page displayed."
+                            );
+
+
+                        } else {
+
+                            console.error(
+                                "showOrderSuccess() function not found."
+                            );
+
+
+                            alert(
+                                "Payment successful! Order ID: " +
+                                frontendOrderId
+                            );
+                        }
+
+
+                    } catch (successError) {
+
+                        console.error(
+                            "showOrderSuccess error:",
+                            successError
+                        );
+
+
+                        alert(
+                            "Payment successful!\n\n" +
+                            "Order ID: " +
+                            frontendOrderId +
+                            "\n\n" +
+                            "Please check My Orders."
+                        );
+                    }
+
 
                     console.log(
                         "===== ORDER COMPLETED ====="
                     );
+                }
 
-                } catch (errorAfterPayment) {
 
-                    // IMPORTANT:
-                    // This is NOT payment verification failure.
-                    // Backend already verified the payment.
+                    // =================================================
+                    // ERROR AFTER PAYMENT VERIFICATION
+                    // =================================================
+
+                catch (errorAfterPayment) {
 
                     console.error(
                         "ERROR AFTER PAYMENT VERIFICATION:",
                         errorAfterPayment
                     );
 
+
                     console.error(
                         "Error Name:",
-                        errorAfterPayment.name
+                        errorAfterPayment?.name
                     );
+
 
                     console.error(
                         "Error Message:",
-                        errorAfterPayment.message
+                        errorAfterPayment?.message
                     );
+
 
                     console.error(
                         "Error Stack:",
-                        errorAfterPayment.stack
+                        errorAfterPayment?.stack
                     );
 
+
+                    /*
+                     * IMPORTANT:
+                     * At this point Razorpay payment was already
+                     * verified by backend.
+                     *
+                     * Therefore DON'T show:
+                     * "Payment verification failed"
+                     *
+                     * Show successful payment message instead.
+                     */
+
                     alert(
-                        "Payment successful. Order was saved in database, but there was a frontend display error. Please check My Orders."
+                        "Payment successful!\n\n" +
+                        "Order ID: " +
+                        backendOrderId +
+                        "\n\n" +
+                        "Please check My Orders."
                     );
                 }
             },
 
 
             // =====================================================
-            // CUSTOMER DETAILS
+            // 18. CUSTOMER DETAILS
             // =====================================================
 
             prefill: {
 
                 name:
-                    currentUser.name || "",
+                    currentUser?.name || "",
 
                 email:
-                    currentUser.email || "",
+                    currentUser?.email || "",
 
                 contact:
-                    currentUser.phone || ""
+                    currentUser?.phone || ""
             },
 
 
+            // =====================================================
+            // 19. THEME
+            // =====================================================
+
             theme: {
-                color: "#e35486"
+
+                color:
+                    "#e35486"
             }
         };
 
 
         // =====================================================
-        // 10. CREATE RAZORPAY INSTANCE
+        // 20. CREATE RAZORPAY INSTANCE
         // =====================================================
+
+        console.log(
+            "Creating Razorpay instance..."
+        );
+
 
         const razorpay =
             new Razorpay(options);
 
 
         // =====================================================
-        // 11. PAYMENT FAILED
+        // 21. PAYMENT FAILED
         // =====================================================
 
         razorpay.on(
@@ -5506,42 +6170,242 @@ async function payWithRazorpay(backendOrderId, orderData) {
                     response
                 );
 
+
+                const description =
+                    response?.error?.description ||
+                    "Unknown payment error.";
+
+
                 alert(
                     "Payment failed: " +
-                    (
-                        response.error?.description ||
-                        "Unknown payment error."
-                    )
+                    description
                 );
             }
         );
 
 
         // =====================================================
-        // 12. OPEN CHECKOUT
+        // 22. OPEN RAZORPAY
         // =====================================================
+
+        console.log(
+            "Opening Razorpay checkout..."
+        );
+
 
         razorpay.open();
 
+
+        console.log(
+            "Razorpay checkout opened."
+        );
+
+
     } catch (error) {
+
+        // =====================================================
+        // 23. GENERAL ERROR
+        // =====================================================
 
         console.error(
             "Razorpay Error:",
             error
         );
 
+
         console.error(
             "Error Message:",
-            error.message
+            error?.message
         );
 
+
+        console.error(
+            "Error Stack:",
+            error?.stack
+        );
+
+
         alert(
-            "Could not connect to the payment server. " +
+            "Could not connect to the payment server.\n\n" +
             "Please make sure Spring Boot is running."
         );
     }
-}
+}function showOrderSuccess(
+    orderId,
+    paymentMethod,
+    finalTotal,
+    deliveryDate
+) {
 
+    console.log("===== ORDER SUCCESS PAGE =====");
+
+    console.log("Order ID:", orderId);
+    console.log("Payment Method:", paymentMethod);
+    console.log("Total:", finalTotal);
+    console.log("Delivery Date:", deliveryDate);
+
+
+    // ==========================================
+    // 1. ORDER ID
+    // ==========================================
+
+    const orderIdElement =
+        document.getElementById("successOrderId");
+
+    if (orderIdElement) {
+        orderIdElement.textContent =
+            orderId || "-";
+    }
+
+
+    // ==========================================
+    // 2. PAYMENT METHOD
+    // ==========================================
+
+    const paymentMethodElement =
+        document.getElementById("successPaymentMethod");
+
+    if (paymentMethodElement) {
+
+        paymentMethodElement.textContent =
+            paymentMethod || "-";
+    }
+
+
+    // ==========================================
+    // 3. TOTAL
+    // ==========================================
+
+    const totalElement =
+        document.getElementById("successOrderTotal");
+
+    if (totalElement) {
+
+        totalElement.textContent =
+            Number(finalTotal || 0).toFixed(2);
+    }
+
+
+    // ==========================================
+    // 4. DELIVERY DATE
+    // ==========================================
+
+    const deliveryElement =
+        document.getElementById("successDeliveryDate");
+
+    if (deliveryElement) {
+
+        const date =
+            deliveryDate instanceof Date
+                ? deliveryDate
+                : new Date(deliveryDate);
+
+        if (!isNaN(date.getTime())) {
+
+            deliveryElement.textContent =
+                date.toLocaleDateString(
+                    "en-IN",
+                    {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric"
+                    }
+                );
+
+        } else {
+
+            deliveryElement.textContent =
+                "To be confirmed";
+        }
+    }
+
+
+    // ==========================================
+    // 5. PAYMENT STATUS
+    // ==========================================
+
+    const paymentStatusElement =
+        document.getElementById("successPaymentStatus");
+
+    if (paymentStatusElement) {
+
+        if (
+            paymentMethod &&
+            paymentMethod
+                .toLowerCase()
+                .includes("cash")
+        ) {
+
+            paymentStatusElement.textContent =
+                "Payment will be collected on delivery";
+
+        } else {
+
+            paymentStatusElement.textContent =
+                "Payment Successful";
+        }
+    }
+
+
+    // ==========================================
+    // 6. HIDE ALL PAGES
+    // ==========================================
+
+    document
+        .querySelectorAll(".page")
+        .forEach(function(page) {
+
+            page.classList.add("hidden");
+        });
+
+
+    // ==========================================
+    // 7. GET SUCCESS PAGE
+    // ==========================================
+
+    const successPage =
+        document.getElementById(
+            "orderSuccessPage"
+        );
+
+
+    if (!successPage) {
+
+        console.error(
+            "orderSuccessPage not found!"
+        );
+
+        alert(
+            "Order placed successfully!\n\n" +
+            "Order ID: " +
+            orderId
+        );
+
+        return;
+    }
+
+
+    // ==========================================
+    // 8. SHOW SUCCESS PAGE
+    // ==========================================
+
+    successPage.classList.remove("hidden");
+
+
+    // ==========================================
+    // 9. SCROLL TOP
+    // ==========================================
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+
+
+    console.log(
+        "Congratulations page opened successfully."
+    );
+}
 function trackShipment() {
 
     const courier = document.getElementById("trackingCourier").value;
