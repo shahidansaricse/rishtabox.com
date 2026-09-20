@@ -84,7 +84,7 @@
 
         <div class="nav-dropdown">
             <button type="button" class="dropdown-btn">
-                Shop by Relationship
+                Gifts by Relationship
                 <span>▼</span>
             </button>
             <div class="dropdown-menu" id="relationshipMenu"></div>
@@ -92,7 +92,7 @@
 
         <div class="nav-dropdown">
             <button type="button" class="dropdown-btn">
-                Shop by Festival
+                Gifts by Festival
                 <span>▼</span>
             </button>
             <div class="dropdown-menu" id="festivalMenu"></div>
@@ -100,7 +100,7 @@
 
         <div class="nav-dropdown">
             <button type="button" class="dropdown-btn">
-                Shop by Category
+                Gifts by Category
                 <span>▼</span>
             </button>
             <div class="dropdown-menu" id="categoryMenu"></div>
@@ -256,7 +256,7 @@
             <div class="container">
 
                 <h2>
-                    Shop by Relationship
+                    Gifts by Relationship
                 </h2>
 
             </div>
@@ -281,7 +281,7 @@
             <div class="container">
 
                 <h2>
-                    Shop by Festival
+                    Gifts by Festival
                 </h2>
 
             </div>
@@ -306,7 +306,7 @@
             <div class="container">
 
                 <h2>
-                    Shop by Category
+                    Gifts by Category
                 </h2>
 
             </div>
@@ -1434,17 +1434,22 @@
     <div id="blogDetailsContent"></div>
 
 </section>
+
 <footer class="footer">
 
     <div class="container">
 
+        <!-- FOOTER CONTENT -->
         <div class="footer-content">
 
             <!-- BRAND -->
             <div class="footer-section footer-brand">
-
                 <h2>
-                    <img src="images/logo.jpeg" alt="RishtaBox Logo" class="footer-logo">
+                    <img
+                            src="images/logo.jpeg"
+                            alt="RishtaBox Logo"
+                            class="footer-logo"
+                    >
                     RishtaBox
                 </h2>
 
@@ -1458,113 +1463,119 @@
                     <span>🚚 Fast Delivery</span>
                     <span>💝 Made With Love</span>
                 </div>
-
             </div>
 
 
             <!-- QUICK LINKS -->
             <div class="footer-section">
-
                 <h3>Quick Links</h3>
 
                 <ul>
                     <li>
-                        <a href="#" onclick="footerHome(); return false;">
+                        <a href="#" onclick="footerHome(event)">
                             Home
                         </a>
                     </li>
 
                     <li>
-                        <a href="#" onclick="footerShop(); return false;">
+                        <a href="#" onclick="footerShop(event)">
                             Shop Gifts
                         </a>
                     </li>
 
                     <li>
-                        <a href="#" onclick="footerCart(); return false;">
+                        <a href="#" onclick="footerCart(event)">
                             My Cart
                         </a>
                     </li>
 
                     <li>
-                        <a href="#" onclick="footerOrders(); return false;">
+                        <a href="#" onclick="footerOrders(event)">
                             My Orders
                         </a>
                     </li>
 
                     <li>
-                        <a href="#" onclick="footerAccount(); return false;">
+                        <a href="#" onclick="footerAccount(event)">
                             My Account
                         </a>
                     </li>
                 </ul>
-
             </div>
 
 
-            <!-- CUSTOMER SERVICE -->
+            <!-- CUSTOMER CARE -->
             <div class="footer-section">
-
                 <h3>Customer Care</h3>
 
                 <ul>
                     <li>
-                        <a href="#">Contact Us</a>
+                        <a href="#" onclick="footerContact(event)">
+                            Contact Us
+                        </a>
                     </li>
 
                     <li>
-                        <a href="#">FAQs</a>
+                        <a href="#" onclick="footerFAQs(event)">
+                            FAQs
+                        </a>
                     </li>
 
                     <li>
-                        <a href="#">Shipping Information</a>
+                        <a href="#" onclick="footerShipping(event)">
+                            Shipping Information
+                        </a>
                     </li>
 
                     <li>
-                        <a href="#">Return & Refund</a>
+                        <a href="#" onclick="footerReturns(event)">
+                            Return &amp; Refund
+                        </a>
                     </li>
 
                     <li>
-                        <a href="#">Privacy Policy</a>
+                        <a href="#" onclick="footerPrivacy(event)">
+                            Privacy Policy
+                        </a>
                     </li>
                 </ul>
-
             </div>
 
 
             <!-- GIFT GUIDE -->
             <div class="footer-section">
-
                 <h3>Gift Ideas</h3>
 
                 <ul>
                     <li>
-                        <a href="#">Birthday Gifts</a>
+                        <a href="#" onclick="footerRelationships(event)">
+                            Gifts by Relationship
+                        </a>
                     </li>
 
                     <li>
-                        <a href="#">Anniversary Gifts</a>
+                        <a href="#" onclick="footerFestivals(event)">
+                            Gifts by Festival
+                        </a>
                     </li>
 
                     <li>
-                        <a href="#">Wedding Gifts</a>
+                        <a href="#" onclick="footerCategories(event)">
+                            Gifts by Category
+                        </a>
                     </li>
 
                     <li>
-                        <a href="#">Gifts for Couples</a>
-                    </li>
-
-                    <li>
-                        <a href="#">Personalized Gifts</a>
+                        <a href="#" onclick="footerCouples(event)">
+                            Gifts for Couples
+                        </a>
                     </li>
                 </ul>
-
             </div>
 
 
             <!-- FOLLOW US -->
             <div class="footer-section">
-
                 <h3>Follow Us</h3>
 
                 <p class="footer-follow-text">
@@ -1573,29 +1584,46 @@
                 </p>
 
                 <div class="social-links">
-
-                    <a href="#" aria-label="Facebook">
+                    <a
+                            href="https://www.facebook.com/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="Facebook"
+                    >
                         <i class="fa-brands fa-facebook-f"></i>
                     </a>
 
-                    <a href="#" aria-label="Instagram">
+                    <a
+                            href="https://www.instagram.com/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="Instagram"
+                    >
                         <i class="fa-brands fa-instagram"></i>
                     </a>
 
-                    <a href="#" aria-label="Twitter">
+                    <a
+                            href="https://x.com/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="Twitter"
+                    >
                         <i class="fa-brands fa-x-twitter"></i>
                     </a>
 
-                    <a href="#" aria-label="YouTube">
+                    <a
+                            href="https://www.youtube.com/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="YouTube"
+                    >
                         <i class="fa-brands fa-youtube"></i>
                     </a>
-
                 </div>
 
                 <p class="footer-payment">
                     💳 Secure Payments
                 </p>
-
             </div>
 
         </div>
@@ -1603,7 +1631,6 @@
 
         <!-- NEWSLETTER -->
         <div class="footer-newsletter">
-
             <div>
                 <h3>🎁 Get Gift Inspiration</h3>
 
@@ -1613,36 +1640,43 @@
             </div>
 
             <div class="newsletter-form">
-
                 <input
                         type="email"
+                        id="footerNewsletterEmail"
                         placeholder="Enter your email"
                         aria-label="Email address"
                 >
 
-                <button type="button">
+                <button
+                        type="button"
+                        onclick="footerSubscribe(event)"
+                >
                     Subscribe
                 </button>
-
             </div>
-
         </div>
 
 
         <!-- BOTTOM -->
         <div class="footer-bottom">
-
             <p>
                 © 2026 <strong>RishtaBox</strong>.
                 All Rights Reserved by PUCHO Limelight.
             </p>
 
             <div class="footer-bottom-links">
-                <a href="#">Terms & Conditions</a>
-                <a href="#">Privacy Policy</a>
-                <a href="#">Refund Policy</a>
-            </div>
+                <a href="#" onclick="footerTerms(event)">
+                    Terms &amp; Conditions
+                </a>
 
+                <a href="#" onclick="footerPrivacy(event)">
+                    Privacy Policy
+                </a>
+
+                <a href="#" onclick="footerReturns(event)">
+                    Refund Policy
+                </a>
+            </div>
         </div>
 
     </div>

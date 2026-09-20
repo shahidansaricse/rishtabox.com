@@ -4003,13 +4003,17 @@ function renderOrderSteps() {
         return;
     }
 }
+
 /* =========================================================
    FOOTER
 ========================================================= */
 
+/* =========================================================
+   FOOTER NEWSLETTER SUBSCRIPTION
+========================================================= */
+
 function initFooter() {
 
-    // Footer newsletter subscription
     const newsletterForm =
         document.querySelector(".newsletter-form");
 
@@ -4017,8 +4021,16 @@ function initFooter() {
         return;
     }
 
+    if (newsletterForm.dataset.initialized === "true") {
+        return;
+    }
+
+    newsletterForm.dataset.initialized = "true";
+
     const emailInput =
-        newsletterForm.querySelector("input[type='email']");
+        newsletterForm.querySelector(
+            "input[type='email']"
+        );
 
     const subscribeBtn =
         newsletterForm.querySelector("button");
@@ -4027,94 +4039,83 @@ function initFooter() {
         return;
     }
 
-    subscribeBtn.addEventListener("click", function () {
+    subscribeBtn.addEventListener(
+        "click",
+        async function (event) {
 
-        const email =
-            emailInput.value.trim();
+            event.preventDefault();
 
-        if (!email) {
-            alert("Please enter your email address.");
-            emailInput.focus();
-            return;
+            const email =
+                emailInput.value.trim();
+
+            if (!email) {
+                alert("Please enter your email address.");
+                emailInput.focus();
+                return;
+            }
+
+            const emailPattern =
+                /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (!emailPattern.test(email)) {
+                alert("Please enter a valid email address.");
+                emailInput.focus();
+                return;
+            }
+
+            subscribeBtn.disabled = true;
+            subscribeBtn.textContent = "Subscribing...";
+
+            try {
+
+                const response = await fetch(
+                    "http://localhost:8080/api/subscribers",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+
+                        body: JSON.stringify({
+                            email: email
+                        })
+                    }
+                );
+
+                const result =
+                    await response.json();
+
+                if (!response.ok) {
+                    throw new Error(
+                        result.message ||
+                        "Subscription failed."
+                    );
+                }
+
+                alert(result.message);
+
+                emailInput.value = "";
+
+            } catch (error) {
+
+                console.error(
+                    "Newsletter subscription error:",
+                    error
+                );
+
+                alert(
+                    error.message ||
+                    "Unable to subscribe. Please try again."
+                );
+
+            } finally {
+
+                subscribeBtn.disabled = false;
+                subscribeBtn.textContent = "Subscribe";
+            }
         }
-
-        const emailPattern =
-            /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-        if (!emailPattern.test(email)) {
-            alert("Please enter a valid email address.");
-            emailInput.focus();
-            return;
-        }
-
-        let subscribers =
-            JSON.parse(
-                localStorage.getItem("rishtaBoxSubscribers")
-            ) || [];
-
-        if (subscribers.includes(email)) {
-            alert("You are already subscribed!");
-            return;
-        }
-
-        subscribers.push(email);
-
-        localStorage.setItem(
-            "rishtaBoxSubscribers",
-            JSON.stringify(subscribers)
-        );
-
-        emailInput.value = "";
-
-        alert(
-            "🎁 Thank you for subscribing to RishtaBox!"
-        );
-    });
-}
-
-
-/* =========================================================
-   FOOTER LINKS
-========================================================= */
-
-function footerHome() {
-    showPage("home");
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-    });
-}
-
-function footerShop() {
-    showPage("category");
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-    });
-}
-
-function footerCart() {
-    showPage("cart");
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-    });
-}
-
-function footerOrders() {
-    showPage("orders");
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-    });
-}
-
-function footerAccount() {
-    showPage("account");
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-    });
+    );
 }
 
 
@@ -4129,7 +4130,98 @@ document.addEventListener(
     }
 );
 
+/* =========================================================
+   COMMON FOOTER NAVIGATION
+========================================================= */
 
+function footerNavigate(pageId) {
+
+    if (typeof showPage !== "function") {
+
+        console.error(
+            "showPage() function is not available."
+        );
+
+        alert(
+            "Page navigation is currently unavailable."
+        );
+
+        return;
+    }
+
+    showPage(pageId);
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+}
+
+
+/* =========================================================
+   FOOTER LINKS
+========================================================= */
+
+function footerHome(event) {
+
+    if (event) {
+        event.preventDefault();
+    }
+
+    footerNavigate("home");
+}
+
+
+function footerShop(event) {
+
+    if (event) {
+        event.preventDefault();
+    }
+
+    footerNavigate("category");
+}
+
+
+function footerCart(event) {
+
+    if (event) {
+        event.preventDefault();
+    }
+
+    footerNavigate("cart");
+}
+
+
+function footerOrders(event) {
+
+    if (event) {
+        event.preventDefault();
+    }
+
+    footerNavigate("orders");
+}
+
+
+function footerAccount(event) {
+
+    if (event) {
+        event.preventDefault();
+    }
+
+    footerNavigate("account");
+}
+
+
+/* =========================================================
+   INITIALIZE FOOTER
+========================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+        initFooter();
+    }
+);
 /* =========================================================
    PANEL / SECONDARY NAVIGATION
 ========================================================= */
