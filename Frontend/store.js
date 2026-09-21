@@ -1430,6 +1430,7 @@ function applyFilters() {
 /* =========================================================
    SHOW PRODUCT
 ========================================================= */
+
 function showProduct(productId) {
 
     const allProducts = [
@@ -1451,223 +1452,404 @@ function showProduct(productId) {
     }
 
     if (!recentlyViewed.includes(product.id)) {
+
         recentlyViewed.unshift(product.id);
-        if (
-            recentlyViewed.length > 10
-        ) {
+
+        if (recentlyViewed.length > 10) {
             recentlyViewed.pop();
         }
+
         saveRecentlyViewed();
     }
+
     const productDetail =
-        document.getElementById(
-            "productDetails"
-        );
+        document.getElementById("productDetails");
+
     if (!productDetail) {
-        console.error(
-            "productDetails not found"
-        );
+        console.error("productDetails not found");
         return;
     }
-    const deliveryDate =
-        new Date();
+
+    const deliveryDate = new Date();
+
     deliveryDate.setDate(
         deliveryDate.getDate() + 7
     );
+
     const colors =
-        Array.isArray(
-            product.colors
-        )
+        Array.isArray(product.colors)
             ? product.colors
             : [];
+
     const sizes =
-        Array.isArray(
-            product.sizes
-        )
+        Array.isArray(product.sizes)
             ? product.sizes
             : [];
+
     const rating =
         Number(product.rating) || 0;
+
     productDetail.innerHTML = `
+
+        <!-- PRODUCT IMAGE -->
         <div>
+
             <img
                 src="${getImagePath(product.image)}"
                 alt="${product.name || ""}"
                 class="product-image"
             >
+
         </div>
+
+
+        <!-- PRODUCT INFORMATION -->
         <div class="product-info">
+
             <h1>
                 ${product.name || ""}
             </h1>
+
             <div class="brand">
                 ${product.brand || ""}
             </div>
+
+
+            <!-- PRODUCT RATING -->
             <div class="product-rating">
-                ${"★".repeat(
-        Math.floor(rating)
-    )}
+
+                ${"★".repeat(Math.floor(rating))}
+
                 ${"☆".repeat(
         Math.max(
             0,
-            5 -
-            Math.floor(rating)
+            5 - Math.floor(rating)
         )
     )}
+
                 ${rating}/5
+
             </div>
+
+
+            <!-- PRODUCT PRICE -->
             <div class="product-price">
+
                 <span class="current-price">
                     ₹${Number(product.price) || 0}
                 </span>
+
                 ${
         product.originalPrice
             ? `
                             <span class="original-price">
                                 ₹${product.originalPrice}
                             </span>
-                        `
+                          `
             : ""
     }
+
                 ${
         product.discount
             ? `
                             <span class="discount">
                                 ${product.discount}% OFF
                             </span>
-                        `
+                          `
             : ""
     }
+
             </div>
+
+
+            <!-- DESCRIPTION -->
             <div class="description">
+
                 ${product.description || ""}
+
             </div>
+
+
+            <!-- PRODUCT OPTIONS -->
             <div class="product-option">
+
                 ${
         colors.length > 0
             ? `
                             <div class="option-group">
+
                                 <label>
                                     Color:
                                 </label>
-                                <select
-                                    id="selectedColor"
-                                >
+
+                                <select id="selectedColor">
+
                                     ${colors
                 .map(
-                    color =>
-                        `
+                    color => `
                                                 <option
                                                     value="${color}"
                                                 >
                                                     ${color}
                                                 </option>
-                                                `
+                                            `
                 )
                 .join("")}
+
                                 </select>
+
                             </div>
-                        `
+                          `
             : ""
     }
+
+
                 ${
         sizes.length > 0
             ? `
                             <div class="option-group">
+
                                 <label>
                                     Size:
                                 </label>
-                                <select
-                                    id="selectedSize"
-                                >
+
+                                <select id="selectedSize">
+
                                     ${sizes
                 .map(
-                    size =>
-                        `
+                    size => `
                                                 <option
                                                     value="${size}"
                                                 >
                                                     ${size}
                                                 </option>
-                                                `
+                                            `
                 )
                 .join("")}
+
                                 </select>
+
                             </div>
-                        `
+                          `
             : ""
     }
+
             </div>
+
+
+            <!-- DELIVERY ADDRESS -->
             <div class="address-section">
+
                 <h3>
                     Delivery Address
                 </h3>
+
                 ${
-        currentUser.address
+        currentUser && currentUser.address
             ? `
                             <p>
                                 ${currentUser.address}
                             </p>
+
                             <button
                                 class="btn-secondary"
-                                onclick="
-                                    showPage('account')
-                                "
+                                onclick="showPage('account')"
                             >
                                 Change Address
                             </button>
-                        `
+                          `
             : `
                             <p>
                                 No address added
                             </p>
+
                             <button
                                 class="btn-secondary"
-                                onclick="
-                                    showPage('account')
-                                "
+                                onclick="showPage('account')"
                             >
                                 Add Address
                             </button>
-                        `
+                          `
     }
+
             </div>
+
+
+            <!-- DELIVERY INFORMATION -->
             <div class="delivery-info">
+
                 <h4>
                     Delivery Information
                 </h4>
+
                 <p>
                     🚚 Delivery by
                     ${deliveryDate.toLocaleDateString()}
                 </p>
+
                 <p>
                     📦 10 days return policy
                 </p>
+
                 <p>
                     💵 Cash on delivery available
                 </p>
+
             </div>
-<div class="product-actions">
 
-    <button
-        class="btn-primary"
-        onclick='addToCart(${JSON.stringify(product.id)})'
-    >
-        Add to Cart
-    </button>
 
-    <button
-        class="btn-secondary"
-        onclick='buyNow(${JSON.stringify(product.id)})'
-    >
-        Buy Now
-    </button>
+            <!-- PRODUCT ACTIONS -->
+            <div class="product-actions">
 
-</div>
+                <button
+                    class="btn-primary"
+                    onclick='addToCart(${JSON.stringify(product.id)})'
+                >
+                    Add to Cart
+                </button>
+
+
+                <button
+                    class="btn-secondary"
+                    onclick='buyNow(${JSON.stringify(product.id)})'
+                >
+                    Buy Now
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             PRODUCT REVIEWS
+             ===================================================== -->
+
+        <div class="product-reviews-section">
+
+            <div class="reviews-header">
+
+                <h2>
+                    Customer Reviews
+                </h2>
+
+                <p>
+                    What our customers say about this product
+                </p>
+
+            </div>
+
+
+            <!-- REVIEW FORM -->
+            <div class="review-form-container">
+
+                <h3>
+                    Write a Review
+                </h3>
+
+                <form
+                    id="reviewForm"
+                    onsubmit="submitReview(event, ${JSON.stringify(product.id)})"
+                >
+
+                    <div class="review-rating-input">
+
+                        <label for="reviewRating">
+                            Rating
+                        </label>
+
+                        <select
+                            id="reviewRating"
+                            required
+                        >
+
+                            <option value="">
+                                Select rating
+                            </option>
+
+                            <option value="5">
+                                ★★★★★ - 5
+                            </option>
+
+                            <option value="4">
+                                ★★★★☆ - 4
+                            </option>
+
+                            <option value="3">
+                                ★★★☆☆ - 3
+                            </option>
+
+                            <option value="2">
+                                ★★☆☆☆ - 2
+                            </option>
+
+                            <option value="1">
+                                ★☆☆☆☆ - 1
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="review-comment-input">
+
+                        <label for="reviewComment">
+                            Your Review
+                        </label>
+
+                        <textarea
+                            id="reviewComment"
+                            placeholder="Write your experience..."
+                            minlength="3"
+                            maxlength="1000"
+                            required
+                        ></textarea>
+
+                    </div>
+
+
+                    <button
+                        type="submit"
+                        class="btn-primary"
+                    >
+                        Submit Review
+                    </button>
+
+                </form>
+
+
+                <p id="reviewFormMessage"></p>
+
+            </div>
+
+
+            <!-- REVIEWS FROM MYSQL -->
+
+            <div
+                id="productReviews"
+                class="product-reviews-list"
+            >
+
+                <p>
+                    Loading reviews...
+                </p>
+
+            </div>
+
+        </div>
+
     `;
-    showPage("product");
-}
 
+
+    // Show product page
+    showPage("product");
+
+
+    // Load reviews from MySQL
+    loadProductReviews(product.id);
+
+}
 /* =========================================================
    ADD TO CART
 ========================================================= */
@@ -7016,47 +7198,116 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
 
                 // -----------------------------
-                // SAVE JWT
-                // -----------------------------
+// VALIDATE AND SAVE JWT
+// -----------------------------
 
-                localStorage.setItem(
-                    "token",
-                    data.token
-                );
+                const token =
+                    data.token ||
+                    data.accessToken ||
+                    data.jwt ||
+                    data.jwtToken;
 
-                // -----------------------------
-                // CREATE USER DATA
-                // -----------------------------
+                if (
+                    !token ||
+                    typeof token !== "string" ||
+                    token.trim() === ""
+                ) {
+                    console.error(
+                        "LOGIN ERROR: JWT token missing",
+                        data
+                    );
+
+                    message.textContent =
+                        "Login failed: Authentication token missing.";
+
+                    return;
+                }
+
+                const cleanToken = token.trim();
+
+                if (cleanToken.split(".").length !== 3) {
+                    console.error(
+                        "LOGIN ERROR: Invalid JWT format"
+                    );
+
+                    message.textContent =
+                        "Login failed: Invalid authentication token.";
+
+                    return;
+                }
+
+// -----------------------------
+// CREATE USER DATA
+// -----------------------------
 
                 const user = {
 
                     id: data.userId,
 
-                    name: data.name,
+                    name: data.name || "",
 
-                    email: data.email,
+                    email: data.email || "",
 
                     phone: "",
 
-                    address: ""
+                    address: "",
+
+                    token: cleanToken
                 };
 
-                // -----------------------------
-                // SAVE USER DATA
-                // -----------------------------
+// -----------------------------
+// SAVE JWT
+// -----------------------------
+
+                localStorage.setItem(
+                    "token",
+                    cleanToken
+                );
+
+// -----------------------------
+// SAVE USER DATA
+// -----------------------------
 
                 localStorage.setItem(
                     "userData",
                     JSON.stringify(user)
                 );
 
-                // IMPORTANT
+// IMPORTANT
+                localStorage.setItem(
+                    "rishtaBoxCurrentUser",
+                    JSON.stringify(user)
+                );
+
                 localStorage.setItem(
                     "rishtaBoxLoggedIn",
                     "true"
                 );
 
+// -----------------------------
+// UPDATE CURRENT USER
+// -----------------------------
+
                 currentUser = user;
+
+                console.log(
+                    "LOGIN TOKEN SAVED SUCCESSFULLY"
+                );
+
+                console.log(
+                    "Token exists:",
+                    Boolean(cleanToken)
+                );
+
+                console.log(
+                    "Token length:",
+                    cleanToken.length
+                );
+
+                console.log(
+                    "Token parts:",
+                    cleanToken.split(".").length
+                );
 
                 console.log(
                     "CURRENT USER:",
@@ -7068,12 +7319,14 @@ document.addEventListener("DOMContentLoaded", function () {
                     currentUser.id
                 );
 
+// -----------------------------
+// LOGIN SUCCESS
+// -----------------------------
+
                 message.textContent =
                     "Login successful.";
 
-
                 showPage("home");
-
             } catch (error) {
 
                 console.error(
@@ -8261,4 +8514,531 @@ function renderPinnedAndSlider(
 
     sliderWrapper.appendChild(sliderTrack);
     grid.appendChild(sliderWrapper);
+}
+/* =========================================================
+   PRODUCT REVIEWS - LOAD FROM BACKEND
+========================================================= */
+
+async function loadProductReviews(productId) {
+
+    const reviewsContainer =
+        document.getElementById("productReviews");
+
+    if (!reviewsContainer) {
+        console.error("productReviews element not found");
+        return;
+    }
+
+    reviewsContainer.innerHTML = `
+        <p>Loading reviews...</p>
+    `;
+
+    try {
+
+        const response = await fetch(
+            `${API_BASE_URL}/api/reviews/product/${productId}`
+        );
+
+        if (!response.ok) {
+            throw new Error(
+                `Failed to load reviews: ${response.status}`
+            );
+        }
+
+        const reviews = await response.json();
+
+        renderProductReviews(reviews);
+
+    } catch (error) {
+
+        console.error(
+            "Error loading product reviews:",
+            error
+        );
+
+        reviewsContainer.innerHTML = `
+            <p class="reviews-error">
+                Unable to load reviews.
+            </p>
+        `;
+    }
+}
+
+
+/* =========================================================
+   RENDER PRODUCT REVIEWS
+========================================================= */
+
+function renderProductReviews(reviews) {
+
+    const reviewsContainer =
+        document.getElementById("productReviews");
+
+    if (!reviewsContainer) {
+        console.error("productReviews element not found");
+        return;
+    }
+
+    if (
+        !Array.isArray(reviews) ||
+        reviews.length === 0
+    ) {
+
+        reviewsContainer.innerHTML = `
+            <div class="no-reviews">
+                <p>No reviews yet.</p>
+                <p>Be the first to review this product.</p>
+            </div>
+        `;
+
+        return;
+    }
+
+    reviewsContainer.innerHTML = reviews.map(review => {
+
+        const rating =
+            Math.max(
+                0,
+                Math.min(
+                    5,
+                    Number(review.rating) || 0
+                )
+            );
+
+        const fullStars =
+            "★".repeat(rating);
+
+        const emptyStars =
+            "☆".repeat(5 - rating);
+
+        const reviewerName =
+            escapeReviewHTML(
+                review.userName ||
+                review.username ||
+                "Customer"
+            );
+
+        const comment =
+            escapeReviewHTML(
+                review.comment || ""
+            );
+
+        const createdAt =
+            review.createdAt
+                ? new Date(
+                    review.createdAt
+                ).toLocaleDateString()
+                : "";
+
+        return `
+            <div class="review-card">
+
+                <div class="review-card-header">
+
+                    <strong>
+                        ${reviewerName}
+                    </strong>
+
+                    <span class="review-date">
+                        ${createdAt}
+                    </span>
+
+                </div>
+
+                <div class="review-stars">
+                    ${fullStars}${emptyStars}
+                </div>
+
+                <p class="review-comment">
+                    ${comment}
+                </p>
+
+                ${
+            review.verifiedPurchaser
+                ? `
+                            <span class="verified-review">
+                                ✓ Verified Purchaser
+                            </span>
+                          `
+                : ""
+        }
+
+            </div>
+        `;
+
+    }).join("");
+}
+
+
+/* =========================================================
+   SUBMIT PRODUCT REVIEW
+========================================================= */
+async function submitReview(event, productId) {
+    event.preventDefault();
+
+    const form = event.target;
+
+    // ==========================================
+    // 1. GET REVIEW FORM ELEMENTS
+    // ==========================================
+
+    const ratingElement =
+        form.querySelector("#reviewRating") ||
+        document.getElementById("reviewRating");
+
+    const commentElement =
+        form.querySelector("#reviewComment") ||
+        document.getElementById("reviewComment");
+
+    const rating = Number(ratingElement?.value || 0);
+    const comment = commentElement?.value?.trim() || "";
+
+    // ==========================================
+    // 2. VALIDATE RATING
+    // ==========================================
+
+    if (!rating || rating < 1 || rating > 5) {
+        showReviewMessage(
+            "Please select a rating between 1 and 5.",
+            "error"
+        );
+        return;
+    }
+
+    // ==========================================
+    // 3. VALIDATE COMMENT
+    // ==========================================
+
+    if (!comment) {
+        showReviewMessage(
+            "Please write your review.",
+            "error"
+        );
+        return;
+    }
+
+    if (comment.length < 3) {
+        showReviewMessage(
+            "Review must contain at least 3 characters.",
+            "error"
+        );
+        return;
+    }
+
+    // ==========================================
+    // 4. GET LOGGED-IN USER
+    // ==========================================
+
+    let currentUser = null;
+
+    try {
+        const currentUserData =
+            localStorage.getItem("rishtaBoxCurrentUser");
+
+        const userData =
+            localStorage.getItem("userData");
+
+        if (currentUserData) {
+            currentUser = JSON.parse(currentUserData);
+        }
+
+        if (!currentUser && userData) {
+            currentUser = JSON.parse(userData);
+        }
+
+    } catch (error) {
+        console.error(
+            "Error reading user data:",
+            error
+        );
+
+        showReviewMessage(
+            "Unable to read login information. Please login again.",
+            "error"
+        );
+
+        return;
+    }
+
+    // ==========================================
+    // 5. GET JWT TOKEN
+    // ==========================================
+
+    let token =
+        localStorage.getItem("token") ||
+        localStorage.getItem("authToken") ||
+        currentUser?.token ||
+        currentUser?.accessToken ||
+        currentUser?.jwt ||
+        currentUser?.jwtToken;
+
+    token = token?.trim() || "";
+
+    // ==========================================
+    // 6. AUTH DEBUG
+    // ==========================================
+
+    console.log("========== REVIEW AUTH DEBUG ==========");
+    console.log("Product ID:", productId);
+    console.log("User exists:", !!currentUser);
+    console.log("User ID:", currentUser?.id);
+    console.log("User email:", currentUser?.email);
+    console.log(
+        "Token exists:",
+        !!token
+    );
+    console.log(
+        "Token length:",
+        token.length
+    );
+    console.log(
+        "Token starts with Bearer:",
+        token.startsWith("Bearer ")
+    );
+    console.log("========================================");
+
+    // ==========================================
+    // 7. VALIDATE USER
+    // ==========================================
+
+    if (!currentUser || !currentUser.id) {
+        showReviewMessage(
+            "Please login before submitting a review.",
+            "error"
+        );
+
+        return;
+    }
+
+    // ==========================================
+    // 8. VALIDATE TOKEN
+    // ==========================================
+
+    if (!token) {
+        showReviewMessage(
+            "Login token missing. Please login again.",
+            "error"
+        );
+
+        return;
+    }
+
+    // Remove Bearer prefix if it was already saved
+    // in localStorage with the prefix.
+    if (token.startsWith("Bearer ")) {
+        token = token.substring(7).trim();
+    }
+
+    if (!token) {
+        showReviewMessage(
+            "Invalid login token. Please login again.",
+            "error"
+        );
+
+        return;
+    }
+
+    // ==========================================
+    // 9. DISABLE SUBMIT BUTTON
+    // ==========================================
+
+    const submitButton =
+        form.querySelector(
+            'button[type="submit"], input[type="submit"]'
+        );
+
+    const isInputButton =
+        submitButton?.tagName?.toLowerCase() === "input";
+
+    const originalButtonText = isInputButton
+        ? submitButton?.value || "Submit Review"
+        : submitButton?.textContent || "Submit Review";
+
+    if (submitButton) {
+        submitButton.disabled = true;
+
+        if (isInputButton) {
+            submitButton.value = "Submitting...";
+        } else {
+            submitButton.textContent = "Submitting...";
+        }
+    }
+
+    // ==========================================
+    // 10. SUBMIT REVIEW TO BACKEND
+    // ==========================================
+
+    try {
+        const response = await fetch(
+            `${API_BASE_URL}/api/reviews`,
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+
+                body: JSON.stringify({
+                    productId: productId,
+                    rating: rating,
+                    comment: comment
+                })
+            }
+        );
+
+        // ======================================
+        // 11. READ RESPONSE
+        // ======================================
+
+        const responseText = await response.text();
+
+        let result = null;
+
+        try {
+            result = responseText
+                ? JSON.parse(responseText)
+                : null;
+
+        } catch (parseError) {
+            result = responseText;
+        }
+
+        console.log(
+            "Review API status:",
+            response.status
+        );
+
+        console.log(
+            "Review API response:",
+            result
+        );
+
+        // ======================================
+        // 12. HANDLE API ERROR
+        // ======================================
+
+        if (!response.ok) {
+            console.error(
+                `Review failed (${response.status}):`,
+                result
+            );
+
+            if (
+                response.status === 401 ||
+                response.status === 403
+            ) {
+                showReviewMessage(
+                    "Review authorization failed. Please login again.",
+                    "error"
+                );
+
+                console.error(
+                    "JWT authentication failed. Check backend console logs."
+                );
+
+            } else if (response.status === 409) {
+                showReviewMessage(
+                    "You have already reviewed this product.",
+                    "error"
+                );
+
+            } else {
+                const errorMessage =
+                    typeof result === "object" &&
+                    result?.message
+                        ? result.message
+                        : `Review failed (${response.status}).`;
+
+                showReviewMessage(
+                    errorMessage,
+                    "error"
+                );
+            }
+
+            return;
+        }
+
+        // ======================================
+        // 13. SUCCESS
+        // ======================================
+
+        showReviewMessage(
+            "Your review was submitted successfully!",
+            "success"
+        );
+
+        // Clear the form
+        form.reset();
+
+        // Reload product reviews
+        await loadProductReviews(productId);
+
+    } catch (error) {
+        // ======================================
+        // 14. NETWORK / FETCH ERROR
+        // ======================================
+
+        console.error(
+            "Review submission error:",
+            error
+        );
+
+        showReviewMessage(
+            "Unable to connect to the server. Please try again.",
+            "error"
+        );
+
+    } finally {
+        // ======================================
+        // 15. ENABLE SUBMIT BUTTON
+        // ======================================
+
+        if (submitButton) {
+            submitButton.disabled = false;
+
+            if (isInputButton) {
+                submitButton.value = originalButtonText;
+            } else {
+                submitButton.textContent = originalButtonText;
+            }
+        }
+    }
+}
+
+/* =========================================================
+   REVIEW MESSAGE
+========================================================= */
+
+function showReviewMessage(message, isError) {
+
+    const messageElement =
+        document.getElementById("reviewFormMessage");
+
+    if (!messageElement) {
+        return;
+    }
+
+    messageElement.textContent = message;
+
+    messageElement.style.color =
+        isError
+            ? "#dc2626"
+            : "#16a34a";
+}
+
+
+/* =========================================================
+   ESCAPE REVIEW HTML
+========================================================= */
+
+function escapeReviewHTML(value) {
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }

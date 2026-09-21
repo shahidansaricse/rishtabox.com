@@ -6620,3 +6620,252 @@ body {
         min-width: 150px !important;
     }
 }
+
+
+
+/* =========================================
+   PRODUCT REVIEWS - PREMIUM DESIGN
+========================================= */
+
+.product-reviews-section {
+    margin-top: 40px;
+    padding: 28px;
+    background: #ffffff;
+    border: 1px solid #eeeeee;
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+}
+
+.product-reviews-section h2 {
+    margin: 0 0 22px;
+    color: #222222;
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.4px;
+}
+
+/* Review Form */
+
+.review-form-container {
+    margin-bottom: 32px;
+    padding: 22px;
+    background: #fafafa;
+    border: 1px solid #eeeeee;
+    border-radius: 16px;
+}
+
+.review-form-container h3 {
+    margin: 0 0 18px;
+    color: #333333;
+    font-size: 20px;
+    font-weight: 650;
+}
+
+.review-rating-input,
+.review-comment-input {
+    margin-bottom: 16px;
+}
+
+.review-rating-input label,
+.review-comment-input label {
+    display: block;
+    margin-bottom: 8px;
+    color: #444444;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+#reviewRating,
+#reviewComment {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 14px;
+    border: 1px solid #dddddd;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #333333;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.25s ease;
+}
+
+#reviewRating:focus,
+#reviewComment:focus {
+    border-color: #d4a017;
+    box-shadow: 0 0 0 3px rgba(212, 160, 23, 0.12);
+}
+
+#reviewComment {
+    min-height: 110px;
+    resize: vertical;
+    font-family: inherit;
+}
+
+#reviewForm button[type="submit"] {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #c89425, #e6b84f);
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+#reviewForm button[type="submit"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(200, 148, 37, 0.28);
+}
+
+#reviewForm button[type="submit"]:active {
+    transform: translateY(0);
+}
+
+/* Review Message */
+
+#reviewFormMessage {
+    margin-top: 12px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* Reviews List */
+
+#productReviews {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.review-card {
+    padding: 20px;
+    border: 1px solid #eeeeee;
+    border-radius: 15px;
+    background: #ffffff;
+    transition: all 0.25s ease;
+}
+
+.review-card:hover {
+    border-color: #e3c77e;
+    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.05);
+    transform: translateY(-2px);
+}
+
+.review-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.review-user-name {
+    color: #222222;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.review-date {
+    margin-top: 4px;
+    color: #888888;
+    font-size: 12px;
+}
+
+.review-stars {
+    color: #f2b01e;
+    font-size: 17px;
+    letter-spacing: 1px;
+    white-space: nowrap;
+}
+
+.review-comment {
+    margin: 10px 0 0;
+    color: #555555;
+    font-size: 14px;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+
+.verified-review {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 12px;
+    padding: 5px 9px;
+    border-radius: 20px;
+    background: #edf8ef;
+    color: #2e7d32;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+/* Empty and Loading State */
+
+.reviews-empty,
+.reviews-loading {
+    padding: 28px 15px;
+    border: 1px dashed #dddddd;
+    border-radius: 12px;
+    color: #888888;
+    font-size: 14px;
+    text-align: center;
+}
+
+/* Mobile Responsive */
+
+@media (max-width: 768px) {
+    .product-reviews-section {
+        margin-top: 28px;
+        padding: 18px;
+        border-radius: 16px;
+    }
+
+    .product-reviews-section h2 {
+        font-size: 22px;
+    }
+
+    .review-form-container {
+        padding: 16px;
+    }
+
+    .review-form-container h3 {
+        font-size: 18px;
+    }
+
+    .review-card {
+        padding: 16px;
+    }
+
+    .review-card-header {
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .review-stars {
+        font-size: 16px;
+    }
+
+    #reviewForm button[type="submit"] {
+        width: 100%;
+        padding: 13px;
+    }
+}
+
+@media (max-width: 420px) {
+    .product-reviews-section {
+        padding: 14px;
+    }
+
+    .review-form-container {
+        padding: 14px;
+    }
+
+    .product-reviews-section h2 {
+        font-size: 20px;
+    }
+
+    .review-comment {
+        font-size: 13px;
+    }
+}

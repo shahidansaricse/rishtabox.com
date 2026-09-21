@@ -100,10 +100,26 @@ public class JwtService {
             String token,
             UserDetails userDetails) {
 
-        String email =
-                extractEmail(token);
+        try {
 
-        return email.equals(userDetails.getUsername())
-                && !isTokenExpired(token);
+            String email = extractEmail(token);
+
+            return email != null
+                    && email.equalsIgnoreCase(
+                    userDetails.getUsername()
+            )
+                    && !isTokenExpired(token);
+
+        } catch (Exception e) {
+
+            System.out.println(
+                    "JWT validation error: "
+                            + e.getClass().getSimpleName()
+                            + " - "
+                            + e.getMessage()
+            );
+
+            return false;
+        }
     }
 }

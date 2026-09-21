@@ -2,14 +2,15 @@ package com.rishtabox.backend.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -17,8 +18,7 @@ public class SecurityConfig {
     public SecurityConfig(
             JwtAuthenticationFilter jwtAuthenticationFilter) {
 
-        this.jwtAuthenticationFilter =
-                jwtAuthenticationFilter;
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
     @Bean
@@ -26,35 +26,45 @@ public class SecurityConfig {
             HttpSecurity http) throws Exception {
 
         http
+                // Disable CSRF for REST API
                 .csrf(csrf -> csrf.disable())
 
+                // Enable CORS
                 .cors(cors -> {})
 
+                // JWT authentication is stateless
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(
                                 SessionCreationPolicy.STATELESS
                         )
                 )
 
+                // Authorization rules
                 .authorizeHttpRequests(auth -> auth
 
-                        // Public review reading
+                        // Public authentication endpoints
                         .requestMatchers(
-                                "GET",
+                                "/api/auth/**"
+                        ).permitAll()
+
+                        // Public review GET endpoints
+                        .requestMatchers(
+                                HttpMethod.GET,
                                 "/api/reviews",
                                 "/api/reviews/product/**"
                         ).permitAll()
 
-                        // Review submission requires login
+                        // Review creation requires login
                         .requestMatchers(
-                                "POST",
+                                HttpMethod.POST,
                                 "/api/reviews"
                         ).authenticated()
 
-                        // Keep other existing rules carefully
+                        // Other endpoints
                         .anyRequest().permitAll()
                 )
 
+                // Add JWT filter before Spring's username/password filter
                 .addFilterBefore(
                         jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class

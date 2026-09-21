@@ -169,14 +169,32 @@ public class AuthService {
         // GENERATE JWT
         // =========================
 
-        String token =
-                jwtService.generateToken(user.getEmail());
+        // ================= GENERATE JWT =================
+
+        String userEmail = user.getEmail()
+                .trim()
+                .toLowerCase();
+
+        String token = jwtService.generateToken(userEmail);
+
+        if (token == null || token.trim().isEmpty()) {
+            throw new RuntimeException("JWT token generation failed");
+        }
+
+        System.out.println("=================================");
+        System.out.println("LOGIN SUCCESSFUL");
+        System.out.println("USER ID    : " + user.getId());
+        System.out.println("USER EMAIL : " + userEmail);
+        System.out.println("TOKEN EXISTS : " + !token.isBlank());
+        System.out.println("TOKEN LENGTH : " + token.length());
+        System.out.println("TOKEN PARTS  : " + token.split("\\.", -1).length);
+        System.out.println("=================================");
 
         return new AuthResponse(
                 token,
                 user.getId(),
                 user.getName(),
-                user.getEmail()
+                userEmail
         );
     }
 }

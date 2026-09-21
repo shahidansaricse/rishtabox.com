@@ -9,7 +9,11 @@ import java.util.Optional;
 public interface ReviewRepository
         extends JpaRepository<Review, Long> {
 
-    List<Review> findByProductId(Long productId);
+    List<Review> findByProductIdOrderByCreatedAtDesc(
+            Long productId
+    );
+
+    List<Review> findAllByOrderByCreatedAtDesc();
 
     Optional<Review> findByUserIdAndProductId(
             Long userId,
