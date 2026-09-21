@@ -840,80 +840,27 @@ async function loadCategories() {
 /* =========================================================
    RENDER CATEGORIES
 ========================================================= */
+
 function renderCategories() {
     const categoryGrid =
-        document.getElementById(
-            "categoryGrid"
-        );
+        document.getElementById("categoryGrid");
+
     if (!categoryGrid) {
-        console.error(
-            "categoryGrid not found"
-        );
+        console.error("categoryGrid not found");
         return;
     }
-    categoryGrid.innerHTML = "";
-    categories.forEach(category => {
-        const categoryCard =
-            document.createElement("div");
-        categoryCard.className =
-            "category-card";
-        categoryCard.onclick = () => {
-            showCategory(
-                category.id
-            );
-        };
-        let cardContent = `
-            <img
-               src="${getImagePath(category.image)}"
-                alt="${category.name || ""}"
-            >
-           <div class="category-card-content">
-                <h3>
-                    ${category.name || ""}
-                </h3>
-                <p>
-                    ${category.description || ""}
-                </p>
-            </div>
-        `;
-        if (category.isRecentlyViewed) {
-            if (
-                recentlyViewed.length === 0
-            ) {
-                cardContent += `
-                    <p>
-                        No recently viewed products
-                    </p>
-                `;
-            } else {
-                cardContent += `
-                    <p>
-                        You have
-                        ${recentlyViewed.length}
-                        recently viewed items
-                    </p>
-                `;
-            }
-        }
-        cardContent += `
-            <a
-                href="#"
-                class="category-btn"
-                onclick="
-                    event.preventDefault();
-                    event.stopPropagation();
-                    showCategory('${category.id}')
-                "
-            >
-                View Products
-            </a>
-        `;
-        categoryCard.innerHTML =
-            cardContent;
-        categoryGrid.appendChild(
-            categoryCard
-        );
-    });
+
+    renderPinnedAndSlider(
+        categoryGrid,
+        categories,
+        "category",
+        [
+            "Artificial Jewellery ",
+            "Birthday Return Gifts ",
+            "Customize Coffee Mug ",
+            "Groom Mala"
+        ]
+    );
 }
 /* =========================================================
    RENDER PRODUCTS
@@ -4374,67 +4321,24 @@ document.addEventListener(
 /* =========================================================
    SHOW FESTIVAL
 ========================================================= */
-function renderFestivals() {
 
-    const festivalGrid = document.getElementById("festivalGrid");
+function renderFestivals() {
+    const festivalGrid =
+        document.getElementById("festivalGrid");
 
     if (!festivalGrid) return;
 
-    festivalGrid.innerHTML = "";
-
-    festivals.forEach(festival => {
-
-        const festivalCard = document.createElement("div");
-
-        // EXACT SAME CLASS AS CATEGORY CARD
-        festivalCard.className = "category-card";
-
-        // EXACT SAME STRUCTURE AS CATEGORY CARD
-        festivalCard.innerHTML = `
-            <img 
-                src="${getImagePath(festival.image)}"
-                alt="${festival.name}"
-            >
-
-            <div class="category-card-content">
-
-                <h3>${festival.name}</h3>
-
-                <p>${festival.description}</p>
-
-            </div>
-
-            <a 
-                href="#" 
-                class="category-btn festival-btn"
-                data-festival-id="${festival.id}"
-            >
-                View Products
-            </a>
-        `;
-
-        festivalGrid.appendChild(festivalCard);
-    });
-
-
-    // Festival button click
-    document
-        .querySelectorAll("#festivalGrid .festival-btn")
-        .forEach(button => {
-
-            button.addEventListener("click", function(event) {
-
-                event.preventDefault();
-                event.stopPropagation();
-
-                const festivalId =
-                    this.getAttribute("data-festival-id");
-
-                showFestival(festivalId);
-
-            });
-
-        });
+    renderPinnedAndSlider(
+        festivalGrid,
+        festivals,
+        "festival",
+        [
+            "Holi",
+            "Diwali",
+            "Eid",
+            "Christmas"
+        ]
+    );
 }
 async function loadFestivals() {
     try {
@@ -4900,52 +4804,22 @@ async function loadRelationships() {
 // ===============================
 // RENDER RELATIONSHIPS
 // ===============================
-
 function renderRelationships() {
 
     const relationshipGrid =
         document.getElementById("relationshipGrid");
 
     if (!relationshipGrid) {
+        console.error("relationshipGrid not found");
         return;
     }
 
-    relationshipGrid.innerHTML = "";
-
-    relationships.forEach(function (relationship) {
-
-        const card = document.createElement("div");
-
-        card.className = "relationship-card";
-
-        card.innerHTML = `
-            <img 
-               src="${getImagePath(relationship.image)}"
-                alt="${relationship.name}"
-            >
-
-            <div class="relationship-card-content">
-
-                <h3>${relationship.name}</h3>
-
-                <p>${relationship.description}</p>
-      <button 
-            class="view-product-btn"
-            onclick="event.stopPropagation(); showRelationshipProducts('${relationship.id}')">
-            View Products
-        </button>
-            </div>
-        `;
-
-        card.addEventListener("click", function () {
-
-            showRelationshipProducts(relationship.id);
-
-        });
-
-        relationshipGrid.appendChild(card);
-
-    });
+    renderPinnedAndSlider(
+        relationshipGrid,
+        relationships,
+        "relationship",
+        ["Mother", "Father", "Wife", "Husband"]
+    );
 }
 // ===============================
 // RELATIONSHIP CLICK
@@ -8254,3 +8128,137 @@ window.addEventListener("resize", updateHeaderSpacing);
 document.addEventListener("DOMContentLoaded", () => {
     updateHeaderSpacing();
 });
+
+function createShopCard(item, type) {
+    const card = document.createElement("div");
+
+    card.className =
+        type === "relationship"
+            ? "relationship-card shop-card"
+            : "category-card shop-card";
+
+    const image = getImagePath(item.image);
+    const name = item.name || "";
+    const description = item.description || "";
+
+    let clickFunction = "";
+
+    if (type === "relationship") {
+        clickFunction =
+            `showRelationshipProducts('${item.id}')`;
+    } else if (type === "festival") {
+        clickFunction =
+            `showFestival('${item.id}')`;
+    } else {
+        clickFunction =
+            `showCategory('${item.id}')`;
+    }
+
+    card.innerHTML = `
+        <img
+            src="${image}"
+            alt="${name}"
+            loading="lazy"
+        >
+
+        <div class="category-card-content">
+            <h3>${name}</h3>
+            <p>${description}</p>
+        </div>
+
+        <a
+            href="#"
+            class="category-btn"
+            onclick="
+                event.preventDefault();
+                event.stopPropagation();
+                ${clickFunction};
+            "
+        >
+            View Products
+        </a>
+    `;
+
+    card.addEventListener("click", function () {
+        window[clickFunction.split("(")[0]]?.(
+            item.id
+        );
+    });
+
+    return card;
+}
+
+function renderPinnedAndSlider(
+    grid,
+    items,
+    type,
+    pinnedNames = []
+) {
+    if (!grid) return;
+
+    grid.innerHTML = "";
+
+    if (!Array.isArray(items) || items.length === 0) {
+        grid.innerHTML = `
+            <p class="empty-shop-message">
+                No items available
+            </p>
+        `;
+        return;
+    }
+
+    const pinnedItems = [];
+
+    pinnedNames.forEach(function (pinnedName) {
+        const found = items.find(function (item) {
+            return String(item.name)
+                    .toLowerCase()
+                    .trim() ===
+                String(pinnedName)
+                    .toLowerCase()
+                    .trim();
+        });
+
+        if (found && !pinnedItems.includes(found)) {
+            pinnedItems.push(found);
+        }
+    });
+
+    const remainingPinned = items.filter(function (item) {
+        return !pinnedItems.includes(item);
+    });
+
+    while (pinnedItems.length < 4 && remainingPinned.length > 0) {
+        pinnedItems.push(remainingPinned.shift());
+    }
+
+    const pinnedSection = document.createElement("div");
+    pinnedSection.className = "pinned-shop-grid";
+
+    pinnedItems.slice(0, 4).forEach(function (item) {
+        pinnedSection.appendChild(
+            createShopCard(item, type)
+        );
+    });
+
+    grid.appendChild(pinnedSection);
+
+    const sliderWrapper = document.createElement("div");
+    sliderWrapper.className = "shop-slider-wrapper";
+
+    const sliderTrack = document.createElement("div");
+    sliderTrack.className = "shop-slider-track";
+
+    // All items are included in the slider,
+    // including pinned items.
+    const sliderItems = [...items, ...items];
+
+    sliderItems.forEach(function (item) {
+        sliderTrack.appendChild(
+            createShopCard(item, type)
+        );
+    });
+
+    sliderWrapper.appendChild(sliderTrack);
+    grid.appendChild(sliderWrapper);
+}

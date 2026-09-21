@@ -1,4 +1,3 @@
-
 package com.rishtabox.backend.security;
 
 import org.springframework.context.annotation.Bean;
@@ -15,13 +14,16 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
-        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    public SecurityConfig(
+            JwtAuthenticationFilter jwtAuthenticationFilter) {
+
+        this.jwtAuthenticationFilter =
+                jwtAuthenticationFilter;
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http)
-            throws Exception {
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http) throws Exception {
 
         http
                 .csrf(csrf -> csrf.disable())
@@ -34,8 +36,23 @@ public class SecurityConfig {
                         )
                 )
 
-                .authorizeHttpRequests(auth ->
-                        auth.anyRequest().permitAll()
+                .authorizeHttpRequests(auth -> auth
+
+                        // Public review reading
+                        .requestMatchers(
+                                "GET",
+                                "/api/reviews",
+                                "/api/reviews/product/**"
+                        ).permitAll()
+
+                        // Review submission requires login
+                        .requestMatchers(
+                                "POST",
+                                "/api/reviews"
+                        ).authenticated()
+
+                        // Keep other existing rules carefully
+                        .anyRequest().permitAll()
                 )
 
                 .addFilterBefore(
