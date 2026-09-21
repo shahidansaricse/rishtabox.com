@@ -195,14 +195,33 @@ function loadRecentlyViewed() {
 /* =========================================================
     CART COUNT
 ========================================================= */
+/* =========================================================
+   UPDATE ALL CART COUNTS
+========================================================= */
+
 function updateCartCount() {
-    const cartCount = cart.reduce(
-        (total, item) =>
-            total + Number(item.quantity || 0),0);
-    const cartCountElement =
+
+    const totalCartItems = cart.reduce(
+        (total, item) => {
+            return total + Number(item.quantity || 0);
+        },
+        0
+    );
+
+    // Upper header cart count
+    const headerCartCount =
         document.getElementById("cartCount");
-    if (cartCountElement) {
-        cartCountElement.textContent =cartCount;
+
+    if (headerCartCount) {
+        headerCartCount.textContent = totalCartItems;
+    }
+
+    // Bottom navigation cart count
+    const bottomCartCount =
+        document.getElementById("bottomCartCount");
+
+    if (bottomCartCount) {
+        bottomCartCount.textContent = totalCartItems;
     }
 }
 /* =========================================================
@@ -554,84 +573,8 @@ function initializeApp() {
 }
 
 
-/* =========================================================
-   DOM READY
-========================================================= */
-
-document.addEventListener(
-    "DOMContentLoaded",
-    () => {
-
-        loadData();
 
 
-        const sortBy =
-            document.getElementById("sortBy");
-
-        const priceRange =
-            document.getElementById("priceRange");
-
-        const brandFilter =
-            document.getElementById("brandFilter");
-
-
-        if (sortBy) {
-
-            sortBy.addEventListener(
-                "change",
-                applyFilters
-            );
-
-        }
-
-
-        if (priceRange) {
-
-            priceRange.addEventListener(
-                "input",
-                applyFilters
-            );
-
-        }
-
-
-        if (brandFilter) {
-
-            brandFilter.addEventListener(
-                "change",
-                applyFilters
-            );
-
-        }
-
-    }
-);
-/* =========================================================
-   INITIALIZE APP
-========================================================= */
-function initializeApp() {
-
-    loadUserData();
-    loadCartData();
-    loadOrdersData();
-    loadRecentlyViewed();
-
-    renderCategories();
-    renderFestivals();
-
-    filteredProducts = [...products];
-
-    console.log(
-        "ALL PRODUCTS:",
-        products
-    );
-
-    renderProducts(filteredProducts);
-
-    updateCartCount();
-
-    showPage("home");
-}
 /* =========================================================
    DOM READY
 ========================================================= */
@@ -682,6 +625,7 @@ function showPage(pageId) {
         orders: "ordersPage",
         account: "accountPage",
         category: "categoryPage",
+        search: "searchPage",
         product: "productPage",
         order: "orderPage",
         login: "loginPage"
@@ -753,32 +697,42 @@ function toggleSidebar() {
 }
 
 function searchProducts() {
-    const searchInput = document.getElementById("searchInput");
+    const searchInput =
+        document.getElementById("searchInput");
 
     if (!searchInput) {
         console.error("searchInput not found");
         return;
     }
 
-    const searchTerm = searchInput.value.trim().toLowerCase();
+    const originalSearchTerm =
+        searchInput.value.trim();
 
-    // Reset search
+    const searchTerm =
+        originalSearchTerm.toLowerCase();
+
+    // Empty search
     if (searchTerm === "") {
         filteredProducts = [...products];
 
-        const categoryTitle =
-            document.getElementById("categoryTitle");
+        const searchNoResults =
+            document.getElementById("searchNoResults");
 
-        if (categoryTitle) {
-            categoryTitle.textContent = "All Products";
+        if (searchNoResults) {
+            searchNoResults.style.display = "none";
         }
 
-        populateFilters();
-        renderProducts();
         showPage("category");
+
+        renderProducts(
+            filteredProducts,
+            "productGrid"
+        );
+
         return;
     }
 
+    // Filter products according to search keyword
     filteredProducts = products.filter(product => {
         const name =
             String(product.name || "").toLowerCase();
@@ -796,17 +750,23 @@ function searchProducts() {
         );
     });
 
-    const categoryTitle =
-        document.getElementById("categoryTitle");
+    // Update search title
+    const searchResultsTitle =
+        document.getElementById("searchResultsTitle");
 
-    if (categoryTitle) {
-        categoryTitle.textContent =
-            `Search results for "${searchTerm}"`;
+    if (searchResultsTitle) {
+        searchResultsTitle.textContent =
+            `Search results for "${originalSearchTerm}"`;
     }
 
-    populateFilters();
-    renderProducts();
-    showPage("category");
+    // Open dedicated search page
+    showPage("search");
+
+    // Render only filtered products
+    renderProducts(
+        filteredProducts,
+        "searchProductGrid"
+    );
 }
 /* =========================================================
    IMAGE PATH
@@ -829,6 +789,25 @@ function getImagePath(image) {
     // Sirf filename ho
     return "images/" + image;
 }
+
+// ================= SEARCH ENTER KEY SUPPORT =================
+
+document.addEventListener("DOMContentLoaded", function () {
+    const searchInput =
+        document.getElementById("searchInput");
+
+    if (searchInput) {
+        searchInput.addEventListener("keydown", function (event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+
+                searchProducts();
+            }
+        });
+    }
+});
+
+// ================= END SEARCH ENTER KEY SUPPORT =================
 /* =========================================================
    LOAD CATEGORIES FROM BACKEND
 ========================================================= */
@@ -939,36 +918,73 @@ function renderCategories() {
 /* =========================================================
    RENDER PRODUCTS
 ========================================================= */
-function renderProducts(productsToRender = products) {
 
+function renderProducts(
+    productsToRender = products,
+    gridId = "productGrid"
+) {
     const productGrid =
-        document.getElementById("productGrid");
+        document.getElementById(gridId);
 
     if (!productGrid) {
-        console.error("productGrid not found");
+        console.error(
+            "Product grid not found:",
+            gridId
+        );
         return;
     }
 
     productGrid.innerHTML = "";
 
-    console.log("========== RENDER PRODUCTS ==========");
-    console.log("PRODUCTS TO RENDER:", productsToRender);
-    console.log("COUNT:", productsToRender?.length);
+    const searchNoResults =
+        document.getElementById("searchNoResults");
 
+    // Reset search no-results message
+    if (searchNoResults) {
+        searchNoResults.style.display = "none";
+    }
+
+    console.log(
+        "========== RENDER PRODUCTS =========="
+    );
+
+    console.log(
+        "GRID ID:",
+        gridId
+    );
+
+    console.log(
+        "PRODUCTS TO RENDER:",
+        productsToRender
+    );
+
+    console.log(
+        "COUNT:",
+        productsToRender?.length
+    );
+
+    // No products found
     if (
         !Array.isArray(productsToRender) ||
         productsToRender.length === 0
     ) {
-        productGrid.innerHTML = `
-            <p>
-                No products found matching your criteria.
-            </p>
-        `;
+        if (gridId === "searchProductGrid") {
+            if (searchNoResults) {
+                searchNoResults.style.display = "block";
+            }
+        } else {
+            productGrid.innerHTML = `
+                <p>
+                    No products found matching your criteria.
+                </p>
+            `;
+        }
+
         return;
     }
 
+    // Render products
     productsToRender.forEach(product => {
-
         const productCard =
             document.createElement("div");
 
@@ -1339,96 +1355,130 @@ function populateFilters() {
 /* =========================================================
    APPLY FILTERS
 ========================================================= */
+/* =========================================================
+   APPLY SORTING AND FILTERS
+========================================================= */
+
 function applyFilters() {
+
     const sortByElement =
-        document.getElementById(
-            "sortBy"
-        );
+        document.getElementById("sortBy");
+
     const priceRangeElement =
-        document.getElementById(
-            "priceRange"
-        );
+        document.getElementById("priceRange");
+
     const brandFilterElement =
-        document.getElementById(
-            "brandFilter"
-        );
+        document.getElementById("brandFilter");
+
     const priceValueElement =
-        document.getElementById(
-            "priceValue"
-        );
+        document.getElementById("priceValue");
+
     if (
         !sortByElement ||
         !priceRangeElement ||
         !brandFilterElement
     ) {
-
         return;
     }
+
     const sortBy =
         sortByElement.value;
+
     const maxPrice =
-        Number(
-            priceRangeElement.value
-        );
+        Number(priceRangeElement.value);
+
     const selectedBrand =
         brandFilterElement.value;
+
     if (priceValueElement) {
         priceValueElement.textContent =
             "₹" + maxPrice;
-
     }
+
+    /*
+       Always start from all products.
+       Do not use filteredProducts here.
+    */
+
     let filtered =
-        filteredProducts.filter(
-            product => {
+        [...products].filter(function (product) {
 
-                const price =
-                    Number(
-                        product.price
-                    ) || 0;
-                if (
-                    price > maxPrice
-                ) {
+            const price =
+                Number(product.price) || 0;
 
-                    return false;
-                }
-                if (
-                    selectedBrand &&
-                    product.brand !==
-                    selectedBrand
-                ) {
-                    return false;
-                }
-                return true;
+            const brand =
+                String(product.brand || "")
+                    .trim()
+                    .toLowerCase();
+
+            const selectedBrandName =
+                String(selectedBrand || "")
+                    .trim()
+                    .toLowerCase();
+
+            // Price filter
+            if (price > maxPrice) {
+                return false;
             }
-        );
+
+            // Brand filter
+            if (
+                selectedBrandName &&
+                brand !== selectedBrandName
+            ) {
+                return false;
+            }
+
+            return true;
+
+        });
+
+    // Sorting
     switch (sortBy) {
+
         case "price-low":
-            filtered.sort(
-                (a, b) =>
-                    Number(a.price) -
-                    Number(b.price)
-            );
+
+            filtered.sort(function (a, b) {
+                return (
+                    Number(a.price || 0) -
+                    Number(b.price || 0)
+                );
+            });
+
             break;
+
         case "price-high":
-            filtered.sort(
-                (a, b) =>
-                    Number(b.price) -
-                    Number(a.price)
-            );
+
+            filtered.sort(function (a, b) {
+                return (
+                    Number(b.price || 0) -
+                    Number(a.price || 0)
+                );
+            });
+
             break;
+
         case "rating":
-            filtered.sort(
-                (a, b) =>
-                    Number(b.rating) -
-                    Number(a.rating)
-            );
+
+            filtered.sort(function (a, b) {
+                return (
+                    Number(b.rating || 0) -
+                    Number(a.rating || 0)
+                );
+            });
+
             break;
+
         default:
             break;
     }
-    renderProducts(
-        filtered
-    );
+
+    // Save updated products
+    filteredProducts = filtered;
+
+    // Render filtered products
+    renderProducts(filteredProducts);
+
 }
 /* =========================================================
    SHOW PRODUCT
@@ -2052,18 +2102,13 @@ function renderCart() {
                 ₹${finalTotal}
             </span>
         </div>
-        <button
-            class="btn-primary"
-            onclick="
-                proceedToCheckout()
-            "
-            style="
-                width:100%;
-                margin-top:20px;
-            "
-        >
-            Place Order
-        </button>
+  <button
+    type="button"
+    class="btn-primary checkout-btn"
+    onclick="proceedToCheckout()"
+>
+    Continue to Payment
+</button>
 
     `;
 }
@@ -8114,4 +8159,98 @@ document.addEventListener("DOMContentLoaded", function () {
 
     });
 
+});
+/* =====================================================
+   BOTTOM NAVIGATION SEARCH
+   ===================================================== */
+
+function openMobileSearch() {
+
+    const searchInput = document.getElementById("searchInput");
+
+    if (!searchInput) {
+        console.error("Search input not found");
+        return;
+    }
+
+    // Search bar par scroll karo
+    searchInput.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+    });
+
+    // Search input focus karo
+    setTimeout(function () {
+        searchInput.focus();
+    }, 400);
+}
+
+
+/* =====================================================
+   UPDATE BOTTOM CART COUNT
+   ===================================================== */
+
+function updateBottomCartCount() {
+
+    const mainCartCount =
+        document.getElementById("cartCount");
+
+    const bottomCartCount =
+        document.getElementById("bottomCartCount");
+
+    if (!bottomCartCount) {
+        return;
+    }
+
+    if (mainCartCount) {
+        bottomCartCount.textContent =
+            mainCartCount.textContent.trim() || "0";
+    } else {
+        bottomCartCount.textContent = "0";
+    }
+}
+
+
+/* =====================================================
+   INITIALIZE BOTTOM CART COUNT
+   ===================================================== */
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    updateBottomCartCount();
+
+});
+/* =========================================================
+   FIX: DYNAMIC HEADER SPACING FOR MOBILE + TABLET
+========================================================= */
+
+function updateHeaderSpacing() {
+    const header = document.querySelector(".header");
+    const bottomNav = document.querySelector(".bottom-nav");
+
+    if (header) {
+        const headerHeight = header.getBoundingClientRect().height;
+
+        document.documentElement.style.setProperty(
+            "--header-height",
+            `${headerHeight}px`
+        );
+    }
+
+    if (bottomNav) {
+        const bottomNavHeight =
+            bottomNav.getBoundingClientRect().height;
+
+        document.documentElement.style.setProperty(
+            "--bottom-nav-height",
+            `${bottomNavHeight}px`
+        );
+    }
+}
+
+window.addEventListener("load", updateHeaderSpacing);
+window.addEventListener("resize", updateHeaderSpacing);
+
+document.addEventListener("DOMContentLoaded", () => {
+    updateHeaderSpacing();
 });

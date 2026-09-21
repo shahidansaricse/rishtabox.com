@@ -47,23 +47,37 @@
 
         </div>
 
+
         <!-- Navigation Actions -->
         <div class="nav-actions">
 
             <!-- Account -->
-            <a href="#" class="nav-btn" onclick="openAccount(); return false;">
-                👤 <span id="accountNavText">Account</span>
+            <a href="#" class="nav-btn"
+               onclick="openAccount(); return false;">
+
+                <span class="nav-icon">👤</span>
+                <span class="nav-label" id="accountNavText">Account</span>
+
             </a>
 
             <!-- Cart -->
-            <a href="#" class="nav-btn" onclick="showPage('cart'); return false;">
-                🛒 Cart (<span id="cartCount">0</span>)
+            <a href="#" class="nav-btn"
+               onclick="showPage('cart'); return false;">
+
+                <span class="nav-icon">🛒</span>
+                <span class="nav-label">
+            Cart (<span id="cartCount">0</span>)
+        </span>
+
             </a>
 
             <!-- Orders -->
             <a href="#" class="nav-btn"
                onclick="showPage('orders'); return false;">
-                📦 Orders
+
+                <span class="nav-icon">📦</span>
+                <span class="nav-label">Orders</span>
+
             </a>
 
         </div>
@@ -422,7 +436,50 @@
 
     </div>
 
+    <!-- ================= SEARCH RESULTS PAGE ================= -->
+    <div id="searchPage" class="page hidden">
 
+        <div class="container">
+
+            <div class="search-results-header">
+
+                <h1 id="searchResultsTitle">
+                    Search Results
+                </h1>
+
+                <button
+                        type="button"
+                        class="btn-secondary"
+                        onclick="showPage('home')">
+
+                    ← Continue Shopping
+
+                </button>
+
+            </div>
+
+            <div
+                    class="product-grid"
+                    id="searchProductGrid">
+
+                <!-- Search products populated by JavaScript -->
+
+            </div>
+
+            <div
+                    id="searchNoResults"
+                    style="display: none; text-align: center; padding: 40px;">
+
+                <h2>No products found</h2>
+
+                <p>Try searching with a different keyword.</p>
+
+            </div>
+
+        </div>
+
+    </div>
+    <!-- ================= END SEARCH RESULTS PAGE ================= -->
 
     <!-- ================= PRODUCT DETAILS PAGE ================= -->
     <div id="productPage" class="page hidden">
@@ -1682,6 +1739,65 @@
     </div>
 
 </footer>
+
+<!-- ================= MOBILE BOTTOM NAVIGATION ================= -->
+
+<nav class="mobile-bottom-nav" aria-label="Mobile Navigation">
+
+    <!-- Home -->
+    <a href="#"
+       class="bottom-nav-item"
+       onclick="showPage('home'); return false;">
+
+        <span class="bottom-nav-icon">🏠</span>
+        <span>Home</span>
+
+    </a>
+
+    <!-- Category -->
+    <a href="#"
+       class="bottom-nav-item"
+       onclick="showPage('category'); return false;">
+
+        <span class="bottom-nav-icon">🛍️</span>
+        <span>Category</span>
+
+    </a>
+
+    <!-- Search -->
+    <a href="#"
+       class="bottom-nav-item"
+       onclick="openMobileSearch(); return false;">
+
+        <span class="bottom-nav-icon">🔍</span>
+        <span>Search</span>
+
+    </a>
+
+    <!-- Account -->
+    <a href="#"
+       class="bottom-nav-item"
+       onclick="openAccount(); return false;">
+
+        <span class="bottom-nav-icon">👤</span>
+        <span>Account</span>
+
+    </a>
+
+    <!-- Cart -->
+    <a href="#"
+       class="bottom-nav-item"
+       onclick="showPage('cart'); return false;">
+
+        <span class="bottom-nav-icon">🛒</span>
+        <span>Cart</span>
+        <span class="bottom-cart-count" id="bottomCartCount">0</span>
+
+    </a>
+
+</nav>
+
+<!-- ================= END MOBILE BOTTOM NAVIGATION ================= -->
 <!-- ================= JAVASCRIPT ================= -->
 <script src="store.js"></script>
 
