@@ -20,10 +20,8 @@ public class OrderItem {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    @Column(nullable = false)
     private Integer quantity;
 
-    @Column(nullable = false)
     private Double price;
 
     public OrderItem() {
@@ -33,36 +31,36 @@ public class OrderItem {
         return id;
     }
 
-    public Order getOrder() {
-        return order;
-    }
-
-    public Product getProduct() {
-        return product;
-    }
-
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public Double getPrice() {
-        return price;
-    }
-
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Order getOrder() {
+        return order;
     }
 
     public void setOrder(Order order) {
         this.order = order;
     }
 
+    public Product getProduct() {
+        return product;
+    }
+
     public void setProduct(Product product) {
         this.product = product;
     }
 
+    public Integer getQuantity() {
+        return quantity;
+    }
+
     public void setQuantity(Integer quantity) {
         this.quantity = quantity;
+    }
+
+    public Double getPrice() {
+        return price;
     }
 
     public void setPrice(Double price) {

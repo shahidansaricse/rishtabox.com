@@ -1,7 +1,9 @@
 package com.rishtabox.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-        import java.util.ArrayList;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -13,7 +15,8 @@ public class Cart {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore
     private User user;
 
     @OneToMany(
@@ -23,9 +26,11 @@ public class Cart {
     )
     private List<CartItem> items = new ArrayList<>();
 
+    // Required by JPA
     public Cart() {
     }
 
+    // Constructor used by CartService
     public Cart(User user) {
         this.user = user;
     }
@@ -34,20 +39,20 @@ public class Cart {
         return id;
     }
 
-    public User getUser() {
-        return user;
-    }
-
-    public List<CartItem> getItems() {
-        return items;
-    }
-
     public void setId(Long id) {
         this.id = id;
     }
 
+    public User getUser() {
+        return user;
+    }
+
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public List<CartItem> getItems() {
+        return items;
     }
 
     public void setItems(List<CartItem> items) {

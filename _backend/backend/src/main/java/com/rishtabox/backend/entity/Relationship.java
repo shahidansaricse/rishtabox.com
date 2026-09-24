@@ -1,14 +1,12 @@
- package com.rishtabox.backend.entity;
+package com.rishtabox.backend.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "relationships")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class Relationship {
 
     @Id
@@ -18,6 +16,43 @@ public class Relationship {
     @Column(nullable = false, unique = true)
     private String name;
 
+    @Column(length = 255)
     private String image;
-}
 
+    public Relationship() {
+    }
+
+    public Relationship(
+            String id,
+            String name,
+            String image) {
+
+        this.id = id;
+        this.name = name;
+        this.image = image;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+}

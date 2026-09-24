@@ -16,24 +16,67 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+
+    // =====================================================
+    // USER
+    // =====================================================
+
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     @JsonIgnore
     private User user;
 
-    @Column(nullable = false)
+
+    // =====================================================
+    // ORDER AMOUNT
+    // =====================================================
+
     private Double totalAmount;
 
-    @Column(nullable = false)
+
+    // =====================================================
+    // PAYMENT
+    // =====================================================
+
     private String paymentMethod;
 
-    @Column(nullable = false)
     private String paymentStatus;
 
-    @Column(nullable = false)
+
+    // =====================================================
+    // ORDER STATUS
+    // =====================================================
+
     private String orderStatus;
 
-    private LocalDateTime createdAt = LocalDateTime.now();
+
+    // =====================================================
+    // SHIPPING
+    // =====================================================
+
+    @Column(
+            name = "shipping_mode",
+            length = 50
+    )
+    private String shippingMode;
+
+    @Column(
+            name = "tracking_id",
+            length = 100
+    )
+    private String trackingId;
+
+
+    // =====================================================
+    // DATE
+    // =====================================================
+
+    private LocalDateTime createdAt;
+
+
+    // =====================================================
+    // ORDER ITEMS
+    // =====================================================
 
     @OneToMany(
             mappedBy = "order",
@@ -44,73 +87,154 @@ public class Order {
     private List<OrderItem> items = new ArrayList<>();
 
 
+    // =====================================================
+    // CONSTRUCTOR
+    // =====================================================
+
     public Order() {
     }
 
+
+    // =====================================================
+    // ID
+    // =====================================================
 
     public Long getId() {
         return id;
     }
 
-    public User getUser() {
-        return user;
-    }
-
-    public Double getTotalAmount() {
-        return totalAmount;
-    }
-
-    public String getPaymentMethod() {
-        return paymentMethod;
-    }
-
-    public String getPaymentStatus() {
-        return paymentStatus;
-    }
-
-    public String getOrderStatus() {
-        return orderStatus;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public List<OrderItem> getItems() {
-        return items;
-    }
-
-
     public void setId(Long id) {
         this.id = id;
+    }
+
+
+    // =====================================================
+    // USER
+    // =====================================================
+
+    public User getUser() {
+        return user;
     }
 
     public void setUser(User user) {
         this.user = user;
     }
 
+
+    // =====================================================
+    // TOTAL AMOUNT
+    // =====================================================
+
+    public Double getTotalAmount() {
+        return totalAmount;
+    }
+
     public void setTotalAmount(Double totalAmount) {
         this.totalAmount = totalAmount;
+    }
+
+
+    // =====================================================
+    // PAYMENT METHOD
+    // =====================================================
+
+    public String getPaymentMethod() {
+        return paymentMethod;
     }
 
     public void setPaymentMethod(String paymentMethod) {
         this.paymentMethod = paymentMethod;
     }
 
+
+    // =====================================================
+    // PAYMENT STATUS
+    // =====================================================
+
+    public String getPaymentStatus() {
+        return paymentStatus;
+    }
+
     public void setPaymentStatus(String paymentStatus) {
         this.paymentStatus = paymentStatus;
+    }
+
+
+    // =====================================================
+    // ORDER STATUS
+    // =====================================================
+
+    public String getOrderStatus() {
+        return orderStatus;
     }
 
     public void setOrderStatus(String orderStatus) {
         this.orderStatus = orderStatus;
     }
 
+
+    // =====================================================
+    // SHIPPING MODE
+    // =====================================================
+
+    public String getShippingMode() {
+        return shippingMode;
+    }
+
+    public void setShippingMode(String shippingMode) {
+        this.shippingMode = shippingMode;
+    }
+
+
+    // =====================================================
+    // TRACKING ID
+    // =====================================================
+
+    public String getTrackingId() {
+        return trackingId;
+    }
+
+    public void setTrackingId(String trackingId) {
+        this.trackingId = trackingId;
+    }
+
+
+    // =====================================================
+    // CREATED AT
+    // =====================================================
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+
+    // =====================================================
+    // ITEMS
+    // =====================================================
+
+    public List<OrderItem> getItems() {
+        return items;
     }
 
     public void setItems(List<OrderItem> items) {
         this.items = items;
     }
 
+
+    // =====================================================
+    // PRE PERSIST
+    // =====================================================
+
+    @PrePersist
+    protected void onCreate() {
+
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+    }
 }
+

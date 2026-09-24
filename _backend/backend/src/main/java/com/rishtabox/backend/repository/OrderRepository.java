@@ -28,4 +28,19 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             @Param("orderStatus") String orderStatus,
             @Param("paymentStatus") String paymentStatus
     );
+    // ================= ADMIN DASHBOARD =================
+
+    long countByOrderStatus(String orderStatus);
+
+    long countByPaymentStatus(String paymentStatus);
+
+    @Query("""
+            SELECT COALESCE(SUM(o.totalAmount), 0)
+            FROM Order o
+            WHERE o.paymentStatus = :paymentStatus
+              AND o.orderStatus <> 'CANCELLED'
+            """)
+    Double getTotalSales(
+            @Param("paymentStatus") String paymentStatus
+    );
 }

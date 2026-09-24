@@ -35,139 +35,118 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             FilterChain filterChain)
             throws ServletException, IOException {
 
+        // =====================================================
+        // GET AUTHORIZATION HEADER
+        // =====================================================
+
         String authHeader = request.getHeader("Authorization");
 
-        System.out.println(
-                "JWT REQUEST: "
-                        + request.getMethod()
-                        + " "
-                        + request.getRequestURI()
-        );
+        // No JWT supplied
+        if (authHeader == null ||
+                !authHeader.startsWith("Bearer ")) {
+
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        // =====================================================
+        // EXTRACT JWT
+        // =====================================================
+
+        String jwt = authHeader.substring(7).trim();
+
+        // Empty JWT
+        if (jwt.isEmpty()) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         try {
 
-            if (authHeader == null ||
-                    !authHeader.startsWith("Bearer ")) {
+            // =================================================
+            // EXTRACT USERNAME / EMAIL FROM TOKEN
+            // =================================================
 
-                System.out.println(
-                        "JWT: Authorization header missing"
-                );
-
-                filterChain.doFilter(request, response);
-                return;
-            }
-
-            String token = authHeader
-                    .substring(7)
-                    .trim();
-
-            if (token.isEmpty()) {
-
-                System.out.println(
-                        "JWT: Empty token"
-                );
-
-                filterChain.doFilter(request, response);
-                return;
-            }
-
-            String email = jwtService.extractEmail(token);
-
-            System.out.println(
-                    "JWT email: " + email
-            );
+            String email = jwtService.extractUsername(jwt);
 
             if (email == null || email.isBlank()) {
-
-                System.out.println(
-                        "JWT: Email is empty"
-                );
-
                 filterChain.doFilter(request, response);
                 return;
             }
+
+            // =================================================
+            // DON'T RE-AUTHENTICATE
+            // =================================================
 
             if (SecurityContextHolder
                     .getContext()
                     .getAuthentication() != null) {
 
-                System.out.println(
-                        "JWT: Authentication already exists"
-                );
+                filterChain.doFilter(request, response);
+                return;
+            }
+
+            // =================================================
+            // LOAD USER FROM DATABASE
+            // =================================================
+
+            UserDetails userDetails =
+                    userDetailsService.loadUserByUsername(email);
+
+            // =================================================
+            // VALIDATE TOKEN
+            // =================================================
+
+            if (!jwtService.isTokenValid(
+                    jwt,
+                    userDetails)) {
 
                 filterChain.doFilter(request, response);
                 return;
             }
 
-            UserDetails userDetails =
-                    userDetailsService.loadUserByUsername(email);
+            // =================================================
+            // CREATE AUTHENTICATION
+            // =================================================
 
-            boolean validToken =
-                    jwtService.isTokenValid(
-                            token,
-                            userDetails
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
                     );
 
-            System.out.println(
-                    "JWT database email: "
-                            + userDetails.getUsername()
+            // =================================================
+            // REQUEST DETAILS
+            // =================================================
+
+            authentication.setDetails(
+                    new WebAuthenticationDetailsSource()
+                            .buildDetails(request)
             );
 
-            System.out.println(
-                    "JWT valid: " + validToken
-            );
+            // =================================================
+            // SET SECURITY CONTEXT
+            // =================================================
 
-            if (validToken) {
-
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(
-                                userDetails,
-                                null,
-                                userDetails.getAuthorities()
-                        );
-
-                authentication.setDetails(
-                        new WebAuthenticationDetailsSource()
-                                .buildDetails(request)
-                );
-
-                SecurityContextHolder
-                        .getContext()
-                        .setAuthentication(authentication);
-
-                System.out.println(
-                        "JWT AUTHENTICATED: "
-                                + userDetails.getUsername()
-                );
-
-            } else {
-
-                System.out.println(
-                        "JWT: Token validation failed"
-                );
-            }
+            SecurityContextHolder
+                    .getContext()
+                    .setAuthentication(authentication);
 
         } catch (Exception exception) {
 
+            // Do not authenticate invalid JWT
+            SecurityContextHolder.clearContext();
+
             System.out.println(
-                    "JWT ERROR: "
-                            + exception.getClass().getSimpleName()
-                            + " - "
+                    "JWT Authentication failed: "
                             + exception.getMessage()
             );
-
-            SecurityContextHolder
-                    .clearContext();
         }
 
-        System.out.println(
-                "AUTHENTICATION PRESENT: "
-                        + (
-                        SecurityContextHolder
-                                .getContext()
-                                .getAuthentication() != null
-                )
-        );
+        // =====================================================
+        // CONTINUE FILTER CHAIN
+        // =====================================================
 
         filterChain.doFilter(request, response);
     }

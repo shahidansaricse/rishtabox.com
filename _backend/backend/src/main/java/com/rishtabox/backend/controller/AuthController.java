@@ -18,11 +18,16 @@ public class AuthController {
 
     private final AuthService authService;
 
+
     public AuthController(AuthService authService) {
         this.authService = authService;
     }
 
-    // ================= REGISTER =================
+
+    // =========================================================
+    // STORE REGISTER
+    // STORE SIGNUP = USER
+    // =========================================================
 
     @PostMapping("/register")
     public ResponseEntity<?> register(
@@ -30,7 +35,8 @@ public class AuthController {
 
         try {
 
-            User user = authService.register(request);
+            User user =
+                    authService.register(request);
 
             return ResponseEntity
                     .status(HttpStatus.CREATED)
@@ -40,13 +46,51 @@ public class AuthController {
 
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of(
-                            "message", e.getMessage()
-                    ));
+                    .body(
+                            Map.of(
+                                    "message",
+                                    e.getMessage()
+                            )
+                    );
         }
     }
 
-    // ================= LOGIN =================
+
+    // =========================================================
+    // ADMIN REGISTER
+    // ADMIN SIGNUP = ADMIN
+    // =========================================================
+
+    @PostMapping("/admin-register")
+    public ResponseEntity<?> registerAdmin(
+            @RequestBody RegisterRequest request) {
+
+        try {
+
+            User user =
+                    authService.registerAdmin(request);
+
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body(user);
+
+        } catch (RuntimeException e) {
+
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(
+                            Map.of(
+                                    "message",
+                                    e.getMessage()
+                            )
+                    );
+        }
+    }
+
+
+    // =========================================================
+    // LOGIN
+    // =========================================================
 
     @PostMapping("/login")
     public ResponseEntity<?> login(
@@ -65,9 +109,12 @@ public class AuthController {
 
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of(
-                            "message", e.getMessage()
-                    ));
+                    .body(
+                            Map.of(
+                                    "message",
+                                    e.getMessage()
+                            )
+                    );
         }
     }
 }

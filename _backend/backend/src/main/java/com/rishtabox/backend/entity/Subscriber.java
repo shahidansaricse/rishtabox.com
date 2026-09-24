@@ -2,13 +2,10 @@ package com.rishtabox.backend.entity;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+
 @Entity
-@Table(
-        name = "subscribers",
-        uniqueConstraints = {
-                @UniqueConstraint(columnNames = "email")
-        }
-)
+@Table(name = "subscribers")
 public class Subscriber {
 
     @Id
@@ -18,11 +15,22 @@ public class Subscriber {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @Column(nullable = false)
+    private LocalDateTime subscribedAt;
+
     public Subscriber() {
     }
 
     public Subscriber(String email) {
         this.email = email;
+        this.subscribedAt = LocalDateTime.now();
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        if (subscribedAt == null) {
+            subscribedAt = LocalDateTime.now();
+        }
     }
 
     public Long getId() {
@@ -39,5 +47,13 @@ public class Subscriber {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public LocalDateTime getSubscribedAt() {
+        return subscribedAt;
+    }
+
+    public void setSubscribedAt(LocalDateTime subscribedAt) {
+        this.subscribedAt = subscribedAt;
     }
 }

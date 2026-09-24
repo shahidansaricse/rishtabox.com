@@ -1,5 +1,7 @@
 package com.rishtabox.backend.security;
 
+import com.rishtabox.backend.entity.User;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -16,14 +18,20 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
+    // =====================================================
+    // CONFIGURATION
+    // =====================================================
+
     @Value("${jwt.secret}")
     private String secret;
 
-    @Value("${jwt.expiration}")
+    @Value("${jwt.expiration:86400000}")
     private long expiration;
 
+    // =====================================================
+    // SIGNING KEY
+    // =====================================================
 
-    // Create signing key
     private SecretKey getSigningKey() {
 
         return Keys.hmacShaKeyFor(
@@ -31,26 +39,11 @@ public class JwtService {
         );
     }
 
+    // =====================================================
+    // EXTRACT USERNAME / EMAIL
+    // =====================================================
 
-    // Generate JWT token
-    public String generateToken(String email) {
-
-        Date now = new Date();
-
-        Date expiryDate =
-                new Date(now.getTime() + expiration);
-
-        return Jwts.builder()
-                .subject(email)
-                .issuedAt(now)
-                .expiration(expiryDate)
-                .signWith(getSigningKey())
-                .compact();
-    }
-
-
-    // Extract email from token
-    public String extractEmail(String token) {
+    public String extractUsername(String token) {
 
         return extractClaim(
                 token,
@@ -58,20 +51,35 @@ public class JwtService {
         );
     }
 
+    // =====================================================
+    // EXTRACT ROLE
+    // =====================================================
 
-    // Extract any claim
-    public <T> T extractClaim(
-            String token,
-            Function<Claims, T> claimsResolver) {
+    public String extractRole(String token) {
 
-        Claims claims =
-                extractAllClaims(token);
-
-        return claimsResolver.apply(claims);
+        return extractClaim(
+                token,
+                claims -> claims.get("role", String.class)
+        );
     }
 
+    // =====================================================
+    // GENERIC CLAIM EXTRACTOR
+    // =====================================================
 
-    // Extract all claims
+    public <T> T extractClaim(
+            String token,
+            Function<Claims, T> resolver) {
+
+        Claims claims = extractAllClaims(token);
+
+        return resolver.apply(claims);
+    }
+
+    // =====================================================
+    // EXTRACT ALL CLAIMS
+    // =====================================================
+
     private Claims extractAllClaims(String token) {
 
         return Jwts.parser()
@@ -81,45 +89,145 @@ public class JwtService {
                 .getPayload();
     }
 
+    // =====================================================
+    // GENERATE TOKEN
+    // =====================================================
 
-    // Check token expiry
-    private boolean isTokenExpired(String token) {
+    public String generateToken(UserDetails userDetails) {
 
-        Date expirationDate =
-                extractClaim(
-                        token,
-                        Claims::getExpiration
-                );
+        Date now = new Date();
 
-        return expirationDate.before(new Date());
+        Date expiryDate = new Date(
+                now.getTime() + expiration
+        );
+
+        /*
+         * Spring Security authority:
+         *
+         * ROLE_USER
+         * ROLE_ADMIN
+         * ROLE_SUPER_ADMIN
+         *
+         * We store the clean role in JWT:
+         *
+         * USER
+         * ADMIN
+         * SUPER_ADMIN
+         */
+
+        String role = "USER";
+
+        if (userDetails.getAuthorities() != null
+                && !userDetails.getAuthorities().isEmpty()) {
+
+            String authority =
+                    userDetails.getAuthorities()
+                            .iterator()
+                            .next()
+                            .getAuthority();
+
+            if (authority.startsWith("ROLE_")) {
+
+                role = authority.substring(5);
+
+            } else {
+
+                role = authority;
+            }
+        }
+
+        // =================================================
+        // BUILD JWT
+        // =================================================
+
+        return Jwts.builder()
+
+                // User email
+                .subject(userDetails.getUsername())
+
+                // User role
+                .claim("role", role)
+
+                // Created time
+                .issuedAt(now)
+
+                // Expiration
+                .expiration(expiryDate)
+
+                // Sign token
+                .signWith(getSigningKey())
+
+                .compact();
     }
 
+    // =====================================================
+    // GENERATE TOKEN FROM USER ENTITY
+    // =====================================================
 
-    // Validate token
+    public String generateToken(User user) {
+
+        Date now = new Date();
+
+        Date expiryDate = new Date(
+                now.getTime() + expiration
+        );
+
+        String role = user.getRole().name();
+
+        return Jwts.builder()
+
+                // Email
+                .subject(user.getEmail())
+
+                // Role
+                .claim("role", role)
+
+                // Created
+                .issuedAt(now)
+
+                // Expiration
+                .expiration(expiryDate)
+
+                // Signature
+                .signWith(getSigningKey())
+
+                .compact();
+    }
+
+    // =====================================================
+    // VALIDATE TOKEN
+    // =====================================================
+
     public boolean isTokenValid(
             String token,
             UserDetails userDetails) {
 
         try {
 
-            String email = extractEmail(token);
+            String username =
+                    extractUsername(token);
 
-            return email != null
-                    && email.equalsIgnoreCase(
+            return username != null
+                    && username.equals(
                     userDetails.getUsername()
             )
                     && !isTokenExpired(token);
 
         } catch (Exception e) {
 
-            System.out.println(
-                    "JWT validation error: "
-                            + e.getClass().getSimpleName()
-                            + " - "
-                            + e.getMessage()
-            );
-
             return false;
         }
+    }
+
+    // =====================================================
+    // CHECK TOKEN EXPIRATION
+    // =====================================================
+
+    private boolean isTokenExpired(String token) {
+
+        return extractClaim(
+                token,
+                Claims::getExpiration
+        ).before(new Date());
     }
 }

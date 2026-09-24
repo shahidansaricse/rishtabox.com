@@ -1,16 +1,10 @@
 package com.rishtabox.backend.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
-
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "blogs")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class Blog {
 
     @Id
@@ -38,6 +32,27 @@ public class Blog {
     @Column(nullable = false)
     private Boolean published = true;
 
+    public Blog() {
+    }
+
+    public Blog(
+            String title,
+            String description,
+            String content,
+            String image,
+            String author,
+            LocalDateTime createdAt,
+            Boolean published) {
+
+        this.title = title;
+        this.description = description;
+        this.content = content;
+        this.image = image;
+        this.author = author;
+        this.createdAt = createdAt;
+        this.published = published;
+    }
+
     @PrePersist
     protected void onCreate() {
 
@@ -48,5 +63,69 @@ public class Blog {
         if (published == null) {
             published = true;
         }
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Boolean getPublished() {
+        return published;
+    }
+
+    public void setPublished(Boolean published) {
+        this.published = published;
     }
 }

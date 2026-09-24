@@ -1,4 +1,4 @@
- package com.rishtabox.backend.entity;
+package com.rishtabox.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -27,6 +27,15 @@ public class Product {
     private String image;
 
     private Integer stock;
+
+    /*
+     * Product active/inactive status
+     *
+     * true  = product website par available/show hoga
+     * false = product admin se disabled hai
+     */
+    @Column(nullable = false)
+    private Boolean active = true;
 
     @ManyToOne
     @JoinColumn(name = "category_id")
@@ -57,6 +66,7 @@ public class Product {
         this.originalPrice = originalPrice;
         this.image = image;
         this.stock = stock;
+        this.active = true;
         this.category = category;
         this.festival = festival;
         this.relationship = relationship;

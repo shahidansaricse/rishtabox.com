@@ -2,19 +2,14 @@ package com.rishtabox.backend.dto;
 
 public class OrderRequest {
 
-    private Long userId;
-
     private String paymentMethod;
 
-
-    public Long getUserId() {
-        return userId;
+    public OrderRequest() {
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public OrderRequest(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
     }
-
 
     public String getPaymentMethod() {
         return paymentMethod;

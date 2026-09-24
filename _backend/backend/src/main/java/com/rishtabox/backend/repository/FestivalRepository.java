@@ -2,7 +2,8 @@ package com.rishtabox.backend.repository;
 
 import com.rishtabox.backend.entity.Festival;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface FestivalRepository
-        extends JpaRepository<Festival, String> {
+@Repository
+public interface FestivalRepository extends JpaRepository<Festival, String> {
 }

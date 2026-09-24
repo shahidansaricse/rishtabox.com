@@ -1,0 +1,1822 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>RishtaBox Admin Dashboard</title>
+
+    <link
+            rel="stylesheet"
+            href="admin.css"
+    >
+
+    <script
+            defer
+            src="admin.js"
+    ></script>
+
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     ADMIN AUTH PAGE
+===================================================== -->
+
+<div
+        id="adminAuthPage"
+        class="admin-auth-page hidden"
+>
+
+
+    <!-- =================================================
+         ADMIN LOGIN
+    ================================================= -->
+
+    <section
+            id="adminLoginSection"
+            class="auth-card"
+    >
+
+        <div class="auth-header">
+
+            <p class="eyebrow">
+                RISHTABOX ADMIN
+            </p>
+
+            <h1>
+                Admin Login
+            </h1>
+
+            <p>
+                Login to manage your RishtaBox store.
+            </p>
+
+        </div>
+
+
+        <form id="adminLoginForm">
+
+
+            <div class="form-group">
+
+                <label for="adminLoginEmail">
+                    Email or Mobile
+                </label>
+
+                <input
+                        type="text"
+                        id="adminLoginEmail"
+                        name="emailOrMobile"
+                        placeholder="Enter email or mobile"
+                        autocomplete="username"
+                        required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="adminLoginPassword">
+                    Password
+                </label>
+
+                <input
+                        type="password"
+                        id="adminLoginPassword"
+                        name="password"
+                        placeholder="Enter password"
+                        autocomplete="current-password"
+                        required
+                >
+
+            </div>
+
+
+            <div
+                    id="adminLoginMessage"
+                    class="form-message"
+            ></div>
+
+
+            <button
+                    type="submit"
+                    class="primary-btn auth-submit-btn"
+            >
+                Login
+            </button>
+
+        </form>
+
+
+        <div class="auth-switch">
+
+            <span>
+                Don't have an account?
+            </span>
+
+            <button
+                    type="button"
+                    class="text-btn"
+                    onclick="showAdminSignup()"
+            >
+                Sign Up
+            </button>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =================================================
+         ADMIN SIGNUP
+    ================================================= -->
+
+    <section
+            id="adminSignupSection"
+            class="auth-card hidden"
+    >
+
+        <div class="auth-header">
+
+            <p class="eyebrow">
+                RISHTABOX ADMIN
+            </p>
+
+            <h1>
+                Admin Sign Up
+            </h1>
+
+            <p>
+                Create your admin account.
+            </p>
+
+        </div>
+
+
+        <form id="adminSignupForm">
+
+
+            <div class="form-group">
+
+                <label for="adminSignupName">
+                    Name
+                </label>
+
+                <input
+                        type="text"
+                        id="adminSignupName"
+                        name="name"
+                        placeholder="Enter your name"
+                        autocomplete="name"
+                        required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="adminSignupMobile">
+                    Mobile
+                </label>
+
+                <input
+                        type="tel"
+                        id="adminSignupMobile"
+                        name="mobile"
+                        placeholder="Enter mobile number"
+                        autocomplete="tel"
+                        required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="adminSignupEmail">
+                    Email
+                </label>
+
+                <input
+                        type="email"
+                        id="adminSignupEmail"
+                        name="email"
+                        placeholder="Enter email"
+                        autocomplete="email"
+                        required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="adminSignupPassword">
+                    Password
+                </label>
+
+                <input
+                        type="password"
+                        id="adminSignupPassword"
+                        name="password"
+                        placeholder="Create password"
+                        autocomplete="new-password"
+                        required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="adminSignupConfirmPassword">
+                    Confirm Password
+                </label>
+
+                <input
+                        type="password"
+                        id="adminSignupConfirmPassword"
+                        name="confirmPassword"
+                        placeholder="Confirm password"
+                        autocomplete="new-password"
+                        required
+                >
+
+            </div>
+
+
+            <div
+                    id="adminSignupMessage"
+                    class="form-message"
+            ></div>
+
+
+            <button
+                    type="submit"
+                    class="primary-btn auth-submit-btn"
+            >
+                Sign Up
+            </button>
+
+        </form>
+
+
+        <div class="auth-switch">
+
+            <span>
+                Already have an account?
+            </span>
+
+            <button
+                    type="button"
+                    class="text-btn"
+                    onclick="showAdminLogin()"
+            >
+                Login
+            </button>
+
+        </div>
+
+    </section>
+
+</div>
+
+
+
+<!-- =====================================================
+     ADMIN DASHBOARD
+===================================================== -->
+
+<div
+        id="adminDashboard"
+        class="hidden"
+>
+
+
+    <!-- =================================================
+         TOPBAR
+    ================================================= -->
+
+    <header class="admin-topbar">
+
+
+        <a
+                href="../store.html"
+                class="brand"
+        >
+            rishta<span>box</span>
+        </a>
+
+
+        <div class="topbar-actions">
+
+
+            <button
+                    type="button"
+                    id="headerLoginBtn"
+                    class="header-auth-btn hidden"
+                    onclick="showAdminLogin()"
+            >
+                Login
+            </button>
+
+
+            <button
+                    type="button"
+                    id="headerSignupBtn"
+                    class="header-auth-btn hidden"
+                    onclick="showAdminSignup()"
+            >
+                Sign Up
+            </button>
+
+
+            <span
+                    id="adminUserLabel"
+                    class="admin-user-label"
+            >
+                Admin
+            </span>
+
+
+            <button
+                    type="button"
+                    id="logoutBtn"
+                    class="outline-btn"
+            >
+                Logout
+            </button>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- =================================================
+         MAIN ADMIN LAYOUT
+    ================================================= -->
+
+    <main class="admin-layout">
+
+
+        <!-- =================================================
+             SIDEBAR
+        ================================================= -->
+
+        <aside class="sidebar">
+
+
+            <h2>
+                Dashboard
+            </h2>
+
+
+            <button
+                    type="button"
+                    class="nav-btn active"
+                    data-section="overview"
+            >
+                Overview
+            </button>
+
+
+            <button
+                    type="button"
+                    class="nav-btn"
+                    data-section="products"
+            >
+                Products
+            </button>
+
+
+            <button
+                    type="button"
+                    class="nav-btn"
+                    data-section="orders"
+            >
+                Orders
+            </button>
+
+
+            <button
+                    type="button"
+                    class="nav-btn"
+                    data-section="users"
+            >
+                Users
+            </button>
+
+
+            <button
+                    type="button"
+                    class="nav-btn"
+                    data-section="blogs"
+            >
+                Blogs
+            </button>
+
+
+            <a
+                    class="back-link"
+                    href="../store.html"
+            >
+                ← Back to Store
+            </a>
+
+        </aside>
+
+
+
+        <!-- =================================================
+             DASHBOARD CONTENT
+        ================================================= -->
+
+        <section class="dashboard-content">
+
+
+            <!-- =================================================
+                 PAGE HEADING
+            ================================================= -->
+
+            <div class="page-heading">
+
+                <div>
+
+                    <p class="eyebrow">
+                        RISHTABOX ADMIN
+                    </p>
+
+                    <h1 id="sectionTitle">
+                        Overview
+                    </h1>
+
+                    <p>
+                        Manage your store from one place.
+                    </p>
+
+                </div>
+
+
+                <button
+                        type="button"
+                        id="refreshBtn"
+                        class="primary-btn"
+                >
+                    Refresh
+                </button>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 ACCESS MESSAGE
+            ================================================= -->
+
+            <div
+                    id="accessMessage"
+                    class="message error hidden"
+            ></div>
+
+
+
+            <!-- =================================================
+                 OVERVIEW
+            ================================================= -->
+
+            <section
+                    id="overview"
+                    class="admin-section"
+            >
+
+
+                <div class="stats-grid">
+
+
+                    <article class="stat-card">
+
+                        <span>
+                            Products
+                        </span>
+
+                        <strong id="productCount">
+                            —
+                        </strong>
+
+                    </article>
+
+
+                    <article class="stat-card">
+
+                        <span>
+                            Orders
+                        </span>
+
+                        <strong id="orderCount">
+                            —
+                        </strong>
+
+                    </article>
+
+
+                    <article class="stat-card">
+
+                        <span>
+                            Users
+                        </span>
+
+                        <strong id="userCount">
+                            —
+                        </strong>
+
+                    </article>
+
+
+                    <article class="stat-card">
+
+                        <span>
+                            Revenue
+                        </span>
+
+                        <strong id="revenue">
+                            —
+                        </strong>
+
+                    </article>
+
+                </div>
+
+
+
+                <div class="panel-card">
+
+                    <h2>
+                        Welcome to your admin panel
+                    </h2>
+
+                    <p>
+                        Use the sidebar to manage
+                        products, orders, users and blogs.
+                    </p>
+
+                    <p class="muted">
+                        Your dashboard is connected to
+                        the RishtaBox backend.
+                    </p>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =================================================
+                 PRODUCTS
+            ================================================= -->
+
+            <section
+                    id="products"
+                    class="admin-section hidden"
+            >
+
+                <div class="panel-card">
+
+
+                    <div class="section-toolbar">
+
+                        <div>
+
+                            <h2>
+                                Products
+                            </h2>
+
+                            <p>
+                                Add, update and delete
+                                RishtaBox products.
+                            </p>
+
+                        </div>
+
+
+                        <button
+                                type="button"
+                                class="primary-btn"
+                                onclick="openProductForm()"
+                        >
+                            + Add Product
+                        </button>
+
+                    </div>
+
+
+
+                    <!-- PRODUCT FORM -->
+
+                    <div
+                            id="productFormContainer"
+                            class="admin-form-container hidden"
+                    >
+
+                        <div class="form-header">
+
+                            <div>
+
+                                <p class="eyebrow">
+                                    PRODUCT MANAGEMENT
+                                </p>
+
+                                <h3 id="productFormTitle">
+                                    Add Product
+                                </h3>
+
+                            </div>
+
+                        </div>
+
+
+                        <form id="productForm">
+
+
+                            <input
+                                    type="hidden"
+                                    id="productId"
+                            >
+
+
+                            <div class="form-group">
+
+                                <label for="productName">
+                                    Product Name
+                                </label>
+
+                                <input
+                                        type="text"
+                                        id="productName"
+                                        placeholder="Enter product name"
+                                        required
+                                >
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="productDescription">
+                                    Description
+                                </label>
+
+                                <textarea
+                                        id="productDescription"
+                                        placeholder="Enter product description"
+                                        rows="4"
+                                ></textarea>
+
+                            </div>
+
+
+                            <div class="form-row">
+
+
+                                <div class="form-group">
+
+                                    <label for="productPrice">
+                                        Price
+                                    </label>
+
+                                    <input
+                                            type="number"
+                                            id="productPrice"
+                                            min="0"
+                                            step="0.01"
+                                            placeholder="0"
+                                            required
+                                    >
+
+                                </div>
+
+
+                                <div class="form-group">
+
+                                    <label for="productOriginalPrice">
+                                        Original Price
+                                    </label>
+
+                                    <input
+                                            type="number"
+                                            id="productOriginalPrice"
+                                            min="0"
+                                            step="0.01"
+                                            placeholder="0"
+                                    >
+
+                                </div>
+
+
+                                <div class="form-group">
+
+                                    <label for="productStock">
+                                        Stock
+                                    </label>
+
+                                    <input
+                                            type="number"
+                                            id="productStock"
+                                            min="0"
+                                            step="1"
+                                            placeholder="0"
+                                            required
+                                    >
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="productImage">
+                                    Image URL
+                                </label>
+
+                                <input
+                                        type="text"
+                                        id="productImage"
+                                        placeholder="images/product.jpg"
+                                        required
+                                >
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="productCategoryId">
+                                    Category ID
+                                </label>
+
+                                <input
+                                        type="text"
+                                        id="productCategoryId"
+                                        placeholder="Optional - enter category ID"
+                                >
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="productFestivalId">
+                                    Festival ID
+                                </label>
+
+                                <input
+                                        type="text"
+                                        id="productFestivalId"
+                                        placeholder="Optional - enter festival ID"
+                                >
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="productRelationshipId">
+                                    Relationship ID
+                                </label>
+
+                                <input
+                                        type="text"
+                                        id="productRelationshipId"
+                                        placeholder="Optional - enter relationship ID"
+                                >
+
+                            </div>
+
+
+                            <p class="muted">
+
+                                Category ID, Festival ID, and
+                                Relationship ID are optional.
+                                Leave any field blank when it
+                                is not required.
+
+                            </p>
+
+
+                            <div
+                                    id="productFormMessage"
+                                    class="form-message"
+                            ></div>
+
+
+                            <div class="form-actions">
+
+                                <button
+                                        type="submit"
+                                        class="primary-btn"
+                                >
+                                    Save Product
+                                </button>
+
+
+                                <button
+                                        type="button"
+                                        class="outline-btn"
+                                        onclick="closeProductForm()"
+                                >
+                                    Cancel
+                                </button>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+
+
+                    <!-- PRODUCTS LIST -->
+
+                    <div
+                            id="productsContent"
+                            class="empty-state"
+                    >
+                        Loading products...
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =================================================
+                 ORDERS
+            ================================================= -->
+
+            <section
+                    id="orders"
+                    class="admin-section hidden"
+            >
+
+                <div class="panel-card">
+
+
+                    <div class="section-toolbar">
+
+                        <div>
+
+                            <h2>
+                                Orders
+                            </h2>
+
+                            <p>
+                                View and manage customer orders.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                            id="ordersContent"
+                            class="empty-state"
+                    >
+                        Loading orders...
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =================================================
+                 USERS
+            ================================================= -->
+
+            <section
+                    id="users"
+                    class="admin-section hidden"
+            >
+
+                <div class="panel-card">
+
+
+                    <!-- USERS HEADER -->
+
+                    <div class="section-toolbar">
+
+                        <div>
+
+                            <p class="eyebrow">
+                                USER MANAGEMENT
+                            </p>
+
+                            <h2>
+                                Users
+                            </h2>
+
+                            <p>
+                                Manage registered RishtaBox
+                                users, admins and super admins.
+                            </p>
+
+                        </div>
+
+
+                        <button
+                                type="button"
+                                id="refreshUsersBtn"
+                                class="outline-btn"
+                        >
+                            Refresh
+                        </button>
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         USER STATISTICS
+                    ================================================= -->
+
+                    <div class="stats-grid users-stats-grid">
+
+
+                        <article class="stat-card">
+
+                            <span>
+                                Total Users
+                            </span>
+
+                            <strong id="totalUsersCount">
+                                —
+                            </strong>
+
+                        </article>
+
+
+                        <article class="stat-card">
+
+                            <span>
+                                Active Users
+                            </span>
+
+                            <strong id="activeUsersCount">
+                                —
+                            </strong>
+
+                        </article>
+
+
+                        <article class="stat-card">
+
+                            <span>
+                                Admins
+                            </span>
+
+                            <strong id="adminUsersCount">
+                                —
+                            </strong>
+
+                        </article>
+
+
+                        <article class="stat-card">
+
+                            <span>
+                                Super Admins
+                            </span>
+
+                            <strong id="superAdminUsersCount">
+                                —
+                            </strong>
+
+                        </article>
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         USER FILTERS
+                    ================================================= -->
+
+                    <div class="user-filter-panel">
+
+
+                        <!-- SEARCH -->
+
+                        <div class="form-group user-search-group">
+
+                            <label for="userSearchInput">
+                                Search Users
+                            </label>
+
+                            <input
+                                    type="search"
+                                    id="userSearchInput"
+                                    placeholder="Search by name, email, mobile or ID..."
+                                    autocomplete="off"
+                            >
+
+                        </div>
+
+
+
+                        <!-- ROLE -->
+
+                        <div class="form-group">
+
+                            <label for="userRoleFilter">
+                                Role
+                            </label>
+
+                            <select id="userRoleFilter">
+
+                                <option value="ALL">
+                                    All Roles
+                                </option>
+
+                                <option value="USER">
+                                    User
+                                </option>
+
+                                <option value="ADMIN">
+                                    Admin
+                                </option>
+
+                                <option value="SUPER_ADMIN">
+                                    Super Admin
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+
+                        <!-- STATUS -->
+
+                        <div class="form-group">
+
+                            <label for="userStatusFilter">
+                                Status
+                            </label>
+
+                            <select id="userStatusFilter">
+
+                                <option value="ALL">
+                                    All Status
+                                </option>
+
+                                <option value="ACTIVE">
+                                    Active
+                                </option>
+
+                                <option value="BLOCKED">
+                                    Blocked
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+
+                        <!-- SORT -->
+
+                        <div class="form-group">
+
+                            <label for="userSortFilter">
+                                Sort By
+                            </label>
+
+                            <select id="userSortFilter">
+
+                                <option value="NEWEST">
+                                    Newest
+                                </option>
+
+                                <option value="OLDEST">
+                                    Oldest
+                                </option>
+
+                                <option value="NAME_ASC">
+                                    Name A-Z
+                                </option>
+
+                                <option value="NAME_DESC">
+                                    Name Z-A
+                                </option>
+
+                                <option value="ORDERS_HIGH">
+                                    Highest Orders
+                                </option>
+
+                                <option value="SPENT_HIGH">
+                                    Highest Spent
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         BULK ACTIONS
+                    ================================================= -->
+
+                    <div
+                            id="userBulkActions"
+                            class="bulk-action-bar hidden"
+                    >
+
+                        <div>
+
+                            <strong id="selectedUsersCount">
+                                0
+                            </strong>
+
+                            users selected
+
+                        </div>
+
+
+                        <div class="form-actions">
+
+                            <button
+                                    type="button"
+                                    id="bulkBlockUsersBtn"
+                                    class="outline-btn"
+                            >
+                                Block Selected
+                            </button>
+
+
+                            <button
+                                    type="button"
+                                    id="bulkDeleteUsersBtn"
+                                    class="danger-btn"
+                            >
+                                Delete Selected
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         USERS MESSAGE
+                    ================================================= -->
+
+                    <div
+                            id="usersMessage"
+                            class="form-message"
+                    ></div>
+
+
+
+                    <!-- =================================================
+                         USERS TABLE
+                    ================================================= -->
+
+                    <div class="users-table-wrapper">
+
+                        <table class="users-table">
+
+                            <thead>
+
+                            <tr>
+
+                                <th class="checkbox-column">
+
+                                    <input
+                                            type="checkbox"
+                                            id="selectAllUsers"
+                                            aria-label="Select all users"
+                                    >
+
+                                </th>
+
+                                <th>
+                                    User
+                                </th>
+
+                                <th>
+                                    Contact
+                                </th>
+
+                                <th>
+                                    Role
+                                </th>
+
+                                <th>
+                                    Orders
+                                </th>
+
+                                <th>
+                                    Total Spent
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                                <th>
+                                    Joined
+                                </th>
+
+                                <th>
+                                    Actions
+                                </th>
+
+                            </tr>
+
+                            </thead>
+
+
+                            <tbody id="usersTableBody">
+
+                            <tr>
+
+                                <td
+                                        colspan="9"
+                                        class="empty-state"
+                                >
+                                    Loading users...
+                                </td>
+
+                            </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         PAGINATION
+                    ================================================= -->
+
+                    <div class="users-pagination">
+
+
+                        <div
+                                id="usersPaginationInfo"
+                                class="muted"
+                        >
+                            Showing 0–0 of 0 users
+                        </div>
+
+
+                        <div class="pagination-buttons">
+
+
+                            <button
+                                    type="button"
+                                    id="usersPrevPage"
+                                    class="outline-btn"
+                                    disabled
+                            >
+                                ← Previous
+                            </button>
+
+
+                            <div
+                                    id="usersPageNumbers"
+                                    class="page-numbers"
+                            ></div>
+
+
+                            <button
+                                    type="button"
+                                    id="usersNextPage"
+                                    class="outline-btn"
+                                    disabled
+                            >
+                                Next →
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =================================================
+                 BLOGS
+            ================================================= -->
+
+            <section
+                    id="blogs"
+                    class="admin-section hidden"
+            >
+
+                <div class="panel-card">
+
+
+                    <div class="section-toolbar">
+
+                        <div>
+
+                            <h2>
+                                Blogs
+                            </h2>
+
+                            <p>
+                                Create and manage RishtaBox blogs.
+                            </p>
+
+                        </div>
+
+
+                        <button
+                                type="button"
+                                class="primary-btn"
+                                onclick="openBlogForm()"
+                        >
+                            + Add Blog
+                        </button>
+
+                    </div>
+
+
+                    <div
+                            id="blogsContent"
+                            class="empty-state"
+                    >
+                        Loading blogs...
+                    </div>
+
+                </div>
+
+            </section>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+
+<!-- =====================================================
+     USER DETAILS MODAL
+===================================================== -->
+
+<div
+        id="userDetailsModal"
+        class="admin-modal hidden"
+>
+
+    <div
+            class="admin-modal-overlay"
+            id="userDetailsOverlay"
+    ></div>
+
+
+    <div class="admin-modal-card">
+
+
+        <!-- MODAL HEADER -->
+
+        <div class="admin-modal-header">
+
+            <div>
+
+                <p class="eyebrow">
+                    USER DETAILS
+                </p>
+
+                <h2>
+                    User Information
+                </h2>
+
+            </div>
+
+
+            <button
+                    type="button"
+                    id="closeUserDetailsBtn"
+                    class="modal-close-btn"
+                    aria-label="Close"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+
+        <!-- PROFILE -->
+
+        <div class="user-profile-header">
+
+
+            <div
+                    id="userDetailsAvatar"
+                    class="user-avatar"
+            >
+                U
+            </div>
+
+
+            <div>
+
+                <h3 id="userDetailsName">
+                    —
+                </h3>
+
+                <span
+                        id="userDetailsRole"
+                        class="role-badge"
+                >
+                    USER
+                </span>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- DETAILS -->
+
+        <div class="user-details-grid">
+
+
+            <div class="detail-item">
+
+                <span>
+                    User ID
+                </span>
+
+                <strong id="userDetailsId">
+                    —
+                </strong>
+
+            </div>
+
+
+            <div class="detail-item">
+
+                <span>
+                    Email
+                </span>
+
+                <strong id="userDetailsEmail">
+                    —
+                </strong>
+
+            </div>
+
+
+            <div class="detail-item">
+
+                <span>
+                    Mobile
+                </span>
+
+                <strong id="userDetailsMobile">
+                    —
+                </strong>
+
+            </div>
+
+
+            <div class="detail-item">
+
+                <span>
+                    Account Status
+                </span>
+
+                <strong id="userDetailsStatus">
+                    —
+                </strong>
+
+            </div>
+
+
+            <div class="detail-item">
+
+                <span>
+                    Joined
+                </span>
+
+                <strong id="userDetailsJoined">
+                    —
+                </strong>
+
+            </div>
+
+
+            <div class="detail-item">
+
+                <span>
+                    Orders
+                </span>
+
+                <strong id="userDetailsOrders">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="detail-item">
+
+                <span>
+                    Total Spent
+                </span>
+
+                <strong id="userDetailsSpent">
+                    ₹0
+                </strong>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- MODAL ACTIONS -->
+
+        <div class="form-actions user-modal-actions">
+
+
+            <button
+                    type="button"
+                    id="editUserBtn"
+                    class="primary-btn"
+            >
+                Edit User
+            </button>
+
+
+            <button
+                    type="button"
+                    id="changeUserRoleBtn"
+                    class="outline-btn"
+            >
+                Change Role
+            </button>
+
+
+            <button
+                    type="button"
+                    id="toggleUserStatusBtn"
+                    class="outline-btn"
+            >
+                Block User
+            </button>
+
+
+            <button
+                    type="button"
+                    id="deleteUserBtn"
+                    class="danger-btn"
+            >
+                Delete User
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     EDIT USER MODAL
+===================================================== -->
+
+<div
+        id="editUserModal"
+        class="admin-modal hidden"
+>
+
+    <div
+            class="admin-modal-overlay"
+            id="editUserOverlay"
+    ></div>
+
+
+    <div class="admin-modal-card">
+
+
+        <!-- HEADER -->
+
+        <div class="admin-modal-header">
+
+            <div>
+
+                <p class="eyebrow">
+                    USER MANAGEMENT
+                </p>
+
+                <h2>
+                    Edit User
+                </h2>
+
+            </div>
+
+
+            <button
+                    type="button"
+                    id="closeEditUserBtn"
+                    class="modal-close-btn"
+                    aria-label="Close"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+
+        <!-- FORM -->
+
+        <form id="editUserForm">
+
+
+            <input
+                    type="hidden"
+                    id="editUserId"
+            >
+
+
+            <!-- NAME -->
+
+            <div class="form-group">
+
+                <label for="editUserName">
+                    Name
+                </label>
+
+                <input
+                        type="text"
+                        id="editUserName"
+                        placeholder="Enter user name"
+                        required
+                >
+
+            </div>
+
+
+            <!-- EMAIL -->
+
+            <div class="form-group">
+
+                <label for="editUserEmail">
+                    Email
+                </label>
+
+                <input
+                        type="email"
+                        id="editUserEmail"
+                        placeholder="Enter email"
+                        required
+                >
+
+            </div>
+
+
+            <!-- MOBILE -->
+
+            <div class="form-group">
+
+                <label for="editUserMobile">
+                    Mobile
+                </label>
+
+                <input
+                        type="tel"
+                        id="editUserMobile"
+                        placeholder="Enter mobile number"
+                        required
+                >
+
+            </div>
+
+
+            <!-- ROLE -->
+
+            <div class="form-group">
+
+                <label for="editUserRole">
+                    Role
+                </label>
+
+                <select id="editUserRole">
+
+                    <option value="USER">
+                        User
+                    </option>
+
+                    <option value="ADMIN">
+                        Admin
+                    </option>
+
+                    <option value="SUPER_ADMIN">
+                        Super Admin
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- STATUS -->
+
+            <div class="form-group">
+
+                <label for="editUserStatus">
+                    Account Status
+                </label>
+
+                <select id="editUserStatus">
+
+                    <option value="ACTIVE">
+                        Active
+                    </option>
+
+                    <option value="BLOCKED">
+                        Blocked
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- MESSAGE -->
+
+            <div
+                    id="editUserMessage"
+                    class="form-message"
+            ></div>
+
+
+            <!-- ACTIONS -->
+
+            <div class="form-actions">
+
+
+                <button
+                        type="submit"
+                        class="primary-btn"
+                >
+                    Save Changes
+                </button>
+
+
+                <button
+                        type="button"
+                        id="cancelEditUserBtn"
+                        class="outline-btn"
+                >
+                    Cancel
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+
+</body>
+
+</html>

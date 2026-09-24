@@ -4,10 +4,8 @@ public class ProductRequest {
 
     private String name;
     private String description;
-
     private Double price;
     private Double originalPrice;
-
     private String image;
     private Integer stock;
 
@@ -15,10 +13,8 @@ public class ProductRequest {
     private String festivalId;
     private String relationshipId;
 
-
-    // =========================
-    // Name
-    // =========================
+    public ProductRequest() {
+    }
 
     public String getName() {
         return name;
@@ -28,11 +24,6 @@ public class ProductRequest {
         this.name = name;
     }
 
-
-    // =========================
-    // Description
-    // =========================
-
     public String getDescription() {
         return description;
     }
@@ -40,11 +31,6 @@ public class ProductRequest {
     public void setDescription(String description) {
         this.description = description;
     }
-
-
-    // =========================
-    // Price
-    // =========================
 
     public Double getPrice() {
         return price;
@@ -54,11 +40,6 @@ public class ProductRequest {
         this.price = price;
     }
 
-
-    // =========================
-    // Original Price
-    // =========================
-
     public Double getOriginalPrice() {
         return originalPrice;
     }
@@ -66,11 +47,6 @@ public class ProductRequest {
     public void setOriginalPrice(Double originalPrice) {
         this.originalPrice = originalPrice;
     }
-
-
-    // =========================
-    // Image
-    // =========================
 
     public String getImage() {
         return image;
@@ -80,11 +56,6 @@ public class ProductRequest {
         this.image = image;
     }
 
-
-    // =========================
-    // Stock
-    // =========================
-
     public Integer getStock() {
         return stock;
     }
@@ -92,11 +63,6 @@ public class ProductRequest {
     public void setStock(Integer stock) {
         this.stock = stock;
     }
-
-
-    // =========================
-    // Category ID
-    // =========================
 
     public String getCategoryId() {
         return categoryId;
@@ -106,11 +72,6 @@ public class ProductRequest {
         this.categoryId = categoryId;
     }
 
-
-    // =========================
-    // Festival ID
-    // =========================
-
     public String getFestivalId() {
         return festivalId;
     }
@@ -118,11 +79,6 @@ public class ProductRequest {
     public void setFestivalId(String festivalId) {
         this.festivalId = festivalId;
     }
-
-
-    // =========================
-    // Relationship ID
-    // =========================
 
     public String getRelationshipId() {
         return relationshipId;

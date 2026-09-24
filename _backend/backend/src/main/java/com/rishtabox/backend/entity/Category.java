@@ -22,11 +22,9 @@ public class Category {
     @Column(length = 255)
     private String image;
 
-    // REQUIRED BY HIBERNATE
     public Category() {
     }
 
-    // Constructor for creating category
     public Category(
             String id,
             String name,

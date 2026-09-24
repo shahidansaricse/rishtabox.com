@@ -2,14 +2,14 @@ package com.rishtabox.backend.repository;
 
 import com.rishtabox.backend.entity.Blog;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository
 public interface BlogRepository extends JpaRepository<Blog, Long> {
 
-    // Get published blogs, newest first
-    List<Blog> findByPublishedTrueOrderByCreatedAtDesc();
-
-    // Get all blogs, newest first
     List<Blog> findAllByOrderByCreatedAtDesc();
+
+    List<Blog> findByPublishedTrueOrderByCreatedAtDesc();
 }

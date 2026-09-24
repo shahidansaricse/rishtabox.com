@@ -1,4 +1,3 @@
-
 package com.rishtabox.backend.service;
 
 import com.rishtabox.backend.dto.AuthResponse;
@@ -6,196 +5,279 @@ import com.rishtabox.backend.dto.LoginRequest;
 import com.rishtabox.backend.dto.RegisterRequest;
 import com.rishtabox.backend.entity.User;
 import com.rishtabox.backend.repository.UserRepository;
+import com.rishtabox.backend.security.CustomUserDetailsService;
 import com.rishtabox.backend.security.JwtService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AuthService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
-
-    private final BCryptPasswordEncoder passwordEncoder =
-            new BCryptPasswordEncoder();
+    private final CustomUserDetailsService userDetailsService;
 
     public AuthService(
             UserRepository userRepository,
-            JwtService jwtService) {
+            PasswordEncoder passwordEncoder,
+            JwtService jwtService,
+            CustomUserDetailsService userDetailsService) {
 
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
+        this.userDetailsService = userDetailsService;
     }
 
-    // ================= REGISTER =================
+    // =========================================================
+    // STORE REGISTER
+    // PUBLIC SIGNUP = USER
+    // =========================================================
 
     public User register(RegisterRequest request) {
 
-        if (request == null) {
-            throw new RuntimeException("Invalid registration request");
-        }
+        validateRegisterRequest(request);
 
-        if (request.getName() == null ||
-                request.getName().trim().isEmpty()) {
-            throw new RuntimeException("Name is required");
-        }
+        String email =
+                request.getEmail()
+                        .trim()
+                        .toLowerCase();
 
-        if (request.getEmail() == null ||
-                request.getEmail().trim().isEmpty()) {
-            throw new RuntimeException("Email is required");
-        }
+        String phone =
+                request.getPhone()
+                        .trim();
 
-        if (request.getPhone() == null ||
-                request.getPhone().trim().isEmpty()) {
-            throw new RuntimeException("Phone is required");
-        }
+        // -----------------------------------------------------
+        // CHECK DUPLICATE EMAIL
+        // -----------------------------------------------------
 
-        if (request.getPassword() == null ||
-                request.getPassword().isEmpty()) {
-            throw new RuntimeException("Password is required");
-        }
-
-        String name = request.getName().trim();
-        String email = request.getEmail().trim().toLowerCase();
-        String phone = request.getPhone().trim();
-        String password = request.getPassword();
-
-        // Check duplicate email
         if (userRepository.existsByEmail(email)) {
-            throw new RuntimeException("Email already registered");
-        }
 
-        // Check duplicate phone
-        if (userRepository.existsByPhone(phone)) {
-            throw new RuntimeException("Phone already registered");
-        }
-
-        // Encrypt password before saving
-        String encodedPassword =
-                passwordEncoder.encode(password);
-
-        // Create user
-        User user = new User();
-
-        user.setName(name);
-        user.setEmail(email);
-        user.setPhone(phone);
-        user.setPassword(encodedPassword);
-
-        // SAVE TO MYSQL
-        User savedUser = userRepository.save(user);
-
-        System.out.println("=================================");
-        System.out.println("USER REGISTERED SUCCESSFULLY");
-        System.out.println("ID    : " + savedUser.getId());
-        System.out.println("NAME  : " + savedUser.getName());
-        System.out.println("EMAIL : " + savedUser.getEmail());
-        System.out.println("PHONE : " + savedUser.getPhone());
-        System.out.println("=================================");
-
-        return savedUser;
-    }
-// ================= LOGIN =================
-
-    public AuthResponse login(LoginRequest request) {
-
-        if (request == null) {
-            throw new RuntimeException("Invalid login request");
-        }
-
-        if (request.getEmail() == null ||
-                request.getEmail().trim().isEmpty()) {
-            throw new RuntimeException("Email or mobile number is required");
-        }
-
-        if (request.getPassword() == null ||
-                request.getPassword().isEmpty()) {
-            throw new RuntimeException("Password is required");
-        }
-
-        String loginValue =
-                request.getEmail().trim();
-
-        User user;
-
-        // =========================
-        // LOGIN USING EMAIL
-        // =========================
-
-        if (loginValue.contains("@")) {
-
-            String email =
-                    loginValue.toLowerCase();
-
-            user = userRepository
-                    .findByEmail(email)
-                    .orElseThrow(() ->
-                            new RuntimeException(
-                                    "No account found. Please create an account first."
-                            ));
-        }
-
-        // =========================
-        // LOGIN USING MOBILE
-        // =========================
-
-        else {
-
-            user = userRepository
-                    .findByPhone(loginValue)
-                    .orElseThrow(() ->
-                            new RuntimeException(
-                                    "No account found. Please create an account first."
-                            ));
-        }
-
-        // =========================
-        // CHECK PASSWORD
-        // =========================
-
-        boolean passwordMatches =
-                passwordEncoder.matches(
-                        request.getPassword(),
-                        user.getPassword()
-                );
-
-        if (!passwordMatches) {
             throw new RuntimeException(
-                    "Invalid email/mobile or password"
+                    "Email already registered"
             );
         }
 
-        // =========================
-        // GENERATE JWT
-        // =========================
+        // -----------------------------------------------------
+        // CHECK DUPLICATE PHONE
+        // -----------------------------------------------------
 
-        // ================= GENERATE JWT =================
+        if (userRepository.existsByPhone(phone)) {
 
-        String userEmail = user.getEmail()
-                .trim()
-                .toLowerCase();
-
-        String token = jwtService.generateToken(userEmail);
-
-        if (token == null || token.trim().isEmpty()) {
-            throw new RuntimeException("JWT token generation failed");
+            throw new RuntimeException(
+                    "Phone already registered"
+            );
         }
 
-        System.out.println("=================================");
-        System.out.println("LOGIN SUCCESSFUL");
-        System.out.println("USER ID    : " + user.getId());
-        System.out.println("USER EMAIL : " + userEmail);
-        System.out.println("TOKEN EXISTS : " + !token.isBlank());
-        System.out.println("TOKEN LENGTH : " + token.length());
-        System.out.println("TOKEN PARTS  : " + token.split("\\.", -1).length);
-        System.out.println("=================================");
+        // -----------------------------------------------------
+        // CREATE USER
+        // -----------------------------------------------------
+
+        User user = new User();
+
+        user.setName(
+                request.getName().trim()
+        );
+
+        user.setEmail(email);
+
+        user.setPhone(phone);
+
+        user.setPassword(
+                passwordEncoder.encode(
+                        request.getPassword()
+                )
+        );
+
+        // -----------------------------------------------------
+        // PUBLIC REGISTRATION ALWAYS CREATES USER
+        // -----------------------------------------------------
+
+        user.setRole(
+                User.Role.USER
+        );
+
+        return userRepository.save(user);
+    }
+
+    // =========================================================
+    // ADMIN REGISTER
+    //
+    // IMPORTANT:
+    // This method should NOT be exposed as a public signup.
+    //
+    // Admin creation will be moved to the SUPER_ADMIN
+    // role-management system.
+    // =========================================================
+
+    @Deprecated
+    public User registerAdmin(RegisterRequest request) {
+
+        throw new RuntimeException(
+                "Public admin registration is disabled. " +
+                        "Only a SUPER_ADMIN can create an ADMIN."
+        );
+    }
+
+    // =========================================================
+    // COMMON REGISTER VALIDATION
+    // =========================================================
+
+    private void validateRegisterRequest(
+            RegisterRequest request) {
+
+        if (request == null) {
+
+            throw new RuntimeException(
+                    "Registration data is required"
+            );
+        }
+
+        if (request.getName() == null ||
+                request.getName().isBlank()) {
+
+            throw new RuntimeException(
+                    "Name is required"
+            );
+        }
+
+        if (request.getEmail() == null ||
+                request.getEmail().isBlank()) {
+
+            throw new RuntimeException(
+                    "Email is required"
+            );
+        }
+
+        if (request.getPhone() == null ||
+                request.getPhone().isBlank()) {
+
+            throw new RuntimeException(
+                    "Phone is required"
+            );
+        }
+
+        if (request.getPassword() == null ||
+                request.getPassword().isBlank()) {
+
+            throw new RuntimeException(
+                    "Password is required"
+            );
+        }
+    }
+
+    // =========================================================
+    // LOGIN
+    // =========================================================
+
+    public AuthResponse login(LoginRequest request) {
+
+        // -----------------------------------------------------
+        // VALIDATE LOGIN REQUEST
+        // -----------------------------------------------------
+
+        if (request == null) {
+
+            throw new RuntimeException(
+                    "Login data is required"
+            );
+        }
+
+        if (request.getEmail() == null ||
+                request.getEmail().isBlank()) {
+
+            throw new RuntimeException(
+                    "Email is required"
+            );
+        }
+
+        if (request.getPassword() == null ||
+                request.getPassword().isBlank()) {
+
+            throw new RuntimeException(
+                    "Password is required"
+            );
+        }
+
+        // -----------------------------------------------------
+        // NORMALIZE EMAIL
+        // -----------------------------------------------------
+
+        String email =
+                request.getEmail()
+                        .trim()
+                        .toLowerCase();
+
+        // -----------------------------------------------------
+        // FIND USER
+        // -----------------------------------------------------
+
+        User user =
+                userRepository
+                        .findByEmail(email)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Invalid email or password"
+                                )
+                        );
+
+        // -----------------------------------------------------
+        // CHECK PASSWORD
+        // -----------------------------------------------------
+
+        if (!passwordEncoder.matches(
+                request.getPassword(),
+                user.getPassword())) {
+
+            throw new RuntimeException(
+                    "Invalid email or password"
+            );
+        }
+
+        // -----------------------------------------------------
+        // LOAD SPRING SECURITY USER
+        // -----------------------------------------------------
+
+        UserDetails userDetails =
+                userDetailsService
+                        .loadUserByUsername(
+                                user.getEmail()
+                        );
+
+        // -----------------------------------------------------
+        // GENERATE JWT
+        //
+        // JwtService now stores:
+        //
+        // email
+        // role
+        //
+        // Example:
+        //
+        // SUPER_ADMIN
+        // ADMIN
+        // USER
+        // -----------------------------------------------------
+
+        String token =
+                jwtService.generateToken(
+                        userDetails
+                );
+
+        // -----------------------------------------------------
+        // RETURN LOGIN RESPONSE
+        // -----------------------------------------------------
 
         return new AuthResponse(
-                token,
                 user.getId(),
                 user.getName(),
-                userEmail
+                user.getEmail(),
+                user.getPhone(),
+                user.getRole().name(),
+                token
         );
     }
 }
-

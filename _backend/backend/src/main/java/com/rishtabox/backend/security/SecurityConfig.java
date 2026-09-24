@@ -1,16 +1,26 @@
-package com.rishtabox.backend.security;
+package com.rishtabox.backend.config;
+
+import com.rishtabox.backend.security.JwtAuthenticationFilter;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
+
 @Configuration
-@EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -21,50 +31,236 @@ public class SecurityConfig {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
+    // =====================================================
+    // PASSWORD ENCODER
+    // =====================================================
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    // =====================================================
+    // CORS CONFIGURATION
+    // =====================================================
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+
+        CorsConfiguration configuration =
+                new CorsConfiguration();
+
+        configuration.setAllowedOrigins(
+                List.of(
+                        "http://localhost:63342"
+                )
+        );
+
+        configuration.setAllowedMethods(
+                List.of(
+                        "GET",
+                        "POST",
+                        "PUT",
+                        "DELETE",
+                        "PATCH",
+                        "OPTIONS"
+                )
+        );
+
+        configuration.setAllowedHeaders(
+                List.of("*")
+        );
+
+        configuration.setAllowCredentials(true);
+
+        configuration.setExposedHeaders(
+                List.of("Authorization")
+        );
+
+        UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
+
+        source.registerCorsConfiguration(
+                "/**",
+                configuration
+        );
+
+        return source;
+    }
+
+    // =====================================================
+    // SECURITY FILTER CHAIN
+    // =====================================================
+
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http) throws Exception {
 
         http
-                // Disable CSRF for REST API
+
+                // =================================================
+                // CSRF
+                // =================================================
+
                 .csrf(csrf -> csrf.disable())
 
-                // Enable CORS
-                .cors(cors -> {})
+                // =================================================
+                // CORS
+                // =================================================
 
-                // JWT authentication is stateless
+                .cors(cors -> {
+                })
+
+                // =================================================
+                // SESSION
+                // =================================================
+
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(
                                 SessionCreationPolicy.STATELESS
                         )
                 )
 
-                // Authorization rules
+                // =================================================
+                // AUTHORIZATION
+                // =================================================
+
                 .authorizeHttpRequests(auth -> auth
 
-                        // Public authentication endpoints
+                        // =========================================
+                        // PUBLIC AUTH
+                        // =========================================
+
                         .requestMatchers(
                                 "/api/auth/**"
                         ).permitAll()
 
-                        // Public review GET endpoints
+                        // =========================================
+                        // PUBLIC PRODUCTS
+                        // =========================================
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/products/**"
+                        ).permitAll()
+
+                        // =========================================
+                        // PUBLIC CATEGORIES
+                        // =========================================
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/categories/**"
+                        ).permitAll()
+
+                        // =========================================
+                        // PUBLIC FESTIVALS
+                        // =========================================
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/festivals/**"
+                        ).permitAll()
+
+                        // =========================================
+                        // PUBLIC RELATIONSHIPS
+                        // =========================================
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/relationships/**"
+                        ).permitAll()
+
+                        // =========================================
+                        // PUBLIC BLOGS
+                        // =========================================
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/blogs/**"
+                        ).permitAll()
+
+                        // =========================================
+                        // PUBLIC REVIEWS
+                        // =========================================
+
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/api/reviews",
                                 "/api/reviews/product/**"
                         ).permitAll()
 
-                        // Review creation requires login
+                        // =========================================
+                        // CREATE REVIEW
+                        // =========================================
+
                         .requestMatchers(
                                 HttpMethod.POST,
                                 "/api/reviews"
                         ).authenticated()
 
-                        // Other endpoints
+                        // =========================================
+                        // ADMIN APIs
+                        //
+                        // ADMIN + SUPER_ADMIN
+                        // =========================================
+
+                        .requestMatchers(
+                                "/api/admin/**"
+                        ).hasAnyRole(
+                                "ADMIN",
+                                "SUPER_ADMIN"
+                        )
+
+                        // =========================================
+                        // PAYMENT KEY
+                        // =========================================
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/payments/key"
+                        ).permitAll()
+
+                        // =========================================
+                        // PAYMENT
+                        // =========================================
+
+                        .requestMatchers(
+                                "/api/payments/create-order",
+                                "/api/payments/verify"
+                        ).authenticated()
+
+                        // =========================================
+                        // CREATE ORDER
+                        // =========================================
+
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/orders",
+                                "/api/orders/**"
+                        ).authenticated()
+
+                        // =========================================
+                        // READ ORDERS
+                        // =========================================
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/orders",
+                                "/api/orders/**"
+                        ).authenticated()
+
+                        // =========================================
+                        // EVERYTHING ELSE
+                        // =========================================
+
                         .anyRequest().permitAll()
                 )
 
-                // Add JWT filter before Spring's username/password filter
+                // =================================================
+                // JWT FILTER
+                // =================================================
+
                 .addFilterBefore(
                         jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class
