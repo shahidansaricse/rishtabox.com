@@ -54,9 +54,10 @@ public class OrderController {
 
     // =========================================================
     // ADMIN - GET ALL ORDERS
+    // ADMIN + SUPER_ADMIN
     // =========================================================
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     @GetMapping("/admin/all")
     public ResponseEntity<List<Order>> getAllOrders() {
 
@@ -73,9 +74,11 @@ public class OrderController {
     // 1. Order Status
     // 2. Shipping Mode
     // 3. Tracking ID
+    //
+    // ADMIN + SUPER_ADMIN
     // =========================================================
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     @PutMapping("/admin/{orderId}")
     public ResponseEntity<Order> updateOrderFromAdmin(
             @PathVariable Long orderId,
@@ -119,4 +122,3 @@ public class OrderController {
         );
     }
 }
-

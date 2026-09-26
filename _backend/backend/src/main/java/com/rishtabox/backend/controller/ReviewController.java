@@ -40,6 +40,21 @@ public class ReviewController {
         return ResponseEntity.ok(reviews);
     }
 
+
+    // =========================================================
+    // ADMIN - GET ALL REVIEWS
+    // =========================================================
+
+    @GetMapping("/admin/all")
+    public ResponseEntity<List<ReviewResponse>> getAllReviewsForAdmin() {
+
+        List<ReviewResponse> reviews =
+                reviewService.getAllReviews();
+
+        return ResponseEntity.ok(reviews);
+    }
+
+
     // =========================================================
     // GET REVIEWS BY PRODUCT ID
     // =========================================================
@@ -54,6 +69,7 @@ public class ReviewController {
         return ResponseEntity.ok(reviews);
     }
 
+
     // =========================================================
     // CREATE REVIEW
     // =========================================================
@@ -65,12 +81,13 @@ public class ReviewController {
 
         try {
 
-            // ==============================================
+            // =================================================
             // CHECK AUTHENTICATION
-            // ==============================================
+            // =================================================
 
-            if (authentication == null ||
-                    !authentication.isAuthenticated()) {
+            if (authentication == null
+                    || !authentication.isAuthenticated()
+                    || "anonymousUser".equals(authentication.getName())) {
 
                 return ResponseEntity
                         .status(HttpStatus.UNAUTHORIZED)
@@ -82,9 +99,10 @@ public class ReviewController {
                         );
             }
 
-            // ==============================================
+
+            // =================================================
             // DEBUG AUTHENTICATED USER
-            // ==============================================
+            // =================================================
 
             System.out.println(
                     "Review authenticated user: "
@@ -97,9 +115,10 @@ public class ReviewController {
                             .getSimpleName()
             );
 
-            // ==============================================
+
+            // =================================================
             // CREATE REVIEW
-            // ==============================================
+            // =================================================
 
             ReviewResponse response =
                     reviewService.createReview(
@@ -126,6 +145,134 @@ public class ReviewController {
                                     exception.getMessage() != null
                                             ? exception.getMessage()
                                             : "Unable to create review."
+                            )
+                    );
+        }
+    }
+
+
+    // =========================================================
+    // ADMIN - APPROVE / REJECT REVIEW
+    // =========================================================
+
+    @PutMapping("/admin/{reviewId}/status")
+    public ResponseEntity<?> updateReviewStatus(
+            @PathVariable Long reviewId,
+            @RequestBody Map<String, Boolean> request) {
+
+        try {
+
+            // =================================================
+            // VALIDATE REVIEW ID
+            // =================================================
+
+            if (reviewId == null) {
+
+                return ResponseEntity
+                        .badRequest()
+                        .body(
+                                Map.of(
+                                        "message",
+                                        "Review ID is required."
+                                )
+                        );
+            }
+
+
+            // =================================================
+            // VALIDATE REQUEST BODY
+            // =================================================
+
+            if (request == null
+                    || !request.containsKey("approved")
+                    || request.get("approved") == null) {
+
+                return ResponseEntity
+                        .badRequest()
+                        .body(
+                                Map.of(
+                                        "message",
+                                        "Approved status is required."
+                                )
+                        );
+            }
+
+
+            Boolean approved =
+                    request.get("approved");
+
+
+            // =================================================
+            // UPDATE REVIEW STATUS
+            // =================================================
+
+            ReviewResponse response =
+                    reviewService.updateReviewApproval(
+                            reviewId,
+                            approved
+                    );
+
+            return ResponseEntity.ok(response);
+
+        } catch (RuntimeException exception) {
+
+            System.out.println(
+                    "Review status update error: "
+                            + exception.getMessage()
+            );
+
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(
+                            Map.of(
+                                    "message",
+                                    exception.getMessage() != null
+                                            ? exception.getMessage()
+                                            : "Unable to update review status."
+                            )
+                    );
+        }
+    }
+
+
+    // =========================================================
+    // ADMIN - DELETE REVIEW
+    // =========================================================
+
+    @DeleteMapping("/admin/{reviewId}")
+    public ResponseEntity<?> deleteReview(
+            @PathVariable Long reviewId) {
+
+        try {
+
+            // =================================================
+            // DELETE REVIEW
+            // =================================================
+
+            reviewService.deleteReview(reviewId);
+
+            return ResponseEntity.ok(
+                    Map.of(
+                            "message",
+                            "Review deleted successfully."
+                    )
+            );
+
+        } catch (RuntimeException exception) {
+
+            System.out.println(
+                    "Review deletion error: "
+                            + exception.getMessage()
+            );
+
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(
+                            Map.of(
+                                    "message",
+                                    exception.getMessage() != null
+                                            ? exception.getMessage()
+                                            : "Unable to delete review."
                             )
                     );
         }

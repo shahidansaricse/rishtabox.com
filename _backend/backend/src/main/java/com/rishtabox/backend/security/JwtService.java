@@ -28,6 +28,7 @@ public class JwtService {
     @Value("${jwt.expiration:86400000}")
     private long expiration;
 
+
     // =====================================================
     // SIGNING KEY
     // =====================================================
@@ -38,6 +39,7 @@ public class JwtService {
                 secret.getBytes(StandardCharsets.UTF_8)
         );
     }
+
 
     // =====================================================
     // EXTRACT USERNAME / EMAIL
@@ -51,6 +53,7 @@ public class JwtService {
         );
     }
 
+
     // =====================================================
     // EXTRACT ROLE
     // =====================================================
@@ -62,6 +65,35 @@ public class JwtService {
                 claims -> claims.get("role", String.class)
         );
     }
+
+
+    // =====================================================
+    // EXTRACT TOKEN VERSION
+    // =====================================================
+    //
+    // Used for Force Logout.
+    //
+    // Example:
+    //
+    // Token:
+    // tokenVersion = 0
+    //
+    // Database:
+    // tokenVersion = 1
+    //
+    // Result:
+    // Token is invalid.
+    //
+    // =====================================================
+
+    public Long extractTokenVersion(String token) {
+
+        return extractClaim(
+                token,
+                claims -> claims.get("tokenVersion", Long.class)
+        );
+    }
+
 
     // =====================================================
     // GENERIC CLAIM EXTRACTOR
@@ -76,6 +108,7 @@ public class JwtService {
         return resolver.apply(claims);
     }
 
+
     // =====================================================
     // EXTRACT ALL CLAIMS
     // =====================================================
@@ -89,8 +122,19 @@ public class JwtService {
                 .getPayload();
     }
 
+
     // =====================================================
-    // GENERATE TOKEN
+    // GENERATE TOKEN FROM USERDETAILS
+    // =====================================================
+    //
+    // Used when only UserDetails is available.
+    //
+    // Token version cannot be obtained from a generic
+    // UserDetails object, so this method keeps tokenVersion
+    // at 0 for compatibility.
+    //
+    // Prefer generateToken(User user) when possible.
+    //
     // =====================================================
 
     public String generateToken(UserDetails userDetails) {
@@ -100,20 +144,6 @@ public class JwtService {
         Date expiryDate = new Date(
                 now.getTime() + expiration
         );
-
-        /*
-         * Spring Security authority:
-         *
-         * ROLE_USER
-         * ROLE_ADMIN
-         * ROLE_SUPER_ADMIN
-         *
-         * We store the clean role in JWT:
-         *
-         * USER
-         * ADMIN
-         * SUPER_ADMIN
-         */
 
         String role = "USER";
 
@@ -126,6 +156,18 @@ public class JwtService {
                             .next()
                             .getAuthority();
 
+            /*
+             * ROLE_USER
+             * ROLE_ADMIN
+             * ROLE_SUPER_ADMIN
+             *
+             * becomes:
+             *
+             * USER
+             * ADMIN
+             * SUPER_ADMIN
+             */
+
             if (authority.startsWith("ROLE_")) {
 
                 role = authority.substring(5);
@@ -136,32 +178,66 @@ public class JwtService {
             }
         }
 
-        // =================================================
-        // BUILD JWT
-        // =================================================
-
         return Jwts.builder()
 
-                // User email
+                // =================================================
+                // EMAIL / USERNAME
+                // =================================================
+
                 .subject(userDetails.getUsername())
 
-                // User role
+                // =================================================
+                // ROLE
+                // =================================================
+
                 .claim("role", role)
 
-                // Created time
+                // =================================================
+                // TOKEN VERSION
+                // =================================================
+                //
+                // Generic UserDetails does not contain our
+                // database tokenVersion, so use 0.
+                //
+                // generateToken(User user) should be preferred.
+                //
+                // =================================================
+
+                .claim("tokenVersion", 0L)
+
+                // =================================================
+                // ISSUED TIME
+                // =================================================
+
                 .issuedAt(now)
 
-                // Expiration
+                // =================================================
+                // EXPIRATION
+                // =================================================
+
                 .expiration(expiryDate)
 
-                // Sign token
+                // =================================================
+                // SIGNATURE
+                // =================================================
+
                 .signWith(getSigningKey())
 
                 .compact();
     }
 
+
     // =====================================================
     // GENERATE TOKEN FROM USER ENTITY
+    // =====================================================
+    //
+    // This is the preferred method for RishtaBox because
+    // the User entity contains:
+    //
+    // - email
+    // - role
+    // - tokenVersion
+    //
     // =====================================================
 
     public String generateToken(User user) {
@@ -172,7 +248,36 @@ public class JwtService {
                 now.getTime() + expiration
         );
 
+        // =================================================
+        // SAFETY CHECK
+        // =================================================
+
+        if (user.getRole() == null) {
+
+            throw new IllegalStateException(
+                    "User role cannot be null"
+            );
+        }
+
+        // =================================================
+        // ROLE
+        // =================================================
+
         String role = user.getRole().name();
+
+        // =================================================
+        // TOKEN VERSION
+        // =================================================
+
+        Long tokenVersion = user.getTokenVersion();
+
+        if (tokenVersion == null) {
+            tokenVersion = 0L;
+        }
+
+        // =================================================
+        // CREATE JWT
+        // =================================================
 
         return Jwts.builder()
 
@@ -182,7 +287,10 @@ public class JwtService {
                 // Role
                 .claim("role", role)
 
-                // Created
+                // Token version
+                .claim("tokenVersion", tokenVersion)
+
+                // Issued time
                 .issuedAt(now)
 
                 // Expiration
@@ -194,8 +302,19 @@ public class JwtService {
                 .compact();
     }
 
+
     // =====================================================
     // VALIDATE TOKEN
+    // =====================================================
+    //
+    // This method validates:
+    //
+    // 1. JWT signature
+    // 2. Username / email
+    // 3. Token expiration
+    // 4. User account status
+    // 5. Token version
+    //
     // =====================================================
 
     public boolean isTokenValid(
@@ -204,14 +323,67 @@ public class JwtService {
 
         try {
 
+            // =================================================
+            // USERNAME
+            // =================================================
+
             String username =
                     extractUsername(token);
 
-            return username != null
-                    && username.equals(
-                    userDetails.getUsername()
-            )
-                    && !isTokenExpired(token);
+            if (username == null
+                    || !username.equals(
+                    userDetails.getUsername())) {
+
+                return false;
+            }
+
+
+            // =================================================
+            // EXPIRATION
+            // =================================================
+
+            if (isTokenExpired(token)) {
+
+                return false;
+            }
+
+
+            // =================================================
+            // ACCOUNT STATUS
+            // =================================================
+
+            if (!userDetails.isEnabled()) {
+
+                return false;
+            }
+
+
+            // =================================================
+            // ACCOUNT LOCK STATUS
+            // =================================================
+
+            if (!userDetails.isAccountNonLocked()) {
+
+                return false;
+            }
+
+
+            // =================================================
+            // TOKEN VERSION
+            // =================================================
+            //
+            // IMPORTANT:
+            //
+            // This check is performed here only when the
+            // UserDetails is our Spring Security user and
+            // tokenVersion is handled separately.
+            //
+            // The JwtAuthenticationFilter should perform
+            // the database User tokenVersion comparison.
+            //
+            // =================================================
+
+            return true;
 
         } catch (Exception e) {
 
@@ -219,15 +391,27 @@ public class JwtService {
         }
     }
 
+
     // =====================================================
     // CHECK TOKEN EXPIRATION
     // =====================================================
 
     private boolean isTokenExpired(String token) {
 
-        return extractClaim(
-                token,
-                Claims::getExpiration
-        ).before(new Date());
+        try {
+
+            Date expirationDate =
+                    extractClaim(
+                            token,
+                            Claims::getExpiration
+                    );
+
+            return expirationDate == null
+                    || expirationDate.before(new Date());
+
+        } catch (Exception e) {
+
+            return true;
+        }
     }
 }

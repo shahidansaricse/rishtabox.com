@@ -1,5 +1,8 @@
 package com.rishtabox.backend.security;
 
+import com.rishtabox.backend.entity.User;
+import com.rishtabox.backend.repository.UserRepository;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,14 +22,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final CustomUserDetailsService userDetailsService;
+    private final UserRepository userRepository;
+
+
+    // =====================================================
+    // CONSTRUCTOR
+    // =====================================================
 
     public JwtAuthenticationFilter(
             JwtService jwtService,
-            CustomUserDetailsService userDetailsService) {
+            CustomUserDetailsService userDetailsService,
+            UserRepository userRepository) {
 
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
+        this.userRepository = userRepository;
     }
+
+
+    // =====================================================
+    // JWT FILTER
+    // =====================================================
 
     @Override
     protected void doFilterInternal(
@@ -35,44 +51,66 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             FilterChain filterChain)
             throws ServletException, IOException {
 
+
         // =====================================================
         // GET AUTHORIZATION HEADER
         // =====================================================
 
-        String authHeader = request.getHeader("Authorization");
+        String authHeader =
+                request.getHeader("Authorization");
 
-        // No JWT supplied
-        if (authHeader == null ||
-                !authHeader.startsWith("Bearer ")) {
+
+        /*
+         * No JWT
+         *
+         * Example:
+         *
+         * GET /api/products
+         *
+         * If endpoint is public, continue normally.
+         */
+
+        if (authHeader == null
+                || !authHeader.startsWith("Bearer ")) {
 
             filterChain.doFilter(request, response);
             return;
         }
+
 
         // =====================================================
         // EXTRACT JWT
         // =====================================================
 
-        String jwt = authHeader.substring(7).trim();
+        String jwt =
+                authHeader.substring(7).trim();
 
-        // Empty JWT
+
         if (jwt.isEmpty()) {
+
             filterChain.doFilter(request, response);
             return;
         }
 
+
         try {
 
             // =================================================
-            // EXTRACT USERNAME / EMAIL FROM TOKEN
+            // EXTRACT EMAIL
             // =================================================
 
-            String email = jwtService.extractUsername(jwt);
+            String email =
+                    jwtService.extractUsername(jwt);
+
 
             if (email == null || email.isBlank()) {
+
+                SecurityContextHolder.clearContext();
+
                 filterChain.doFilter(request, response);
                 return;
             }
+
 
             // =================================================
             // DON'T RE-AUTHENTICATE
@@ -86,24 +124,175 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return;
             }
 
+
             // =================================================
-            // LOAD USER FROM DATABASE
+            // LOAD DATABASE USER
+            // =================================================
+
+            User databaseUser =
+                    userRepository
+                            .findByEmail(email)
+                            .orElse(null);
+
+
+            // =================================================
+            // USER DOES NOT EXIST
+            // =================================================
+
+            if (databaseUser == null) {
+
+                SecurityContextHolder.clearContext();
+
+                filterChain.doFilter(request, response);
+                return;
+            }
+
+
+            // =================================================
+            // CHECK ACCOUNT STATUS
+            // =================================================
+            //
+            // active = false
+            //
+            // means account is blocked.
+            //
+            // A blocked user must not be able to continue
+            // using an already-issued JWT.
+            //
+            // =================================================
+
+            if (!databaseUser.isActive()) {
+
+                SecurityContextHolder.clearContext();
+
+                System.out.println(
+                        "JWT rejected: account is blocked - "
+                                + email
+                );
+
+                filterChain.doFilter(request, response);
+                return;
+            }
+
+
+            // =================================================
+            // LOAD USERDETAILS
+            // =================================================
+            //
+            // Important:
+            //
+            // UserDetails is created from the CURRENT
+            // database role.
+            //
+            // Therefore if:
+            //
+            // ADMIN -> USER
+            //
+            // or:
+            //
+            // USER -> ADMIN
+            //
+            // the current database role is used for the
+            // authentication authorities.
+            //
             // =================================================
 
             UserDetails userDetails =
-                    userDetailsService.loadUserByUsername(email);
+                    userDetailsService
+                            .loadUserByUsername(email);
+
 
             // =================================================
-            // VALIDATE TOKEN
+            // VALIDATE JWT
             // =================================================
 
             if (!jwtService.isTokenValid(
                     jwt,
                     userDetails)) {
 
+                SecurityContextHolder.clearContext();
+
+                System.out.println(
+                        "JWT rejected: invalid or expired token - "
+                                + email
+                );
+
                 filterChain.doFilter(request, response);
                 return;
             }
+
+
+            // =================================================
+            // TOKEN VERSION CHECK
+            // =================================================
+            //
+            // This is what makes FORCE LOGOUT work.
+            //
+            // Example:
+            //
+            // Database:
+            //
+            // tokenVersion = 1
+            //
+            // JWT:
+            //
+            // tokenVersion = 0
+            //
+            // Result:
+            //
+            // JWT is rejected.
+            //
+            // =================================================
+
+            Long jwtTokenVersion =
+                    jwtService.extractTokenVersion(jwt);
+
+
+            Long databaseTokenVersion =
+                    databaseUser.getTokenVersion();
+
+
+            // =================================================
+            // SAFETY FOR OLD TOKENS
+            // =================================================
+            //
+            // Tokens created before tokenVersion was added
+            // may not contain this claim.
+            //
+            // We treat a missing claim as version 0.
+            //
+            // =================================================
+
+            if (jwtTokenVersion == null) {
+
+                jwtTokenVersion = 0L;
+            }
+
+
+            if (databaseTokenVersion == null) {
+
+                databaseTokenVersion = 0L;
+            }
+
+
+            // =================================================
+            // COMPARE TOKEN VERSION
+            // =================================================
+
+            if (!jwtTokenVersion.equals(
+                    databaseTokenVersion)) {
+
+                SecurityContextHolder.clearContext();
+
+                System.out.println(
+                        "JWT rejected: token version mismatch - "
+                                + email
+                );
+
+                filterChain.doFilter(request, response);
+                return;
+            }
+
 
             // =================================================
             // CREATE AUTHENTICATION
@@ -116,6 +305,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             userDetails.getAuthorities()
                     );
 
+
             // =================================================
             // REQUEST DETAILS
             // =================================================
@@ -125,6 +315,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             .buildDetails(request)
             );
 
+
             // =================================================
             // SET SECURITY CONTEXT
             // =================================================
@@ -133,9 +324,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     .getContext()
                     .setAuthentication(authentication);
 
+
         } catch (Exception exception) {
 
-            // Do not authenticate invalid JWT
+            // =================================================
+            // JWT ERROR
+            // =================================================
+
             SecurityContextHolder.clearContext();
 
             System.out.println(
@@ -143,6 +338,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             + exception.getMessage()
             );
         }
+
 
         // =====================================================
         // CONTINUE FILTER CHAIN

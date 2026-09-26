@@ -80,13 +80,6 @@ public class OrderService {
 
     // =========================================================
     // CREATE ORDER
-    //
-    // COD:
-    //   Order create + stock decrease immediately
-    //
-    // RAZORPAY:
-    //   Order create + stock validate
-    //   Stock decrease only after payment verification
     // =========================================================
 
     @Transactional
@@ -100,10 +93,6 @@ public class OrderService {
         }
 
         User user = getAuthenticatedUser();
-
-        // -----------------------------------------------------
-        // GET USER CART
-        // -----------------------------------------------------
 
         Cart cart =
                 cartRepository.findByUserId(user.getId())
@@ -122,10 +111,6 @@ public class OrderService {
                     "Cart is empty"
             );
         }
-
-        // -----------------------------------------------------
-        // PAYMENT METHOD
-        // -----------------------------------------------------
 
         String paymentMethod =
                 request.getPaymentMethod();
@@ -151,10 +136,6 @@ public class OrderService {
             );
         }
 
-        // -----------------------------------------------------
-        // CREATE ORDER
-        // -----------------------------------------------------
-
         Order order = new Order();
 
         order.setUser(user);
@@ -162,11 +143,6 @@ public class OrderService {
         order.setPaymentMethod(
                 paymentMethod
         );
-
-        // -----------------------------------------------------
-        // CALCULATE PRODUCT TOTAL
-        // + VALIDATE STOCK
-        // -----------------------------------------------------
 
         double productTotal = 0;
 
@@ -200,10 +176,6 @@ public class OrderService {
                 );
             }
 
-            // -------------------------------------------------
-            // PRODUCT ACTIVE CHECK
-            // -------------------------------------------------
-
             if (!Boolean.TRUE.equals(
                     product.getActive())) {
 
@@ -212,10 +184,6 @@ public class OrderService {
                                 + product.getName()
                 );
             }
-
-            // -------------------------------------------------
-            // PRODUCT STOCK CHECK
-            // -------------------------------------------------
 
             Integer stock =
                     product.getStock();
@@ -239,10 +207,6 @@ public class OrderService {
                 );
             }
 
-            // -------------------------------------------------
-            // PRICE CHECK
-            // -------------------------------------------------
-
             if (product.getPrice() == null) {
 
                 throw new RuntimeException(
@@ -257,13 +221,6 @@ public class OrderService {
                     price * quantity;
         }
 
-        // -----------------------------------------------------
-        // DELIVERY CHARGE
-        //
-        // ₹500 or above = FREE
-        // Below ₹500 = ₹50
-        // -----------------------------------------------------
-
         double deliveryFee =
                 productTotal >= 500
                         ? 0
@@ -272,34 +229,13 @@ public class OrderService {
         double totalAmount =
                 productTotal + deliveryFee;
 
-        // -----------------------------------------------------
-        // ORDER TOTAL
-        // -----------------------------------------------------
-
         order.setTotalAmount(
                 totalAmount
         );
 
-        // -----------------------------------------------------
-        // PAYMENT STATUS
-        // -----------------------------------------------------
-
-        if (paymentMethod.equals("COD")) {
-
-            order.setPaymentStatus(
-                    "PENDING"
-            );
-
-        } else {
-
-            order.setPaymentStatus(
-                    "PENDING"
-            );
-        }
-
-        // -----------------------------------------------------
-        // ORDER STATUS
-        // -----------------------------------------------------
+        order.setPaymentStatus(
+                "PENDING"
+        );
 
         if (paymentMethod.equals("RAZORPAY")) {
 
@@ -314,17 +250,9 @@ public class OrderService {
             );
         }
 
-        // -----------------------------------------------------
-        // CREATED TIME
-        // -----------------------------------------------------
-
         order.setCreatedAt(
                 LocalDateTime.now()
         );
-
-        // -----------------------------------------------------
-        // ORDER ITEMS
-        // -----------------------------------------------------
 
         for (CartItem cartItem : cartItems) {
 
@@ -350,19 +278,8 @@ public class OrderService {
             );
         }
 
-        // -----------------------------------------------------
-        // SAVE ORDER
-        // -----------------------------------------------------
-
         Order savedOrder =
                 orderRepository.save(order);
-
-        // -----------------------------------------------------
-        // COD
-        //
-        // COD order is placed successfully,
-        // so decrease stock now.
-        // -----------------------------------------------------
 
         if (paymentMethod.equals("COD")) {
 
@@ -382,41 +299,16 @@ public class OrderService {
                 );
             }
 
-            // -------------------------------------------------
-            // CLEAR CART
-            // -------------------------------------------------
-
             cartItems.clear();
 
             cartRepository.save(cart);
         }
-
-        // -----------------------------------------------------
-        // RAZORPAY
-        //
-        // Do NOT decrease stock here.
-        // Payment is still pending.
-        //
-        // Cart is also kept until payment succeeds.
-        // -----------------------------------------------------
 
         return savedOrder;
     }
 
     // =========================================================
     // CONFIRM RAZORPAY PAYMENT
-    //
-    // IMPORTANT:
-    // Call this method ONLY after Razorpay signature
-    // verification succeeds.
-    //
-    // It:
-    // 1. checks order
-    // 2. prevents duplicate stock deduction
-    // 3. decreases stock
-    // 4. marks payment PAID
-    // 5. changes order status to PLACED
-    // 6. clears user's cart
     // =========================================================
 
     @Transactional
@@ -440,10 +332,6 @@ public class OrderService {
                                         "Order not found"
                                 ));
 
-        // -----------------------------------------------------
-        // ORDER OWNERSHIP
-        // -----------------------------------------------------
-
         if (order.getUser() == null ||
                 order.getUser().getId() == null ||
                 !order.getUser()
@@ -455,10 +343,6 @@ public class OrderService {
             );
         }
 
-        // -----------------------------------------------------
-        // CHECK PAYMENT METHOD
-        // -----------------------------------------------------
-
         if (!"RAZORPAY".equalsIgnoreCase(
                 order.getPaymentMethod())) {
 
@@ -467,19 +351,11 @@ public class OrderService {
             );
         }
 
-        // -----------------------------------------------------
-        // PREVENT DUPLICATE STOCK REDUCTION
-        // -----------------------------------------------------
-
         if ("PAID".equalsIgnoreCase(
                 order.getPaymentStatus())) {
 
             return order;
         }
-
-        // -----------------------------------------------------
-        // VERIFY ORDER STATE
-        // -----------------------------------------------------
 
         if ("CANCELLED".equalsIgnoreCase(
                 order.getOrderStatus())) {
@@ -488,10 +364,6 @@ public class OrderService {
                     "Cancelled order cannot be completed"
             );
         }
-
-        // -----------------------------------------------------
-        // CHECK EVERY PRODUCT AGAIN
-        // -----------------------------------------------------
 
         for (OrderItem orderItem :
                 order.getItems()) {
@@ -537,10 +409,6 @@ public class OrderService {
                 );
             }
 
-            // -------------------------------------------------
-            // PRODUCT MUST STILL BE ACTIVE
-            // -------------------------------------------------
-
             if (!Boolean.TRUE.equals(
                     product.getActive())) {
 
@@ -550,10 +418,6 @@ public class OrderService {
                 );
             }
         }
-
-        // -----------------------------------------------------
-        // DECREASE STOCK
-        // -----------------------------------------------------
 
         for (OrderItem orderItem :
                 order.getItems()) {
@@ -567,10 +431,6 @@ public class OrderService {
             );
         }
 
-        // -----------------------------------------------------
-        // PAYMENT SUCCESS
-        // -----------------------------------------------------
-
         order.setPaymentStatus(
                 "PAID"
         );
@@ -581,10 +441,6 @@ public class OrderService {
 
         Order savedOrder =
                 orderRepository.save(order);
-
-        // -----------------------------------------------------
-        // CLEAR USER CART
-        // -----------------------------------------------------
 
         Cart cart =
                 cartRepository.findByUserId(
@@ -661,7 +517,9 @@ public class OrderService {
         // -----------------------------------------------------
 
         if (authenticatedUser.getRole()
-                == User.Role.ADMIN) {
+                == User.Role.ADMIN ||
+                authenticatedUser.getRole()
+                        == User.Role.SUPER_ADMIN) {
 
             return order;
         }
@@ -712,10 +570,6 @@ public class OrderService {
                                         "Order not found"
                                 ));
 
-        // -----------------------------------------------------
-        // ONLY OWNER CAN CANCEL
-        // -----------------------------------------------------
-
         if (order.getUser() == null ||
                 order.getUser().getId() == null ||
                 !order.getUser()
@@ -732,10 +586,6 @@ public class OrderService {
         String currentStatus =
                 order.getOrderStatus();
 
-        // -----------------------------------------------------
-        // ALREADY CANCELLED
-        // -----------------------------------------------------
-
         if ("CANCELLED".equalsIgnoreCase(
                 currentStatus)) {
 
@@ -743,10 +593,6 @@ public class OrderService {
                     "Order is already cancelled"
             );
         }
-
-        // -----------------------------------------------------
-        // SHIPPED / OUT FOR DELIVERY / DELIVERED
-        // -----------------------------------------------------
 
         if ("SHIPPED".equalsIgnoreCase(
                 currentStatus)
@@ -764,10 +610,6 @@ public class OrderService {
             );
         }
 
-        // -----------------------------------------------------
-        // CANCEL
-        // -----------------------------------------------------
-
         order.setOrderStatus(
                 "CANCELLED"
         );
@@ -778,24 +620,14 @@ public class OrderService {
     // =========================================================
     // ADMIN - UPDATE ORDER
     //
-    // Admin can edit:
-    // 1. Order Status
-    // 2. Shipping Mode
-    // 3. Tracking ID
-    //
-    // Payment Method and Payment Status
-    // are intentionally NOT changed.
+    // ADMIN + SUPER_ADMIN
     // =========================================================
 
     @Transactional
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     public Order updateOrderFromAdmin(
             Long orderId,
             AdminOrderUpdateRequest request) {
-
-        // -----------------------------------------------------
-        // ORDER ID CHECK
-        // -----------------------------------------------------
 
         if (orderId == null) {
 
@@ -804,20 +636,12 @@ public class OrderService {
             );
         }
 
-        // -----------------------------------------------------
-        // REQUEST CHECK
-        // -----------------------------------------------------
-
         if (request == null) {
 
             throw new RuntimeException(
                     "Order update request is required"
             );
         }
-
-        // -----------------------------------------------------
-        // FIND ORDER
-        // -----------------------------------------------------
 
         Order order =
                 orderRepository
@@ -826,10 +650,6 @@ public class OrderService {
                                 new RuntimeException(
                                         "Order not found"
                                 ));
-
-        // -----------------------------------------------------
-        // ORDER STATUS
-        // -----------------------------------------------------
 
         String status =
                 request.getOrderStatus();
@@ -867,10 +687,6 @@ public class OrderService {
             );
         }
 
-        // -----------------------------------------------------
-        // SHIPPING MODE
-        // -----------------------------------------------------
-
         String shippingMode =
                 request.getShippingMode();
 
@@ -906,10 +722,6 @@ public class OrderService {
             order.setShippingMode(null);
         }
 
-        // -----------------------------------------------------
-        // TRACKING ID
-        // -----------------------------------------------------
-
         String trackingId =
                 request.getTrackingId();
 
@@ -928,29 +740,22 @@ public class OrderService {
                 trackingId
         );
 
-        // -----------------------------------------------------
-        // SET ORDER STATUS
-        // -----------------------------------------------------
-
         order.setOrderStatus(
                 status
         );
-
-        // -----------------------------------------------------
-        // SAVE ORDER
-        // -----------------------------------------------------
 
         return orderRepository.save(order);
     }
 
     // =========================================================
     // ADMIN - GET ALL ORDERS
+    //
+    // ADMIN + SUPER_ADMIN
     // =========================================================
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     public List<Order> getAllOrders() {
 
         return orderRepository.findAll();
     }
 }
-

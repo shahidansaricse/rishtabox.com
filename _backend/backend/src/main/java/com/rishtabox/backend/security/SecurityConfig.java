@@ -25,11 +25,18 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
+
+    // =====================================================
+    // CONSTRUCTOR
+    // =====================================================
+
     public SecurityConfig(
             JwtAuthenticationFilter jwtAuthenticationFilter) {
 
-        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.jwtAuthenticationFilter =
+                jwtAuthenticationFilter;
     }
+
 
     // =====================================================
     // PASSWORD ENCODER
@@ -37,8 +44,10 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
+
         return new BCryptPasswordEncoder();
     }
+
 
     // =====================================================
     // CORS CONFIGURATION
@@ -50,11 +59,25 @@ public class SecurityConfig {
         CorsConfiguration configuration =
                 new CorsConfiguration();
 
+
+        // -------------------------------------------------
+        // ALLOWED FRONTEND ORIGINS
+        // -------------------------------------------------
+
         configuration.setAllowedOrigins(
                 List.of(
-                        "http://localhost:63342"
+                        "http://localhost:63342",
+                        "http://localhost:5500",
+                        "http://127.0.0.1:5500",
+                        "https://rishtabox.com",
+                        "https://www.rishtabox.com"
                 )
         );
+
+
+        // -------------------------------------------------
+        // ALLOWED HTTP METHODS
+        // -------------------------------------------------
 
         configuration.setAllowedMethods(
                 List.of(
@@ -67,15 +90,35 @@ public class SecurityConfig {
                 )
         );
 
+
+        // -------------------------------------------------
+        // ALLOWED HEADERS
+        // -------------------------------------------------
+
         configuration.setAllowedHeaders(
                 List.of("*")
         );
 
+
+        // -------------------------------------------------
+        // CREDENTIALS
+        // -------------------------------------------------
+
         configuration.setAllowCredentials(true);
+
+
+        // -------------------------------------------------
+        // EXPOSED HEADERS
+        // -------------------------------------------------
 
         configuration.setExposedHeaders(
                 List.of("Authorization")
         );
+
+
+        // -------------------------------------------------
+        // REGISTER CORS CONFIGURATION
+        // -------------------------------------------------
 
         UrlBasedCorsConfigurationSource source =
                 new UrlBasedCorsConfigurationSource();
@@ -85,8 +128,10 @@ public class SecurityConfig {
                 configuration
         );
 
+
         return source;
     }
+
 
     // =====================================================
     // SECURITY FILTER CHAIN
@@ -102,7 +147,10 @@ public class SecurityConfig {
                 // CSRF
                 // =================================================
 
-                .csrf(csrf -> csrf.disable())
+                .csrf(csrf ->
+                        csrf.disable()
+                )
+
 
                 // =================================================
                 // CORS
@@ -111,8 +159,13 @@ public class SecurityConfig {
                 .cors(cors -> {
                 })
 
+
                 // =================================================
                 // SESSION
+                // =================================================
+                //
+                // JWT authentication is stateless.
+                //
                 // =================================================
 
                 .sessionManagement(session ->
@@ -121,19 +174,43 @@ public class SecurityConfig {
                         )
                 )
 
+
                 // =================================================
                 // AUTHORIZATION
                 // =================================================
 
                 .authorizeHttpRequests(auth -> auth
 
+
                         // =========================================
                         // PUBLIC AUTH
                         // =========================================
 
                         .requestMatchers(
-                                "/api/auth/**"
+                                "/api/auth/**",
+                                "/api/users/signup",
+                                "/api/users/login"
                         ).permitAll()
+
+
+                        // =========================================
+                        // USER ADMIN APIs
+                        // =========================================
+                        //
+                        // Authentication is required here.
+                        //
+                        // Exact permissions are handled by:
+                        //
+                        // @PreAuthorize(...)
+                        //
+                        // in UserController.
+                        //
+                        // =========================================
+
+                        .requestMatchers(
+                                "/api/users/admin/**"
+                        ).authenticated()
+
 
                         // =========================================
                         // PUBLIC PRODUCTS
@@ -144,6 +221,7 @@ public class SecurityConfig {
                                 "/api/products/**"
                         ).permitAll()
 
+
                         // =========================================
                         // PUBLIC CATEGORIES
                         // =========================================
@@ -152,6 +230,7 @@ public class SecurityConfig {
                                 HttpMethod.GET,
                                 "/api/categories/**"
                         ).permitAll()
+
 
                         // =========================================
                         // PUBLIC FESTIVALS
@@ -162,6 +241,7 @@ public class SecurityConfig {
                                 "/api/festivals/**"
                         ).permitAll()
 
+
                         // =========================================
                         // PUBLIC RELATIONSHIPS
                         // =========================================
@@ -171,6 +251,7 @@ public class SecurityConfig {
                                 "/api/relationships/**"
                         ).permitAll()
 
+
                         // =========================================
                         // PUBLIC BLOGS
                         // =========================================
@@ -179,6 +260,7 @@ public class SecurityConfig {
                                 HttpMethod.GET,
                                 "/api/blogs/**"
                         ).permitAll()
+
 
                         // =========================================
                         // PUBLIC REVIEWS
@@ -190,6 +272,7 @@ public class SecurityConfig {
                                 "/api/reviews/product/**"
                         ).permitAll()
 
+
                         // =========================================
                         // CREATE REVIEW
                         // =========================================
@@ -198,6 +281,7 @@ public class SecurityConfig {
                                 HttpMethod.POST,
                                 "/api/reviews"
                         ).authenticated()
+
 
                         // =========================================
                         // ADMIN APIs
@@ -212,6 +296,7 @@ public class SecurityConfig {
                                 "SUPER_ADMIN"
                         )
 
+
                         // =========================================
                         // PAYMENT KEY
                         // =========================================
@@ -221,6 +306,7 @@ public class SecurityConfig {
                                 "/api/payments/key"
                         ).permitAll()
 
+
                         // =========================================
                         // PAYMENT
                         // =========================================
@@ -229,6 +315,7 @@ public class SecurityConfig {
                                 "/api/payments/create-order",
                                 "/api/payments/verify"
                         ).authenticated()
+
 
                         // =========================================
                         // CREATE ORDER
@@ -240,6 +327,7 @@ public class SecurityConfig {
                                 "/api/orders/**"
                         ).authenticated()
 
+
                         // =========================================
                         // READ ORDERS
                         // =========================================
@@ -250,12 +338,14 @@ public class SecurityConfig {
                                 "/api/orders/**"
                         ).authenticated()
 
+
                         // =========================================
                         // EVERYTHING ELSE
                         // =========================================
 
                         .anyRequest().permitAll()
                 )
+
 
                 // =================================================
                 // JWT FILTER
@@ -265,6 +355,7 @@ public class SecurityConfig {
                         jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class
                 );
+
 
         return http.build();
     }

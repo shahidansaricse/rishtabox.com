@@ -94,32 +94,211 @@ h1,h2,h3,h4,h5,h6 {
     justify-content: space-between;
     gap: 20px;
 }
+/* =========================================================
+   LOGO HEADER - DESKTOP
+========================================================= */
 
-/* =========================
-   LOGO + HOME
-========================= */
 .logo-section {
     display: flex;
     align-items: center;
-    gap: 25px;
+
+    width: 55%;
+    height: 100px;
+
     flex-shrink: 0;
+    overflow: hidden;
 }
 
 .logo {
+    width: 100%;
+    height: 100%;
+
     display: flex;
     align-items: center;
-    justify-content: center;
+
     text-decoration: none;
+    overflow: hidden;
 }
 
 .logo img {
-    width: 70px;
-    height: 70px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-left: 0;
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+    object-position: 50% center;
+
+    display: block;
 }
 
+/* =========================================================
+   RISHTABOX HEADER LOGO - STANDARD RESPONSIVE
+========================================================= */
+
+.logo-section {
+    width: 42%;
+    height: 90px;
+
+    display: flex;
+    align-items: center;
+
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.logo {
+    width: 100%;
+    height: 90px;
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+
+    text-decoration: none;
+    overflow: hidden;
+}
+
+.logo img {
+    width: 360px;
+    height: auto;
+
+    max-width: 100%;
+    max-height: 82px;
+
+    display: block;
+
+    object-fit: contain;
+    object-position: left center;
+}
+
+
+/* =========================================================
+   LARGE DESKTOP
+========================================================= */
+
+@media (min-width: 1200px) {
+
+    .logo-section {
+        width: 45%;
+        height: 95px;
+    }
+
+    .logo {
+        height: 95px;
+    }
+
+    .logo img {
+        width: 380px;
+        max-height: 88px;
+    }
+}
+
+
+/* =========================================================
+   LAPTOP
+========================================================= */
+
+@media (min-width: 1025px) and (max-width: 1199px) {
+
+    .logo-section {
+        width: 43%;
+        height: 90px;
+    }
+
+    .logo {
+        height: 90px;
+    }
+
+    .logo img {
+        width: 340px;
+        max-height: 84px;
+    }
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (min-width: 768px) and (max-width: 1024px) {
+
+    .logo-section {
+        width: 45%;
+        height: 85px;
+    }
+
+    .logo {
+        height: 85px;
+    }
+
+    .logo img {
+        width: 300px;
+        max-width: 100%;
+        max-height: 78px;
+    }
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 767px) {
+
+    .logo-section {
+        width: 100%;
+        height: 72px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        overflow: hidden;
+    }
+
+    .logo {
+        width: 100%;
+        height: 72px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        overflow: hidden;
+    }
+
+    .logo img {
+        width: 220px;
+        height: auto;
+
+        max-width: 90%;
+        max-height: 65px;
+
+        object-fit: contain;
+        object-position: center;
+    }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 480px) {
+
+    .logo-section {
+        height: 65px;
+    }
+
+    .logo {
+        height: 65px;
+    }
+
+    .logo img {
+        width: 200px;
+        max-width: 88%;
+        max-height: 58px;
+    }
+}
 /* RishtaBox text */
 .logo-section .home-btn {
     display: flex;
@@ -3586,34 +3765,84 @@ ORDER SUMMARY
 /* =====================================================
    BLOG SECTION
 ===================================================== */
-
 .blog-section {
     padding: 60px 5%;
     background: #fafafa;
 }
 
 
+/* =========================================================
+   BLOG CONTAINER
+========================================================= */
 .blogs-container {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 25px;
-    max-width: 1200px;
-    margin: auto;
+    display: flex;
+    gap: 20px;
+
+    width: 100%;
+
+    padding: 10px 0 20px;
+
+    box-sizing: border-box;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    scroll-behavior: smooth;
+
+    scroll-snap-type: x mandatory;
+
+    scrollbar-width: none;
+
+    -webkit-overflow-scrolling: touch;
+
+    cursor: grab;
 }
 
+.blogs-container::-webkit-scrollbar {
+    display: none;
+}
 
+.blogs-container:active {
+    cursor: grabbing;
+}
+
+/* =========================================================
+   BLOG CARD
+   3 CARDS VISIBLE
+========================================================= */
 .blog-card {
-    background: #fff;
-    border-radius: 15px;
+    flex: 0 0 calc((100vw - 10% - 70px) / 6);
+    width: calc((100vw - 10% - 70px) / 6);
+
+    min-width: 0;
+
+    height: 300px;
+
+    display: flex;
+    flex-direction: column;
+
+    box-sizing: border-box;
     overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-    transition: 0.3s;
+
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 15px;
+
+    scroll-snap-align: start;
+
+    box-shadow: 0 4px 15px rgba(0, 0, 0, .08);
+
+    transition:
+            transform .3s ease,
+            box-shadow .3s ease;
 }
-
-
 .blog-card:hover {
     transform: translateY(-5px);
+
+    box-shadow:
+            0 10px 25px rgba(0, 0, 0, .12);
 }
+
 
 
 .blog-card > img {
@@ -3667,32 +3896,1389 @@ ORDER SUMMARY
 
 
 /* =====================================================
-   MOBILE
+   TESTIMONIALS SECTION
 ===================================================== */
 
-@media (max-width: 768px) {
+.testimonials-section {
+    width: 100%;
+    padding: 60px 5%;
+    background: #fff;
+    box-sizing: border-box;
+}
 
-    .testimonials-container {
-        grid-template-columns: 1fr;
+.section-heading {
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+.section-heading h2 {
+    font-size: 30px;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.section-heading p {
+    color: #777;
+    font-size: 16px;
+}
+
+.testimonials-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+    max-width: 1200px;
+    margin: auto;
+}
+
+.testimonial-card {
+    padding: 25px;
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    transition: 0.3s;
+}
+
+.testimonial-card:hover {
+    transform: translateY(-5px);
+}
+
+.customer-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.customer-info img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.customer-info h3 {
+    margin: 0 0 5px;
+    font-size: 18px;
+}
+
+.rating {
+    color: #f5a623;
+    font-size: 18px;
+    letter-spacing: 2px;
+}
+
+.testimonial-text {
+    margin-top: 20px;
+    color: #555;
+    line-height: 1.6;
+    font-size: 15px;
+}
+
+.verified {
+    display: inline-block;
+    margin-top: 12px;
+    color: #28a745;
+    font-size: 13px;
+}
+
+/* =========================================================
+   RISHTABOX BLOG SECTION
+========================================================= */
+
+.blog-section {
+    width: 100%;
+    padding: 45px 5%;
+    background: #fafafa;
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   BLOG CAROUSEL
+========================================================= */
+
+.blog-carousel {
+    position: relative;
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+
+/* =========================================================
+   BLOG SLIDER WRAPPER
+========================================================= */
+
+.blog-slider-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 1250px;
+    margin: 0 auto;
+    padding: 0 45px;
+    box-sizing: border-box;
+}
+
+.blog-slider {
+    width: 100%;
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   BLOG CONTAINER
+   3 CARDS VISIBLE
+========================================================= */
+.blogs-container {
+    display: flex;
+    gap: 20px;
+
+    width: max-content;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    padding: 10px 0 20px;
+
+    box-sizing: border-box;
+
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+
+    -webkit-overflow-scrolling: touch;
+
+    scrollbar-width: none;
+
+    overscroll-behavior-x: contain;
+
+    cursor: grab;
+}
+
+.blogs-container:active {
+    cursor: grabbing;
+}
+
+.blogs-container::-webkit-scrollbar {
+    display: none;
+}
+
+/* =========================================================
+   BLOG CARD
+   FIXED SIZE
+========================================================= */
+
+.blog-card {
+    flex: 0 0 calc((100% - 40px) / 3);
+
+    width: calc((100% - 40px) / 3);
+
+    min-width: 0;
+
+    height: 300px;
+
+    display: flex;
+    flex-direction: column;
+
+    background: #fff;
+
+    border: 1px solid #eee;
+
+    border-radius: 15px;
+
+    overflow: hidden;
+
+    box-sizing: border-box;
+
+    box-shadow:
+            0 4px 15px rgba(0, 0, 0, 0.08);
+
+    transition:
+            transform 0.3s ease,
+            box-shadow 0.3s ease;
+}
+
+.blog-card:hover {
+    transform: translateY(-5px);
+
+    box-shadow:
+            0 10px 25px rgba(0, 0, 0, 0.12);
+}
+
+
+/* =========================================================
+   BLOG IMAGE
+   FIXED HEIGHT
+========================================================= */
+
+.blog-image-wrapper {
+    width: 100%;
+
+    height: 125px;
+    min-height: 125px;
+    max-height: 125px;
+
+    flex-shrink: 0;
+
+    overflow: hidden;
+
+    background: #f5f5f5;
+}
+
+.blog-image,
+.blog-card > img,
+.blog-image-wrapper img {
+    width: 100%;
+
+    height: 125px;
+    min-height: 125px;
+    max-height: 125px;
+
+    display: block;
+
+    object-fit: cover;
+
+    transition:
+            transform 0.3s ease;
+}
+
+.blog-card:hover .blog-image,
+.blog-card:hover > img,
+.blog-card:hover .blog-image-wrapper img {
+    transform: scale(1.04);
+}
+
+
+/* =========================================================
+   BLOG CONTENT
+========================================================= */
+
+.blog-content {
+    width: 100%;
+
+    height: 175px;
+    min-height: 175px;
+    max-height: 175px;
+
+    padding: 12px;
+
+    display: flex;
+    flex-direction: column;
+
+    box-sizing: border-box;
+
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   BLOG META
+========================================================= */
+
+.blog-meta {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    flex-wrap: wrap;
+
+    gap: 4px;
+
+    height: 18px;
+    min-height: 18px;
+
+    margin-bottom: 4px;
+
+    overflow: hidden;
+}
+
+.blog-date {
+    font-size: 10px;
+    line-height: 1.2;
+
+    color: #888;
+}
+
+.blog-author {
+    font-size: 10px;
+    line-height: 1.2;
+
+    color: #999;
+}
+
+
+/* =========================================================
+   BLOG TITLE
+   FIXED HEIGHT
+========================================================= */
+
+.blog-content h3 {
+    height: 34px;
+    min-height: 34px;
+    max-height: 34px;
+
+    margin: 4px 0;
+
+    color: #333;
+
+    font-size: 14px;
+
+    line-height: 1.2;
+
+    display: -webkit-box;
+
+    -webkit-box-orient: vertical;
+
+    -webkit-line-clamp: 2;
+
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   BLOG DESCRIPTION
+   FIXED HEIGHT
+========================================================= */
+
+.blog-content p {
+    height: 42px;
+    min-height: 42px;
+    max-height: 42px;
+
+    margin: 3px 0 6px;
+
+    color: #666;
+
+    font-size: 10px;
+
+    line-height: 1.4;
+
+    display: -webkit-box;
+
+    -webkit-box-orient: vertical;
+
+    -webkit-line-clamp: 3;
+
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   READ MORE
+========================================================= */
+
+.read-more-btn {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    align-self: flex-start;
+
+    margin-top: auto;
+
+    height: 27px;
+    min-height: 27px;
+
+    padding: 4px 9px;
+
+    background: #e35486;
+
+    color: #fff;
+
+    border: none;
+
+    border-radius: 5px;
+
+    cursor: pointer;
+
+    font-size: 9px;
+
+    font-weight: 600;
+
+    transition: 0.3s ease;
+}
+
+.read-more-btn:hover {
+    background: #d94376;
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   BLOG ARROWS
+========================================================= */
+
+.blog-slider-arrow,
+.blog-carousel-btn {
+    position: absolute;
+
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    z-index: 10;
+
+    width: 40px;
+    height: 40px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    background: #e35486;
+
+    color: #fff;
+
+    border: none;
+
+    border-radius: 50%;
+
+    cursor: pointer;
+
+    font-size: 20px;
+
+    font-weight: bold;
+
+    line-height: 1;
+
+    box-shadow:
+            0 4px 12px rgba(0, 0, 0, 0.15);
+
+    transition: 0.2s ease;
+}
+
+.blog-slider-arrow:hover,
+.blog-carousel-btn:hover {
+    background: #d94376;
+
+    transform:
+            translateY(-50%) scale(1.08);
+}
+
+.blog-prev,
+.blog-carousel-prev {
+    left: 0;
+}
+
+.blog-next,
+.blog-carousel-next {
+    right: 0;
+}
+
+
+/* =========================================================
+   BLOG DOTS
+========================================================= */
+
+.blog-slider-dots {
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    gap: 7px;
+
+    margin-top: 15px;
+}
+
+.blog-slider-dot {
+    width: 8px;
+    height: 8px;
+
+    padding: 0;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background: #d5d5d5;
+
+    cursor: pointer;
+
+    transition: 0.25s ease;
+}
+
+.blog-slider-dot.active {
+    width: 22px;
+
+    border-radius: 10px;
+
+    background: #e35486;
+}
+
+
+/* =========================================================
+   BLOG LOADING / EMPTY / ERROR
+========================================================= */
+
+.blog-loading,
+.blog-empty,
+.blog-error {
+    width: 100%;
+
+    padding: 60px 20px;
+
+    text-align: center;
+
+    box-sizing: border-box;
+
+    color: #666;
+}
+
+.blog-loading h3,
+.blog-empty h3,
+.blog-error h3 {
+    margin: 0 0 10px;
+
+    color: #333;
+}
+
+
+/* =========================================================
+   VIEW ALL BLOGS
+========================================================= */
+
+.blog-view-all {
+    width: 100%;
+
+    margin-top: 25px;
+
+    text-align: center;
+}
+
+.view-all-blogs-btn {
+    padding: 10px 20px;
+
+    background: #e35486;
+
+    color: #fff;
+
+    border: none;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    transition: 0.3s ease;
+}
+
+.view-all-blogs-btn:hover {
+    background: #d94376;
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   ALL BLOGS PAGE
+========================================================= */
+
+.blog-page {
+    width: 100%;
+
+    min-height: 100vh;
+
+    padding: 50px 5%;
+
+    background: #fff;
+
+    box-sizing: border-box;
+}
+
+.blog-page-header {
+    max-width: 1200px;
+
+    margin: 0 auto 40px;
+
+    text-align: center;
+}
+
+.blog-page-header h1 {
+    margin: 10px 0 12px;
+
+    font-size: 40px;
+
+    line-height: 1.2;
+
+    color: #222;
+}
+
+.blog-page-header p {
+    max-width: 700px;
+
+    margin: 0 auto;
+
+    color: #666;
+
+    font-size: 16px;
+
+    line-height: 1.7;
+}
+
+
+/* =========================================================
+   SECTION TAG
+========================================================= */
+
+.section-tag {
+    display: inline-block;
+
+    margin-bottom: 8px;
+
+    color: #e35486;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    letter-spacing: 1.5px;
+
+    text-transform: uppercase;
+}
+
+
+/* =========================================================
+   BLOG BACK BUTTON
+========================================================= */
+
+.blog-back-btn,
+.back-to-blog-btn {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    margin-bottom: 30px;
+
+    padding: 11px 18px;
+
+    background: #f5f5f5;
+
+    color: #333;
+
+    border: none;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    transition: 0.3s ease;
+}
+
+.blog-back-btn:hover,
+.back-to-blog-btn:hover {
+    background: #e9e9e9;
+
+    transform: translateX(-2px);
+}
+
+
+/* =========================================================
+   BLOG DETAILS
+========================================================= */
+
+.blog-details-section {
+    width: 100%;
+
+    min-height: 100vh;
+
+    padding: 50px 5%;
+
+    background: #fff;
+
+    box-sizing: border-box;
+}
+
+.blog-details-container {
+    width: 100%;
+
+    max-width: 1000px;
+
+    margin: 0 auto;
+}
+
+.blog-details {
+    width: 100%;
+}
+
+
+/* =========================================================
+   BLOG DETAILS IMAGE
+========================================================= */
+
+.blog-details-image {
+    width: 100%;
+
+    max-height: 520px;
+
+    display: block;
+
+    object-fit: cover;
+
+    border-radius: 18px;
+
+    margin-bottom: 28px;
+
+    background: #f5f5f5;
+}
+
+
+/* =========================================================
+   BLOG DETAILS DATE
+========================================================= */
+
+.blog-details-date {
+    display: block;
+
+    margin-bottom: 10px;
+
+    color: #e35486;
+
+    font-size: 14px;
+
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   BLOG DETAILS TITLE
+========================================================= */
+
+.blog-details-title {
+    margin: 0 0 15px;
+
+    color: #222;
+
+    font-size: 42px;
+
+    line-height: 1.2;
+
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   BLOG DETAILS META
+========================================================= */
+
+.blog-details-meta {
+    margin-bottom: 28px;
+
+    color: #777;
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   BLOG DETAILS DESCRIPTION
+========================================================= */
+
+.blog-details-description {
+    margin-bottom: 25px;
+
+    color: #444;
+
+    font-size: 19px;
+
+    line-height: 1.8;
+
+    font-weight: 500;
+}
+
+
+/* =========================================================
+   BLOG DETAILS CONTENT
+========================================================= */
+
+.blog-details-text,
+.blog-details-content {
+    width: 100%;
+
+    color: #333;
+
+    font-size: 17px;
+
+    line-height: 1.9;
+
+    overflow-wrap: break-word;
+}
+
+.blog-details-text p,
+.blog-details-content p {
+    margin: 0 0 20px;
+}
+
+.blog-details-text h2,
+.blog-details-content h2 {
+    margin: 35px 0 15px;
+
+    color: #222;
+
+    font-size: 27px;
+
+    line-height: 1.3;
+}
+
+.blog-details-text h3,
+.blog-details-content h3 {
+    margin: 28px 0 12px;
+
+    color: #222;
+
+    font-size: 22px;
+}
+
+
+/* =========================================================
+   FIXED HEADER OFFSET
+========================================================= */
+
+#blogDetailsSection {
+    scroll-margin-top: 100px;
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .blog-slider-wrapper {
+        padding: 0 35px;
     }
 
     .blogs-container {
-        grid-template-columns: 1fr;
+        gap: 10px;
     }
 
-    .section-heading h2 {
-        font-size: 24px;
+    .blog-card {
+        flex: 0 0 calc((100vw - 40px) / 3);
+
+        width: calc((100vw - 40px) / 3);
+
+        min-width: 0;
+
+        height: 300px;
+
+        display: flex;
+        flex-direction: column;
+
+        background: #fff;
+
+        border: 1px solid #eee;
+
+        border-radius: 15px;
+
+        overflow: hidden;
+
+        box-sizing: border-box;
+
+        scroll-snap-align: start;
+
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
     }
 
-    .testimonial-card {
-        padding: 20px;
+    .blog-image-wrapper,
+    .blog-image,
+    .blog-card > img,
+    .blog-image-wrapper img {
+        height: 85px;
+        min-height: 85px;
+        max-height: 85px;
     }
 
-    .blog-card > img {
-        height: 200px;
+    .blog-content {
+        height: 150px;
+        min-height: 150px;
+        max-height: 150px;
+
+        padding: 7px;
+    }
+
+    .blog-meta {
+        height: 12px;
+        min-height: 12px;
+    }
+
+    .blog-date,
+    .blog-author {
+        font-size: 7px;
+    }
+
+    .blog-content h3 {
+        height: 25px;
+        min-height: 25px;
+        max-height: 25px;
+
+        font-size: 9px;
+
+        margin: 3px 0;
+    }
+
+    .blog-content p {
+        height: 30px;
+        min-height: 30px;
+        max-height: 30px;
+
+        font-size: 7px;
+
+        line-height: 1.35;
+
+        margin: 2px 0 4px;
+    }
+
+    .read-more-btn {
+        height: 20px;
+        min-height: 20px;
+
+        padding: 2px 6px;
+
+        font-size: 7px;
+    }
+
+    .blog-slider-arrow,
+    .blog-carousel-btn {
+        width: 30px;
+        height: 30px;
+
+        font-size: 14px;
     }
 }
 
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+
+    .blog-section {
+        padding: 30px 3%;
+    }
+
+    .blog-slider-wrapper {
+        padding: 0 25px;
+    }
+
+    .blogs-container {
+        gap: 6px;
+    }
+
+    .blog-card {
+        flex: 0 0 calc((100% - 12px) / 3);
+
+        width: calc((100% - 12px) / 3);
+
+        height: 175px;
+
+        border-radius: 7px;
+    }
+
+    /* FIXED SMALL IMAGE */
+
+    .blog-image-wrapper,
+    .blog-image,
+    .blog-card > img,
+    .blog-image-wrapper img {
+        height: 55px;
+        min-height: 55px;
+        max-height: 55px;
+    }
+
+    /* FIXED CONTENT */
+
+    .blog-content {
+        height: 120px;
+        min-height: 120px;
+        max-height: 120px;
+
+        padding: 5px;
+    }
+
+    .blog-meta {
+        height: 12px;
+        min-height: 12px;
+
+        gap: 2px;
+        margin-bottom: 2px;
+    }
+
+    .blog-date,
+    .blog-author {
+        font-size: 5.5px;
+    }
+
+    /* SMALL TITLE */
+
+    .blog-content h3 {
+        height: 19px;
+        min-height: 19px;
+        max-height: 19px;
+
+        margin: 2px 0;
+
+        font-size: 7px;
+
+        line-height: 1.15;
+    }
+
+    /* SMALL DESCRIPTION */
+
+    .blog-content p {
+        height: 22px;
+        min-height: 22px;
+        max-height: 22px;
+
+        margin: 1px 0 3px;
+
+        font-size: 5.5px;
+
+        line-height: 1.3;
+    }
+
+    /* SMALL BUTTON */
+
+    .read-more-btn {
+        height: 17px;
+        min-height: 17px;
+
+        padding: 1px 4px;
+
+        font-size: 5.5px;
+
+        border-radius: 4px;
+    }
+
+    /* SMALL ARROW */
+
+    .blog-slider-arrow,
+    .blog-carousel-btn {
+        width: 23px;
+        height: 23px;
+
+        font-size: 11px;
+    }
+
+    .blog-slider-dots {
+        margin-top: 10px;
+
+        gap: 5px;
+    }
+
+    .blog-slider-dot {
+        width: 6px;
+        height: 6px;
+    }
+
+    .blog-slider-dot.active {
+        width: 16px;
+    }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 380px) {
+
+    .blog-section {
+        padding: 25px 2%;
+    }
+
+    .blog-slider-wrapper {
+        padding: 0 20px;
+    }
+
+    .blogs-container {
+        gap: 4px;
+    }
+
+    .blog-card {
+        flex: 0 0 calc((100% - 8px) / 3);
+
+        width: calc((100% - 8px) / 3);
+
+        height: 145px;
+
+        border-radius: 5px;
+    }
+
+    /* VERY SMALL IMAGE */
+
+    .blog-image-wrapper,
+    .blog-image,
+    .blog-card > img,
+    .blog-image-wrapper img {
+        height: 42px;
+        min-height: 42px;
+        max-height: 42px;
+    }
+
+    /* VERY SMALL CONTENT */
+
+    .blog-content {
+        height: 103px;
+        min-height: 103px;
+        max-height: 103px;
+
+        padding: 4px;
+    }
+
+    .blog-meta {
+        height: 10px;
+        min-height: 10px;
+    }
+
+    .blog-date,
+    .blog-author {
+        font-size: 5px;
+    }
+
+    .blog-content h3 {
+        height: 16px;
+        min-height: 16px;
+        max-height: 16px;
+
+        font-size: 6px;
+
+        line-height: 1.1;
+    }
+
+    .blog-content p {
+        height: 16px;
+        min-height: 16px;
+        max-height: 16px;
+
+        font-size: 5px;
+
+        line-height: 1.1;
+    }
+
+    .read-more-btn {
+        height: 14px;
+        min-height: 14px;
+
+        padding: 1px 3px;
+
+        font-size: 5px;
+
+        border-radius: 3px;
+    }
+
+    .blog-slider-arrow,
+    .blog-carousel-btn {
+        width: 19px;
+        height: 19px;
+
+        font-size: 9px;
+    }
+
+    .blog-slider-dots {
+        margin-top: 8px;
+
+        gap: 4px;
+    }
+
+    .blog-slider-dot {
+        width: 5px;
+        height: 5px;
+    }
+
+    .blog-slider-dot.active {
+        width: 13px;
+    }
+}
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .blog-slider-wrapper {
+        padding: 0 20px;
+    }
+
+    .blogs-container {
+        gap: 8px;
+    }
+
+    .blog-card {
+        flex: 0 0 calc((100% - 16px) / 3);
+        width: calc((100% - 16px) / 3);
+
+        padding: 3px;
+        border-radius: 5px;
+
+        /* overall card small */
+        min-height: 0;
+        height: auto;
+    }
+
+    .blog-card img {
+        width: 100%;
+        height: 40px;
+        object-fit: cover;
+        border-radius: 3px;
+    }
+
+    .blog-card h3 {
+        font-size: 7px;
+        line-height: 1.05;
+        margin: 2px 0;
+
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .blog-card p {
+        font-size: 5.5px;
+        line-height: 1.1;
+        margin: 1px 0;
+
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .blog-card .read-more,
+    .blog-card a,
+    .blog-card button {
+        font-size: 5.5px;
+        padding: 1px 3px;
+        margin-top: 1px;
+    }
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+
+    .blog-slider-wrapper {
+        padding: 0 12px;
+    }
+
+    .blogs-container {
+        gap: 6px;
+    }
+
+    .blog-card {
+        flex: 0 0 calc((100% - 12px) / 3);
+        width: calc((100% - 12px) / 3);
+
+        padding: 2px;
+        border-radius: 4px;
+
+        min-height: 0;
+        height: auto;
+    }
+
+    .blog-card img {
+        width: 100%;
+        height: 32px;
+        object-fit: cover;
+        border-radius: 3px;
+    }
+
+    .blog-card h3 {
+        font-size: 6px;
+        line-height: 1;
+        margin: 2px 0 1px;
+
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .blog-card p {
+        font-size: 5px;
+        line-height: 1;
+        margin: 1px 0;
+
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .blog-card .read-more,
+    .blog-card a,
+    .blog-card button {
+        font-size: 5px;
+        padding: 1px 2px;
+        margin-top: 1px;
+    }
+}
+
+
+/* =========================================================
+   VERY SMALL MOBILE
+========================================================= */
+
+@media (max-width: 380px) {
+
+    .blog-slider-wrapper {
+        padding: 0 8px;
+    }
+
+    .blogs-container {
+        gap: 5px;
+    }
+
+    .blog-card {
+        flex: 0 0 calc((100% - 10px) / 3);
+        width: calc((100% - 10px) / 3);
+
+        padding: 2px;
+    }
+
+    .blog-card img {
+        height: 27px;
+    }
+
+    .blog-card h3 {
+        font-size: 5.5px;
+        line-height: 1;
+        margin: 1px 0;
+    }
+
+    .blog-card p {
+        font-size: 4.5px;
+        line-height: 1;
+        margin: 1px 0;
+    }
+
+    .blog-card .read-more,
+    .blog-card a,
+    .blog-card button {
+        font-size: 4.5px;
+        padding: 1px 2px;
+    }
+}
 /* ================= SHOP BY RELATIONSHIP ================= */
 
 .relationship-section {
@@ -6868,4 +8454,381 @@ body {
     .review-comment {
         font-size: 13px;
     }
+}/* =========================================================
+   CUSTOMER TESTIMONIAL AUTO SLIDER
+   ALWAYS 3 CARDS VISIBLE
+========================================================= */
+
+.testimonials-slider-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 1250px;
+    margin: 0 auto;
+    padding: 0 45px;
+    box-sizing: border-box;
 }
+
+.testimonials-slider {
+    width: 100%;
+    overflow: hidden;
+}
+
+.testimonials-container {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+
+    transition: transform 0.6s ease;
+    will-change: transform;
+}
+
+.testimonial-card {
+    flex: 0 0 calc((100% - 40px) / 3);
+    width: calc((100% - 40px) / 3);
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   ARROWS
+========================================================= */
+
+.testimonial-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+
+    width: 40px;
+    height: 40px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: var(--primary-color);
+    color: #fff;
+
+    font-size: 20px;
+    font-weight: bold;
+
+    cursor: pointer;
+    z-index: 10;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    transition: 0.2s ease;
+}
+
+.testimonial-arrow:hover {
+    transform: translateY(-50%) scale(1.08);
+}
+
+.testimonial-prev {
+    left: 0;
+}
+
+.testimonial-next {
+    right: 0;
+}
+
+
+/* =========================================================
+   DOTS
+========================================================= */
+
+.testimonial-dots {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 7px;
+    margin-top: 20px;
+}
+
+.testimonial-dot {
+    width: 8px;
+    height: 8px;
+
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+
+    background: #d5d5d5;
+    cursor: pointer;
+
+    transition: 0.25s ease;
+}
+
+.testimonial-dot.active {
+    width: 22px;
+    border-radius: 10px;
+    background: var(--primary-color);
+}
+
+
+/* =========================================================
+   MOBILE
+   STILL 3 CARDS
+========================================================= */
+@media (max-width: 600px) {
+
+    .testimonials-slider-wrapper {
+        padding: 0 24px;
+    }
+
+    .testimonials-container {
+        gap: 7px;
+    }
+
+    .testimonial-card {
+        flex: 0 0 calc((100% - 14px) / 3);
+        width: calc((100% - 14px) / 3);
+        padding: 10px;
+        border-radius: 10px;
+    }
+
+    .testimonial-card .customer-info {
+        gap: 6px;
+    }
+
+    .testimonial-card .customer-info img {
+        width: 28px;
+        height: 28px;
+        min-width: 28px;
+    }
+
+    .testimonial-card h3 {
+        font-size: 11px;
+        line-height: 1.2;
+        margin: 0;
+    }
+
+    .testimonial-card .rating {
+        font-size: 9px;
+        line-height: 1;
+        margin-top: 3px;
+    }
+
+    .testimonial-card .testimonial-text {
+        font-size: 9px;
+        line-height: 1.35;
+        margin: 8px 0;
+    }
+
+    .testimonial-card .verified {
+        font-size: 8px;
+        line-height: 1.2;
+    }
+
+    .testimonial-arrow {
+        width: 26px;
+        height: 26px;
+        font-size: 13px;
+    }
+
+    .testimonial-prev {
+        left: 0;
+    }
+
+    .testimonial-next {
+        right: 0;
+    }
+
+    .testimonial-dots {
+        margin-top: 14px;
+        gap: 5px;
+    }
+
+    .testimonial-dot {
+        width: 6px;
+        height: 6px;
+    }
+
+    .testimonial-dot.active {
+        width: 16px;
+    }
+}
+@media (max-width: 380px) {
+
+    .testimonials-slider-wrapper {
+        padding: 0 20px;
+    }
+
+    .testimonials-container {
+        gap: 5px;
+    }
+
+    .testimonial-card {
+        flex: 0 0 calc((100% - 10px) / 3);
+        width: calc((100% - 10px) / 3);
+        padding: 7px;
+    }
+
+    .testimonial-card .customer-info img {
+        width: 24px;
+        height: 24px;
+        min-width: 24px;
+    }
+
+    .testimonial-card h3 {
+        font-size: 9px;
+    }
+
+    .testimonial-card .rating {
+        font-size: 7px;
+    }
+
+    .testimonial-card .testimonial-text {
+        font-size: 8px;
+        line-height: 1.3;
+    }
+
+    .testimonial-card .verified {
+        font-size: 7px;
+    }
+
+    .testimonial-arrow {
+        width: 22px;
+        height: 22px;
+        font-size: 11px;
+    }
+}
+/* =========================================================
+   MOBILE BOTTOM NAVIGATION
+========================================================= */
+
+.bottom-nav {
+    display: none;
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+
+    .bottom-nav {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+
+        height: 64px;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+
+        background: #ffffff;
+
+        border-top: 1px solid #eeeeee;
+
+        box-shadow:
+                0 -3px 15px rgba(0, 0, 0, 0.08);
+
+        z-index: 9999;
+
+        padding:
+                6px 5px
+                calc(6px + env(safe-area-inset-bottom));
+
+        box-sizing: border-box;
+    }
+
+    .bottom-nav-item {
+        position: relative;
+
+        flex: 1;
+
+        min-width: 0;
+
+        height: 52px;
+
+        display: flex;
+        flex-direction: column;
+
+        align-items: center;
+        justify-content: center;
+
+        gap: 3px;
+
+        text-decoration: none;
+
+        color: #666;
+
+        font-size: 11px;
+        font-weight: 500;
+
+        border: none;
+        background: transparent;
+
+        cursor: pointer;
+
+        transition:
+                color 0.2s ease,
+                transform 0.2s ease;
+    }
+
+    .bottom-nav-item:hover,
+    .bottom-nav-item:active {
+        color: #e35486;
+    }
+
+    .bottom-nav-item:active {
+        transform: scale(0.95);
+    }
+
+    .bottom-nav-icon {
+        width: 25px;
+        height: 25px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-size: 21px;
+
+        line-height: 1;
+    }
+
+    .bottom-nav-item span:last-child {
+        line-height: 14px;
+    }
+
+    /* Cart Count */
+    .bottom-cart-count {
+        position: absolute;
+
+        top: 3px;
+        right: calc(50% - 22px);
+
+        min-width: 17px;
+        height: 17px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        padding: 0 4px;
+
+        box-sizing: border-box;
+
+        background: #e35486;
+        color: #ffffff;
+
+        border-radius: 50%;
+
+        font-size: 9px;
+        font-weight: 700;
+
+        line-height: 17px;
+    }
+
+    /* Give page space for fixed bottom navigation */
+    body {
+        padding-bottom: 70px;
+    }
+}
+
+
+
+
+

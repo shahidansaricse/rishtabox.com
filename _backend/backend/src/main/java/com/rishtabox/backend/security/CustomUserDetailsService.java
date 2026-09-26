@@ -22,6 +22,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         this.userRepository = userRepository;
     }
 
+
     // =====================================================
     // LOAD USER
     // =====================================================
@@ -38,38 +39,73 @@ public class CustomUserDetailsService implements UserDetailsService {
                         )
                 );
 
-        // =================================================
-        // ROLE
-        // =================================================
+
+        // =====================================================
+        // CHECK ROLE
+        // =====================================================
+
+        if (user.getRole() == null) {
+
+            throw new UsernameNotFoundException(
+                    "User role is not assigned for email: "
+                            + email
+            );
+        }
+
+
+        // =====================================================
+        // DATABASE ROLE
+        // =====================================================
 
         String role = user.getRole().name();
 
+
         /*
-         * Database role:
+         * Database:
          *
          * USER
          * ADMIN
          * SUPER_ADMIN
          *
-         * Spring Security authority:
+         * Spring Security:
          *
          * ROLE_USER
          * ROLE_ADMIN
          * ROLE_SUPER_ADMIN
          */
 
+
+        // =====================================================
+        // CREATE AUTHORITY
+        // =====================================================
+
         SimpleGrantedAuthority authority =
                 new SimpleGrantedAuthority(
                         "ROLE_" + role
                 );
 
-        // =================================================
-        // SPRING SECURITY USER
-        // =================================================
+
+        // =====================================================
+        // RETURN SPRING SECURITY USER
+        // =====================================================
+        //
+        // Account status:
+        //
+        // user.isActive() = true
+        //      -> account enabled
+        //
+        // user.isActive() = false
+        //      -> account disabled
+        //
+        // =====================================================
 
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),
                 user.getPassword(),
+                true,                  // enabled
+                true,                  // accountNonExpired
+                true,                  // credentialsNonExpired
+                user.isActive(),       // accountNonLocked
                 Collections.singletonList(authority)
         );
     }

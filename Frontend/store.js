@@ -5056,101 +5056,492 @@ function renderTestimonials() {
     }).join("");
 }
 
+/* =========================================================
+   RISHTABOX BLOG SYSTEM
+   CUSTOMER FRONTEND
+========================================================= */
+
+let publishedBlogs = [];
+let currentBlogId = null;
+
+
+/* =========================================================
+   LOAD PUBLISHED BLOGS FROM BACKEND
+========================================================= */
+
+async function loadBlogs() {
+
+    const blogsContainer =
+        document.getElementById("blogsContainer");
+
+    const allBlogsContainer =
+        document.getElementById("allBlogsContainer");
+
+
+    try {
+
+        const response = await fetch(
+            `${API_BASE_URL}/api/blogs`
+        );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                `Failed to load blogs: ${response.status}`
+            );
+
+        }
+
+
+        const blogs = await response.json();
+
+
+        publishedBlogs =
+            Array.isArray(blogs)
+                ? blogs
+                : [];
+
+
+        console.log(
+            "Published blogs:",
+            publishedBlogs
+        );
+
+
+        renderBlogs();
+
+
+    } catch (error) {
+
+        console.error(
+            "Blog loading error:",
+            error
+        );
+
+
+        const errorHTML = `
+
+            <div class="blog-error">
+
+                <h3>
+                    Unable to load blogs
+                </h3>
+
+                <p>
+                    Please try again later.
+                </p>
+
+            </div>
+
+        `;
+
+
+        if (blogsContainer) {
+
+            blogsContainer.innerHTML =
+                errorHTML;
+
+        }
+
+
+        if (allBlogsContainer) {
+
+            allBlogsContainer.innerHTML =
+                errorHTML;
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   RENDER BLOGS
+========================================================= */
 
 function renderBlogs() {
 
-    const container = document.getElementById("blogsContainer");
+    const container =
+        document.getElementById(
+            "blogsContainer"
+        );
 
-    if (!container) return;
+    const allContainer =
+        document.getElementById(
+            "allBlogsContainer"
+        );
 
-    const blogs = [
-        {
-            title: "10 Best Wedding Gift Ideas for Couples",
-            date: "September 10, 2026",
-            image: "https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=800",
-            description: "Discover thoughtful and memorable wedding gifts for newly married couples."
-        },
-        {
-            title: "Best Personalized Gifts for Your Loved Ones",
-            date: "September 8, 2026",
-            image: "https://images.unsplash.com/photo-1512909006721-3d6018887383?w=800",
-            description: "Make your special moments memorable with beautiful personalized gifts."
-        },
-        {
-            title: "Best Birthday Gifts for Someone Special",
-            date: "September 5, 2026",
-            image: "https://images.unsplash.com/photo-1464349153735-7db50ed83c84?w=800",
-            description: "Find unique and thoughtful birthday gift ideas for your loved ones."
+
+    /* =====================================================
+       NO BLOGS
+    ===================================================== */
+
+    if (!publishedBlogs.length) {
+
+        const emptyHTML = `
+
+            <div class="blog-empty">
+
+                <h3>
+                    No blogs available
+                </h3>
+
+                <p>
+                    New stories and gifting ideas
+                    will appear here soon.
+                </p>
+
+            </div>
+
+        `;
+
+
+        if (container) {
+
+            container.innerHTML =
+                emptyHTML;
+
         }
-    ];
 
-    container.innerHTML = blogs.map(blog => {
 
-        return `
-            <div class="blog-card">
+        if (allContainer) {
 
-                <img 
-                    src="${getImagePath(blog.image)}"
-                    alt="${blog.title}"
+            allContainer.innerHTML =
+                emptyHTML;
+
+        }
+
+
+        return;
+
+    }
+
+
+    /* =====================================================
+       HOME BLOGS
+       ONLY FIRST 3
+    ===================================================== */
+    if (container) {
+
+        container.innerHTML = publishedBlogs
+            .map(function (blog) {
+                return createBlogCard(blog);
+            })
+            .join("");
+
+        startBlogAutoScroll();
+    }
+    /* =====================================================
+       ALL BLOGS
+    ===================================================== */
+
+    if (allContainer) {
+
+        allContainer.innerHTML =
+            publishedBlogs
+                .map(function (blog) {
+
+                    return createBlogCard(blog);
+
+                })
+                .join("");
+
+    }
+
+}
+
+
+/* =========================================================
+   CREATE BLOG CARD
+========================================================= */
+
+function createBlogCard(blog) {
+
+    const blogId =
+        Number(blog.id);
+
+
+    const imageUrl =
+        getBlogImageUrl(blog.image);
+
+
+    const title =
+        escapeBlogHTML(
+            blog.title || "RishtaBox Blog"
+        );
+
+
+    const description =
+        escapeBlogHTML(
+            blog.description || ""
+        );
+
+
+    const author =
+        escapeBlogHTML(
+            blog.author || "RishtaBox"
+        );
+
+
+    const date =
+        escapeBlogHTML(
+            formatBlogDate(blog.createdAt)
+        );
+
+
+    return `
+
+        <article
+            class="blog-card"
+            data-blog-id="${blogId}">
+
+
+            <!-- BLOG IMAGE -->
+
+            <div class="blog-image-wrapper">
+
+                <img
+                    src="${escapeBlogHTML(imageUrl)}"
+                    alt="${title}"
+                    class="blog-image"
+                    loading="lazy"
+                    onerror="
+                        this.onerror=null;
+                        this.src='images/logo.jpeg';
+                    "
                 >
 
-                <div class="blog-content">
+            </div>
+
+
+            <!-- BLOG CONTENT -->
+
+            <div class="blog-content">
+
+
+                <div class="blog-meta">
 
                     <span class="blog-date">
-                        ${blog.date}
+                        ${date}
                     </span>
 
-                    <h3>
-                        ${blog.title}
-                    </h3>
-
-                    <p>
-                        ${blog.description}
-                    </p>
-
-                    <button 
-                        class="read-more-btn"
-                        onclick="readBlog('${blog.title}')"
-                    >
-                        Read More →
-                    </button>
+                    <span class="blog-author">
+                        By ${author}
+                    </span>
 
                 </div>
 
+
+                <h3>
+                    ${title}
+                </h3>
+
+
+                <p>
+                    ${description}
+                </p>
+
+
+                <button
+                    type="button"
+                    class="read-more-btn"
+                    onclick="openBlog(${blogId})">
+
+                    Read More →
+
+                </button>
+
+
             </div>
-        `;
 
-    }).join("");
+        </article>
+
+    `;
+
+}
+/* =========================================================
+   INFINITE BLOG AUTO SCROLL
+   1 → 2 → 3 → 4 → 5 → ... → 1
+========================================================= */
+
+let blogAutoScrollInterval = null;
+let blogScrollPaused = false;
+
+function startBlogAutoScroll() {
+
+    const container =
+        document.getElementById("blogsContainer");
+
+    if (!container) return;
+
+    if (blogAutoScrollInterval) {
+        clearInterval(blogAutoScrollInterval);
+    }
+
+    blogAutoScrollInterval = setInterval(function () {
+
+        if (blogScrollPaused) return;
+
+        const cards =
+            container.querySelectorAll(".blog-card");
+
+        if (cards.length <= 3) {
+            return;
+        }
+
+        const firstCard = cards[0];
+
+        const gap =
+            parseFloat(
+                window.getComputedStyle(container).gap
+            ) || 0;
+
+        const cardWidth =
+            firstCard.getBoundingClientRect().width + gap;
+
+        const maxScroll =
+            container.scrollWidth -
+            container.clientWidth;
+
+        /*
+         * Move one blog at a time
+         */
+        if (container.scrollLeft < maxScroll - 5) {
+
+            container.scrollBy({
+                left: cardWidth,
+                behavior: "smooth"
+            });
+
+        } else {
+
+            /*
+             * All blogs completed
+             * Start again from Blog 1
+             */
+            container.scrollTo({
+                left: 0,
+                behavior: "smooth"
+            });
+        }
+
+    }, 3000);
+}
+function stopBlogAutoScroll() {
+
+    if (blogAutoScrollInterval) {
+
+        clearInterval(blogAutoScrollInterval);
+
+        blogAutoScrollInterval = null;
+    }
+}
+/* =========================================================
+   PAUSE ON USER INTERACTION
+========================================================= */
+
+function pauseBlogAutoScroll() {
+
+    blogScrollPaused = true;
 }
 
 
-/* Read More */
+function resumeBlogAutoScroll() {
 
-function readBlog(title) {
-
-    alert(
-        "Opening Blog: " + title
-    );
-
+    blogScrollPaused = false;
 }
 
 
-/* Load Sections */
+/* =========================================================
+   BLOG SCROLL EVENTS
+========================================================= */
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    renderTestimonials();
+    const container =
+        document.getElementById("blogsContainer");
 
-    renderBlogs();
+    if (!container) return;
 
+    container.addEventListener(
+        "mouseenter",
+        pauseBlogAutoScroll
+    );
+
+    container.addEventListener(
+        "mouseleave",
+        resumeBlogAutoScroll
+    );
+
+    container.addEventListener(
+        "touchstart",
+        pauseBlogAutoScroll,
+        { passive: true }
+    );
+
+    container.addEventListener(
+        "touchend",
+        function () {
+
+            setTimeout(function () {
+                resumeBlogAutoScroll();
+            }, 1500);
+
+        },
+        { passive: true }
+    );
+
+    startBlogAutoScroll();
 });
-function showBlogDetails(id) {
 
-    const blog = blogDetails[id];
+/* Mouse interaction */
+document.addEventListener("DOMContentLoaded", function () {
 
-    if (!blog) return;
+    const container =
+        document.getElementById("blogsContainer");
 
-    const blogSection = document.querySelector(".blog-section");
+    if (!container) return;
+
+    container.addEventListener(
+        "mouseenter",
+        pauseBlogAutoScroll
+    );
+
+    container.addEventListener(
+        "mouseleave",
+        resumeBlogAutoScroll
+    );
+
+    /* Mobile touch */
+    container.addEventListener(
+        "touchstart",
+        pauseBlogAutoScroll,
+        { passive: true }
+    );
+
+    container.addEventListener(
+        "touchend",
+        function () {
+
+            setTimeout(function () {
+                resumeBlogAutoScroll();
+            }, 2000);
+
+        },
+        { passive: true }
+    );
+
+    startBlogAutoScroll();
+});
+
+/* =========================================================
+   OPEN BLOG
+========================================================= */
+async function openBlog(blogId) {
+
+    console.log("OPEN BLOG ID:", blogId);
 
     const detailsSection =
         document.getElementById("blogDetailsSection");
@@ -5158,205 +5549,457 @@ function showBlogDetails(id) {
     const detailsContent =
         document.getElementById("blogDetailsContent");
 
+    if (!detailsSection) {
+        console.error("blogDetailsSection NOT FOUND");
+        return;
+    }
+
+    if (!detailsContent) {
+        console.error("blogDetailsContent NOT FOUND");
+        return;
+    }
+
+
+    /* =====================================================
+       SHOW BLOG DETAILS
+    ===================================================== */
+
+    detailsSection.style.display = "block";
+
+
+    /* =====================================================
+       TEMPORARY LOADING
+    ===================================================== */
 
     detailsContent.innerHTML = `
-
-        <button 
-            class="back-to-blog-btn"
-            onclick="closeBlogDetails()">
-            ← Back to Blogs
-        </button>
-
-        <img 
-            src="${blog.image}"
-            alt="${blog.title}"
-            class="blog-details-image"
-        >
-
-        <span class="blog-details-date">
-            ${blog.date}
-        </span>
-
-        <h1 class="blog-details-title">
-            ${blog.title}
-        </h1>
-
-        <div class="blog-details-text">
-            ${blog.content}
+        <div class="blog-loading">
+            Loading blog...
         </div>
+    `;
+
+
+    /* =====================================================
+       SCROLL DIRECTLY TO BLOG DETAILS
+    ===================================================== */
+
+    detailsSection.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+
+
+    /* =====================================================
+       LOAD BLOG FROM BACKEND
+    ===================================================== */
+
+    try {
+
+        const response = await fetch(
+            `${API_BASE_URL}/api/blogs/${blogId}`
+        );
+
+
+        console.log(
+            "BLOG RESPONSE STATUS:",
+            response.status
+        );
+
+
+        const data = await response.json();
+
+
+        console.log(
+            "BLOG RESPONSE DATA:",
+            data
+        );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.message ||
+                `Blog not found (${response.status})`
+            );
+
+        }
+
+
+        /* =================================================
+           RENDER BLOG
+        ================================================= */
+
+        renderBlogDetails(data);
+
+
+        /* =================================================
+           SCROLL TO TOP OF BLOG DETAILS AGAIN
+        ================================================= */
+
+        setTimeout(function () {
+
+            detailsSection.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+
+        }, 100);
+
+
+    } catch (error) {
+
+        console.error(
+            "BLOG DETAILS ERROR:",
+            error
+        );
+
+
+        detailsContent.innerHTML = `
+
+            <div class="blog-error">
+
+                <h2>
+                    Unable to Load Blog
+                </h2>
+
+                <p>
+                    ${escapeBlogHTML(error.message)}
+                </p>
+
+                <button
+                    type="button"
+                    class="blog-back-btn"
+                    onclick="closeBlogDetails()">
+
+                    ← Back to Blogs
+
+                </button>
+
+            </div>
+
+        `;
+    }
+}
+/* =========================================================
+   RENDER BLOG DETAILS
+========================================================= */
+function renderBlogDetails(blog) {
+
+    console.log(
+        "RENDERING BLOG:",
+        blog
+    );
+
+
+    const container =
+        document.getElementById(
+            "blogDetailsContent"
+        );
+
+
+    if (!container) {
+
+        console.error(
+            "blogDetailsContent NOT FOUND"
+        );
+
+        return;
+    }
+
+
+    const imageUrl =
+        getBlogImageUrl(blog.image);
+
+
+    container.innerHTML = `
+
+        <article class="blog-details">
+
+
+            <button
+                type="button"
+                class="back-to-blog-btn"
+                onclick="closeBlogDetails()">
+
+                ← Back to Blogs
+
+            </button>
+
+
+            <img
+                src="${escapeBlogHTML(imageUrl)}"
+                alt="${escapeBlogHTML(
+        blog.title || "Blog"
+    )}"
+                class="blog-details-image"
+                onerror="
+                    this.onerror=null;
+                    this.src='images/logo.jpeg';
+                "
+            >
+
+
+            <span class="blog-details-date">
+
+                ${escapeBlogHTML(
+        formatBlogDate(blog.createdAt)
+    )}
+
+            </span>
+
+
+            <h1 class="blog-details-title">
+
+                ${escapeBlogHTML(
+        blog.title || ""
+    )}
+
+            </h1>
+
+
+            <div class="blog-details-meta">
+
+                By
+                ${escapeBlogHTML(
+        blog.author || "RishtaBox"
+    )}
+
+            </div>
+
+
+            <div class="blog-details-description">
+
+                ${escapeBlogHTML(
+        blog.description || ""
+    )}
+
+            </div>
+
+
+            <div class="blog-details-text">
+
+                ${escapeBlogHTML(
+        blog.content || ""
+    )}
+
+            </div>
+
+
+        </article>
 
     `;
 
 
-    blogSection.style.display = "none";
+    console.log(
+        "BLOG DETAILS HTML CREATED"
+    );
 
-    detailsSection.style.display = "block";
-
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-    });
 }
+/* =========================================================
+   BLOG IMAGE PATH
+========================================================= */
 
+function getBlogImageUrl(image) {
 
-function closeBlogDetails() {
+    if (!image) {
 
-    document.getElementById("blogDetailsSection").style.display = "none";
+        return "images/logo.jpeg";
 
-    document.querySelector(".blog-section").style.display = "block";
-
-    document.querySelector(".blog-section").scrollIntoView({
-        behavior: "smooth"
-    });
-}
-const blogDetails = {
-
-    1: {
-        title: "10 Best Wedding Gift Ideas for Couples",
-        date: "September 10, 2026",
-        image: "https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=800",
-
-        content: `
-            <p>
-                Finding the perfect wedding gift can be difficult,
-                especially when you want to give something meaningful
-                and memorable. A good wedding gift should celebrate
-                the couple and their new journey together.
-            </p>
-
-            <h2>1. Personalized Gifts</h2>
-
-            <p>
-                Personalized gifts are one of the best choices for
-                newly married couples. Customized mugs, photo frames,
-                cushions and other personalized products can make
-                the gift more special and emotional.
-            </p>
-
-            <h2>2. Couple Gifts</h2>
-
-            <p>
-                Couple gifts are another great option. You can choose
-                matching products or something that the couple can
-                use together in their everyday life.
-            </p>
-
-            <h2>3. Wedding Accessories</h2>
-
-            <p>
-                Wedding accessories can also be a thoughtful gift.
-                Choose beautiful accessories that match the couple's
-                style and make their wedding memories even more special.
-            </p>
-
-            <h2>Conclusion</h2>
-
-            <p>
-                The best wedding gift is not always the most expensive
-                one. A thoughtful and meaningful gift can make the
-                couple feel special and create memories that last for
-                years.
-            </p>
-        `
-    },
-
-
-    2: {
-        title: "Best Personalized Gifts for Your Loved Ones",
-        date: "September 8, 2026",
-        image: "https://images.unsplash.com/photo-1512909006721-3d6018887383?w=800",
-
-        content: `
-            <p>
-                Personalized gifts are a wonderful way to show someone
-                that you care. Adding a name, photo or special message
-                can turn an ordinary gift into something truly unique.
-            </p>
-
-            <h2>Why Choose Personalized Gifts?</h2>
-
-            <p>
-                Personalized gifts have an emotional value because
-                they are created especially for the person receiving
-                them. They are perfect for birthdays, anniversaries,
-                weddings and other special occasions.
-            </p>
-
-            <h2>Personalized Mugs</h2>
-
-            <p>
-                Personalized coffee mugs are simple, useful and
-                memorable gifts. You can add photographs, names or
-                special messages to make them unique.
-            </p>
-
-            <h2>Photo Gifts</h2>
-
-            <p>
-                Photo-based gifts are another excellent choice.
-                A memorable photograph can be turned into a beautiful
-                gift that reminds someone of a special moment.
-            </p>
-
-            <h2>Conclusion</h2>
-
-            <p>
-                If you want to give something meaningful, personalized
-                gifts are an excellent choice because they combine
-                creativity with personal memories.
-            </p>
-        `
-    },
-
-
-    3: {
-        title: "Best Birthday Gifts for Someone Special",
-        date: "September 5, 2026",
-        image: "https://images.unsplash.com/photo-1464349153735-7db50ed83c84?w=800",
-
-        content: `
-            <p>
-                Birthdays are a perfect opportunity to make someone
-                feel special. Choosing the right gift can make the
-                celebration even more memorable.
-            </p>
-
-            <h2>1. Personalized Gifts</h2>
-
-            <p>
-                Personalized gifts are always a great birthday choice.
-                You can choose a customized mug, photo frame or another
-                gift that includes the person's name or photograph.
-            </p>
-
-            <h2>2. Useful Gifts</h2>
-
-            <p>
-                Useful gifts are practical and can be enjoyed for a
-                long time. Choose something that matches the person's
-                interests and daily needs.
-            </p>
-
-            <h2>3. Special Memories</h2>
-
-            <p>
-                Gifts connected with memories can be more meaningful
-                than expensive products. Photos and customized items
-                can help preserve special moments.
-            </p>
-
-            <h2>Conclusion</h2>
-
-            <p>
-                The best birthday gift is something selected with
-                thought and care. A meaningful gift can make the
-                birthday celebration unforgettable.
-            </p>
-        `
     }
 
-};
 
+    const value =
+        String(image).trim();
+
+
+    /* Full URL */
+
+    if (
+        value.startsWith("http://") ||
+        value.startsWith("https://")
+    ) {
+
+        return value;
+
+    }
+
+
+    /* Absolute path */
+
+    if (value.startsWith("/")) {
+
+        return value;
+
+    }
+
+
+    /* Already contains images/ */
+
+    if (
+        value.startsWith("images/")
+    ) {
+
+        return value;
+
+    }
+
+
+    /* Filename stored in database */
+
+    return `images/${value}`;
+
+}
+function closeBlogDetails() {
+
+    const detailsSection =
+        document.getElementById("blogDetailsSection");
+
+    if (detailsSection) {
+        detailsSection.style.display = "none";
+    }
+
+
+    /* Scroll back to Blog section */
+
+    const blogSection =
+        document.getElementById("blogs");
+
+    if (blogSection) {
+
+        blogSection.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+
+    }
+
+}
+/* =========================================================
+   ESCAPE HTML
+========================================================= */
+
+function escapeBlogHTML(value) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
+        return "";
+
+    }
+
+
+    return String(value)
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+/* =========================================================
+   FORMAT DATE
+========================================================= */
+
+function formatBlogDate(date) {
+
+    if (!date) {
+        return "";
+    }
+
+
+    const parsedDate =
+        new Date(date);
+
+
+    if (
+        Number.isNaN(
+            parsedDate.getTime()
+        )
+    ) {
+
+        return "";
+
+    }
+
+
+    return parsedDate.toLocaleDateString(
+        "en-IN",
+        {
+            day: "2-digit",
+            month: "long",
+            year: "numeric"
+        }
+    );
+
+}
+
+
+/* =========================================================
+   LOAD SECTIONS
+========================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        /* Existing testimonial system */
+
+        if (
+            typeof renderTestimonials ===
+            "function"
+        ) {
+
+            renderTestimonials();
+
+        }
+
+
+        /* Backend blogs */
+
+        loadBlogs();
+
+    }
+);
+
+
+/* =========================================================
+   GLOBAL FUNCTIONS
+========================================================= */
+
+window.loadBlogs =
+    loadBlogs;
+
+window.renderBlogs =
+    renderBlogs;
+
+window.openBlog =
+    openBlog;
+
+window.renderBlogDetails =
+    renderBlogDetails;
 
 // ===============================
 // LOAD RELATIONSHIPS FROM BACKEND
@@ -9448,4 +10091,434 @@ function escapeReviewHTML(value) {
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
+}
+/* =========================================================
+   CUSTOMER TESTIMONIALS
+========================================================= */
+
+const TESTIMONIAL_API_URL =
+    "http://localhost:8080/api/testimonials";
+
+
+async function loadCustomerTestimonials() {
+
+    const container =
+        document.getElementById(
+            "testimonialsContainer"
+        );
+
+    if (!container) {
+
+        console.error(
+            "testimonialsContainer not found."
+        );
+
+        return;
+    }
+
+    container.innerHTML = `
+        <div class="testimonial-loading">
+            Loading customer testimonials...
+        </div>
+    `;
+
+    try {
+
+        const response =
+            await fetch(
+                `${TESTIMONIAL_API_URL}/published`
+            );
+
+        if (!response.ok) {
+
+            throw new Error(
+                `HTTP ${response.status}`
+            );
+        }
+
+        const data =
+            await response.json();
+
+        console.log(
+            "Customer testimonials:",
+            data
+        );
+
+        const testimonials =
+            Array.isArray(data)
+                ? data
+                : [];
+
+        renderCustomerTestimonials(
+            testimonials
+        );
+
+    } catch (error) {
+
+        console.error(
+            "CUSTOMER TESTIMONIAL ERROR:",
+            error
+        );
+
+        container.innerHTML = `
+            <div class="testimonial-empty">
+                <p>
+                    Customer testimonials are
+                    currently unavailable.
+                </p>
+            </div>
+        `;
+    }
+}
+function renderCustomerTestimonials(testimonials) {
+
+    const container =
+        document.getElementById(
+            "testimonialsContainer"
+        );
+
+    if (!container) {
+
+        console.error(
+            "testimonialsContainer not found."
+        );
+
+        return;
+    }
+
+    if (
+        !Array.isArray(testimonials) ||
+        testimonials.length === 0
+    ) {
+
+        container.innerHTML = `
+            <div class="testimonial-empty">
+                <p>
+                    No customer testimonials available yet.
+                </p>
+            </div>
+        `;
+
+        return;
+    }
+
+    container.innerHTML =
+        testimonials.map(testimonial => {
+
+            const name =
+                testimonial.customerName ||
+                "Happy Customer";
+
+            const image =
+                testimonial.customerImage ||
+                "https://i.pravatar.cc/100";
+
+            const rating = Math.min(
+                5,
+                Math.max(
+                    0,
+                    Number(testimonial.rating || 0)
+                )
+            );
+
+            const message =
+                testimonial.message ||
+                "";
+
+            const stars =
+                "★".repeat(rating) +
+                "☆".repeat(5 - rating);
+
+            return `
+                <div class="testimonial-card">
+
+                    <div class="customer-info">
+
+                        <img
+                            src="${escapeHTMLTestimonial(image)}"
+                            alt="${escapeHTMLTestimonial(name)}"
+                            loading="lazy"
+                        >
+
+                        <div>
+
+                            <h3>
+                                ${escapeHTMLTestimonial(name)}
+                            </h3>
+
+                            <div class="rating">
+                                ${stars}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <p class="testimonial-text">
+                        "${escapeHTMLTestimonial(message)}"
+                    </p>
+
+                    <span class="verified">
+                        ✓ Verified Customer
+                    </span>
+
+                </div>
+            `;
+
+        }).join("");
+    testimonialCurrentIndex = 0;
+
+    setTimeout(() => {
+
+        updateTestimonialSlider();
+
+        startTestimonialAutoSlide();
+
+    }, 100);
+}
+/* =========================================================
+   TESTIMONIAL AUTO SLIDER
+   ALWAYS 3 CARDS
+========================================================= */
+
+let testimonialCurrentIndex = 0;
+let testimonialAutoSlide = null;
+
+
+/* =========================================================
+   UPDATE SLIDER
+========================================================= */
+
+function updateTestimonialSlider() {
+
+    const container =
+        document.getElementById(
+            "testimonialsContainer"
+        );
+
+    if (!container) {
+        return;
+    }
+
+    const cards =
+        container.querySelectorAll(
+            ".testimonial-card"
+        );
+
+    if (!cards.length) {
+        return;
+    }
+
+    const cardWidth =
+        cards[0].getBoundingClientRect().width;
+
+    const gap =
+        parseFloat(
+            getComputedStyle(container).gap
+        ) || 0;
+
+    const maxIndex =
+        Math.max(
+            0,
+            cards.length - 3
+        );
+
+    if (
+        testimonialCurrentIndex >
+        maxIndex
+    ) {
+        testimonialCurrentIndex = 0;
+    }
+
+    const moveAmount =
+        testimonialCurrentIndex *
+        (cardWidth + gap);
+
+    container.style.transform =
+        `translateX(-${moveAmount}px)`;
+
+    updateTestimonialDots(
+        cards.length,
+        testimonialCurrentIndex
+    );
+}
+
+
+/* =========================================================
+   AUTO MOVE
+========================================================= */
+
+function moveTestimonialSlide() {
+
+    const container =
+        document.getElementById(
+            "testimonialsContainer"
+        );
+
+    if (!container) {
+        return;
+    }
+
+    const cards =
+        container.querySelectorAll(
+            ".testimonial-card"
+        );
+
+    if (!cards.length) {
+        return;
+    }
+
+    const maxIndex =
+        Math.max(
+            0,
+            cards.length - 3
+        );
+
+    testimonialCurrentIndex++;
+
+    if (
+        testimonialCurrentIndex >
+        maxIndex
+    ) {
+        testimonialCurrentIndex = 0;
+    }
+
+    updateTestimonialSlider();
+}
+
+
+/* =========================================================
+   DOTS
+========================================================= */
+
+function updateTestimonialDots(
+    totalCards,
+    currentIndex
+) {
+
+    const dotsContainer =
+        document.getElementById(
+            "testimonialDots"
+        );
+
+    if (!dotsContainer) {
+        return;
+    }
+
+    const totalSlides =
+        Math.max(
+            1,
+            totalCards - 3 + 1
+        );
+
+    let html = "";
+
+    for (
+        let i = 0;
+        i < totalSlides;
+        i++
+    ) {
+
+        html += `
+            <button
+                type="button"
+                class="testimonial-dot ${
+            i === currentIndex
+                ? "active"
+                : ""
+        }"
+                onclick="goToTestimonialSlide(${i})"
+            ></button>
+        `;
+    }
+
+    dotsContainer.innerHTML = html;
+}
+
+
+/* =========================================================
+   MANUAL DOT
+========================================================= */
+
+function goToTestimonialSlide(index) {
+
+    testimonialCurrentIndex =
+        index;
+
+    updateTestimonialSlider();
+}
+
+
+/* =========================================================
+   START AUTO SLIDE
+========================================================= */
+
+function startTestimonialAutoSlide() {
+
+    stopTestimonialAutoSlide();
+
+    testimonialAutoSlide =
+        setInterval(() => {
+
+            moveTestimonialSlide();
+
+        }, 3500);
+}
+
+
+/* =========================================================
+   STOP AUTO SLIDE
+========================================================= */
+
+function stopTestimonialAutoSlide() {
+
+    if (testimonialAutoSlide) {
+
+        clearInterval(
+            testimonialAutoSlide
+        );
+
+        testimonialAutoSlide = null;
+    }
+}
+
+
+/* =========================================================
+   WINDOW RESIZE
+========================================================= */
+
+window.addEventListener(
+    "resize",
+    () => {
+
+        updateTestimonialSlider();
+
+    }
+);
+function escapeHTMLTestimonial(value) {
+
+    return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+document.addEventListener("DOMContentLoaded", function () {
+
+    // Existing code...
+
+    loadCustomerTestimonials();
+
+});
+
+function openOrders() {
+
+    // Orders page open
+    showPage("orders");
+
+    // Orders backend se load
+    if (typeof loadOrders === "function") {
+        loadOrders();
+    }
 }

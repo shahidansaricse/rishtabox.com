@@ -5,11 +5,9 @@ import com.rishtabox.backend.dto.LoginRequest;
 import com.rishtabox.backend.dto.RegisterRequest;
 import com.rishtabox.backend.entity.User;
 import com.rishtabox.backend.repository.UserRepository;
-import com.rishtabox.backend.security.CustomUserDetailsService;
 import com.rishtabox.backend.security.JwtService;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,19 +16,22 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
-    private final CustomUserDetailsService userDetailsService;
+
+
+    // =========================================================
+    // CONSTRUCTOR
+    // =========================================================
 
     public AuthService(
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
-            JwtService jwtService,
-            CustomUserDetailsService userDetailsService) {
+            JwtService jwtService) {
 
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
-        this.userDetailsService = userDetailsService;
     }
+
 
     // =========================================================
     // STORE REGISTER
@@ -39,16 +40,31 @@ public class AuthService {
 
     public User register(RegisterRequest request) {
 
+        // -----------------------------------------------------
+        // VALIDATE REQUEST
+        // -----------------------------------------------------
+
         validateRegisterRequest(request);
+
+
+        // -----------------------------------------------------
+        // NORMALIZE EMAIL
+        // -----------------------------------------------------
 
         String email =
                 request.getEmail()
                         .trim()
                         .toLowerCase();
 
+
+        // -----------------------------------------------------
+        // NORMALIZE PHONE
+        // -----------------------------------------------------
+
         String phone =
                 request.getPhone()
                         .trim();
+
 
         // -----------------------------------------------------
         // CHECK DUPLICATE EMAIL
@@ -61,6 +77,7 @@ public class AuthService {
             );
         }
 
+
         // -----------------------------------------------------
         // CHECK DUPLICATE PHONE
         // -----------------------------------------------------
@@ -72,25 +89,31 @@ public class AuthService {
             );
         }
 
+
         // -----------------------------------------------------
         // CREATE USER
         // -----------------------------------------------------
 
         User user = new User();
 
+
         user.setName(
                 request.getName().trim()
         );
 
+
         user.setEmail(email);
 
+
         user.setPhone(phone);
+
 
         user.setPassword(
                 passwordEncoder.encode(
                         request.getPassword()
                 )
         );
+
 
         // -----------------------------------------------------
         // PUBLIC REGISTRATION ALWAYS CREATES USER
@@ -100,17 +123,43 @@ public class AuthService {
                 User.Role.USER
         );
 
+
+        // -----------------------------------------------------
+        // NEW ACCOUNT IS ACTIVE
+        // -----------------------------------------------------
+
+        user.setActive(true);
+
+
+        // -----------------------------------------------------
+        // INITIAL TOKEN VERSION
+        // -----------------------------------------------------
+        //
+        // This makes the first JWT version:
+        //
+        // 0
+        //
+        // -----------------------------------------------------
+
+        if (user.getTokenVersion() == null) {
+
+            user.setTokenVersion(0L);
+        }
+
+
         return userRepository.save(user);
     }
 
+
     // =========================================================
     // ADMIN REGISTER
+    // =========================================================
     //
-    // IMPORTANT:
-    // This method should NOT be exposed as a public signup.
+    // Public ADMIN registration is disabled.
     //
-    // Admin creation will be moved to the SUPER_ADMIN
-    // role-management system.
+    // ADMIN accounts will be created by SUPER_ADMIN through
+    // the admin user-management system.
+    //
     // =========================================================
 
     @Deprecated
@@ -121,6 +170,7 @@ public class AuthService {
                         "Only a SUPER_ADMIN can create an ADMIN."
         );
     }
+
 
     // =========================================================
     // COMMON REGISTER VALIDATION
@@ -136,6 +186,7 @@ public class AuthService {
             );
         }
 
+
         if (request.getName() == null ||
                 request.getName().isBlank()) {
 
@@ -143,6 +194,7 @@ public class AuthService {
                     "Name is required"
             );
         }
+
 
         if (request.getEmail() == null ||
                 request.getEmail().isBlank()) {
@@ -152,6 +204,7 @@ public class AuthService {
             );
         }
 
+
         if (request.getPhone() == null ||
                 request.getPhone().isBlank()) {
 
@@ -159,6 +212,7 @@ public class AuthService {
                     "Phone is required"
             );
         }
+
 
         if (request.getPassword() == null ||
                 request.getPassword().isBlank()) {
@@ -168,6 +222,7 @@ public class AuthService {
             );
         }
     }
+
 
     // =========================================================
     // LOGIN
@@ -186,6 +241,7 @@ public class AuthService {
             );
         }
 
+
         if (request.getEmail() == null ||
                 request.getEmail().isBlank()) {
 
@@ -193,6 +249,7 @@ public class AuthService {
                     "Email is required"
             );
         }
+
 
         if (request.getPassword() == null ||
                 request.getPassword().isBlank()) {
@@ -202,6 +259,7 @@ public class AuthService {
             );
         }
 
+
         // -----------------------------------------------------
         // NORMALIZE EMAIL
         // -----------------------------------------------------
@@ -210,6 +268,7 @@ public class AuthService {
                 request.getEmail()
                         .trim()
                         .toLowerCase();
+
 
         // -----------------------------------------------------
         // FIND USER
@@ -224,6 +283,23 @@ public class AuthService {
                                 )
                         );
 
+
+        // -----------------------------------------------------
+        // CHECK ACCOUNT STATUS
+        // -----------------------------------------------------
+        //
+        // BLOCKED USER CANNOT LOGIN.
+        //
+        // -----------------------------------------------------
+
+        if (!user.isActive()) {
+
+            throw new RuntimeException(
+                    "Your account has been blocked"
+            );
+        }
+
+
         // -----------------------------------------------------
         // CHECK PASSWORD
         // -----------------------------------------------------
@@ -237,35 +313,42 @@ public class AuthService {
             );
         }
 
+
         // -----------------------------------------------------
-        // LOAD SPRING SECURITY USER
+        // ENSURE TOKEN VERSION EXISTS
         // -----------------------------------------------------
 
-        UserDetails userDetails =
-                userDetailsService
-                        .loadUserByUsername(
-                                user.getEmail()
-                        );
+        if (user.getTokenVersion() == null) {
+
+            user.setTokenVersion(0L);
+
+            userRepository.save(user);
+        }
+
 
         // -----------------------------------------------------
         // GENERATE JWT
+        // -----------------------------------------------------
         //
-        // JwtService now stores:
+        // IMPORTANT:
+        //
+        // Use the User entity here.
+        //
+        // This puts the CURRENT tokenVersion into the JWT.
+        //
+        // JWT contains:
         //
         // email
         // role
+        // tokenVersion
+        // issuedAt
+        // expiration
         //
-        // Example:
-        //
-        // SUPER_ADMIN
-        // ADMIN
-        // USER
         // -----------------------------------------------------
 
         String token =
-                jwtService.generateToken(
-                        userDetails
-                );
+                jwtService.generateToken(user);
+
 
         // -----------------------------------------------------
         // RETURN LOGIN RESPONSE

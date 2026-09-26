@@ -48,7 +48,6 @@ public class ReviewService {
             ReviewRequest request,
             Authentication authentication) {
 
-        // 1. Check whether the user is logged in
         if (authentication == null
                 || !authentication.isAuthenticated()
                 || "anonymousUser".equals(authentication.getName())) {
@@ -58,7 +57,6 @@ public class ReviewService {
             );
         }
 
-        // 2. Find the logged-in user
         String email = authentication.getName();
 
         User user = userRepository.findByEmail(email)
@@ -68,7 +66,6 @@ public class ReviewService {
                         )
                 );
 
-        // 3. Validate product ID
         if (request == null || request.getProductId() == null) {
 
             throw new RuntimeException(
@@ -76,7 +73,6 @@ public class ReviewService {
             );
         }
 
-        // 4. Find product
         Product product = productRepository
                 .findById(request.getProductId())
                 .orElseThrow(() ->
@@ -85,7 +81,6 @@ public class ReviewService {
                         )
                 );
 
-        // 5. Validate rating
         if (request.getRating() == null
                 || request.getRating() < 1
                 || request.getRating() > 5) {
@@ -95,7 +90,6 @@ public class ReviewService {
             );
         }
 
-        // 6. Validate comment
         if (request.getComment() == null
                 || request.getComment().trim().isEmpty()) {
 
@@ -120,7 +114,6 @@ public class ReviewService {
             );
         }
 
-        // 7. Check whether the user has already reviewed this product
         boolean alreadyReviewed =
                 reviewRepository
                         .findByUserIdAndProductId(
@@ -136,13 +129,11 @@ public class ReviewService {
             );
         }
 
-        // 8. Check whether the user purchased the product
         boolean purchased = hasEligiblePurchase(
                 user.getId(),
                 product.getId()
         );
 
-        // 9. Only purchased users can submit reviews
         if (!purchased) {
 
             throw new RuntimeException(
@@ -150,23 +141,22 @@ public class ReviewService {
             );
         }
 
-        // 10. Create Review entity
         Review review = new Review();
 
         review.setUser(user);
         review.setProduct(product);
         review.setRating(request.getRating());
         review.setComment(comment);
-
-        // Only eligible purchasers reach this point
         review.setVerifiedPurchaser(true);
+
+        // New reviews remain pending
+        review.setApproved(false);
 
         review.setCreatedAt(LocalDateTime.now());
 
-        // 11. Save Review entity
-        Review savedReview = reviewRepository.save(review);
+        Review savedReview =
+                reviewRepository.save(review);
 
-        // 12. Convert entity into ReviewResponse
         return new ReviewResponse(savedReview);
     }
 
@@ -194,22 +184,18 @@ public class ReviewService {
             String orderStatus = order.getOrderStatus();
             String paymentStatus = order.getPaymentStatus();
 
-            // 1. Cancelled orders are not eligible
             if ("CANCELLED".equalsIgnoreCase(orderStatus)) {
                 continue;
             }
 
-            // 2. Only PLACED orders are eligible
             if (!"PLACED".equalsIgnoreCase(orderStatus)) {
                 continue;
             }
 
-            // 3. Only PAID orders are eligible
             if (!"PAID".equalsIgnoreCase(paymentStatus)) {
                 continue;
             }
 
-            // 4. Check order items
             if (order.getItems() == null
                     || order.getItems().isEmpty()) {
 
@@ -228,7 +214,6 @@ public class ReviewService {
                         orderItem.getProduct().getId();
 
                 if (productId.equals(orderedProductId)) {
-
                     return true;
                 }
             }
@@ -264,5 +249,79 @@ public class ReviewService {
                 .stream()
                 .map(ReviewResponse::new)
                 .toList();
+    }
+
+    // =========================================================
+    // ADMIN - APPROVE / REJECT REVIEW
+    // =========================================================
+
+    @Transactional
+    public ReviewResponse updateReviewApproval(
+            Long reviewId,
+            boolean approved) {
+
+        System.out.println(
+                "Updating review ID: " + reviewId
+        );
+
+        System.out.println(
+                "New approved status: " + approved
+        );
+
+        if (reviewId == null) {
+
+            throw new IllegalArgumentException(
+                    "Review ID is required"
+            );
+        }
+
+        Review review = reviewRepository
+                .findById(reviewId)
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "Review not found with ID: " + reviewId
+                        )
+                );
+
+        review.setApproved(approved);
+
+        Review updatedReview =
+                reviewRepository.saveAndFlush(review);
+
+        System.out.println(
+                "Review updated successfully. ID: "
+                        + updatedReview.getId()
+        );
+
+        System.out.println(
+                "Saved approved status: "
+                        + updatedReview.isApproved()
+        );
+
+        return new ReviewResponse(updatedReview);
+    }
+
+    // =========================================================
+    // ADMIN - DELETE REVIEW
+    // =========================================================
+
+    @Transactional
+    public void deleteReview(Long reviewId) {
+
+        if (reviewId == null) {
+
+            throw new IllegalArgumentException(
+                    "Review ID is required"
+            );
+        }
+
+        if (!reviewRepository.existsById(reviewId)) {
+
+            throw new RuntimeException(
+                    "Review not found with ID: " + reviewId
+            );
+        }
+
+        reviewRepository.deleteById(reviewId);
     }
 }

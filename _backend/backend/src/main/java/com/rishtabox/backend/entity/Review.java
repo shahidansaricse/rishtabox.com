@@ -1,9 +1,10 @@
 package com.rishtabox.backend.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 
-        import java.time.LocalDateTime;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(
@@ -16,18 +17,37 @@ import jakarta.persistence.*;
 )
 public class Review {
 
+    // =========================================================
+    // PRIMARY KEY
+    // =========================================================
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+
+    // =========================================================
+    // USER RELATION
+    // =========================================================
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     @JsonIgnore
     private User user;
 
+
+    // =========================================================
+    // PRODUCT RELATION
+    // =========================================================
+
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
+
+
+    // =========================================================
+    // REVIEW DETAILS
+    // =========================================================
 
     @Column(nullable = false)
     private Integer rating;
@@ -38,12 +58,33 @@ public class Review {
     @Column(nullable = false)
     private boolean verifiedPurchaser;
 
+
+    // =========================================================
+    // APPROVAL STATUS
+    // =========================================================
+
+    @Column(nullable = false)
+    private boolean approved = false;
+
+
+    // =========================================================
+    // CREATED DATE
+    // =========================================================
+
     private LocalDateTime createdAt;
 
+
+    // =========================================================
+    // CONSTRUCTOR
+    // =========================================================
 
     public Review() {
     }
 
+
+    // =========================================================
+    // GETTERS
+    // =========================================================
 
     public Long getId() {
         return id;
@@ -69,10 +110,18 @@ public class Review {
         return verifiedPurchaser;
     }
 
+    public boolean isApproved() {
+        return approved;
+    }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
+
+    // =========================================================
+    // SETTERS
+    // =========================================================
 
     public void setId(Long id) {
         this.id = id;
@@ -96,6 +145,10 @@ public class Review {
 
     public void setVerifiedPurchaser(boolean verifiedPurchaser) {
         this.verifiedPurchaser = verifiedPurchaser;
+    }
+
+    public void setApproved(boolean approved) {
+        this.approved = approved;
     }
 
     public void setCreatedAt(LocalDateTime createdAt) {

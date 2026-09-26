@@ -21,13 +21,14 @@ public class ProductController {
         this.productService = productService;
     }
 
+
     // =========================================================
     // CREATE PRODUCT
     // POST /api/products
-    // ADMIN ONLY
+    // ADMIN + SUPER_ADMIN
     // =========================================================
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     @PostMapping
     public ResponseEntity<Product> createProduct(
             @RequestBody ProductRequest request) {
@@ -47,6 +48,7 @@ public class ProductController {
         return ResponseEntity.ok(product);
     }
 
+
     // =========================================================
     // GET ALL ACTIVE PRODUCTS
     // GET /api/products
@@ -61,14 +63,15 @@ public class ProductController {
         );
     }
 
+
     // =========================================================
     // GET ALL PRODUCTS FOR ADMIN
     // GET /api/products/admin/all
     // ACTIVE + INACTIVE
-    // ADMIN ONLY
+    // ADMIN + SUPER_ADMIN
     // =========================================================
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     @GetMapping("/admin/all")
     public ResponseEntity<List<Product>> getAllProductsForAdmin() {
 
@@ -76,6 +79,7 @@ public class ProductController {
                 productService.getAllProductsForAdmin()
         );
     }
+
 
     // =========================================================
     // GET PRODUCT BY ID
@@ -92,16 +96,17 @@ public class ProductController {
         return ResponseEntity.ok(product);
     }
 
+
     // =========================================================
     // UPDATE PRODUCT
     // PUT /api/products/{id}
-    // ADMIN ONLY
+    // ADMIN + SUPER_ADMIN
     //
     // Category / Festival / Relationship
     // are handled independently
     // =========================================================
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<Product> updateProduct(
             @PathVariable Long id,
@@ -123,13 +128,14 @@ public class ProductController {
         return ResponseEntity.ok(product);
     }
 
+
     // =========================================================
     // SOFT DELETE PRODUCT
     // DELETE /api/products/{id}
-    // ADMIN ONLY
+    // ADMIN + SUPER_ADMIN
     // =========================================================
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteProduct(
             @PathVariable Long id) {
@@ -144,13 +150,14 @@ public class ProductController {
         );
     }
 
+
     // =========================================================
     // RESTORE PRODUCT
     // PUT /api/products/{id}/restore
-    // ADMIN ONLY
+    // ADMIN + SUPER_ADMIN
     // =========================================================
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     @PutMapping("/{id}/restore")
     public ResponseEntity<Product> restoreProduct(
             @PathVariable Long id) {
@@ -159,6 +166,7 @@ public class ProductController {
 
         return ResponseEntity.ok(product);
     }
+
 
     // =========================================================
     // GET PRODUCTS BY CATEGORY
