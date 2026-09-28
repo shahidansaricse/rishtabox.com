@@ -1,14 +1,3 @@
-function getImagePath(image) {
-    if (!image) return "";
-
-    // Online image hai to same URL use karo
-    if (image.startsWith("http://") || image.startsWith("https://")) {
-        return image;
-    }
-
-    // Local image ke liye images folder
-    return "images/" + image;
-}
 /* =========================================================
    DATA
 ========================================================= */
@@ -193,9 +182,6 @@ function loadRecentlyViewed() {
     }
 }
 /* =========================================================
-    CART COUNT
-========================================================= */
-/* =========================================================
    UPDATE ALL CART COUNTS
 ========================================================= */
 
@@ -224,35 +210,7 @@ function updateCartCount() {
         bottomCartCount.textContent = totalCartItems;
     }
 }
-/* =========================================================
-   LOAD DATA
-========================================================= */
-//async function loadData() {
-//    try {
-//        const response = await fetch("data.json");
-//        if (!response.ok) {
-//            throw new Error(
-//                "HTTP Error: " + response.status
-//            );
-//        }
-//        const data = await response.json();
-//        console.log("DATA:", data);
-//        categories = data.categories || [];
-//        products = data.products || [];
-//        festivalProducts = data.festivalProducts || [];
-//        relationshipProducts = data.relationshipProducts || [];
-//
-//        initializeApp();
-//    } catch (error) {
-//        console.error("DATA LOAD ERROR:",error);
-//        document.body.innerHTML = `
-//            <div style="text-align:center;padding:50px;">
-//                <h2>Error loading data</h2>
-//                <p>${error.message}</p>
-//            </div>
-//        `;
-//    }
-//}
+
 async function loadData() {
     try {
 
@@ -323,7 +281,6 @@ async function loadData() {
             "BACKEND RELATIONSHIPS:",
             relationships
         );
-
 
         // =====================================================
         // LOAD PRODUCTS FROM BACKEND
@@ -636,9 +593,6 @@ function initializeApp() {
 
     showPage("home");
 }
-
-
-
 
 /* =========================================================
    DOM READY
@@ -1258,8 +1212,6 @@ function showCategory(categoryId) {
 
         return;
     }
-
-
     // =====================================================
     // RECENTLY VIEWED
     // =====================================================
@@ -1459,9 +1411,6 @@ function populateFilters() {
         );
     });
 }
-/* =========================================================
-   APPLY FILTERS
-========================================================= */
 /* =========================================================
    APPLY SORTING AND FILTERS
 ========================================================= */
@@ -2673,203 +2622,6 @@ function updateQuantity(index, change, newValue = null) {
     updateCartCount();
     saveCartData();
     renderCart();
-}
-// ======================================================
-// ORDER STEPS
-// ======================================================
-
-function renderOrderSteps() {
-
-    const orderSteps = document.getElementById("orderSteps");
-
-    if (!orderSteps) return;
-// ==================================================
-// STEP 1: USER DETAILS
-// ==================================================
-    if (currentOrderSteps === 1) {
-        orderSteps.innerHTML = `
-            <div class="order-form">
-                <h2>Step 1: Enter Your Details</h2>
-                <div class="form-group">
-                    <label for="orderName">Name:</label>
-                    <input
-                        type="text"
-                        id="orderName"
-                        value="${currentUser.name || ""}"
-                        placeholder="Enter your name"
-                    >
-                </div>
-                <div class="form-group">
-                    <label for="orderPhone">Phone Number:</label>
-                    <input
-                        type="tel"
-                        id="orderPhone"
-                        value="${currentUser.phone || ""}"
-                        placeholder="Enter your phone number"
-                    >
-                </div>
-                <div class="form-group">
-                    <label for="orderAddress">Address:</label>
-                    <textarea
-                        id="orderAddress"
-                        placeholder="Enter your complete address"
-                    >${currentUser.address || ""}</textarea>
-                </div>
-                <button
-                    class="btn-primary"
-                    onclick="saveOrderDetails()"
-                >
-                    Continue to Summary
-                </button>
-            </div>
-        `;
-    }
-// ==================================================
-// STEP 2: ORDER SUMMARY
-// ==================================================
-    else if (currentOrderSteps === 2) {
-        const cartTotal = cart.reduce(
-            (total, item) =>
-                total + Number(item.price) * Number(item.quantity),
-            0
-        );
-        const deliveryCharges = cartTotal > 500 ? 0 : 50;
-        const finalTotal =
-            cartTotal + deliveryCharges;
-        let cartItemsHtml = "";
-        cart.forEach((item) => {
-            cartItemsHtml += `
-                <div class="cart-item">
-                  <img src="${getImagePath(item.image)}"
-                        alt="${item.name}"
-                    >
-                    <div class="cart-item-details">
-                        <h3>${item.name}</h3>
-                        <div class="product-brand">
-                            ${item.brand || ""}
-                        </div>
-                        ${
-                item.color
-                    ? `<p>Color: ${item.color}</p>`
-                    : ""
-            }
-                        ${
-                item.size
-                    ? `<p>Size: ${item.size}</p>`
-                    : ""
-            }
-                        <p>
-                            Quantity: ${item.quantity}
-                        </p>
-                        <p>
-                            Price:
-                            ₹${Number(item.price) * Number(item.quantity)}
-                        </p>
-                    </div>
-                </div>
-            `;
-        });
-        orderSteps.innerHTML = `
-            <div class="order-form">
-                <h2>Step 2: Order Summary</h2>
-                <div class="address-section">
-                    <h3>Delivery Address</h3>
-                    <p>
-                        <strong>
-                            ${currentUser.name}
-                        </strong>
-                    </p>
-                    <p>${currentUser.phone}</p>
-                    <p>${currentUser.address}</p>
-                </div>
-                <h3>Order Items</h3>
-                ${cartItemsHtml}
-                <div class="cart-summary">
-                    <div class="summary-row">
-                        <span>Items Total:</span>
-                        <span>
-                            ₹${cartTotal}
-                        </span>
-                    </div>
-                    <div class="summary-row">
-                        <span>Delivery Charges:</span>
-                        <span>
-                            ${
-            deliveryCharges === 0
-                ? "FREE"
-                : "₹" + deliveryCharges
-        }
-                        </span>
-                    </div>
-                    <div class="summary-divider"></div>
-                    <div class="summary-row summary-total">
-                        <span>Total Amount:</span>
-                        <span>
-                            ₹${finalTotal}
-                        </span>
-                    </div>
-                </div>
-                <button
-                    class="btn-primary"
-                    onclick="proceedToPayment()"
-                >
-                    Proceed to Payment
-                </button>
-            </div>
-        `;
-    }
-        // ==================================================
-        // STEP 3: PAYMENT
-    // ==================================================
-    else if (currentOrderSteps === 3) {
-        orderSteps.innerHTML = `
-            <div class="order-form">
-                <h2>Step 3: Payment</h2>
-                <div class="payment-options">
-                    <div class="payment-option">
-                        <input
-                            type="radio"
-                            id="upi"
-                            name="payment"
-                            value="upi"
-                        >
-                        <label for="upi">
-                            UPI Payment
-                        </label>
-                    </div>
-                    <div class="payment-option">
-                        <input
-                            type="radio"
-                            id="card"
-                            name="payment"
-                            value="card"
-                        >
-                        <label for="card">
-                            Credit/Debit Card
-                        </label>
-                    </div>
-                    <div class="payment-option">
-                        <input
-                            type="radio"
-                            id="cod"
-                            name="payment"
-                            value="cod"
-                            checked
-                        >
-                        <label for="cod">
-                            Cash on Delivery
-                        </label>
-                    </div>
-                </div>
-                <button
-                    class="btn-primary"
-                    onclick="placeOrder()"
-                >
-                    Place Order
-                </button>
-            </div>
-        `;
-    }
 }
 // ======================================================
 // SAVE USER DETAILS
@@ -6450,163 +6202,6 @@ if (signupForm) {
 const loginForm =
     document.getElementById("loginForm");
 
-//
-// if (loginForm) {
-//
-//     loginForm.addEventListener(
-//         "submit",
-//         function (event) {
-//
-//             event.preventDefault();
-//
-//
-//             const loginValue =
-//                 document.getElementById("loginEmail")
-//                 .value
-//                 .trim();
-//
-//
-//             const password =
-//                 document.getElementById("loginPassword")
-//                 .value;
-//
-//
-//             const message =
-//                 document.getElementById("loginMessage");
-//
-//
-//             message.textContent = "";
-//
-//             message.className =
-//                 "auth-message";
-//
-//
-//             if (loginValue === "") {
-//
-//                 showLoginError(
-//                     "Please enter your email or mobile number."
-//                 );
-//
-//                 return;
-//             }
-//
-//
-//             if (password === "") {
-//
-//                 showLoginError(
-//                     "Please enter your password."
-//                 );
-//
-//                 return;
-//             }
-//
-//
-//             /* Get users */
-//
-//             const users =
-//                 JSON.parse(
-//                     localStorage.getItem(
-//                         "rishtaBoxUsers"
-//                     )
-//                 ) || [];
-//
-//
-//             if (users.length === 0) {
-//
-//                 showLoginError(
-//                     "No account found. Please create an account first."
-//                 );
-//
-//                 return;
-//             }
-//
-//
-//             /* Find user */
-//
-//             const user =
-//                 users.find(function (item) {
-//
-//                     return (
-//
-//                         item.email.toLowerCase() ===
-//                         loginValue.toLowerCase()
-//
-//                         ||
-//
-//                         item.mobile ===
-//                         loginValue
-//
-//                     );
-//
-//                 });
-//
-//
-//             if (!user) {
-//
-//                 showLoginError(
-//                     "Account not found. Please check your details."
-//                 );
-//
-//                 return;
-//             }
-//
-//
-//             /* Password */
-//
-//             if (user.password !== password) {
-//
-//                 showLoginError(
-//                     "Incorrect password. Please try again."
-//                 );
-//
-//                 return;
-//             }
-//
-//
-//             /* Login */
-//
-//             localStorage.setItem(
-//                 "rishtaBoxLoggedIn",
-//                 "true"
-//             );
-//
-//
-//             localStorage.setItem(
-//                 "rishtaBoxCurrentUser",
-//                 JSON.stringify(user)
-//             );
-//
-//
-//             /* Success */
-//
-//             message.textContent =
-//                 "Welcome back, " +
-//                 user.name +
-//                 "! ❤️";
-//
-//             message.className =
-//                 "auth-message success";
-//
-//
-//             /* Update account */
-//
-//             updateAccountNav(user);
-//
-//
-//             /* Go home */
-//
-//             setTimeout(function () {
-//
-//                 showPage("home");
-//
-//             }, 900);
-//
-//         }
-//     );
-//
-// }
-
-
 /* =========================
    UPDATE ACCOUNT NAV
 ========================= */
@@ -8138,7 +7733,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 // Clear signup form
                 signupForm.reset();
 
-                // Go to login
+                // Go to log in
                 setTimeout(() => {
 
                     showLogin();
@@ -8986,211 +8581,9 @@ function calculateDiscount(originalPrice, price) {
         ((originalPrice - price) / originalPrice) * 100
     );
 }
-/* =========================================================
-   RISHTABOX - RENDER SHOP MENUS
-========================================================= */
 
-function renderShopMenus() {
 
-    console.log("========== RENDER SHOP MENUS ==========");
-
-    const relationshipMenu =
-        document.getElementById("relationshipMenu");
-
-    const festivalMenu =
-        document.getElementById("festivalMenu");
-
-    const categoryMenu =
-        document.getElementById("categoryMenu");
-
-
-    /* =====================================================
-       RELATIONSHIP
-    ===================================================== */
-
-    if (relationshipMenu) {
-
-        relationshipMenu.innerHTML = "";
-
-        if (
-            Array.isArray(relationships) &&
-            relationships.length > 0
-        ) {
-
-            relationships.forEach(function (relationship) {
-
-                const link =
-                    document.createElement("a");
-
-                link.href = "#";
-
-                link.textContent =
-                    relationship.name;
-
-                link.addEventListener(
-                    "click",
-                    function (event) {
-
-                        event.preventDefault();
-                        event.stopPropagation();
-
-                        showRelationshipProducts(
-                            relationship.id
-                        );
-
-                        closeMobileMenus();
-
-                    }
-                );
-
-                relationshipMenu.appendChild(link);
-
-            });
-
-        } else {
-
-            relationshipMenu.innerHTML =
-                `<div class="dropdown-empty">
-                    No relationships available
-                </div>`;
-
-        }
-    }
-
-
-    /* =====================================================
-       FESTIVAL
-    ===================================================== */
-
-    if (festivalMenu) {
-
-        festivalMenu.innerHTML = "";
-
-        if (
-            Array.isArray(festivals) &&
-            festivals.length > 0
-        ) {
-
-            festivals.forEach(function (festival) {
-
-                const link =
-                    document.createElement("a");
-
-                link.href = "#";
-
-                link.textContent =
-                    festival.name;
-
-                link.addEventListener(
-                    "click",
-                    function (event) {
-
-                        event.preventDefault();
-                        event.stopPropagation();
-
-                        showFestival(
-                            festival.id
-                        );
-
-                        closeMobileMenus();
-
-                    }
-                );
-
-                festivalMenu.appendChild(link);
-
-            });
-
-        } else {
-
-            festivalMenu.innerHTML =
-                `<div class="dropdown-empty">
-                    No festivals available
-                </div>`;
-
-        }
-    }
-
-
-    /* =====================================================
-       CATEGORY
-    ===================================================== */
-
-    if (categoryMenu) {
-
-        categoryMenu.innerHTML = "";
-
-        if (
-            Array.isArray(categories) &&
-            categories.length > 0
-        ) {
-
-            categories.forEach(function (category) {
-
-                const link =
-                    document.createElement("a");
-
-                link.href = "#";
-
-                link.textContent =
-                    category.name;
-
-                link.addEventListener(
-                    "click",
-                    function (event) {
-
-                        event.preventDefault();
-                        event.stopPropagation();
-
-                        showCategory(
-                            category.id
-                        );
-
-                        closeMobileMenus();
-
-                    }
-                );
-
-                categoryMenu.appendChild(link);
-
-            });
-
-        } else {
-
-            categoryMenu.innerHTML =
-                `<div class="dropdown-empty">
-                    No categories available
-                </div>`;
-
-        }
-    }
-
-
-    console.log(
-        "Relationship items:",
-        relationshipMenu
-            ? relationshipMenu.children.length
-            : 0
-    );
-
-    console.log(
-        "Festival items:",
-        festivalMenu
-            ? festivalMenu.children.length
-            : 0
-    );
-
-    console.log(
-        "Category items:",
-        categoryMenu
-            ? categoryMenu.children.length
-            : 0
-    );
-
-    console.log("========== MENUS DONE ==========");
-}
-
-/* =========================================================
+/* ==========================================================
    RISHTABOX - TABLET & MOBILE DROPDOWN
 ========================================================= */
 
