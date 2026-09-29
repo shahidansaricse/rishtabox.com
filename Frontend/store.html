@@ -17,9 +17,6 @@
 <header class="header">
     <div class="nav-container">
         <div class="logo-section">
-
-
-
             <a href="#" class="home-btn"
                onclick="showPage('home'); return false;">
 
@@ -57,42 +54,146 @@
 
     </div>
     <!-- ================= SHOP NAVIGATION ================= -->
-    <div class="panel">
-        <div class="panel-all">
-            <a href="#" onclick="openAllGifts(); return false;">
-                ☰ All Gifts
-            </a>
+    <!-- ================= SHOP NAVIGATION ================= -->
+
+    <div class="shop-nav-wrapper">
+
+        <!-- BACK BUTTON -->
+        <button
+                type="button"
+                class="nav-scroll-btn nav-back-btn"
+                onclick="scrollNavBack()"
+                aria-label="Scroll navigation back">
+            ← Back
+        </button>
+
+
+        <!-- SCROLLABLE NAVIGATION -->
+        <div class="shop-nav-scroll">
+
+            <div class="panel">
+
+                <div class="panel-all">
+                    <a href="#" onclick="openAllGifts(); return false;">
+                        ☰ All Gifts
+                    </a>
+                </div>
+
+                <!-- Gifts by Price -->
+                <div class="nav-dropdown">
+
+                    <button type="button" class="dropdown-btn">
+                        Gifts by Price
+                        <span>▼</span>
+                    </button>
+
+                    <div class="dropdown-menu price-menu">
+
+                        <a href="#" onclick="showPriceProducts(99); return false;">
+                            Under ₹99
+                        </a>
+
+                        <a href="#" onclick="showPriceProducts(199); return false;">
+                            Under ₹199
+                        </a>
+
+                        <a href="#" onclick="showPriceProducts(499); return false;">
+                            Under ₹499
+                        </a>
+
+                        <a href="#" onclick="showPriceProducts(999); return false;">
+                            Under ₹999
+                        </a>
+
+                        <a href="#" onclick="showPriceProducts(1499); return false;">
+                            Under ₹1,499
+                        </a>
+
+                        <a href="#" onclick="showPriceProducts(1999); return false;">
+                            Under ₹1,999
+                        </a>
+
+                        <a href="#" onclick="showPriceProducts(2999); return false;">
+                            Under ₹2,999
+                        </a>
+
+                        <a href="#" onclick="showPriceProducts(4999); return false;">
+                            Under ₹4,999
+                        </a>
+
+                    </div>
+
+                </div>
+
+
+                <div class="nav-dropdown">
+
+                    <button type="button" class="dropdown-btn">
+                        Gifts by Relationship
+                        <span>▼</span>
+                    </button>
+
+                    <div
+                            class="dropdown-menu"
+                            id="relationshipMenu">
+                    </div>
+
+                </div>
+
+
+                <div class="nav-dropdown">
+
+                    <button type="button" class="dropdown-btn">
+                        Gifts by Festival
+                        <span>▼</span>
+                    </button>
+
+                    <div
+                            class="dropdown-menu"
+                            id="festivalMenu">
+                    </div>
+
+                </div>
+
+
+                <div class="nav-dropdown">
+
+                    <button type="button" class="dropdown-btn">
+                        Gifts by Category
+                        <span>▼</span>
+                    </button>
+
+                    <div
+                            class="dropdown-menu"
+                            id="categoryMenu">
+                    </div>
+
+                </div>
+
+
+                <div class="panel-deals">
+
+                    <a href="#"
+                       onclick="showSpecialOffers(); return false;">
+                        🎁 Special Offers
+                    </a>
+
+                </div>
+
+            </div>
+
         </div>
 
-        <div class="nav-dropdown">
-            <button type="button" class="dropdown-btn">
-                Gifts by Relationship
-                <span>▼</span>
-            </button>
-            <div class="dropdown-menu" id="relationshipMenu"></div>
-        </div>
 
-        <div class="nav-dropdown">
-            <button type="button" class="dropdown-btn">
-                Gifts by Festival
-                <span>▼</span>
-            </button>
-            <div class="dropdown-menu" id="festivalMenu"></div>
-        </div>
+        <!-- MORE BUTTON -->
+        <button
+                type="button"
+                class="nav-scroll-btn nav-more-btn"
+                onclick="scrollNavMore()"
+                aria-label="Show more navigation">
+            More →
+        </button>
 
-        <div class="nav-dropdown">
-            <button type="button" class="dropdown-btn">
-                Gifts by Category
-                <span>▼</span>
-            </button>
-            <div class="dropdown-menu" id="categoryMenu"></div>
-        </div>
-
-        <div class="panel-deals">
-            <a href="#" onclick="showSpecialOffers(); return false;">
-                🎁 Special Offers
-            </a>
-        </div>
     </div>
 </header>
 <!-- ================= MAIN CONTENT ================= -->
@@ -1320,7 +1421,7 @@
                 class="view-all-blogs-btn"
                 onclick="showPage('blogsPage')">
 
-            View All Blogs →
+            View All Blogs
 
         </button>
 
@@ -1627,7 +1728,7 @@
         <div class="footer-bottom">
             <p>
                 © 2026 <strong>RishtaBox</strong>.
-                All Rights Reserved by PUCHO Limelight.
+                Site made by PUCHO Limelight.
             </p>
 
             <div class="footer-bottom-links">
@@ -1664,13 +1765,22 @@
     </a>
 
     <!-- Category -->
-    <a href="#"
-       class="bottom-nav-item"
-       onclick="showPage('category'); return false;">
+<!--    <a href="#"-->
+<!--       class="bottom-nav-item"-->
+<!--       onclick="showPage('category'); return false;">-->
 
+<!--        <span class="bottom-nav-icon">🛍️</span>-->
+<!--        <span>Category</span>-->
+
+<!--    </a>-->
+    <a href="#" class="bottom-nav-item"
+       onclick="showPage('home'); setTimeout(() => {
+       document.getElementById('categories')?.scrollIntoView({
+           behavior: 'smooth'
+       });
+   }, 100); return false;">
         <span class="bottom-nav-icon">🛍️</span>
         <span>Category</span>
-
     </a>
 
     <!-- Search -->
@@ -1714,6 +1824,121 @@
     </a>
 
 </nav>
+
+<!-- =========================================================
+     ACCOUNT PANEL
+========================================================= -->
+
+<div
+        id="accountPanel"
+        class="account-panel"
+        aria-hidden="true">
+
+    <div class="account-panel-header">
+
+        <div class="account-user-info">
+
+            <span class="account-user-icon">
+                👤
+            </span>
+
+            <div>
+                <div class="account-welcome">
+                    Hello,
+                    <strong id="accountUserName">
+                        User
+                    </strong>
+                </div>
+
+                <div
+                        class="account-user-email"
+                        id="accountUserEmail">
+                    Welcome to RishtaBox
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- Close -->
+        <button
+                type="button"
+                class="account-close"
+                onclick="closeAccount()"
+                aria-label="Close Account">
+
+            ×
+
+        </button>
+
+    </div>
+
+
+    <!-- =====================================================
+         ACCOUNT OPTIONS
+    ====================================================== -->
+
+    <div class="account-panel-body">
+
+        <!-- My Account -->
+        <a
+                href="#"
+                class="account-option"
+                onclick="showPage('account'); closeAccount(); return false;">
+
+            <span class="account-option-icon">
+                👤
+            </span>
+
+            <span>
+                My Account
+            </span>
+
+        </a>
+
+
+        <!-- My Orders -->
+        <a
+                href="#"
+                class="account-option"
+                onclick="showPage('orders'); closeAccount(); return false;">
+
+            <span class="account-option-icon">
+                📦
+            </span>
+
+            <span>
+                My Orders
+            </span>
+
+        </a>
+
+
+
+
+
+        <!-- Divider -->
+        <div class="account-divider"></div>
+
+
+        <!-- Sign Out -->
+        <button
+                type="button"
+                class="account-option logout-btn"
+                onclick="logoutUser()">
+
+            <span class="account-option-icon">
+                🚪
+            </span>
+
+            <span>
+                Sign Out
+            </span>
+
+        </button>
+
+    </div>
+</div>
 
 <!-- ================= END MOBILE BOTTOM NAVIGATION ================= -->
 <!-- ================= JAVASCRIPT ================= -->

@@ -639,6 +639,7 @@ function showPage(pageId) {
     });
 
     const pageMap = {
+
         home: "homePage",
         cart: "cartPage",
         orders: "ordersPage",
@@ -647,17 +648,23 @@ function showPage(pageId) {
         search: "searchPage",
         product: "productPage",
         order: "orderPage",
-        login: "loginPage"
+        login: "loginPage",
+
+        // BLOG
+        blogsPage: "blogsPage"
+
     };
 
     const targetPage =
         document.getElementById(pageMap[pageId]);
 
     if (!targetPage) {
+
         console.error(
             "Page not found:",
             pageMap[pageId]
         );
+
         return;
     }
 
@@ -666,41 +673,97 @@ function showPage(pageId) {
     switch (pageId) {
 
         case "home":
+
             renderCategories();
+
             break;
+
 
         case "cart":
-            if (typeof renderCart === "function") {
+
+            if (
+                typeof renderCart === "function"
+            ) {
+
                 renderCart();
+
             }
+
             break;
+
 
         case "orders":
-            if (typeof renderOrders === "function") {
+
+            if (
+                typeof renderOrders === "function"
+            ) {
+
                 renderOrders();
+
             }
+
             break;
+
 
         case "order":
+
             currentOrderSteps = 1;
 
-            if (typeof renderOrderSteps === "function") {
+            if (
+                typeof renderOrderSteps === "function"
+            ) {
+
                 renderOrderSteps();
+
             }
+
             break;
 
+
         case "account":
+
             if (
                 typeof loadUserAccountPage === "function"
             ) {
+
                 loadUserAccountPage();
+
             }
+
             break;
 
+
         case "category":
+
             // DO NOTHING
+
+            break;
+
+
+        // =========================
+        // BLOG PAGE
+        // =========================
+
+        case "blogsPage":
+
+            if (
+                typeof loadBlogs === "function"
+            ) {
+
+                loadBlogs();
+
+            }
+
             break;
     }
+
+
+    // Scroll to top
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
 }
 function toggleSidebar() {
     const sidebar = document.querySelector(".sidebar");
@@ -9904,14 +9967,147 @@ document.addEventListener("DOMContentLoaded", function () {
     loadCustomerTestimonials();
 
 });
+/* =========================================================
+   ACCOUNT
+========================================================= */
 
-function openOrders() {
+function openAccount() {
 
-    // Orders page open
-    showPage("orders");
+    console.log("Account clicked");
 
-    // Orders backend se load
-    if (typeof loadOrders === "function") {
-        loadOrders();
+    const loggedIn =
+        localStorage.getItem("rishtaBoxLoggedIn");
+
+    console.log("Login status:", loggedIn);
+
+    // NOT LOGGED IN
+    if (loggedIn !== "true") {
+
+        closeAccount();
+
+        showPage("login");
+
+        // Wait until login page is displayed
+        setTimeout(function () {
+            showLogin();
+        }, 50);
+
+        return;
     }
+
+    // LOGGED IN
+    const panel =
+        document.getElementById("accountPanel");
+
+    if (!panel) {
+        console.error("accountPanel not found");
+        return;
+    }
+
+    panel.classList.add("active");
+}
+
+
+/* =========================================================
+   CLOSE ACCOUNT
+========================================================= */
+
+function closeAccount() {
+
+    const panel =
+        document.getElementById("accountPanel");
+
+    if (panel) {
+        panel.classList.remove("active");
+    }
+}
+
+
+/* =========================================================
+   LOGOUT
+========================================================= */
+
+function logoutUser() {
+
+    console.log("========== LOGOUT ==========");
+
+    // Remove login/session information
+    localStorage.removeItem("rishtaBoxLoggedIn");
+    localStorage.removeItem("rishtaBoxCurrentUser");
+
+    // Remove other possible current-user/session data
+    localStorage.removeItem("currentUser");
+    localStorage.removeItem("userData");
+    localStorage.removeItem("rishtaBoxToken");
+
+    // Close account panel
+    closeAccount();
+
+    // Verify
+    console.log(
+        "rishtaBoxLoggedIn:",
+        localStorage.getItem("rishtaBoxLoggedIn")
+    );
+
+    console.log(
+        "rishtaBoxCurrentUser:",
+        localStorage.getItem("rishtaBoxCurrentUser")
+    );
+
+    // Go to login
+    showPage("login");
+
+    setTimeout(function () {
+
+        showLogin();
+
+        console.log("Login page opened after logout");
+
+    }, 100);
+}
+function showPriceProducts(maxPrice) {
+
+    const filteredProducts = products.filter(function (product) {
+        return Number(product.price) < maxPrice;
+    });
+
+    showPage("category");
+
+    renderProducts(filteredProducts);
+}
+/* =========================================================
+   NAVIGATION HORIZONTAL SCROLL
+========================================================= */
+
+function scrollNavMore() {
+
+    const nav = document.querySelector(".shop-nav-scroll");
+
+    if (!nav) {
+        return;
+    }
+
+    nav.scrollBy({
+        left: nav.clientWidth * 0.75,
+        behavior: "smooth"
+    });
+}
+
+
+/* =========================================================
+   NAVIGATION BACK
+========================================================= */
+
+function scrollNavBack() {
+
+    const nav = document.querySelector(".shop-nav-scroll");
+
+    if (!nav) {
+        return;
+    }
+
+    nav.scrollBy({
+        left: -(nav.clientWidth * 0.7),
+        behavior: "smooth"
+    });
 }
