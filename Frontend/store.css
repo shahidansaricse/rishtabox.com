@@ -1679,8 +1679,8 @@ ORDER SUMMARY
 ========================================================= */
 
 .footer {
-    background: #2b1823;
-    color: #ffffff;
+    background: #f3e1e7;
+    color: #4a2635;
     margin-top: 50px;
     border-top: 3px solid var(--primary-color);
 }
@@ -1709,7 +1709,7 @@ ORDER SUMMARY
 
 .footer-section h3 {
     margin: 0 0 18px;
-    color: #ffffff;
+    color: #4a2635;
     font-size: 17px;
     font-weight: 700;
     position: relative;
@@ -1725,7 +1725,7 @@ ORDER SUMMARY
 }
 
 .footer-section p {
-    color: #e8dce1;
+    color: #6b4a57;
     line-height: 1.7;
     font-size: 14px;
 }
@@ -1744,7 +1744,7 @@ ORDER SUMMARY
 }
 
 .footer-features span {
-    color: #f5dce6;
+    color: #6b4a57;
     font-size: 13px;
 }
 
@@ -1760,7 +1760,7 @@ ORDER SUMMARY
 }
 
 .footer-section ul li a {
-    color: #e8dce1;
+    color: #6b4a57;
     text-decoration: none;
     font-size: 14px;
     transition: all 0.25s ease;
@@ -1790,7 +1790,7 @@ ORDER SUMMARY
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #ffffff;
+    color: #4a2635;
     text-decoration: none;
     background: rgba(227, 84, 134, 0.08);
     transition: all 0.25s ease;
@@ -1805,7 +1805,7 @@ ORDER SUMMARY
 
 .footer-payment {
     margin-top: 18px;
-    color: #f5dce6 !important;
+    color: #6b4a57 !important;
 }
 
 /* =========================================================
@@ -1818,8 +1818,8 @@ ORDER SUMMARY
     justify-content: space-between;
     gap: 25px;
     padding: 25px 0;
-    border-top: 1px solid rgba(255,255,255,0.1);
-    border-bottom: 1px solid rgba(255,255,255,0.1);
+    border-top: 1px solid rgba(74, 38, 53, 0.12);
+    border-bottom: 1px solid rgba(74, 38, 53, 0.12);
 }
 
 .footer-newsletter h3 {
@@ -1830,7 +1830,7 @@ ORDER SUMMARY
 
 .footer-newsletter p {
     margin: 0;
-    color: #d8cbd1;
+    color: #6b4a57;
     font-size: 13px;
 }
 
@@ -1886,7 +1886,8 @@ ORDER SUMMARY
 
 .footer-bottom p {
     margin: 0;
-    color: #cdbfc5;
+    color: #6b4a57;
+
     font-size: 13px;
 }
 
@@ -1900,7 +1901,7 @@ ORDER SUMMARY
 }
 
 .footer-bottom-links a {
-    color: #cdbfc5;
+    color: #4a2635;
     text-decoration: none;
     font-size: 13px;
     transition: 0.2s ease;
@@ -3081,8 +3082,8 @@ ORDER SUMMARY
 
     gap: 25px;
 
-    background: #4a2635;
-    color: #ffffff;
+    background: #f3e1e7;
+    color: #4a2635;
 
     border-top:
             1px solid rgba(227, 84, 134, 0.25);
@@ -3119,7 +3120,7 @@ ORDER SUMMARY
 
     padding: 0 8px;
 
-    color: #ffffff;
+    color: #4a2635;
 
     text-decoration: none;
 
@@ -3137,10 +3138,10 @@ ORDER SUMMARY
 }
 
 .panel-all a:hover {
-    color: #f8a4bf;
+    color: #e35486;
 
-    background:
-            rgba(227, 84, 134, 0.10);
+
+    background: rgba(227, 84, 134, 0.15);
 }
 
 
@@ -3176,7 +3177,8 @@ ORDER SUMMARY
 
     background: transparent;
 
-    color: #ffffff;
+    color: #4a2635;
+
 
     padding: 0 8px;
 
@@ -3200,10 +3202,10 @@ ORDER SUMMARY
 }
 
 .dropdown-btn:hover {
-    color: #f8a4bf;
+    color: #e35486;
 
-    background:
-            rgba(227, 84, 134, 0.10);
+
+    background: rgba(227, 84, 134, 0.15);
 }
 
 
@@ -5359,7 +5361,7 @@ ORDER SUMMARY
 /* ================= LEFT SIDE ================= */
 
 .auth-welcome {
-    background: #4a2635;
+    background: #f8f1f3;
 
     color: #ffffff;
 
@@ -5370,12 +5372,21 @@ ORDER SUMMARY
     justify-content: center;
 }
 
-
+.auth-gift-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
 .auth-gift-icon img {
-    width: 50px;
-    height: 50px;
+    width: 100px;
+    height: 100px;
+
     object-fit: cover;
     border-radius: 50%;
+
+    display: block;
+    margin: 0 auto;
 }
 
 
@@ -5385,6 +5396,8 @@ ORDER SUMMARY
     line-height: 1.3;
 
     margin-bottom: 15px;
+
+    color: #4a2635;
 }
 
 
@@ -5393,7 +5406,7 @@ ORDER SUMMARY
 
     line-height: 1.8;
 
-    color: #eadfe3;
+    color: #4a2635;
 
     margin-bottom: 30px;
 }
@@ -5418,6 +5431,7 @@ ORDER SUMMARY
     gap: 12px;
 
     font-size: 13px;
+    color: #4a2635;
 }
 
 
@@ -10688,7 +10702,7 @@ body {
     margin: 0 !important;
     padding: 0 !important;
 
-    background: #4a2635 !important;
+    background: #f3e1e7 !important;
 
     box-sizing: border-box;
 
@@ -10715,8 +10729,8 @@ body {
     border-radius: 0 !important;
     outline: none !important;
 
-    background: #4a2635 !important;
-    color: #ffffff !important;
+    background: #f3e1e7 !important;
+    color: #4a2635 !important;
 
     font-family: inherit !important;
     font-size: 15px !important;
@@ -10744,26 +10758,23 @@ body {
 ========================================================= */
 
 .nav-back-btn {
-    border-right: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-right: 1px solid rgba(74, 38, 53, 0.15) !important;
 }
-
 
 /* =========================================================
    MORE BUTTON
 ========================================================= */
-
 .nav-more-btn {
-    border-left: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-left: 1px solid rgba(74, 38, 53, 0.15) !important;
 }
-
 
 /* =========================================================
    HOVER
 ========================================================= */
 
 .nav-scroll-btn:hover {
-    background: #5a3041 !important;
-    color: #ffffff !important;
+    background: #f3c4d4 !important;
+    color: #e35486 !important;
 }
 
 
@@ -10839,7 +10850,7 @@ body {
 
     justify-content: flex-start !important;
 
-    background: #4a2635 !important;
+    background: #f3e1e7 !important;
 
     box-sizing: border-box;
 
@@ -10882,8 +10893,7 @@ body {
 
     padding: 0 18px !important;
 
-    color: #ffffff !important;
-
+    color: #4a2635 !important;
     font-size: 16px;
     font-weight: 700;
 
@@ -10960,8 +10970,7 @@ body {
 
     padding: 0 18px !important;
 
-    color: #ffffff !important;
-
+    color: #4a2635 !important;
     font-size: 16px;
     font-weight: 700;
 
@@ -11070,113 +11079,7 @@ body {
     }
 
 }
-/* =========================================================
-   DESKTOP / LAPTOP DROPDOWN FIX
-========================================================= */
 
-@media (min-width: 769px) {
-
-    /* Allow dropdown menus to appear outside navigation */
-    .shop-nav-wrapper {
-        overflow: visible !important;
-    }
-
-    .shop-nav-scroll {
-        overflow: visible !important;
-    }
-
-    .shop-nav-scroll .panel {
-        overflow: visible !important;
-    }
-
-    .shop-nav-scroll .nav-dropdown {
-        position: relative !important;
-    }
-
-    .shop-nav-scroll .dropdown-menu {
-        position: absolute !important;
-
-        top: 100% !important;
-        left: 0 !important;
-
-        z-index: 99999 !important;
-    }
-
-}
-/* =========================================================
-   DESKTOP / LAPTOP - KEEP MORE BUTTON VISIBLE
-========================================================= */
-
-@media (min-width: 769px) {
-
-    .shop-nav-wrapper {
-        display: flex !important;
-        width: 100% !important;
-        height: 40px !important;
-
-        overflow: visible !important;
-    }
-
-    /* BACK BUTTON */
-    .nav-back-btn {
-        flex: 0 0 100px !important;
-        width: 100px !important;
-        height: 40px !important;
-    }
-
-    /* MIDDLE NAVIGATION */
-    .shop-nav-scroll {
-        flex: 1 1 auto !important;
-        min-width: 0 !important;
-
-        height: 40px !important;
-
-        /*
-         * Keep horizontal navigation inside available space.
-         */
-        overflow-x: auto !important;
-        overflow-y: visible !important;
-
-        scrollbar-width: none;
-    }
-
-    .shop-nav-scroll::-webkit-scrollbar {
-        display: none;
-    }
-
-    /* NAV CONTENT */
-    .shop-nav-scroll .panel {
-        width: max-content !important;
-        min-width: 100% !important;
-
-        height: 40px !important;
-
-        display: flex !important;
-        align-items: center !important;
-        flex-wrap: nowrap !important;
-
-        overflow: visible !important;
-    }
-
-    /* MORE BUTTON */
-    .nav-more-btn {
-        flex: 0 0 100px !important;
-
-        width: 100px !important;
-        height: 40px !important;
-
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-
-        background: #4a2635 !important;
-        color: #ffffff !important;
-
-        position: relative !important;
-        z-index: 1000 !important;
-    }
-
-}
 
 /* =========================================================
    TABLET + MOBILE + SMALL MOBILE
@@ -11305,7 +11208,7 @@ body {
 
     .shop-nav-scroll {
         overflow-x: auto !important;
-        overflow-y: hidden !important;
+        overflow-y: visible !important;
 
         touch-action: pan-x !important;
     }
@@ -11732,4 +11635,87 @@ body {
         text-align: center !important;
     }
 
+}/* =========================================================
+   FINAL SHOP NAV TEXT COLOR
+========================================================= */
+
+.shop-nav-scroll .panel-all a,
+.shop-nav-scroll .dropdown-btn,
+.shop-nav-scroll .panel-deals a {
+    color: #4a2635 !important;
+}
+
+/* Hover */
+.shop-nav-scroll .panel-all a:hover,
+.shop-nav-scroll .dropdown-btn:hover,
+.shop-nav-scroll .panel-deals a:hover {
+    color: #e35486 !important;
+    background: #f3c4d4 !important;
+}
+
+/* =========================================================
+   FINAL SHOP NAV CLICK COLOR
+========================================================= */
+
+.nav-back-btn:active,
+.nav-more-btn:active,
+.shop-nav-scroll .panel-all a:active,
+.shop-nav-scroll .dropdown-btn:active,
+.shop-nav-scroll .panel-deals a:active {
+    background: #f3c4d4 !important;
+    color: #e35486 !important;
+}
+
+/* =========================================================
+   DESKTOP ONLY — DROPDOWN FIX
+   KEEP SCROLL + MORE WORKING
+========================================================= */
+@media (min-width: 1025px) {
+
+    .shop-nav-scroll .nav-dropdown {
+        position: relative !important;
+        z-index: 10000 !important;
+    }
+
+    .shop-nav-scroll .nav-dropdown .dropdown-menu {
+        position: fixed !important;
+
+        display: none !important;
+
+        min-width: 180px !important;
+
+
+        padding: 8px 0 !important;
+        margin: 0 !important;
+
+        background: #ffffff !important;
+
+        border: 1px solid #e8dce1 !important;
+        border-radius: 0 0 10px 10px !important;
+
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15) !important;
+
+        z-index: 999999 !important;
+
+        transform: none !important;
+    }
+
+    .shop-nav-scroll .nav-dropdown:hover .dropdown-menu,
+    .shop-nav-scroll .nav-dropdown.active .dropdown-menu {
+        display: block !important;
+    }
+
+    .shop-nav-scroll .nav-dropdown .dropdown-menu a {
+        display: block !important;
+        padding: 10px 18px !important;
+        background: #ffffff !important;
+        color: #4a2635 !important;
+        text-decoration: none !important;
+        white-space: nowrap !important;
+    }
+
+    .shop-nav-scroll .nav-dropdown .dropdown-menu a:hover {
+        background: #fff0f5 !important;
+        color: #e35486 !important;
+    }
 }

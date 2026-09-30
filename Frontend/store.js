@@ -6667,7 +6667,7 @@ document.addEventListener(
         const options = {
 
             // Your TEST key
-            key: "rzp_test_TcGIuj6KWkDynr",
+            key: "rzp_live_T993YlUbiXqvXZ",
 
             // Razorpay expects paise
             amount:
