@@ -10111,3 +10111,204 @@ function scrollNavBack() {
         behavior: "smooth"
     });
 }
+/* =========================================================
+   FORCE DROPDOWN TO OPEN DIRECTLY BELOW ITS BUTTON
+========================================================= */
+
+(function () {
+
+    function forceDropdownPosition(item) {
+
+        if (!item) return;
+
+        const menu = item.querySelector(".dropdown-menu");
+
+        if (!menu) return;
+
+        const rect = item.getBoundingClientRect();
+
+        /*
+         * FORCE exact browser position
+         */
+        menu.style.setProperty(
+            "position",
+            "fixed",
+            "important"
+        );
+
+        menu.style.setProperty(
+            "top",
+            Math.round(rect.bottom) + "px",
+            "important"
+        );
+
+        menu.style.setProperty(
+            "left",
+            Math.round(rect.left) + "px",
+            "important"
+        );
+
+        menu.style.setProperty(
+            "right",
+            "auto",
+            "important"
+        );
+
+        menu.style.setProperty(
+            "bottom",
+            "auto",
+            "important"
+        );
+
+        menu.style.setProperty(
+            "transform",
+            "none",
+            "important"
+        );
+
+        menu.style.setProperty(
+            "margin",
+            "0",
+            "important"
+        );
+    }
+
+
+    function forceAllOpenDropdowns() {
+
+        document
+            .querySelectorAll(
+                ".shop-nav-scroll .nav-dropdown"
+            )
+            .forEach(function (item) {
+
+                const menu =
+                    item.querySelector(".dropdown-menu");
+
+                if (!menu) return;
+
+                const isOpen =
+                    item.classList.contains("active") ||
+                    getComputedStyle(menu).display !== "none";
+
+                if (isOpen) {
+                    forceDropdownPosition(item);
+                }
+            });
+    }
+
+
+    /* CLICK — capture phase */
+    document.addEventListener(
+        "click",
+        function (event) {
+
+            const item =
+                event.target.closest(
+                    ".shop-nav-scroll .nav-dropdown"
+                );
+
+            if (!item) return;
+
+            /*
+             * Run multiple times because your
+             * existing JS may change the class
+             * after click.
+             */
+            requestAnimationFrame(function () {
+                forceDropdownPosition(item);
+            });
+
+            setTimeout(function () {
+                forceDropdownPosition(item);
+            }, 20);
+
+            setTimeout(function () {
+                forceDropdownPosition(item);
+            }, 100);
+
+            setTimeout(function () {
+                forceDropdownPosition(item);
+            }, 300);
+
+        },
+        true
+    );
+
+
+    /* MOUSE DOWN */
+    document.addEventListener(
+        "mousedown",
+        function (event) {
+
+            const item =
+                event.target.closest(
+                    ".shop-nav-scroll .nav-dropdown"
+                );
+
+            if (!item) return;
+
+            setTimeout(function () {
+                forceDropdownPosition(item);
+            }, 10);
+
+        },
+        true
+    );
+
+
+    /* SCROLL */
+    window.addEventListener(
+        "scroll",
+        function () {
+            forceAllOpenDropdowns();
+        },
+        true
+    );
+
+
+    /* RESIZE */
+    window.addEventListener(
+        "resize",
+        function () {
+            forceAllOpenDropdowns();
+        }
+    );
+
+
+    /*
+     * WATCH class/style changes.
+     * This defeats other JS that moves the dropdown.
+     */
+    const nav =
+        document.querySelector(".shop-nav-scroll");
+
+    if (nav) {
+
+        const observer =
+            new MutationObserver(function () {
+
+                forceAllOpenDropdowns();
+
+            });
+
+        observer.observe(nav, {
+            subtree: true,
+            attributes: true,
+            attributeFilter: [
+                "class",
+                "style"
+            ]
+        });
+    }
+
+
+    /*
+     * FINAL continuous correction while dropdown
+     * is open. This is the FORCE part.
+     */
+    setInterval(function () {
+        forceAllOpenDropdowns();
+    }, 100);
+
+})();

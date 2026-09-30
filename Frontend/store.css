@@ -11684,7 +11684,6 @@ body {
 
         min-width: 180px !important;
 
-
         padding: 8px 0 !important;
         margin: 0 !important;
 
@@ -11693,7 +11692,7 @@ body {
         border: 1px solid #e8dce1 !important;
         border-radius: 0 0 10px 10px !important;
 
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15) !important;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15) !important;
 
         z-index: 999999 !important;
 
@@ -11717,5 +11716,120 @@ body {
     .shop-nav-scroll .nav-dropdown .dropdown-menu a:hover {
         background: #fff0f5 !important;
         color: #e35486 !important;
+    }
+}
+/* =========================================================
+   LAPTOP / DESKTOP ONLY
+   ENTIRE PINK NAVIGATION STRIP = 40px
+========================================================= */
+
+@media (min-width: 1025px) {
+
+    /* COMPLETE OUTER PINK STRIP */
+    .shop-nav-wrapper {
+        height: 40px !important;
+        min-height: 40px !important;
+        max-height: 40px !important;
+
+        padding: 0 !important;
+        margin: 0 !important;
+
+        box-sizing: border-box !important;
+
+        overflow: visible !important;
+    }
+
+
+    /* BACK + MORE */
+    .nav-scroll-btn {
+        height: 40px !important;
+        min-height: 40px !important;
+        max-height: 40px !important;
+
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+
+        box-sizing: border-box !important;
+    }
+
+
+    /* SCROLL AREA */
+    .shop-nav-scroll {
+        height: 40px !important;
+        min-height: 40px !important;
+        max-height: 40px !important;
+
+        padding: 0 !important;
+        margin: 0 !important;
+
+        box-sizing: border-box !important;
+
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+    }
+
+
+    /* INNER PINK PANEL */
+    .shop-nav-scroll .panel {
+        height: 40px !important;
+        min-height: 40px !important;
+        max-height: 40px !important;
+
+        padding: 0 !important;
+        margin: 0 !important;
+
+        box-sizing: border-box !important;
+    }
+
+
+    /* EVERY ITEM INSIDE PANEL */
+    .shop-nav-scroll .panel > * {
+        height: 40px !important;
+        min-height: 40px !important;
+        max-height: 40px !important;
+
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+
+        box-sizing: border-box !important;
+    }
+
+
+    /* ALL GIFTS */
+    .shop-nav-scroll .panel-all,
+    .shop-nav-scroll .panel-all a {
+
+        height: 40px !important;
+        min-height: 40px !important;
+        max-height: 40px !important;
+
+        box-sizing: border-box !important;
+    }
+
+
+    /* DROPDOWN BUTTONS */
+    .shop-nav-scroll .nav-dropdown,
+    .shop-nav-scroll .dropdown-btn {
+
+        height: 40px !important;
+        min-height: 40px !important;
+        max-height: 40px !important;
+
+        box-sizing: border-box !important;
+    }
+
+
+    /* SPECIAL OFFERS */
+    .shop-nav-scroll .panel-deals,
+    .shop-nav-scroll .panel-deals a {
+
+        height: 40px !important;
+        min-height: 40px !important;
+        max-height: 40px !important;
+
+        box-sizing: border-box !important;
     }
 }
