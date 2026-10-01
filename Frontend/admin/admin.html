@@ -187,7 +187,24 @@
                 <button type="button" class="nav-btn" data-section="testimonials">
                     Testimonials
                 </button>
+                <button
+                        type="button"
+                        class="nav-btn"
+                        data-section="relationships"
+                >
+                    Relationships
+                </button>
 
+                <button type="button" class="nav-btn" data-section="festivals">
+                    Festivals
+                </button>
+                <button
+                        type="button"
+                        class="nav-btn"
+                        data-section="categories"
+                >
+                    Categories
+                </button>
                 <a class="back-link" href="../store.html">
                     ← Back to Store
                 </a>
@@ -1498,6 +1515,141 @@
 
 
 
+
+                <!-- =========================================================
+                     RELATIONSHIPS
+                ========================================================= -->
+
+                <section id="relationships" class="admin-section hidden">
+
+                    <div class="panel-card">
+
+                        <div class="section-toolbar">
+
+                            <div>
+
+                                <p class="eyebrow">
+                                    RELATIONSHIP MANAGEMENT
+                                </p>
+
+                                <h2>
+                                    Relationships
+                                </h2>
+
+                                <p>
+                                    Pin or unpin relationships displayed
+                                    on the customer store.
+                                </p>
+
+                            </div>
+
+                            <button
+                                    type="button"
+                                    class="primary-btn"
+                                    onclick="loadAdminRelationships()"
+                            >
+                                Refresh
+                            </button>
+
+                        </div>
+
+                        <div id="relationshipsContent" class="empty-state">
+                            Loading relationships...
+                        </div>
+
+                    </div>
+
+                </section>
+                <!-- =========================================================
+                                  FESTIVALS
+                             ========================================================= -->
+
+                <section id="festivals" class="admin-section hidden">
+
+                    <div class="panel-card">
+
+                        <div class="section-toolbar">
+
+                            <div>
+
+                                <p class="eyebrow">
+                                    FESTIVAL MANAGEMENT
+                                </p>
+
+                                <h2>
+                                    Festivals
+                                </h2>
+
+                                <p>
+                                    Pin or unpin festivals displayed
+                                    on the customer store.
+                                </p>
+
+                            </div>
+
+
+                            <button
+                                    type="button"
+                                    class="primary-btn"
+                                    onclick="loadAdminFestivals()"
+                            >
+                                Refresh
+                            </button>
+
+                        </div>
+
+
+                        <div id="festivalsContent" class="empty-state">
+                            Loading festivals...
+                        </div>
+
+                    </div>
+
+                </section>
+                <!-- =========================================================
+                     CATEGORIES
+                ========================================================= -->
+
+                <section id="categories" class="admin-section hidden">
+
+                    <div class="panel-card">
+
+                        <div class="section-toolbar">
+
+                            <div>
+
+                                <p class="eyebrow">
+                                    CATEGORY MANAGEMENT
+                                </p>
+
+                                <h2>
+                                    Categories
+                                </h2>
+
+                                <p>
+                                    Pin or unpin categories displayed
+                                    on the customer store.
+                                </p>
+
+                            </div>
+
+                            <button
+                                    type="button"
+                                    class="primary-btn"
+                                    onclick="loadAdminCategories()"
+                            >
+                                Refresh
+                            </button>
+
+                        </div>
+
+                        <div id="categoriesContent" class="empty-state">
+                            Loading categories...
+                        </div>
+
+                    </div>
+
+                </section>
             </section>
         </main>
 

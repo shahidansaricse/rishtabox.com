@@ -16,13 +16,22 @@ public class Festival {
     @Column(name = "image")
     private String image;
 
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    @Column(nullable = false)
+    private boolean pinned = false;
+
     public Festival() {
     }
 
-    public Festival(String id, String name, String image) {
+    public Festival(String id, String name, String image,
+                    String description, boolean pinned) {
         this.id = id;
         this.name = name;
         this.image = image;
+        this.description = description;
+        this.pinned = pinned;
     }
 
     // =========================
@@ -41,6 +50,14 @@ public class Festival {
         return image;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public boolean isPinned() {
+        return pinned;
+    }
+
     // =========================
     // SETTERS
     // =========================
@@ -55,5 +72,13 @@ public class Festival {
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setPinned(boolean pinned) {
+        this.pinned = pinned;
     }
 }

@@ -112,6 +112,10 @@ public class OrderService {
             );
         }
 
+        // =====================================================
+        // PAYMENT METHOD
+        // =====================================================
+
         String paymentMethod =
                 request.getPaymentMethod();
 
@@ -136,6 +140,10 @@ public class OrderService {
             );
         }
 
+        // =====================================================
+        // CREATE ORDER
+        // =====================================================
+
         Order order = new Order();
 
         order.setUser(user);
@@ -143,6 +151,94 @@ public class OrderService {
         order.setPaymentMethod(
                 paymentMethod
         );
+
+        // =====================================================
+        // SHIPPING DETAILS
+        // =====================================================
+
+        String shippingAddress =
+                request.getShippingAddress();
+
+        String shippingCity =
+                request.getShippingCity();
+
+        String shippingState =
+                request.getShippingState();
+
+        String shippingPincode =
+                request.getShippingPincode();
+
+        // -----------------------------------------------------
+        // VALIDATE SHIPPING ADDRESS
+        // -----------------------------------------------------
+
+        if (shippingAddress == null ||
+                shippingAddress.isBlank()) {
+
+            throw new RuntimeException(
+                    "Shipping address is required"
+            );
+        }
+
+        // -----------------------------------------------------
+        // VALIDATE CITY
+        // -----------------------------------------------------
+
+        if (shippingCity == null ||
+                shippingCity.isBlank()) {
+
+            throw new RuntimeException(
+                    "Shipping city is required"
+            );
+        }
+
+        // -----------------------------------------------------
+        // VALIDATE STATE
+        // -----------------------------------------------------
+
+        if (shippingState == null ||
+                shippingState.isBlank()) {
+
+            throw new RuntimeException(
+                    "Shipping state is required"
+            );
+        }
+
+        // -----------------------------------------------------
+        // VALIDATE PINCODE
+        // -----------------------------------------------------
+
+        if (shippingPincode == null ||
+                !shippingPincode.matches("\\d{6}")) {
+
+            throw new RuntimeException(
+                    "Valid 6-digit shipping pincode is required"
+            );
+        }
+
+        // -----------------------------------------------------
+        // SAVE SHIPPING DETAILS
+        // -----------------------------------------------------
+
+        order.setShippingAddress(
+                shippingAddress.trim()
+        );
+
+        order.setShippingCity(
+                shippingCity.trim()
+        );
+
+        order.setShippingState(
+                shippingState.trim()
+        );
+
+        order.setShippingPincode(
+                shippingPincode.trim()
+        );
+
+        // =====================================================
+        // CALCULATE PRODUCT TOTAL
+        // =====================================================
 
         double productTotal = 0;
 
@@ -176,6 +272,10 @@ public class OrderService {
                 );
             }
 
+            // -------------------------------------------------
+            // PRODUCT ACTIVE CHECK
+            // -------------------------------------------------
+
             if (!Boolean.TRUE.equals(
                     product.getActive())) {
 
@@ -184,6 +284,10 @@ public class OrderService {
                                 + product.getName()
                 );
             }
+
+            // -------------------------------------------------
+            // STOCK CHECK
+            // -------------------------------------------------
 
             Integer stock =
                     product.getStock();
@@ -207,6 +311,10 @@ public class OrderService {
                 );
             }
 
+            // -------------------------------------------------
+            // PRICE CHECK
+            // -------------------------------------------------
+
             if (product.getPrice() == null) {
 
                 throw new RuntimeException(
@@ -221,10 +329,18 @@ public class OrderService {
                     price * quantity;
         }
 
+        // =====================================================
+        // DELIVERY FEE
+        // =====================================================
+
         double deliveryFee =
                 productTotal >= 500
                         ? 0
                         : 50;
+
+        // =====================================================
+        // TOTAL AMOUNT
+        // =====================================================
 
         double totalAmount =
                 productTotal + deliveryFee;
@@ -233,9 +349,17 @@ public class OrderService {
                 totalAmount
         );
 
+        // =====================================================
+        // PAYMENT STATUS
+        // =====================================================
+
         order.setPaymentStatus(
                 "PENDING"
         );
+
+        // =====================================================
+        // ORDER STATUS
+        // =====================================================
 
         if (paymentMethod.equals("RAZORPAY")) {
 
@@ -250,16 +374,26 @@ public class OrderService {
             );
         }
 
+        // =====================================================
+        // CREATED DATE
+        // =====================================================
+
         order.setCreatedAt(
                 LocalDateTime.now()
         );
+
+        // =====================================================
+        // CREATE ORDER ITEMS
+        // =====================================================
 
         for (CartItem cartItem : cartItems) {
 
             OrderItem orderItem =
                     new OrderItem();
 
-            orderItem.setOrder(order);
+            orderItem.setOrder(
+                    order
+            );
 
             orderItem.setProduct(
                     cartItem.getProduct()
@@ -278,8 +412,16 @@ public class OrderService {
             );
         }
 
+        // =====================================================
+        // SAVE ORDER
+        // =====================================================
+
         Order savedOrder =
                 orderRepository.save(order);
+
+        // =====================================================
+        // COD
+        // =====================================================
 
         if (paymentMethod.equals("COD")) {
 
@@ -298,6 +440,10 @@ public class OrderService {
                         orderItem.getQuantity()
                 );
             }
+
+            // -------------------------------------------------
+            // CLEAR CART
+            // -------------------------------------------------
 
             cartItems.clear();
 
@@ -332,6 +478,10 @@ public class OrderService {
                                         "Order not found"
                                 ));
 
+        // =====================================================
+        // ORDER OWNERSHIP
+        // =====================================================
+
         if (order.getUser() == null ||
                 order.getUser().getId() == null ||
                 !order.getUser()
@@ -343,6 +493,10 @@ public class OrderService {
             );
         }
 
+        // =====================================================
+        // PAYMENT METHOD CHECK
+        // =====================================================
+
         if (!"RAZORPAY".equalsIgnoreCase(
                 order.getPaymentMethod())) {
 
@@ -351,11 +505,19 @@ public class OrderService {
             );
         }
 
+        // =====================================================
+        // ALREADY PAID
+        // =====================================================
+
         if ("PAID".equalsIgnoreCase(
                 order.getPaymentStatus())) {
 
             return order;
         }
+
+        // =====================================================
+        // CANCELLED CHECK
+        // =====================================================
 
         if ("CANCELLED".equalsIgnoreCase(
                 order.getOrderStatus())) {
@@ -364,6 +526,10 @@ public class OrderService {
                     "Cancelled order cannot be completed"
             );
         }
+
+        // =====================================================
+        // STOCK VALIDATION
+        // =====================================================
 
         for (OrderItem orderItem :
                 order.getItems()) {
@@ -419,6 +585,10 @@ public class OrderService {
             }
         }
 
+        // =====================================================
+        // DECREASE STOCK
+        // =====================================================
+
         for (OrderItem orderItem :
                 order.getItems()) {
 
@@ -431,6 +601,10 @@ public class OrderService {
             );
         }
 
+        // =====================================================
+        // UPDATE PAYMENT
+        // =====================================================
+
         order.setPaymentStatus(
                 "PAID"
         );
@@ -441,6 +615,10 @@ public class OrderService {
 
         Order savedOrder =
                 orderRepository.save(order);
+
+        // =====================================================
+        // CLEAR CART
+        // =====================================================
 
         Cart cart =
                 cartRepository.findByUserId(
@@ -570,6 +748,10 @@ public class OrderService {
                                         "Order not found"
                                 ));
 
+        // =====================================================
+        // ORDER OWNERSHIP
+        // =====================================================
+
         if (order.getUser() == null ||
                 order.getUser().getId() == null ||
                 !order.getUser()
@@ -586,6 +768,10 @@ public class OrderService {
         String currentStatus =
                 order.getOrderStatus();
 
+        // =====================================================
+        // ALREADY CANCELLED
+        // =====================================================
+
         if ("CANCELLED".equalsIgnoreCase(
                 currentStatus)) {
 
@@ -593,6 +779,10 @@ public class OrderService {
                     "Order is already cancelled"
             );
         }
+
+        // =====================================================
+        // CANCELLATION NOT ALLOWED
+        // =====================================================
 
         if ("SHIPPED".equalsIgnoreCase(
                 currentStatus)
@@ -609,6 +799,10 @@ public class OrderService {
                     "Order cannot be cancelled at this stage"
             );
         }
+
+        // =====================================================
+        // CANCEL ORDER
+        // =====================================================
 
         order.setOrderStatus(
                 "CANCELLED"
@@ -651,6 +845,10 @@ public class OrderService {
                                         "Order not found"
                                 ));
 
+        // =====================================================
+        // ORDER STATUS
+        // =====================================================
+
         String status =
                 request.getOrderStatus();
 
@@ -687,6 +885,10 @@ public class OrderService {
             );
         }
 
+        // =====================================================
+        // SHIPPING MODE
+        // =====================================================
+
         String shippingMode =
                 request.getShippingMode();
 
@@ -722,6 +924,10 @@ public class OrderService {
             order.setShippingMode(null);
         }
 
+        // =====================================================
+        // TRACKING ID
+        // =====================================================
+
         String trackingId =
                 request.getTrackingId();
 
@@ -739,6 +945,10 @@ public class OrderService {
         order.setTrackingId(
                 trackingId
         );
+
+        // =====================================================
+        // UPDATE STATUS
+        // =====================================================
 
         order.setOrderStatus(
                 status

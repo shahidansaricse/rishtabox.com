@@ -2784,6 +2784,7 @@ function renderOrders(orders) {
                         <th>Order Status</th>
                         <th>Shipping Mode</th>
                         <th>Tracking ID</th>
+                        <th>Shiprocket</th>
                         <th>Order Date</th>
                         <th>Action</th>
 
@@ -2834,6 +2835,23 @@ function renderOrders(orders) {
 
             const trackingId =
                 order.trackingId || "";
+            const shiprocketOrderId =
+                order.shiprocketOrderId || "";
+
+            const shiprocketShipmentId =
+                order.shiprocketShipmentId || "";
+
+            const awbCode =
+                order.awbCode || "";
+
+            const courierName =
+                order.courierName || "";
+
+            const shipmentStatus =
+                order.shipmentStatus || "";
+
+            const trackingUrl =
+                order.trackingUrl || "";
 
             html += `
 
@@ -2942,7 +2960,131 @@ function renderOrders(orders) {
                         >
 
                     </td>
+<td>
 
+    <div
+        style="
+            min-width:220px;
+            display:flex;
+            flex-direction:column;
+            gap:6px;
+        "
+    >
+
+        ${
+                !shiprocketOrderId
+                    ? `
+                    <button
+                        type="button"
+                        class="primary-btn"
+                        onclick="
+                            createShiprocketShipment(${orderId})
+                        "
+                    >
+                        Create Shipment
+                    </button>
+                `
+                    : `
+                    <div style="font-size:12px;">
+                        <strong>SR Order:</strong>
+                        ${escapeHtml(shiprocketOrderId)}
+                    </div>
+
+                    <div style="font-size:12px;">
+                        <strong>Shipment:</strong>
+                        ${escapeHtml(shiprocketShipmentId)}
+                    </div>
+                `
+            }
+
+
+        ${
+                shiprocketShipmentId && !awbCode
+                    ? `
+                    <button
+                        type="button"
+                        class="primary-btn"
+                        onclick="
+                            assignShiprocketCourier(
+                                ${orderId},
+                                ${shiprocketShipmentId}
+                            )
+                        "
+                    >
+                        Assign Courier / AWB
+                    </button>
+                `
+                    : ""
+            }
+
+
+        ${
+                awbCode
+                    ? `
+                    <div style="font-size:12px;">
+                        <strong>AWB:</strong>
+                        ${escapeHtml(awbCode)}
+                    </div>
+
+                    <div style="font-size:12px;">
+                        <strong>Courier:</strong>
+                        ${escapeHtml(courierName || "-")}
+                    </div>
+                `
+                    : ""
+            }
+
+
+        ${
+                awbCode
+                    ? `
+                    <button
+                        type="button"
+                        class="primary-btn"
+                        onclick="
+                            trackShiprocketShipment(${orderId})
+                        "
+                    >
+                        Track Shipment
+                    </button>
+                `
+                    : ""
+            }
+
+
+        ${
+                shipmentStatus
+                    ? `
+                    <div style="font-size:12px;">
+                        <strong>Status:</strong>
+                        ${escapeHtml(shipmentStatus)}
+                    </div>
+                `
+                    : ""
+            }
+
+
+        ${
+                trackingUrl
+                    ? `
+                    <a
+                        href="${escapeHtml(trackingUrl)}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style="
+                            font-size:12px;
+                            text-decoration:underline;
+                        "
+                    >
+                        View Tracking
+                    </a>
+                `
+                    : ""
+            }
+
+    </div>
+
+</td>
                     <td>
 
                         ${formatDate(order.createdAt)}
@@ -2986,7 +3128,275 @@ function renderOrders(orders) {
         html;
 }
 
+/* =========================================================
+   CREATE SHIPROCKET SHIPMENT
+========================================================= */
 
+async function createShiprocketShipment(orderId) {
+
+    if (!isAdmin()) {
+        alert("Admin access required.");
+        return;
+    }
+
+    if (!orderId || isNaN(Number(orderId))) {
+        alert("Invalid order ID.");
+        return;
+    }
+
+    if (!confirm("Create Shiprocket shipment for this order?")) {
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            `${API_BASE_URL}/api/shiprocket/orders/${Number(orderId)}`,
+            {
+                method: "POST",
+                headers: getAuthHeaders()
+            }
+        );
+
+        const responseText = await response.text();
+
+        console.log(
+            "Shiprocket create status:",
+            response.status
+        );
+
+        console.log(
+            "Shiprocket create response:",
+            responseText
+        );
+
+        if (!response.ok) {
+
+            let message =
+                responseText ||
+                `Shiprocket order creation failed: ${response.status}`;
+
+            try {
+
+                const data =
+                    JSON.parse(responseText);
+
+                message =
+                    data.message ||
+                    data.error ||
+                    message;
+
+            } catch (error) {}
+
+            throw new Error(message);
+        }
+
+        alert(
+            "Shiprocket shipment created successfully."
+        );
+
+        await loadOrders();
+
+    } catch (error) {
+
+        console.error(
+            "Create Shiprocket shipment error:",
+            error
+        );
+
+        alert(
+            "Shiprocket shipment creation failed.\n\n" +
+            error.message
+        );
+    }
+}
+
+
+/* =========================================================
+   ASSIGN SHIPROCKET COURIER / AWB
+========================================================= */
+
+async function assignShiprocketCourier(
+    orderId,
+    shipmentId
+) {
+
+    if (!isAdmin()) {
+        alert("Admin access required.");
+        return;
+    }
+
+    if (
+        !orderId ||
+        isNaN(Number(orderId))
+    ) {
+        alert("Invalid order ID.");
+        return;
+    }
+
+    if (
+        !shipmentId ||
+        isNaN(Number(shipmentId))
+    ) {
+        alert("Invalid Shiprocket shipment ID.");
+        return;
+    }
+
+    if (
+        !confirm(
+            "Assign courier and generate AWB for this shipment?"
+        )
+    ) {
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            `${API_BASE_URL}/api/shiprocket/orders/${Number(orderId)}/assign-courier/${Number(shipmentId)}`,
+            {
+                method: "POST",
+                headers: getAuthHeaders()
+            }
+        );
+
+        const responseText =
+            await response.text();
+
+        console.log(
+            "Shiprocket AWB status:",
+            response.status
+        );
+
+        console.log(
+            "Shiprocket AWB response:",
+            responseText
+        );
+
+        if (!response.ok) {
+
+            let message =
+                responseText ||
+                `Courier assignment failed: ${response.status}`;
+
+            try {
+
+                const data =
+                    JSON.parse(responseText);
+
+                message =
+                    data.message ||
+                    data.error ||
+                    message;
+
+            } catch (error) {}
+
+            throw new Error(message);
+        }
+
+        alert(
+            "Courier/AWB assigned successfully."
+        );
+
+        await loadOrders();
+
+    } catch (error) {
+
+        console.error(
+            "Assign Shiprocket courier error:",
+            error
+        );
+
+        alert(
+            "Courier/AWB assignment failed.\n\n" +
+            error.message
+        );
+    }
+}
+
+
+/* =========================================================
+   TRACK SHIPROCKET SHIPMENT
+========================================================= */
+
+async function trackShiprocketShipment(orderId) {
+
+    if (!isAdmin()) {
+        alert("Admin access required.");
+        return;
+    }
+
+    if (
+        !orderId ||
+        isNaN(Number(orderId))
+    ) {
+        alert("Invalid order ID.");
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            `${API_BASE_URL}/api/shiprocket/orders/${Number(orderId)}/track`,
+            {
+                method: "GET",
+                headers: getAuthHeaders()
+            }
+        );
+
+        const responseText =
+            await response.text();
+
+        console.log(
+            "Shiprocket tracking status:",
+            response.status
+        );
+
+        console.log(
+            "Shiprocket tracking response:",
+            responseText
+        );
+
+        if (!response.ok) {
+
+            let message =
+                responseText ||
+                `Shipment tracking failed: ${response.status}`;
+
+            try {
+
+                const data =
+                    JSON.parse(responseText);
+
+                message =
+                    data.message ||
+                    data.error ||
+                    message;
+
+            } catch (error) {}
+
+            throw new Error(message);
+        }
+
+        alert(
+            "Shipment tracking updated successfully."
+        );
+
+        await loadOrders();
+
+    } catch (error) {
+
+        console.error(
+            "Track Shiprocket shipment error:",
+            error
+        );
+
+        alert(
+            "Shipment tracking failed.\n\n" +
+            error.message
+        );
+    }
+}
 /* =========================================================
    UPDATE ORDER FROM ADMIN
 ========================================================= */
@@ -9678,3 +10088,600 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 });
+// =========================================================
+// FESTIVAL MANAGEMENT
+// =========================================================
+
+async function loadAdminFestivals() {
+
+    const container =
+        document.getElementById("festivalsContent");
+
+    if (!container) return;
+
+    container.innerHTML = "Loading festivals...";
+
+    try {
+
+        const response = await fetch(
+            `${API_BASE_URL}/api/festivals`
+        );
+
+        if (!response.ok) {
+            throw new Error("Failed to load festivals");
+        }
+
+        const festivals = await response.json();
+
+        if (!festivals.length) {
+
+            container.innerHTML = `
+                <div class="empty-state">
+                    No festivals found.
+                </div>
+            `;
+
+            return;
+        }
+
+        container.innerHTML = festivals.map(festival => `
+
+            <div class="panel-card festival-admin-card">
+
+                <div class="section-toolbar">
+
+                    <div>
+
+                        <h3>
+                            ${festival.name}
+                        </h3>
+
+                        <p class="muted">
+                            ID: ${festival.id}
+                        </p>
+
+                        ${
+            festival.description
+                ? `
+                                    <p>
+                                        ${festival.description}
+                                    </p>
+                                  `
+                : ""
+        }
+
+                    </div>
+
+                    <div>
+
+                        <button
+                            type="button"
+                            class="${
+            festival.pinned
+                ? "outline-btn"
+                : "primary-btn"
+        }"
+                            onclick="toggleFestivalPin(
+                                '${festival.id}',
+                                ${!festival.pinned}
+                            )"
+                        >
+                            ${
+            festival.pinned
+                ? "📌 Unpin"
+                : "📍 Pin"
+        }
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        `).join("");
+
+    } catch (error) {
+
+        console.error(
+            "Festival loading error:",
+            error
+        );
+
+        container.innerHTML = `
+            <div class="message error">
+                Unable to load festivals.
+            </div>
+        `;
+    }
+}
+
+
+// =========================================================
+// PIN / UNPIN FESTIVAL
+// =========================================================
+
+async function toggleFestivalPin(
+    festivalId,
+    pinned
+) {
+
+    try {
+
+        const response = await fetch(
+            `${API_BASE_URL}/api/festivals/${festivalId}/pin?pinned=${pinned}`,
+            {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }
+        );
+
+        if (!response.ok) {
+
+            const errorText =
+                await response.text();
+
+            throw new Error(errorText);
+        }
+
+        const festival =
+            await response.json();
+
+        console.log(
+            "Festival pin updated:",
+            festival
+        );
+
+        await loadAdminFestivals();
+
+    } catch (error) {
+
+        console.error(
+            "Festival pin error:",
+            error
+        );
+
+        alert(
+            "Unable to update festival pin status."
+        );
+    }
+}
+/* =========================================================
+   ADMIN SECTION NAVIGATION
+========================================================= */
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const navButtons =
+        document.querySelectorAll(".nav-btn");
+
+    const sections =
+        document.querySelectorAll(".admin-section");
+
+
+    navButtons.forEach(function (button) {
+
+        button.addEventListener("click", function () {
+
+            const sectionId =
+                button.getAttribute("data-section");
+
+
+            /* Hide all sections */
+
+            sections.forEach(function (section) {
+
+                section.classList.add("hidden");
+
+            });
+
+
+            /* Remove active from all buttons */
+
+            navButtons.forEach(function (btn) {
+
+                btn.classList.remove("active");
+
+            });
+
+
+            /* Show selected section */
+
+            const selectedSection =
+                document.getElementById(sectionId);
+
+            if (selectedSection) {
+
+                selectedSection.classList.remove("hidden");
+
+            }
+
+
+            /* Make button active */
+
+            button.classList.add("active");
+
+
+            /* Load festivals */
+
+            if (sectionId === "festivals") {
+
+                loadAdminFestivals();
+
+            }
+
+        });
+
+    });
+
+});
+/* =========================================================
+   CATEGORY MANAGEMENT
+========================================================= */
+
+async function loadAdminCategories() {
+
+    const container =
+        document.getElementById("categoriesContent");
+
+    if (!container) return;
+
+    container.innerHTML =
+        "Loading categories...";
+
+
+    try {
+
+        const response = await fetch(
+            `${API_BASE_URL}/api/categories`
+        );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Failed to load categories"
+            );
+
+        }
+
+
+        const categories =
+            await response.json();
+
+
+        if (!categories.length) {
+
+            container.innerHTML = `
+                <div class="empty-state">
+                    No categories found.
+                </div>
+            `;
+
+            return;
+        }
+
+
+        container.innerHTML =
+            categories.map(category => `
+
+                <div class="panel-card category-admin-card">
+
+                    <div class="section-toolbar">
+
+                        <div>
+
+                            <h3>
+                                ${category.name}
+                            </h3>
+
+                            <p class="muted">
+                                ID: ${category.id}
+                            </p>
+
+                            ${
+                category.description
+                    ? `
+                                        <p>
+                                            ${category.description}
+                                        </p>
+                                      `
+                    : ""
+            }
+
+                        </div>
+
+
+                        <div>
+
+                            <button
+                                type="button"
+                                class="${
+                category.pinned
+                    ? "outline-btn"
+                    : "primary-btn"
+            }"
+                                onclick="toggleCategoryPin(
+                                    '${category.id}',
+                                    ${!category.pinned}
+                                )"
+                            >
+                                ${
+                category.pinned
+                    ? "📌 Unpin"
+                    : "📍 Pin"
+            }
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            `).join("");
+
+
+    } catch (error) {
+
+        console.error(
+            "Category loading error:",
+            error
+        );
+
+
+        container.innerHTML = `
+            <div class="message error">
+                Unable to load categories.
+            </div>
+        `;
+
+    }
+}
+
+
+/* =========================================================
+   TOGGLE CATEGORY PIN
+========================================================= */
+
+async function toggleCategoryPin(
+    categoryId,
+    pinned
+) {
+
+    try {
+
+        const response = await fetch(
+            `${API_BASE_URL}/api/categories/${categoryId}/pin?pinned=${pinned}`,
+            {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }
+        );
+
+
+        if (!response.ok) {
+
+            const errorText =
+                await response.text();
+
+            throw new Error(errorText);
+
+        }
+
+
+        const category =
+            await response.json();
+
+
+        console.log(
+            "Category pin updated:",
+            category
+        );
+
+
+        await loadAdminCategories();
+
+
+    } catch (error) {
+
+        console.error(
+            "Category pin error:",
+            error
+        );
+
+
+        alert(
+            "Unable to update category pin status."
+        );
+
+    }
+}
+/* =========================================================
+   RELATIONSHIP MANAGEMENT
+========================================================= */
+
+async function loadAdminRelationships() {
+
+    const container =
+        document.getElementById("relationshipsContent");
+
+    if (!container) return;
+
+    container.innerHTML =
+        "Loading relationships...";
+
+
+    try {
+
+        const response = await fetch(
+            `${API_BASE_URL}/api/relationships`
+        );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Failed to load relationships"
+            );
+
+        }
+
+
+        const relationships =
+            await response.json();
+
+
+        if (!relationships.length) {
+
+            container.innerHTML = `
+                <div class="empty-state">
+                    No relationships found.
+                </div>
+            `;
+
+            return;
+        }
+
+
+        container.innerHTML =
+            relationships.map(relationship => `
+
+                <div class="panel-card relationship-admin-card">
+
+                    <div class="section-toolbar">
+
+                        <div>
+
+                            <h3>
+                                ${relationship.name}
+                            </h3>
+
+                            <p class="muted">
+                                ID: ${relationship.id}
+                            </p>
+
+                            ${
+                relationship.description
+                    ? `
+                                        <p>
+                                            ${relationship.description}
+                                        </p>
+                                      `
+                    : ""
+            }
+
+                        </div>
+
+
+                        <div>
+
+                            <button
+                                type="button"
+                                class="${
+                relationship.pinned
+                    ? "outline-btn"
+                    : "primary-btn"
+            }"
+                                onclick="toggleRelationshipPin(
+                                    '${relationship.id}',
+                                    ${!relationship.pinned}
+                                )"
+                            >
+                                ${
+                relationship.pinned
+                    ? "📌 Unpin"
+                    : "📍 Pin"
+            }
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            `).join("");
+
+
+    } catch (error) {
+
+        console.error(
+            "Relationship loading error:",
+            error
+        );
+
+
+        container.innerHTML = `
+            <div class="message error">
+                Unable to load relationships.
+            </div>
+        `;
+
+    }
+}
+
+
+/* =========================================================
+   TOGGLE RELATIONSHIP PIN
+========================================================= */
+
+async function toggleRelationshipPin(
+    relationshipId,
+    pinned
+) {
+
+    try {
+
+        const response = await fetch(
+            `${API_BASE_URL}/api/relationships/${relationshipId}/pin?pinned=${pinned}`,
+            {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }
+        );
+
+
+        if (!response.ok) {
+
+            const errorText =
+                await response.text();
+
+            throw new Error(errorText);
+
+        }
+
+
+        const relationship =
+            await response.json();
+
+
+        console.log(
+            "Relationship pin updated:",
+            relationship
+        );
+
+
+        await loadAdminRelationships();
+
+
+    } catch (error) {
+
+        console.error(
+            "Relationship pin error:",
+            error
+        );
+
+
+        alert(
+            "Unable to update relationship pin status."
+        );
+
+    }
+}

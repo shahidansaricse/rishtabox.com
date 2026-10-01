@@ -1,9 +1,6 @@
 package com.rishtabox.backend.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "categories")
@@ -22,6 +19,9 @@ public class Category {
     @Column(length = 255)
     private String image;
 
+    @Column(nullable = false)
+    private boolean pinned = false;
+
     public Category() {
     }
 
@@ -29,43 +29,61 @@ public class Category {
             String id,
             String name,
             String description,
-            String image) {
+            String image,
+            boolean pinned) {
 
         this.id = id;
         this.name = name;
         this.description = description;
         this.image = image;
+        this.pinned = pinned;
     }
+
+    // =========================
+    // GETTERS
+    // =========================
 
     public String getId() {
         return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getDescription() {
         return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public String getImage() {
         return image;
     }
 
+    public boolean isPinned() {
+        return pinned;
+    }
+
+    // =========================
+    // SETTERS
+    // =========================
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public void setPinned(boolean pinned) {
+        this.pinned = pinned;
     }
 }

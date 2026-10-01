@@ -15,6 +15,10 @@ public class CategoryService {
         this.categoryRepository = categoryRepository;
     }
 
+    // =========================
+    // CREATE CATEGORY
+    // =========================
+
     public Category createCategory(String name) {
 
         if (categoryRepository.existsByName(name)) {
@@ -34,13 +38,72 @@ public class CategoryService {
                 id,
                 name,
                 null,
-                null
+                null,
+                false
         );
 
         return categoryRepository.save(category);
     }
 
+    // =========================
+    // GET ALL CATEGORIES
+    // =========================
+
     public List<Category> getAllCategories() {
         return categoryRepository.findAll();
+    }
+
+    // =========================
+    // UPDATE CATEGORY
+    // =========================
+
+    public Category updateCategory(
+            String id,
+            Category updatedCategory) {
+
+        Category category =
+                categoryRepository.findById(id)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Category not found: " + id
+                                ));
+
+        category.setName(
+                updatedCategory.getName()
+        );
+
+        category.setDescription(
+                updatedCategory.getDescription()
+        );
+
+        category.setImage(
+                updatedCategory.getImage()
+        );
+
+        category.setPinned(
+                updatedCategory.isPinned()
+        );
+
+        return categoryRepository.save(category);
+    }
+
+    // =========================
+    // PIN / UNPIN CATEGORY
+    // =========================
+
+    public Category togglePin(
+            String id,
+            boolean pinned) {
+
+        Category category =
+                categoryRepository.findById(id)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Category not found: " + id
+                                ));
+
+        category.setPinned(pinned);
+
+        return categoryRepository.save(category);
     }
 }

@@ -6,12 +6,28 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
+    // =========================================================
+    // USER ORDERS
+    // =========================================================
+
     List<Order> findByUserId(Long userId);
 
-    // Check whether the user purchased a specific product
+
+    // =========================================================
+    // FIND ORDER BY ORDER NUMBER
+    // =========================================================
+
+    Optional<Order> findByOrderNumber(String orderNumber);
+
+
+    // =========================================================
+    // CHECK WHETHER USER PURCHASED A SPECIFIC PRODUCT
+    // =========================================================
+
     @Query("""
             SELECT CASE WHEN COUNT(o) > 0 THEN true ELSE false END
             FROM Order o
@@ -28,11 +44,20 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             @Param("orderStatus") String orderStatus,
             @Param("paymentStatus") String paymentStatus
     );
-    // ================= ADMIN DASHBOARD =================
+
+
+    // =========================================================
+    // ADMIN DASHBOARD
+    // =========================================================
 
     long countByOrderStatus(String orderStatus);
 
     long countByPaymentStatus(String paymentStatus);
+
+
+    // =========================================================
+    // TOTAL SALES
+    // =========================================================
 
     @Query("""
             SELECT COALESCE(SUM(o.totalAmount), 0)

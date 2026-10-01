@@ -18,11 +18,26 @@ public class Order {
 
 
     // =====================================================
+    // ORDER NUMBER
+    // =====================================================
+
+    @Column(
+            name = "order_number",
+            length = 100,
+            unique = true
+    )
+    private String orderNumber;
+
+
+    // =====================================================
     // USER
     // =====================================================
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(
+            name = "user_id",
+            nullable = false
+    )
     @JsonIgnore
     private User user;
 
@@ -31,6 +46,7 @@ public class Order {
     // ORDER AMOUNT
     // =====================================================
 
+    @Column(name = "total_amount")
     private Double totalAmount;
 
 
@@ -38,8 +54,10 @@ public class Order {
     // PAYMENT
     // =====================================================
 
+    @Column(name = "payment_method")
     private String paymentMethod;
 
+    @Column(name = "payment_status")
     private String paymentStatus;
 
 
@@ -47,7 +65,37 @@ public class Order {
     // ORDER STATUS
     // =====================================================
 
+    @Column(name = "order_status")
     private String orderStatus;
+
+
+    // =====================================================
+    // SHIPPING ADDRESS
+    // =====================================================
+
+    @Column(
+            name = "shipping_address",
+            length = 500
+    )
+    private String shippingAddress;
+
+    @Column(
+            name = "shipping_city",
+            length = 100
+    )
+    private String shippingCity;
+
+    @Column(
+            name = "shipping_state",
+            length = 100
+    )
+    private String shippingState;
+
+    @Column(
+            name = "shipping_pincode",
+            length = 10
+    )
+    private String shippingPincode;
 
 
     // =====================================================
@@ -68,9 +116,45 @@ public class Order {
 
 
     // =====================================================
+    // SHIPROCKET
+    // =====================================================
+
+    @Column(name = "shiprocket_order_id")
+    private Long shiprocketOrderId;
+
+    @Column(name = "shiprocket_shipment_id")
+    private Long shiprocketShipmentId;
+
+    @Column(
+            name = "awb_code",
+            length = 100
+    )
+    private String awbCode;
+
+    @Column(
+            name = "courier_name",
+            length = 150
+    )
+    private String courierName;
+
+    @Column(
+            name = "shipment_status",
+            length = 100
+    )
+    private String shipmentStatus;
+
+    @Column(
+            name = "tracking_url",
+            length = 500
+    )
+    private String trackingUrl;
+
+
+    // =====================================================
     // DATE
     // =====================================================
 
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
 
@@ -84,7 +168,8 @@ public class Order {
             orphanRemoval = true
     )
     @JsonManagedReference
-    private List<OrderItem> items = new ArrayList<>();
+    private List<OrderItem> items =
+            new ArrayList<>();
 
 
     // =====================================================
@@ -105,6 +190,19 @@ public class Order {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+
+    // =====================================================
+    // ORDER NUMBER
+    // =====================================================
+
+    public String getOrderNumber() {
+        return orderNumber;
+    }
+
+    public void setOrderNumber(String orderNumber) {
+        this.orderNumber = orderNumber;
     }
 
 
@@ -174,6 +272,58 @@ public class Order {
 
 
     // =====================================================
+    // SHIPPING ADDRESS
+    // =====================================================
+
+    public String getShippingAddress() {
+        return shippingAddress;
+    }
+
+    public void setShippingAddress(String shippingAddress) {
+        this.shippingAddress = shippingAddress;
+    }
+
+
+    // =====================================================
+    // SHIPPING CITY
+    // =====================================================
+
+    public String getShippingCity() {
+        return shippingCity;
+    }
+
+    public void setShippingCity(String shippingCity) {
+        this.shippingCity = shippingCity;
+    }
+
+
+    // =====================================================
+    // SHIPPING STATE
+    // =====================================================
+
+    public String getShippingState() {
+        return shippingState;
+    }
+
+    public void setShippingState(String shippingState) {
+        this.shippingState = shippingState;
+    }
+
+
+    // =====================================================
+    // SHIPPING PINCODE
+    // =====================================================
+
+    public String getShippingPincode() {
+        return shippingPincode;
+    }
+
+    public void setShippingPincode(String shippingPincode) {
+        this.shippingPincode = shippingPincode;
+    }
+
+
+    // =====================================================
     // SHIPPING MODE
     // =====================================================
 
@@ -200,6 +350,93 @@ public class Order {
 
 
     // =====================================================
+    // SHIPROCKET ORDER ID
+    // =====================================================
+
+    public Long getShiprocketOrderId() {
+        return shiprocketOrderId;
+    }
+
+    public void setShiprocketOrderId(
+            Long shiprocketOrderId) {
+
+        this.shiprocketOrderId =
+                shiprocketOrderId;
+    }
+
+
+    // =====================================================
+    // SHIPROCKET SHIPMENT ID
+    // =====================================================
+
+    public Long getShiprocketShipmentId() {
+        return shiprocketShipmentId;
+    }
+
+    public void setShiprocketShipmentId(
+            Long shiprocketShipmentId) {
+
+        this.shiprocketShipmentId =
+                shiprocketShipmentId;
+    }
+
+
+    // =====================================================
+    // AWB
+    // =====================================================
+
+    public String getAwbCode() {
+        return awbCode;
+    }
+
+    public void setAwbCode(String awbCode) {
+        this.awbCode = awbCode;
+    }
+
+
+    // =====================================================
+    // COURIER
+    // =====================================================
+
+    public String getCourierName() {
+        return courierName;
+    }
+
+    public void setCourierName(String courierName) {
+        this.courierName = courierName;
+    }
+
+
+    // =====================================================
+    // SHIPMENT STATUS
+    // =====================================================
+
+    public String getShipmentStatus() {
+        return shipmentStatus;
+    }
+
+    public void setShipmentStatus(
+            String shipmentStatus) {
+
+        this.shipmentStatus =
+                shipmentStatus;
+    }
+
+
+    // =====================================================
+    // TRACKING URL
+    // =====================================================
+
+    public String getTrackingUrl() {
+        return trackingUrl;
+    }
+
+    public void setTrackingUrl(String trackingUrl) {
+        this.trackingUrl = trackingUrl;
+    }
+
+
+    // =====================================================
     // CREATED AT
     // =====================================================
 
@@ -207,7 +444,9 @@ public class Order {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(
+            LocalDateTime createdAt) {
+
         this.createdAt = createdAt;
     }
 
@@ -220,7 +459,9 @@ public class Order {
         return items;
     }
 
-    public void setItems(List<OrderItem> items) {
+    public void setItems(
+            List<OrderItem> items) {
+
         this.items = items;
     }
 
@@ -233,8 +474,47 @@ public class Order {
     protected void onCreate() {
 
         if (createdAt == null) {
-            createdAt = LocalDateTime.now();
+
+            createdAt =
+                    LocalDateTime.now();
+        }
+
+        if (orderNumber == null ||
+                orderNumber.isBlank()) {
+
+            orderNumber =
+                    "ORD"
+                            + System.currentTimeMillis();
+        }
+
+        if (orderStatus == null ||
+                orderStatus.isBlank()) {
+
+            orderStatus =
+                    "PLACED";
+        }
+
+        if (paymentStatus == null ||
+                paymentStatus.isBlank()) {
+
+            if ("COD".equalsIgnoreCase(
+                    paymentMethod)) {
+
+                paymentStatus =
+                        "PENDING";
+
+            } else {
+
+                paymentStatus =
+                        "PAID";
+            }
+        }
+
+        if (shipmentStatus == null ||
+                shipmentStatus.isBlank()) {
+
+            shipmentStatus =
+                    "NOT_CREATED";
         }
     }
 }
-

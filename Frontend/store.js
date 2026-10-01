@@ -918,8 +918,8 @@ async function loadCategories() {
 /* =========================================================
    RENDER CATEGORIES
 ========================================================= */
-
 function renderCategories() {
+
     const categoryGrid =
         document.getElementById("categoryGrid");
 
@@ -931,13 +931,7 @@ function renderCategories() {
     renderPinnedAndSlider(
         categoryGrid,
         categories,
-        "category",
-        [
-            "Artificial Jewellery ",
-            "Birthday Return Gifts ",
-            "Customize Coffee Mug ",
-            "Groom Mala"
-        ]
+        "category"
     );
 }
 /* =========================================================
@@ -2703,18 +2697,32 @@ function saveOrderDetails() {
     const addressElement =
         document.getElementById("orderAddress");
 
+    const cityElement =
+        document.getElementById("orderCity");
+
+    const stateElement =
+        document.getElementById("orderState");
+
+    const pincodeElement =
+        document.getElementById("orderPincode");
+
 
     if (
         !nameElement ||
         !phoneElement ||
-        !addressElement
+        !addressElement ||
+        !cityElement ||
+        !stateElement ||
+        !pincodeElement
     ) {
         console.error(
             "Checkout form fields not found."
         );
+
         alert(
             "Unable to read checkout details."
         );
+
         return;
     }
 
@@ -2733,8 +2741,24 @@ function saveOrderDetails() {
     const address =
         addressElement.value.trim();
 
+    const city =
+        cityElement.value.trim();
 
-    if (!name || !phone || !address) {
+    const state =
+        stateElement.value.trim();
+
+    const pincode =
+        pincodeElement.value.trim();
+
+
+    if (
+        !name ||
+        !phone ||
+        !address ||
+        !city ||
+        !state ||
+        !pincode
+    ) {
 
         alert(
             "Please fill all required fields."
@@ -2777,11 +2801,24 @@ function saveOrderDetails() {
     }
 
 
+    if (!/^\d{6}$/.test(pincode)) {
+
+        alert(
+            "Please enter a valid 6-digit pincode."
+        );
+
+        return;
+    }
+
+
     // Save customer details
     currentUser.name = name;
     currentUser.email = email;
     currentUser.phone = phone;
     currentUser.address = address;
+    currentUser.city = city;
+    currentUser.state = state;
+    currentUser.pincode = pincode;
 
     saveUserData();
 
@@ -2791,6 +2828,7 @@ function saveOrderDetails() {
 
     renderOrderSteps();
 }
+
 // ======================================================
 // GO TO PAYMENT
 // ======================================================
@@ -2849,9 +2887,12 @@ async function placeOrder() {
     if (
         !currentUser.name ||
         !currentUser.phone ||
-        !currentUser.address
+        !currentUser.address ||
+        !currentUser.city ||
+        !currentUser.state ||
+        !currentUser.pincode
     ) {
-        alert("Please enter your delivery details.");
+        alert("Please enter your complete delivery details.");
 
         currentOrderSteps = 1;
         renderOrderSteps();
@@ -2975,7 +3016,19 @@ async function placeOrder() {
                     currentUser.id,
 
                     paymentMethod:
-                    backendPaymentMethod
+                    backendPaymentMethod,
+
+                    shippingAddress:
+                    currentUser.address,
+
+                    shippingCity:
+                    currentUser.city,
+
+                    shippingState:
+                    currentUser.state,
+
+                    shippingPincode:
+                    currentUser.pincode
                 })
             }
         );
@@ -3169,7 +3222,16 @@ async function placeOrder() {
             currentUser.phone,
 
             address:
-            currentUser.address
+            currentUser.address,
+
+            city:
+            currentUser.city,
+
+            state:
+            currentUser.state,
+
+            pincode:
+            currentUser.pincode
         };
 
 
@@ -3202,11 +3264,31 @@ async function placeOrder() {
         // ==========================================
         // 17. SHOW SUCCESS
         // ==========================================
-        console.log("========== BEFORE COD SUCCESS PAGE ==========");
-        console.log("orderId:", orderId);
-        console.log("finalTotal:", finalTotal);
-        console.log("deliveryDate:", deliveryDate);
-        console.log("showOrderSuccess:", typeof showOrderSuccess);
+
+        console.log(
+            "========== BEFORE COD SUCCESS PAGE =========="
+        );
+
+        console.log(
+            "orderId:",
+            orderId
+        );
+
+        console.log(
+            "finalTotal:",
+            finalTotal
+        );
+
+        console.log(
+            "deliveryDate:",
+            deliveryDate
+        );
+
+        console.log(
+            "showOrderSuccess:",
+            typeof showOrderSuccess
+        );
+
 
         showOrderSuccess(
             orderId,
@@ -3215,12 +3297,28 @@ async function placeOrder() {
             deliveryDate
         );
 
+
     } catch (error) {
 
-        console.error("========== FRONTEND ORDER ERROR ==========");
-        console.error("Error:", error);
-        console.error("Message:", error.message);
-        console.error("Stack:", error.stack);
+        console.error(
+            "========== FRONTEND ORDER ERROR =========="
+        );
+
+        console.error(
+            "Error:",
+            error
+        );
+
+        console.error(
+            "Message:",
+            error.message
+        );
+
+        console.error(
+            "Stack:",
+            error.stack
+        );
+
 
         alert(
             "Payment successful, but frontend display failed.\n\n" +
@@ -3493,14 +3591,30 @@ function showOrderTracking(orderId) {
             `tracking-${orderId}`
         );
 
-    if (!trackingElement) return;
-
-    // Toggle
-    if (trackingElement.style.display === "block") {
-        trackingElement.style.display = "none";
-        trackingElement.innerHTML = "";
+    if (!trackingElement) {
+        console.error(
+            "Tracking element not found:",
+            `tracking-${orderId}`
+        );
         return;
     }
+
+    /* =========================================================
+       TOGGLE TRACKING
+    ========================================================= */
+
+    if (trackingElement.style.display === "block") {
+
+        trackingElement.style.display = "none";
+        trackingElement.innerHTML = "";
+
+        return;
+    }
+
+
+    /* =========================================================
+       DATES
+    ========================================================= */
 
     const orderDate =
         new Date(order.orderDate);
@@ -3510,6 +3624,11 @@ function showOrderTracking(orderId) {
 
     const currentDate =
         new Date();
+
+
+    /* =========================================================
+       PROGRESS
+    ========================================================= */
 
     const totalTime =
         deliveryDate.getTime() -
@@ -3525,128 +3644,358 @@ function showOrderTracking(orderId) {
             : 1;
 
     progress =
-        Math.max(0, Math.min(1, progress));
+        Math.max(
+            0,
+            Math.min(1, progress)
+        );
+
+
+    /* =========================================================
+       CURRENT STEP
+    ========================================================= */
 
     let currentStep = 1;
 
     if (order.status === "Cancelled") {
+
         currentStep = -1;
+
     } else if (progress >= 1) {
+
         currentStep = 4;
+
     } else if (progress >= 0.70) {
+
         currentStep = 3;
+
     } else if (progress >= 0.35) {
+
         currentStep = 2;
+
     }
 
+
+    /* =========================================================
+       TRACKING STEPS
+    ========================================================= */
+
     const steps = [
+
         {
             title: "Order Placed",
-            icon: "✓"
+            icon: "✓",
+            description:
+                "Your order has been placed"
         },
+
         {
             title: "Confirmed",
-            icon: "✓"
+            icon: "✓",
+            description:
+                "Your order has been confirmed"
         },
+
         {
             title: "Shipped",
-            icon: "🚚"
+            icon: "🚚",
+            description:
+                "Your order has been shipped"
         },
+
         {
             title: "Out for Delivery",
-            icon: "🚚"
+            icon: "🚚",
+            description:
+                "Your order is out for delivery"
         },
+
         {
             title: "Delivered",
-            icon: "✓"
+            icon: "✓",
+            description:
+                "Your order has been delivered"
         }
+
     ];
+
+
+    /* =========================================================
+       CREATE TIMELINE
+    ========================================================= */
 
     let stepsHTML = "";
 
-    steps.forEach((step, index) => {
 
-        const stepNumber = index;
+    steps.forEach(
+        function (step, index) {
 
-        let className = "";
+            const stepNumber = index;
 
-        if (currentStep === -1) {
-            className = "cancelled";
-        } else if (stepNumber < currentStep) {
-            className = "completed";
-        } else if (stepNumber === currentStep) {
-            className = "current";
-        }
+            let className = "";
 
-        stepsHTML += `
-            <div class="tracking-step ${className}">
 
-                <div class="tracking-icon">
-                    ${step.icon}
+            if (currentStep === -1) {
+
+                className = "cancelled";
+
+            } else if (
+                stepNumber < currentStep
+            ) {
+
+                className = "completed";
+
+            } else if (
+                stepNumber === currentStep
+            ) {
+
+                className = "current";
+
+            }
+
+
+            stepsHTML += `
+
+                <div
+                    class="tracking-step ${className}"
+                >
+
+                    <div
+                        class="tracking-icon"
+                    >
+                        ${step.icon}
+                    </div>
+
+
+                    <div
+                        class="tracking-step-content"
+                    >
+
+                        <strong>
+                            ${step.title}
+                        </strong>
+
+                        <span>
+                            ${step.description}
+                        </span>
+
+                    </div>
+
                 </div>
 
-                <div class="tracking-step-content">
-
-                    <strong>
-                        ${step.title}
-                    </strong>
-
-                    <span>
-                        ${
-            stepNumber === 0
-                ? "Your order has been placed"
-                : stepNumber === 1
-                    ? "Your order has been confirmed"
-                    : stepNumber === 2
-                        ? "Your order has been shipped"
-                        : stepNumber === 3
-                            ? "Your order is out for delivery"
-                            : "Your order has been delivered"
+            `;
         }
-                    </span>
+    );
 
-                </div>
+
+    /* =========================================================
+       ORDER NUMBER
+    ========================================================= */
+
+    const displayOrderId =
+        order.orderNumber ||
+        order.id ||
+        "Not available";
+
+
+    /* =========================================================
+       TRACKING / AWB
+    ========================================================= */
+
+    const trackingId =
+        order.awbCode ||
+        order.trackingId ||
+        "Not available yet";
+
+
+    /* =========================================================
+       COURIER
+    ========================================================= */
+
+    const courierName =
+        order.courierName ||
+        "";
+
+
+    /* =========================================================
+       TRACKING URL
+    ========================================================= */
+
+    const trackingUrl =
+        order.trackingUrl ||
+        "";
+
+
+    /* =========================================================
+       TRACKING BUTTON
+    ========================================================= */
+
+    let trackingButtonHTML = "";
+
+
+    if (trackingUrl) {
+
+        trackingButtonHTML = `
+
+            <p>
+
+                <a
+                    href="${trackingUrl}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="track-shipment-btn"
+                >
+                    🚚 Track Shipment
+                </a>
+
+            </p>
+
+        `;
+
+    }
+
+
+    /* =========================================================
+       COURIER HTML
+    ========================================================= */
+
+    let courierHTML = "";
+
+
+    if (courierName) {
+
+        courierHTML = `
+
+            <p>
+
+                <strong>
+                    Courier:
+                </strong>
+
+                ${courierName}
+
+            </p>
+
+        `;
+
+    }
+
+
+    /* =========================================================
+       CANCELLED ORDER
+    ========================================================= */
+
+    let trackingContentHTML = "";
+
+
+    if (order.status === "Cancelled") {
+
+        trackingContentHTML = `
+
+            <div
+                class="tracking-cancelled"
+            >
+
+                ❌ This order has been cancelled.
 
             </div>
+
         `;
-    });
+
+    } else {
+
+        trackingContentHTML = `
+
+            <div
+                class="tracking-timeline"
+            >
+
+                ${stepsHTML}
+
+            </div>
+
+        `;
+
+    }
+
+
+    /* =========================================================
+       FINAL TRACKING HTML
+    ========================================================= */
 
     trackingElement.innerHTML = `
 
-        <div class="order-tracking-box">
+        <div
+            class="order-tracking-box"
+        >
 
             <h3>
                 🚚 Track Order
             </h3>
 
-            <p>
-                <strong>Order ID:</strong>
-                ${order.id}
-            </p>
 
             <p>
-                <strong>Expected Delivery:</strong>
-                ${deliveryDate.toLocaleDateString()}
+
+                <strong>
+                    Order ID:
+                </strong>
+
+                ${displayOrderId}
+
             </p>
 
-            ${
-        order.status === "Cancelled"
-            ? `
-                        <div class="tracking-cancelled">
-                            ❌ This order has been cancelled.
-                        </div>
-                    `
-            : `
-                        <div class="tracking-timeline">
-                            ${stepsHTML}
-                        </div>
-                    `
+
+            <p>
+
+                <strong>
+                    Tracking ID / AWB:
+                </strong>
+
+                <span
+                    class="tracking-number"
+                >
+                    ${trackingId}
+                </span>
+
+            </p>
+
+
+            ${courierHTML}
+
+
+            <p>
+
+                <strong>
+                    Expected Delivery:
+                </strong>
+
+                ${
+        isNaN(
+            deliveryDate.getTime()
+        )
+            ? "Not available"
+            : deliveryDate.toLocaleDateString()
     }
 
+            </p>
+
+
+            ${trackingButtonHTML}
+
+
+            ${trackingContentHTML}
+
+
         </div>
+
     `;
 
-    trackingElement.style.display = "block";
+
+    /* =========================================================
+       SHOW TRACKING
+    ========================================================= */
+
+    trackingElement.style.display =
+        "block";
 }
 /*--------------------------------------------------*/
 /*--------------------------------------------------*/
@@ -4001,87 +4350,136 @@ function renderOrderSteps() {
                 </div>
 
 
-                <div class="order-form">
+                        <div class="order-form">
 
-                    <h3>Delivery Details</h3>
-
-
-                    <div class="form-group">
-
-                        <label for="orderName">
-                            Full Name
-                        </label>
-
-                        <input
-                            type="text"
-                            id="orderName"
-                            placeholder="Enter your full name"
-                            value="${currentUser.name || ""}"
-                        >
-
-                    </div>
+            <h3>Delivery Details</h3>
 
 
-                    <div class="form-group">
+            <div class="form-group">
 
-                        <label for="orderEmail">
-                            Email
-                        </label>
+                <label for="orderName">
+                    Full Name
+                </label>
 
-                        <input
-                            type="email"
-                            id="orderEmail"
-                            placeholder="Enter your email"
-                            value="${currentUser.email || ""}"
-                        >
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label for="orderPhone">
-                            Mobile Number
-                        </label>
-
-                        <input
-                            type="tel"
-                            id="orderPhone"
-                            placeholder="Enter your mobile number"
-                            value="${currentUser.phone || ""}"
-                        >
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label for="orderAddress">
-                            Delivery Address
-                        </label>
-
-                        <textarea
-                            id="orderAddress"
-                            placeholder="Enter your complete delivery address"
-                            rows="4"
-                        >${currentUser.address || ""}</textarea>
-
-                    </div>
-
-
-                    <button
-                        type="button"
-                        class="btn-primary"
-                        onclick="saveOrderDetails()"
-                    >
-                        Continue to Order Summary
-                    </button>
-
-                </div>
+                <input
+                    type="text"
+                    id="orderName"
+                    placeholder="Enter your full name"
+                    value="${currentUser.name || ""}"
+                >
 
             </div>
-        `;
 
+
+            <div class="form-group">
+
+                <label for="orderEmail">
+                    Email
+                </label>
+
+                <input
+                    type="email"
+                    id="orderEmail"
+                    placeholder="Enter your email"
+                    value="${currentUser.email || ""}"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="orderPhone">
+                    Mobile Number
+                </label>
+
+                <input
+                    type="tel"
+                    id="orderPhone"
+                    placeholder="Enter your mobile number"
+                    value="${currentUser.phone || ""}"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="orderAddress">
+                    Delivery Address
+                </label>
+
+                <textarea
+                    id="orderAddress"
+                    placeholder="Enter your complete delivery address"
+                    rows="4"
+                >${currentUser.address || ""}</textarea>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="orderCity">
+                    City
+                </label>
+
+                <input
+                    type="text"
+                    id="orderCity"
+                    placeholder="Enter your city"
+                    value="${currentUser.city || ""}"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="orderState">
+                    State
+                </label>
+
+                <input
+                    type="text"
+                    id="orderState"
+                    placeholder="Enter your state"
+                    value="${currentUser.state || ""}"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="orderPincode">
+                    Pincode
+                </label>
+
+                <input
+                    type="text"
+                    id="orderPincode"
+                    placeholder="Enter 6-digit pincode"
+                    maxlength="6"
+                    inputmode="numeric"
+                    value="${currentUser.pincode || ""}"
+                >
+
+            </div>
+
+
+            <button
+                type="button"
+                class="btn-primary"
+                onclick="saveOrderDetails()"
+            >
+                Continue to Order Summary
+            </button>
+
+        </div>
+
+    </div>
+`;
         return;
     }
 
@@ -4725,23 +5123,29 @@ document.addEventListener(
 /* =========================================================
    SHOW FESTIVAL
 ========================================================= */
-
 function renderFestivals() {
+
     const festivalGrid =
         document.getElementById("festivalGrid");
 
     if (!festivalGrid) return;
 
+
+    /*
+     * Admin-controlled pinned festivals
+     */
+
+    const pinnedFestivals =
+        festivals
+            .filter(festival => festival.pinned === true)
+            .map(festival => festival.name);
+
+
     renderPinnedAndSlider(
         festivalGrid,
         festivals,
         "festival",
-        [
-            "Holi",
-            "Diwali",
-            "Eid",
-            "Christmas"
-        ]
+        pinnedFestivals
     );
 }
 async function loadFestivals() {
@@ -5857,15 +6261,16 @@ function renderRelationships() {
         document.getElementById("relationshipGrid");
 
     if (!relationshipGrid) {
-        console.error("relationshipGrid not found");
+        console.error(
+            "relationshipGrid not found"
+        );
         return;
     }
 
     renderPinnedAndSlider(
         relationshipGrid,
         relationships,
-        "relationship",
-        ["Mother", "Father", "Wife", "Husband"]
+        "relationship"
     );
 }
 // ===============================
@@ -8887,33 +9292,67 @@ window.addEventListener("resize", updateHeaderSpacing);
 document.addEventListener("DOMContentLoaded", () => {
     updateHeaderSpacing();
 });
-
 function createShopCard(item, type) {
+
     const card = document.createElement("div");
+
+
+    /* =========================================================
+       CARD TYPE
+    ========================================================= */
 
     card.className =
         type === "relationship"
             ? "relationship-card shop-card"
-            : "category-card shop-card";
+            : type === "festival"
+                ? "festival-card shop-card"
+                : "category-card shop-card";
 
-    const image = getImagePath(item.image);
-    const name = item.name || "";
-    const description = item.description || "";
+
+    /* =========================================================
+       DATA
+    ========================================================= */
+
+    const image =
+        getImagePath(item.image);
+
+    const name =
+        item.name || "";
+
+    const description =
+        item.description || "";
+
+
+    /* =========================================================
+       CLICK FUNCTION
+    ========================================================= */
 
     let clickFunction = "";
 
     if (type === "relationship") {
+
         clickFunction =
-            `showRelationshipProducts('${item.id}')`;
+            "showRelationshipProducts";
+
     } else if (type === "festival") {
+
         clickFunction =
-            `showFestival('${item.id}')`;
+            "showFestival";
+
     } else {
+
         clickFunction =
-            `showCategory('${item.id}')`;
+            "showCategory";
+
     }
 
+
+    /* =========================================================
+       CARD HTML
+    ========================================================= */
+
     card.innerHTML = `
+
         <img
             src="${image}"
             alt="${name}"
@@ -8921,105 +9360,181 @@ function createShopCard(item, type) {
         >
 
         <div class="category-card-content">
-            <h3>${name}</h3>
-            <p>${description}</p>
+
+            <h3>
+                ${name}
+            </h3>
+
+            ${
+        description
+            ? `
+                        <p>
+                            ${description}
+                        </p>
+                    `
+            : ""
+    }
+
         </div>
+
 
         <a
             href="#"
             class="category-btn"
-            onclick="
-                event.preventDefault();
-                event.stopPropagation();
-                ${clickFunction};
-            "
         >
             View Products
         </a>
+
     `;
 
-    card.addEventListener("click", function () {
-        window[clickFunction.split("(")[0]]?.(
-            item.id
-        );
-    });
+
+    /* =========================================================
+       VIEW PRODUCTS BUTTON
+    ========================================================= */
+
+    const viewButton =
+        card.querySelector(".category-btn");
+
+
+    viewButton.addEventListener(
+        "click",
+        function (event) {
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            window[clickFunction]?.(
+                item.id
+            );
+
+        }
+    );
+
+
+    /* =========================================================
+       CARD CLICK
+    ========================================================= */
+
+    card.addEventListener(
+        "click",
+        function () {
+
+            window[clickFunction]?.(
+                item.id
+            );
+
+        }
+    );
+
 
     return card;
 }
-
 function renderPinnedAndSlider(
     grid,
     items,
-    type,
-    pinnedNames = []
+    type
 ) {
     if (!grid) return;
 
     grid.innerHTML = "";
 
     if (!Array.isArray(items) || items.length === 0) {
+
         grid.innerHTML = `
             <p class="empty-shop-message">
                 No items available
             </p>
         `;
+
         return;
     }
 
-    const pinnedItems = [];
 
-    pinnedNames.forEach(function (pinnedName) {
-        const found = items.find(function (item) {
-            return String(item.name)
-                    .toLowerCase()
-                    .trim() ===
-                String(pinnedName)
-                    .toLowerCase()
-                    .trim();
-        });
+    /* =========================================================
+       ADMIN PINNED ITEMS
+    ========================================================= */
 
-        if (found && !pinnedItems.includes(found)) {
-            pinnedItems.push(found);
-        }
+    const pinnedItems = items.filter(function (item) {
+
+        return item.pinned === true;
+
     });
 
-    const remainingPinned = items.filter(function (item) {
-        return !pinnedItems.includes(item);
-    });
 
-    while (pinnedItems.length < 4 && remainingPinned.length > 0) {
-        pinnedItems.push(remainingPinned.shift());
+    /* =========================================================
+       PINNED SECTION
+    ========================================================= */
+
+    if (pinnedItems.length > 0) {
+
+        const pinnedSection =
+            document.createElement("div");
+
+        pinnedSection.className =
+            "pinned-shop-grid";
+
+
+        pinnedItems
+            .slice(0, 4)
+            .forEach(function (item) {
+
+                pinnedSection.appendChild(
+                    createShopCard(item, type)
+                );
+
+            });
+
+
+        grid.appendChild(pinnedSection);
+
     }
 
-    const pinnedSection = document.createElement("div");
-    pinnedSection.className = "pinned-shop-grid";
 
-    pinnedItems.slice(0, 4).forEach(function (item) {
-        pinnedSection.appendChild(
-            createShopCard(item, type)
-        );
-    });
+    /* =========================================================
+       SLIDER
+    ========================================================= */
 
-    grid.appendChild(pinnedSection);
+    const sliderWrapper =
+        document.createElement("div");
 
-    const sliderWrapper = document.createElement("div");
-    sliderWrapper.className = "shop-slider-wrapper";
+    sliderWrapper.className =
+        "shop-slider-wrapper";
 
-    const sliderTrack = document.createElement("div");
-    sliderTrack.className = "shop-slider-track";
 
-    // All items are included in the slider,
-    // including pinned items.
-    const sliderItems = [...items, ...items];
+    const sliderTrack =
+        document.createElement("div");
+
+    sliderTrack.className =
+        "shop-slider-track";
+
+
+    /*
+     * All items are shown in slider.
+     * Pinned items are also included.
+     */
+
+    const sliderItems = [
+        ...items,
+        ...items
+    ];
+
 
     sliderItems.forEach(function (item) {
+
         sliderTrack.appendChild(
             createShopCard(item, type)
         );
+
     });
 
-    sliderWrapper.appendChild(sliderTrack);
-    grid.appendChild(sliderWrapper);
+
+    sliderWrapper.appendChild(
+        sliderTrack
+    );
+
+    grid.appendChild(
+        sliderWrapper
+    );
 }
 /* =========================================================
    PRODUCT REVIEWS - LOAD FROM BACKEND
