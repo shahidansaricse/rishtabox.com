@@ -24,7 +24,7 @@ public class MailConfig {
         );
 
         mailSender.setPassword(
-                "dkpvnzcdbgwenjwo"
+                "tkpqzguypexgfyxz"
         );
 
         Properties props =

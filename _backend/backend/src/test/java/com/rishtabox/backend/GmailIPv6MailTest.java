@@ -1,31 +1,39 @@
 package com.rishtabox.backend;
 
-import jakarta.mail.Authenticator;
-import jakarta.mail.PasswordAuthentication;
-import jakarta.mail.Session;
-import jakarta.mail.Transport;
+import jakarta.mail.*;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
 
 import java.util.Properties;
 
-public class GmailSmtpTest {
+public class GmailIPv6MailTest {
 
     public static void main(String[] args) {
 
         String username = "mdshahidans2005@gmail.com";
+        String password = "tkpqzguypexgfyxz";
 
-        // Yahan NEW App Password daalo
-        String password = "dkpvnzcdbgwenjwo";
+        System.out.println("=================================");
+        System.out.println("GMAIL IPv6 MAIL TEST");
+        System.out.println("=================================");
+
+        System.setProperty("java.net.preferIPv6Addresses", "true");
+        System.setProperty("java.net.preferIPv4Stack", "false");
 
         Properties props = new Properties();
 
         props.put("mail.smtp.host", "smtp.gmail.com");
         props.put("mail.smtp.port", "587");
         props.put("mail.smtp.auth", "true");
+
         props.put("mail.smtp.starttls.enable", "true");
         props.put("mail.smtp.starttls.required", "true");
-        props.put("mail.smtp.ssl.trust", "smtp.gmail.com");
-        props.put("mail.smtp.ssl.checkserveridentity", "true");
-        props.put("mail.smtp.auth.mechanisms", "LOGIN");
+
+        props.put("mail.smtp.connectiontimeout", "15000");
+        props.put("mail.smtp.timeout", "15000");
+        props.put("mail.smtp.writetimeout", "15000");
+
+        props.put("mail.debug", "true");
 
         Session session = Session.getInstance(
                 props,
@@ -40,31 +48,39 @@ public class GmailSmtpTest {
                 }
         );
 
-        session.setDebug(true);
-
         try {
-            Transport transport = session.getTransport("smtp");
 
-            transport.connect(
-                    "smtp.gmail.com",
-                    587,
-                    username,
-                    password
+            System.out.println("Connecting to Gmail...");
+
+            Message message = new MimeMessage(session);
+
+            message.setFrom(
+                    new InternetAddress(username)
             );
+
+            message.setRecipients(
+                    Message.RecipientType.TO,
+                    InternetAddress.parse(username)
+            );
+
+            message.setSubject("RishtaBox Gmail Test");
+
+            message.setText(
+                    "This is a test email from RishtaBox."
+            );
+
+            Transport.send(message);
 
             System.out.println();
             System.out.println("=================================");
-            System.out.println("SMTP AUTH SUCCESS");
-            System.out.println("Gmail accepted the App Password");
+            System.out.println("EMAIL SENT SUCCESSFULLY");
             System.out.println("=================================");
-
-            transport.close();
 
         } catch (Exception e) {
 
             System.out.println();
             System.out.println("=================================");
-            System.out.println("SMTP AUTH FAILED");
+            System.out.println("EMAIL FAILED");
             System.out.println("=================================");
 
             e.printStackTrace();
