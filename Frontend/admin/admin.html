@@ -1512,13 +1512,9 @@
 
                 </section>
 
-
-
-
-
                 <!-- =========================================================
-                     RELATIONSHIPS
-                ========================================================= -->
+                RELATIONSHIPS
+           ========================================================= -->
 
                 <section id="relationships" class="admin-section hidden">
 
@@ -1527,7 +1523,6 @@
                         <div class="section-toolbar">
 
                             <div>
-
                                 <p class="eyebrow">
                                     RELATIONSHIP MANAGEMENT
                                 </p>
@@ -1537,32 +1532,157 @@
                                 </h2>
 
                                 <p>
-                                    Pin or unpin relationships displayed
-                                    on the customer store.
+                                    Add, edit, delete and pin/unpin relationships.
                                 </p>
+                            </div>
+
+                            <div class="form-actions">
+
+                                <button
+                                        type="button"
+                                        class="primary-btn"
+                                        onclick="openRelationshipForm()">
+                                    + Add Relationship
+                                </button>
+
+                                <button
+                                        type="button"
+                                        class="outline-btn"
+                                        onclick="loadAdminRelationships()">
+                                    Refresh
+                                </button>
 
                             </div>
 
-                            <button
-                                    type="button"
-                                    class="primary-btn"
-                                    onclick="loadAdminRelationships()"
-                            >
-                                Refresh
-                            </button>
+                        </div>
+
+
+                        <!-- RELATIONSHIP FORM -->
+
+                        <div
+                                id="relationshipFormContainer"
+                                class="admin-form-container hidden">
+
+                            <div class="form-header">
+
+                                <div>
+                                    <p class="eyebrow">
+                                        RELATIONSHIP MANAGEMENT
+                                    </p>
+
+                                    <h3 id="relationshipFormTitle">
+                                        Add Relationship
+                                    </h3>
+                                </div>
+
+                            </div>
+
+
+                            <form id="relationshipForm">
+
+                                <input
+                                        type="hidden"
+                                        id="relationshipId">
+
+
+                                <div class="form-group">
+
+                                    <label for="relationshipName">
+                                        Relationship Name
+                                    </label>
+
+                                    <input
+                                            type="text"
+                                            id="relationshipName"
+                                            placeholder="Example: Brother"
+                                            required>
+
+                                </div>
+
+
+                                <div class="form-group">
+
+                                    <label for="relationshipImage">
+                                        Image
+                                    </label>
+
+                                    <input
+                                            type="text"
+                                            id="relationshipImage"
+                                            placeholder="images/relationship/brother.jpeg">
+
+                                </div>
+
+
+                                <div class="form-group">
+
+                                    <label for="relationshipDescription">
+                                        Description
+                                    </label>
+
+                                    <textarea
+                                            id="relationshipDescription"
+                                            rows="4"
+                                            placeholder="Enter relationship description"></textarea>
+
+                                </div>
+
+
+                                <div class="form-group">
+
+                                    <label>
+                                        <input
+                                                type="checkbox"
+                                                id="relationshipPinned">
+
+                                        Pinned
+                                    </label>
+
+                                </div>
+
+
+                                <div
+                                        id="relationshipFormMessage"
+                                        class="form-message">
+                                </div>
+
+
+                                <div class="form-actions">
+
+                                    <button
+                                            type="submit"
+                                            class="primary-btn">
+                                        Save Relationship
+                                    </button>
+
+                                    <button
+                                            type="button"
+                                            class="outline-btn"
+                                            onclick="closeRelationshipForm()">
+                                        Cancel
+                                    </button>
+
+                                </div>
+
+                            </form>
 
                         </div>
 
-                        <div id="relationshipsContent" class="empty-state">
+
+                        <!-- RELATIONSHIP LIST -->
+
+                        <div id="relationshipsContent">
                             Loading relationships...
                         </div>
 
                     </div>
 
                 </section>
+
+
                 <!-- =========================================================
-                                  FESTIVALS
-                             ========================================================= -->
+                     FESTIVALS
+                ========================================================= -->
 
                 <section id="festivals" class="admin-section hidden">
 
@@ -1571,7 +1691,6 @@
                         <div class="section-toolbar">
 
                             <div>
-
                                 <p class="eyebrow">
                                     FESTIVAL MANAGEMENT
                                 </p>
@@ -1581,31 +1700,154 @@
                                 </h2>
 
                                 <p>
-                                    Pin or unpin festivals displayed
-                                    on the customer store.
+                                    Add, edit, delete and pin/unpin festivals.
                                 </p>
-
                             </div>
 
+                            <div class="form-actions">
 
-                            <button
-                                    type="button"
-                                    class="primary-btn"
-                                    onclick="loadAdminFestivals()"
-                            >
-                                Refresh
-                            </button>
+                                <button
+                                        type="button"
+                                        class="primary-btn"
+                                        onclick="openFestivalForm()">
+                                    + Add Festival
+                                </button>
+
+                                <button
+                                        type="button"
+                                        class="outline-btn"
+                                        onclick="loadAdminFestivals()">
+                                    Refresh
+                                </button>
+
+                            </div>
 
                         </div>
 
 
-                        <div id="festivalsContent" class="empty-state">
+                        <!-- FESTIVAL FORM -->
+
+                        <div
+                                id="festivalFormContainer"
+                                class="admin-form-container hidden">
+
+                            <div class="form-header">
+
+                                <div>
+                                    <p class="eyebrow">
+                                        FESTIVAL MANAGEMENT
+                                    </p>
+
+                                    <h3 id="festivalFormTitle">
+                                        Add Festival
+                                    </h3>
+                                </div>
+
+                            </div>
+
+
+                            <form id="festivalForm">
+
+                                <input
+                                        type="hidden"
+                                        id="festivalId">
+
+
+                                <div class="form-group">
+
+                                    <label for="festivalName">
+                                        Festival Name
+                                    </label>
+
+                                    <input
+                                            type="text"
+                                            id="festivalName"
+                                            placeholder="Example: Diwali"
+                                            required>
+
+                                </div>
+
+
+                                <div class="form-group">
+
+                                    <label for="festivalImage">
+                                        Image
+                                    </label>
+
+                                    <input
+                                            type="text"
+                                            id="festivalImage"
+                                            placeholder="images/festivals/diwali.jpeg">
+
+                                </div>
+
+
+                                <div class="form-group">
+
+                                    <label for="festivalDescription">
+                                        Description
+                                    </label>
+
+                                    <textarea
+                                            id="festivalDescription"
+                                            rows="4"
+                                            placeholder="Enter festival description"></textarea>
+
+                                </div>
+
+
+                                <div class="form-group">
+
+                                    <label>
+                                        <input
+                                                type="checkbox"
+                                                id="festivalPinned">
+
+                                        Pinned
+                                    </label>
+
+                                </div>
+
+
+                                <div
+                                        id="festivalFormMessage"
+                                        class="form-message">
+                                </div>
+
+
+                                <div class="form-actions">
+
+                                    <button
+                                            type="submit"
+                                            class="primary-btn">
+                                        Save Festival
+                                    </button>
+
+                                    <button
+                                            type="button"
+                                            class="outline-btn"
+                                            onclick="closeFestivalForm()">
+                                        Cancel
+                                    </button>
+
+                                </div>
+
+                            </form>
+
+                        </div>
+
+
+                        <!-- FESTIVAL LIST -->
+
+                        <div id="festivalsContent">
                             Loading festivals...
                         </div>
 
                     </div>
 
                 </section>
+
+
                 <!-- =========================================================
                      CATEGORIES
                 ========================================================= -->
@@ -1617,7 +1859,6 @@
                         <div class="section-toolbar">
 
                             <div>
-
                                 <p class="eyebrow">
                                     CATEGORY MANAGEMENT
                                 </p>
@@ -1627,39 +1868,158 @@
                                 </h2>
 
                                 <p>
-                                    Pin or unpin categories displayed
-                                    on the customer store.
+                                    Add, edit, delete and pin/unpin categories.
                                 </p>
+                            </div>
+
+                            <div class="form-actions">
+
+                                <button
+                                        type="button"
+                                        class="primary-btn"
+                                        onclick="openCategoryForm()">
+                                    + Add Category
+                                </button>
+
+                                <button
+                                        type="button"
+                                        class="outline-btn"
+                                        onclick="loadAdminCategories()">
+                                    Refresh
+                                </button>
 
                             </div>
 
-                            <button
-                                    type="button"
-                                    class="primary-btn"
-                                    onclick="loadAdminCategories()"
-                            >
-                                Refresh
-                            </button>
+                        </div>
+
+
+                        <!-- CATEGORY FORM -->
+
+                        <div
+                                id="categoryFormContainer"
+                                class="admin-form-container hidden">
+
+                            <div class="form-header">
+
+                                <div>
+                                    <p class="eyebrow">
+                                        CATEGORY MANAGEMENT
+                                    </p>
+
+                                    <h3 id="categoryFormTitle">
+                                        Add Category
+                                    </h3>
+                                </div>
+
+                            </div>
+
+
+                            <form id="categoryForm">
+
+                                <input
+                                        type="hidden"
+                                        id="categoryId">
+
+
+                                <div class="form-group">
+
+                                    <label for="categoryName">
+                                        Category Name
+                                    </label>
+
+                                    <input
+                                            type="text"
+                                            id="categoryName"
+                                            placeholder="Example: Birthday Gifts"
+                                            required>
+
+                                </div>
+
+
+                                <div class="form-group">
+
+                                    <label for="categoryImage">
+                                        Image
+                                    </label>
+
+                                    <input
+                                            type="text"
+                                            id="categoryImage"
+                                            placeholder="images/categories/birthday.jpeg">
+
+                                </div>
+
+
+                                <div class="form-group">
+
+                                    <label for="categoryDescription">
+                                        Description
+                                    </label>
+
+                                    <textarea
+                                            id="categoryDescription"
+                                            rows="4"
+                                            placeholder="Enter category description"></textarea>
+
+                                </div>
+
+
+                                <div class="form-group">
+
+                                    <label>
+                                        <input
+                                                type="checkbox"
+                                                id="categoryPinned">
+
+                                        Pinned
+                                    </label>
+
+                                </div>
+
+
+                                <div
+                                        id="categoryFormMessage"
+                                        class="form-message">
+                                </div>
+
+
+                                <div class="form-actions">
+
+                                    <button
+                                            type="submit"
+                                            class="primary-btn">
+                                        Save Category
+                                    </button>
+
+                                    <button
+                                            type="button"
+                                            class="outline-btn"
+                                            onclick="closeCategoryForm()">
+                                        Cancel
+                                    </button>
+
+                                </div>
+
+                            </form>
 
                         </div>
 
-                        <div id="categoriesContent" class="empty-state">
+
+                        <!-- CATEGORY LIST -->
+
+                        <div id="categoriesContent">
                             Loading categories...
                         </div>
 
                     </div>
 
                 </section>
-            </section>
-        </main>
-
-    </div>
 
 
 
-    <!-- =====================================================
-     USER DETAILS MODAL
-===================================================== -->
+                <!-- =====================================================
+                 USER DETAILS MODAL
+            ===================================================== -->
 
     <div id="userDetailsModal" class="admin-modal hidden">
 

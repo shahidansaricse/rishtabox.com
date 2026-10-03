@@ -27,7 +27,6 @@ public class CategoryService {
             );
         }
 
-        // Create ID from category name
         String id = name
                 .trim()
                 .toLowerCase()
@@ -105,5 +104,21 @@ public class CategoryService {
         category.setPinned(pinned);
 
         return categoryRepository.save(category);
+    }
+
+    // =========================
+    // DELETE CATEGORY
+    // =========================
+
+    public void deleteCategory(String id) {
+
+        Category category =
+                categoryRepository.findById(id)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Category not found: " + id
+                                ));
+
+        categoryRepository.delete(category);
     }
 }

@@ -1179,42 +1179,47 @@ function renderProducts(
 }
 /*SHOW CATEGORY
 ========================================================= */
+
 function showCategory(categoryId) {
 
     console.log("=================================");
     console.log("CLICKED CATEGORY:", categoryId);
     console.log("=================================");
 
+    const selectedId =
+        String(categoryId || "")
+            .trim()
+            .toLowerCase();
+
 
     // =====================================================
     // ALL GIFTS
     // =====================================================
 
-    if (
-        String(categoryId)
-            .trim()
-            .toLowerCase() === "all"
-    ) {
+    if (selectedId === "all") {
 
         console.log("ALL GIFTS SELECTED");
 
+        // Clear other filters
+        window.currentCategoryId = null;
+        window.currentRelationshipId = null;
+        window.currentFestivalId = null;
+
         filteredProducts = products.slice();
+
+        const categoryTitle =
+            document.getElementById("categoryTitle");
+
+        if (categoryTitle) {
+            categoryTitle.textContent = "All Gifts";
+        }
 
         console.log(
             "ALL GIFTS COUNT:",
             filteredProducts.length
         );
 
-        const categoryTitle =
-            document.getElementById("categoryTitle");
-
-        if (categoryTitle) {
-            categoryTitle.textContent =
-                "All Gifts";
-        }
-
         showPage("category");
-
         renderProducts(filteredProducts);
 
         return;
@@ -1225,16 +1230,16 @@ function showCategory(categoryId) {
     // SPECIAL OFFERS
     // =====================================================
 
-    if (
-        String(categoryId)
-            .trim()
-            .toLowerCase() === "special-offers"
-    ) {
+    if (selectedId === "special-offers") {
 
         console.log("SPECIAL OFFERS SELECTED");
 
-        filteredProducts = products.filter(
-            function (product) {
+        window.currentCategoryId = null;
+        window.currentRelationshipId = null;
+        window.currentFestivalId = null;
+
+        filteredProducts =
+            products.filter(function (product) {
 
                 const originalPrice =
                     Number(product.originalPrice) || 0;
@@ -1247,40 +1252,41 @@ function showCategory(categoryId) {
                     currentPrice > 0 &&
                     currentPrice < originalPrice
                 );
-            }
-        );
+            });
+
+        const categoryTitle =
+            document.getElementById("categoryTitle");
+
+        if (categoryTitle) {
+            categoryTitle.textContent = "Special Offers";
+        }
 
         console.log(
             "SPECIAL OFFER COUNT:",
             filteredProducts.length
         );
 
-        const categoryTitle =
-            document.getElementById("categoryTitle");
-
-        if (categoryTitle) {
-            categoryTitle.textContent =
-                "Special Offers";
-        }
-
         showPage("category");
-
         renderProducts(filteredProducts);
 
         return;
     }
+
+
     // =====================================================
     // RECENTLY VIEWED
     // =====================================================
 
-    if (
-        String(categoryId)
-            .trim()
-            .toLowerCase() === "recently-viewed"
-    ) {
+    if (selectedId === "recently-viewed") {
 
-        filteredProducts = products.filter(
-            function (product) {
+        console.log("RECENTLY VIEWED SELECTED");
+
+        window.currentCategoryId = null;
+        window.currentRelationshipId = null;
+        window.currentFestivalId = null;
+
+        filteredProducts =
+            products.filter(function (product) {
 
                 return recentlyViewed.some(
                     function (id) {
@@ -1291,8 +1297,7 @@ function showCategory(categoryId) {
                     }
                 );
 
-            }
-        );
+            });
 
         const categoryTitle =
             document.getElementById("categoryTitle");
@@ -1302,8 +1307,12 @@ function showCategory(categoryId) {
                 "Recently Viewed Products";
         }
 
-        showPage("category");
+        console.log(
+            "RECENTLY VIEWED COUNT:",
+            filteredProducts.length
+        );
 
+        showPage("category");
         renderProducts(filteredProducts);
 
         return;
@@ -1314,19 +1323,24 @@ function showCategory(categoryId) {
     // NORMAL CATEGORY
     // =====================================================
 
-    const selectedId =
-        String(categoryId)
-            .trim()
-            .toLowerCase();
+    window.currentCategoryId = selectedId;
 
+    // Clear relationship and festival filters
+    window.currentRelationshipId = null;
+    window.currentFestivalId = null;
+
+
+    // =====================================================
+    // FIND SELECTED CATEGORY
+    // =====================================================
 
     const selectedCategory =
         categories.find(
             function (category) {
 
-                return String(category.id)
-                        .trim()
-                        .toLowerCase() ===
+                return String(category.id || "")
+                    .trim()
+                    .toLowerCase() ===
                     selectedId;
 
             }
@@ -1339,9 +1353,13 @@ function showCategory(categoryId) {
     );
 
 
+    // =====================================================
+    // CATEGORY NAME
+    // =====================================================
+
     const selectedCategoryName =
         selectedCategory
-            ? String(selectedCategory.name)
+            ? String(selectedCategory.name || "")
                 .trim()
                 .toLowerCase()
             : "";
@@ -1353,24 +1371,75 @@ function showCategory(categoryId) {
     );
 
 
+    // =====================================================
+    // FILTER PRODUCTS
+    // =====================================================
+
     filteredProducts =
         products.filter(
             function (product) {
 
-                const productCategoryId =
-                    product.category != null
-                        ? String(product.category)
-                            .trim()
-                            .toLowerCase()
-                        : "";
+                if (!product.category) {
+                    console.log(
+                        "NO CATEGORY:",
+                        product.name
+                    );
+
+                    return false;
+                }
 
 
-                const productCategoryName =
-                    product.categoryName != null
-                        ? String(product.categoryName)
-                            .trim()
-                            .toLowerCase()
-                        : "";
+                // -----------------------------------------
+                // PRODUCT CATEGORY ID
+                // -----------------------------------------
+
+                let productCategoryId = "";
+
+
+                if (
+                    typeof product.category ===
+                    "object"
+                ) {
+
+                    productCategoryId =
+                        product.category.id || "";
+
+                } else {
+
+                    productCategoryId =
+                        product.category;
+
+                }
+
+
+                productCategoryId =
+                    String(productCategoryId || "")
+                        .trim()
+                        .toLowerCase();
+
+
+                // -----------------------------------------
+                // PRODUCT CATEGORY NAME
+                // -----------------------------------------
+
+                let productCategoryName = "";
+
+
+                if (
+                    typeof product.category ===
+                    "object"
+                ) {
+
+                    productCategoryName =
+                        product.category.name || "";
+
+                }
+
+
+                productCategoryName =
+                    String(productCategoryName || "")
+                        .trim()
+                        .toLowerCase();
 
 
                 console.log(
@@ -1378,18 +1447,20 @@ function showCategory(categoryId) {
                     product.name,
                     "| CATEGORY ID:",
                     productCategoryId,
-                    "| CATEGORY NAME:",
-                    productCategoryName
+                    "| SELECTED:",
+                    selectedId
                 );
 
 
+                // -----------------------------------------
+                // MATCH CATEGORY
+                // -----------------------------------------
+
                 return (
-                    productCategoryId ===
-                    selectedId
+                    productCategoryId === selectedId
                     ||
                     (
-                        selectedCategoryName !== ""
-                        &&
+                        selectedCategoryName !== "" &&
                         productCategoryName ===
                         selectedCategoryName
                     )
@@ -1398,6 +1469,10 @@ function showCategory(categoryId) {
             }
         );
 
+
+    // =====================================================
+    // RESULT
+    // =====================================================
 
     console.log("=================================");
 
@@ -1414,9 +1489,12 @@ function showCategory(categoryId) {
     console.log("=================================");
 
 
+    // =====================================================
+    // CATEGORY TITLE
+    // =====================================================
+
     const categoryTitle =
         document.getElementById("categoryTitle");
-
 
     if (categoryTitle) {
 
@@ -1428,10 +1506,16 @@ function showCategory(categoryId) {
     }
 
 
+    // =====================================================
+    // OPEN CATEGORY PAGE
+    // =====================================================
+
     showPage("category");
 
     renderProducts(filteredProducts);
 }
+
+
 /* =========================================================
    POPULATE BRAND FILTER
 ========================================================= */
@@ -1471,6 +1555,9 @@ function populateFilters() {
 /* =========================================================
    APPLY SORTING AND FILTERS
 ========================================================= */
+// =========================================================
+// APPLY FILTERS
+// =========================================================
 
 function applyFilters() {
 
@@ -1486,13 +1573,28 @@ function applyFilters() {
     const priceValueElement =
         document.getElementById("priceValue");
 
+
+    // =====================================================
+    // CHECK FILTER ELEMENTS
+    // =====================================================
+
     if (
         !sortByElement ||
         !priceRangeElement ||
         !brandFilterElement
     ) {
+
+        console.log(
+            "Filter elements not found"
+        );
+
         return;
     }
+
+
+    // =====================================================
+    // GET FILTER VALUES
+    // =====================================================
 
     const sortBy =
         sortByElement.value;
@@ -1501,98 +1603,452 @@ function applyFilters() {
         Number(priceRangeElement.value);
 
     const selectedBrand =
-        brandFilterElement.value;
+        String(
+            brandFilterElement.value || ""
+        )
+            .trim()
+            .toLowerCase();
+
+
+    // =====================================================
+    // UPDATE PRICE TEXT
+    // =====================================================
 
     if (priceValueElement) {
+
         priceValueElement.textContent =
             "₹" + maxPrice;
+
     }
 
-    /*
-       Always start from all products.
-       Do not use filteredProducts here.
-    */
+
+    // =====================================================
+    // CURRENT RELATIONSHIP
+    // =====================================================
+
+    const relationshipId =
+        String(
+            window.currentRelationshipId || ""
+        )
+            .trim()
+            .toLowerCase();
+
+
+    // =====================================================
+    // CURRENT FESTIVAL
+    // =====================================================
+
+    const festivalId =
+        String(
+            window.currentFestivalId || ""
+        )
+            .trim()
+            .toLowerCase();
+
+
+    // =====================================================
+    // DEBUG
+    // =====================================================
+
+    console.log(
+        "================================="
+    );
+
+    console.log(
+        "CURRENT RELATIONSHIP:",
+        relationshipId
+    );
+
+    console.log(
+        "CURRENT FESTIVAL:",
+        festivalId
+    );
+
+    console.log(
+        "TOTAL PRODUCTS:",
+        products.length
+    );
+
+    console.log(
+        "================================="
+    );
+
+
+    // =====================================================
+    // START WITH ALL PRODUCTS
+    // =====================================================
+
+    let baseProducts =
+        [...products];
+
+
+    // =====================================================
+    // RELATIONSHIP FILTER
+    // =====================================================
+
+    if (relationshipId) {
+
+        baseProducts =
+            baseProducts.filter(function (product) {
+
+                if (!product.relationship) {
+
+                    return false;
+
+                }
+
+
+                let productRelationshipId = "";
+
+
+                if (
+                    typeof product.relationship ===
+                    "object"
+                ) {
+
+                    productRelationshipId =
+                        product.relationship.id || "";
+
+                }
+
+                else {
+
+                    productRelationshipId =
+                        product.relationship;
+
+                }
+
+
+                productRelationshipId =
+                    String(
+                        productRelationshipId || ""
+                    )
+                        .trim()
+                        .toLowerCase();
+
+
+                console.log(
+                    "PRODUCT:",
+                    product.name,
+                    "| RELATIONSHIP:",
+                    productRelationshipId
+                );
+
+
+                return (
+                    productRelationshipId ===
+                    relationshipId
+                );
+
+            });
+
+    }
+
+
+    // =====================================================
+    // FESTIVAL FILTER
+    // =====================================================
+
+    if (festivalId) {
+
+        console.log(
+            "APPLYING FESTIVAL FILTER:",
+            festivalId
+        );
+
+
+        baseProducts =
+            baseProducts.filter(function (product) {
+
+                if (!product.festival) {
+
+                    console.log(
+                        "NO FESTIVAL:",
+                        product.name
+                    );
+
+                    return false;
+
+                }
+
+
+                let productFestivalId = "";
+
+
+                // -----------------------------------------
+                // BACKEND OBJECT
+                //
+                // festival: {
+                //     id: "11",
+                //     name: "Christmas"
+                // }
+                // -----------------------------------------
+
+                if (
+                    typeof product.festival ===
+                    "object"
+                ) {
+
+                    productFestivalId =
+                        product.festival.id || "";
+
+                }
+
+                // -----------------------------------------
+                // STRING FORMAT
+                // -----------------------------------------
+
+                else {
+
+                    productFestivalId =
+                        product.festival;
+
+                }
+
+
+                // -----------------------------------------
+                // NORMALIZE
+                // -----------------------------------------
+
+                productFestivalId =
+                    String(
+                        productFestivalId || ""
+                    )
+                        .trim()
+                        .toLowerCase();
+
+
+                console.log(
+                    "FESTIVAL PRODUCT:",
+                    product.name,
+                    "| FESTIVAL:",
+                    productFestivalId,
+                    "| SELECTED:",
+                    festivalId
+                );
+
+
+                // -----------------------------------------
+                // MATCH
+                // -----------------------------------------
+
+                return (
+                    productFestivalId ===
+                    festivalId
+                );
+
+            });
+
+    }
+
+
+    // =====================================================
+    // SHOW BASE PRODUCT COUNT
+    // =====================================================
+
+    console.log(
+        "BASE PRODUCTS:",
+        baseProducts.length
+    );
+
+    console.log(
+        "BASE PRODUCT DATA:",
+        baseProducts
+    );
+
+
+    // =====================================================
+    // PRICE + BRAND FILTER
+    // =====================================================
 
     let filtered =
-        [...products].filter(function (product) {
+        baseProducts.filter(function (product) {
+
+
+            // -----------------------------------------
+            // PRICE
+            // -----------------------------------------
 
             const price =
                 Number(product.price) || 0;
 
-            const brand =
-                String(product.brand || "")
-                    .trim()
-                    .toLowerCase();
 
-            const selectedBrandName =
-                String(selectedBrand || "")
-                    .trim()
-                    .toLowerCase();
-
-            // Price filter
             if (price > maxPrice) {
+
                 return false;
+
             }
 
-            // Brand filter
-            if (
-                selectedBrandName &&
-                brand !== selectedBrandName
-            ) {
-                return false;
+
+            // -----------------------------------------
+            // BRAND
+            // -----------------------------------------
+
+            const brand =
+                String(
+                    product.brand || ""
+                )
+                    .trim()
+                    .toLowerCase();
+
+
+            // -----------------------------------------
+            // ALL BRANDS
+            // -----------------------------------------
+
+            const allBrands =
+                !selectedBrand ||
+                selectedBrand === "all" ||
+                selectedBrand === "all brands" ||
+                selectedBrand === "all-brands" ||
+                selectedBrand.includes("all");
+
+
+            // -----------------------------------------
+            // SELECTED BRAND
+            // -----------------------------------------
+
+            if (!allBrands) {
+
+                if (
+                    brand !==
+                    selectedBrand
+                ) {
+
+                    return false;
+
+                }
+
             }
+
 
             return true;
 
         });
 
-    // Sorting
+
+    // =====================================================
+    // SORTING
+    // =====================================================
+
     switch (sortBy) {
 
         case "price-low":
 
-            filtered.sort(function (a, b) {
-                return (
-                    Number(a.price || 0) -
-                    Number(b.price || 0)
-                );
-            });
+            filtered.sort(
+                function (a, b) {
+
+                    return (
+                        Number(a.price || 0) -
+                        Number(b.price || 0)
+                    );
+
+                }
+            );
 
             break;
+
 
         case "price-high":
 
-            filtered.sort(function (a, b) {
-                return (
-                    Number(b.price || 0) -
-                    Number(a.price || 0)
-                );
-            });
+            filtered.sort(
+                function (a, b) {
+
+                    return (
+                        Number(b.price || 0) -
+                        Number(a.price || 0)
+                    );
+
+                }
+            );
 
             break;
+
 
         case "rating":
 
-            filtered.sort(function (a, b) {
-                return (
-                    Number(b.rating || 0) -
-                    Number(a.rating || 0)
-                );
-            });
+            filtered.sort(
+                function (a, b) {
+
+                    return (
+                        Number(b.rating || 0) -
+                        Number(a.rating || 0)
+                    );
+
+                }
+            );
 
             break;
+
 
         default:
+
             break;
+
     }
 
-    // Save updated products
-    filteredProducts = filtered;
 
-    // Render filtered products
-    renderProducts(filteredProducts);
+    // =====================================================
+    // SAVE FILTERED PRODUCTS
+    // =====================================================
 
+    filteredProducts =
+        filtered;
+
+
+    // =====================================================
+    // FINAL DEBUG
+    // =====================================================
+
+    console.log(
+        "================================="
+    );
+
+    console.log(
+        "RELATIONSHIP:",
+        relationshipId
+    );
+
+    console.log(
+        "FESTIVAL:",
+        festivalId
+    );
+
+    console.log(
+        "TOTAL PRODUCTS:",
+        products.length
+    );
+
+    console.log(
+        "BASE PRODUCTS:",
+        baseProducts.length
+    );
+
+    console.log(
+        "FINAL PRODUCTS:",
+        filteredProducts
+    );
+
+    console.log(
+        "FINAL COUNT:",
+        filteredProducts.length
+    );
+
+    console.log(
+        "================================="
+    );
+
+
+    // =====================================================
+    // RENDER
+    // =====================================================
+
+    renderProducts(
+        filteredProducts
+    );
 }
+
+
 /* =========================================================
    SHOW PRODUCT
 ========================================================= */
@@ -5165,41 +5621,53 @@ async function loadFestivals() {
     } catch (error) {
         console.error("Festival loading error:", error);
     }
-}
-function showFestival(festivalId) {
+}function showFestivalProducts(festivalId) {
 
-    const festival = festivals.find(
-        festival =>
-            String(festival.id).toLowerCase() ===
-            String(festivalId).toLowerCase()
+    console.log("=================================");
+    console.log("FESTIVAL CLICK");
+    console.log("SELECTED FESTIVAL ID:", festivalId);
+    console.log("=================================");
+
+    window.currentFestivalId =
+        String(festivalId || "")
+            .trim()
+            .toLowerCase();
+
+    // Clear relationship filter
+    window.currentRelationshipId = null;
+
+    console.log(
+        "CURRENT FESTIVAL:",
+        window.currentFestivalId
     );
 
-    if (!festival) {
-        console.error("Festival not found:", festivalId);
-        return;
-    }
+    const festival =
+        festivals.find(function (f) {
 
-    filteredProducts = products.filter(function(product) {
+            return String(f.id || "")
+                    .trim()
+                    .toLowerCase() ===
+                window.currentFestivalId;
 
-        return product.festival != null &&
-            String(product.festival).toLowerCase() ===
-            String(festivalId).toLowerCase();
-
-    });
-
-    console.log("Selected festival:", festivalId);
-    console.log("Festival Products:", filteredProducts);
+        });
 
     const categoryTitle =
         document.getElementById("categoryTitle");
 
     if (categoryTitle) {
-        categoryTitle.textContent = festival.name;
+
+        if (festival) {
+            categoryTitle.textContent =
+                festival.name;
+        } else {
+            categoryTitle.textContent =
+                "Gifts for " + festivalId;
+        }
     }
 
     showPage("category");
 
-    renderProducts(filteredProducts);
+    applyFilters();
 }
 document.addEventListener("DOMContentLoaded", function () {
 
@@ -6254,31 +6722,57 @@ function renderRelationships() {
         "relationship"
     );
 }
-// ===============================
-// RELATIONSHIP CLICK
-// ===============================
 
 function showRelationshipProducts(relationshipId) {
 
-    console.log("Selected relationship:", relationshipId);
+    console.log("=================================");
+    console.log("RELATIONSHIP CLICK");
+    console.log("SELECTED ID:", relationshipId);
+    console.log("=================================");
 
-    // Filter products coming from MySQL backend
-    filteredProducts = products.filter(function(product) {
+    // =====================================================
+    // SAVE CURRENT RELATIONSHIP
+    // =====================================================
 
-        return product.relationship &&
-            String(product.relationship).toLowerCase() ===
-            String(relationshipId).toLowerCase();
+    window.currentRelationshipId =
+        String(relationshipId || "")
+            .trim()
+            .toLowerCase();
 
-    });
+    // =====================================================
+    // VERY IMPORTANT:
+    // CLEAR FESTIVAL FILTER
+    // =====================================================
 
-    console.log("Relationship Products:", filteredProducts);
+    window.currentFestivalId = null;
 
-    const relationship = relationships.find(function(r) {
+    console.log(
+        "CURRENT RELATIONSHIP:",
+        window.currentRelationshipId
+    );
 
-        return String(r.id).toLowerCase() ===
-            String(relationshipId).toLowerCase();
+    console.log(
+        "CURRENT FESTIVAL:",
+        window.currentFestivalId
+    );
 
-    });
+    // =====================================================
+    // FIND RELATIONSHIP
+    // =====================================================
+
+    const relationship =
+        relationships.find(function (r) {
+
+            return String(r.id || "")
+                    .trim()
+                    .toLowerCase() ===
+                window.currentRelationshipId;
+
+        });
+
+    // =====================================================
+    // SET PAGE TITLE
+    // =====================================================
 
     const categoryTitle =
         document.getElementById("categoryTitle");
@@ -6286,21 +6780,31 @@ function showRelationshipProducts(relationshipId) {
     if (categoryTitle) {
 
         if (relationship) {
-            categoryTitle.textContent = relationship.name;
+
+            categoryTitle.textContent =
+                relationship.name;
+
         } else {
+
             categoryTitle.textContent =
                 "Gifts for " + relationshipId;
-        }
 
+        }
     }
 
-    populateFilters();
+    // =====================================================
+    // OPEN CATEGORY PAGE
+    // =====================================================
 
     showPage("category");
 
-    applyFilters();
+    // =====================================================
+    // APPLY FILTER
+    // =====================================================
 
+    applyFilters();
 }
+
 
 // ===============================
 // LOAD RELATIONSHIPS
@@ -10223,7 +10727,7 @@ function renderShopMenus() {
                             festival.name
                         );
 
-                        showFestival(
+                        showFestivalProducts(
                             festival.id
                         );
 

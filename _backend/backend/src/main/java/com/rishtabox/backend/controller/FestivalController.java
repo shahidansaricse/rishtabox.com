@@ -20,18 +20,20 @@ public class FestivalController {
         this.festivalRepository = festivalRepository;
     }
 
-    // =========================
+    // =========================================================
     // GET ALL FESTIVALS
-    // =========================
+    // =========================================================
 
     @GetMapping
     public List<Festival> getAllFestivals() {
+
         return festivalRepository.findAll();
     }
 
-    // =========================
+
+    // =========================================================
     // GET FESTIVAL BY ID
-    // =========================
+    // =========================================================
 
     @GetMapping("/{id}")
     public Festival getFestivalById(@PathVariable String id) {
@@ -40,12 +42,14 @@ public class FestivalController {
                 .orElseThrow(() ->
                         new RuntimeException(
                                 "Festival not found: " + id
-                        ));
+                        )
+                );
     }
 
-    // =========================
+
+    // =========================================================
     // CREATE FESTIVAL
-    // =========================
+    // =========================================================
 
     @PostMapping
     public Festival createFestival(
@@ -54,9 +58,10 @@ public class FestivalController {
         return festivalRepository.save(festival);
     }
 
-    // =========================
+
+    // =========================================================
     // UPDATE FESTIVAL
-    // =========================
+    // =========================================================
 
     @PutMapping("/{id}")
     public Festival updateFestival(
@@ -67,23 +72,21 @@ public class FestivalController {
                 .orElseThrow(() ->
                         new RuntimeException(
                                 "Festival not found: " + id
-                        ));
+                        )
+                );
 
         festival.setName(updatedFestival.getName());
         festival.setImage(updatedFestival.getImage());
-        festival.setDescription(
-                updatedFestival.getDescription()
-        );
-        festival.setPinned(
-                updatedFestival.isPinned()
-        );
+        festival.setDescription(updatedFestival.getDescription());
+        festival.setPinned(updatedFestival.isPinned());
 
         return festivalRepository.save(festival);
     }
 
-    // =========================
+
+    // =========================================================
     // PIN / UNPIN FESTIVAL
-    // =========================
+    // =========================================================
 
     @PutMapping("/{id}/pin")
     public Festival toggleFestivalPin(
@@ -94,10 +97,32 @@ public class FestivalController {
                 .orElseThrow(() ->
                         new RuntimeException(
                                 "Festival not found: " + id
-                        ));
+                        )
+                );
 
         festival.setPinned(pinned);
 
         return festivalRepository.save(festival);
+    }
+
+
+    // =========================================================
+    // DELETE FESTIVAL
+    // =========================================================
+
+    @DeleteMapping("/{id}")
+    public String deleteFestival(
+            @PathVariable String id) {
+
+        Festival festival = festivalRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "Festival not found: " + id
+                        )
+                );
+
+        festivalRepository.delete(festival);
+
+        return "Festival deleted successfully";
     }
 }

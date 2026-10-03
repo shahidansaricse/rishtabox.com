@@ -1,4 +1,4 @@
-package com.rishtabox.backend.controller;
+ package com.rishtabox.backend.controller;
 
 import com.rishtabox.backend.entity.Relationship;
 import com.rishtabox.backend.repository.RelationshipRepository;
@@ -112,4 +112,25 @@ public class RelationshipController {
 
         return relationshipRepository.save(relationship);
     }
+
+    // =========================
+    // DELETE RELATIONSHIP
+    // =========================
+
+    @DeleteMapping("/{id}")
+    public String deleteRelationship(
+            @PathVariable String id) {
+
+        Relationship relationship =
+                relationshipRepository.findById(id)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Relationship not found: " + id
+                                ));
+
+        relationshipRepository.delete(relationship);
+
+        return "Relationship deleted successfully";
+    }
 }
+

@@ -28,11 +28,21 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
 
     // =========================================================
-    // EXISTING METHOD
+    // GET ALL PRODUCTS BY CATEGORY
+    // Used by admin / category management
     // =========================================================
 
     List<Product> findByCategoryId(
             String categoryId
     );
-}
 
+
+    // =========================================================
+    // GET ALL PRODUCTS BY FESTIVAL
+    // Used by admin / festival management
+    // =========================================================
+
+    List<Product> findByFestivalId(
+            String festivalId
+    );
+}

@@ -3556,3 +3556,226 @@ textarea:focus-visible {
         pointer-events: auto !important;
         cursor: pointer !important;
     }
+    /* =========================================================
+   ADMIN MANAGEMENT FORMS
+========================================================= */
+
+    .admin-form-container {
+        margin-top: 24px;
+        padding: 24px;
+        border: 1px solid #ead5dd;
+        border-radius: 16px;
+        background: #fff;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+    }
+
+    .admin-form-container.hidden {
+        display: none;
+    }
+
+
+    /* =========================================================
+       FORM HEADER
+    ========================================================= */
+
+    .form-header {
+        margin-bottom: 22px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid #f0dfe5;
+    }
+
+    .form-header h3 {
+        margin: 4px 0 0;
+        font-size: 22px;
+        font-weight: 700;
+        color: #4a2635;
+    }
+
+    .form-header .eyebrow {
+        margin: 0;
+    }
+
+
+    /* =========================================================
+       FORM GROUP
+    ========================================================= */
+
+    .admin-form-container .form-group {
+        margin-bottom: 18px;
+    }
+
+    .admin-form-container .form-group label {
+        display: block;
+        margin-bottom: 7px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #4a2635;
+    }
+
+
+    /* =========================================================
+       INPUTS
+    ========================================================= */
+
+    .admin-form-container input[type="text"],
+    .admin-form-container input[type="url"],
+    .admin-form-container textarea {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 12px 14px;
+        border: 1px solid #ddc5ce;
+        border-radius: 10px;
+        background: #fff;
+        color: #4a2635;
+        font-size: 14px;
+        font-family: inherit;
+        outline: none;
+        transition: 0.2s ease;
+    }
+
+    .admin-form-container input[type="text"]:focus,
+    .admin-form-container input[type="url"]:focus,
+    .admin-form-container textarea:focus {
+        border-color: #e35486;
+        box-shadow: 0 0 0 3px rgba(227, 84, 134, 0.12);
+    }
+
+    .admin-form-container textarea {
+        min-height: 110px;
+        resize: vertical;
+    }
+
+    .admin-form-container input::placeholder,
+    .admin-form-container textarea::placeholder {
+        color: #a9959d;
+    }
+
+
+    /* =========================================================
+       PINNED CHECKBOX
+    ========================================================= */
+
+    .admin-form-container .form-group label:has(input[type="checkbox"]) {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        width: fit-content;
+        margin: 0;
+        cursor: pointer;
+    }
+
+    .admin-form-container input[type="checkbox"] {
+        width: 17px;
+        height: 17px;
+        margin: 0;
+        accent-color: #e35486;
+        cursor: pointer;
+    }
+
+
+    /* =========================================================
+       FORM ACTIONS
+    ========================================================= */
+
+    .admin-form-container .form-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 22px;
+        flex-wrap: wrap;
+    }
+
+
+    /* =========================================================
+       PRIMARY BUTTON
+    ========================================================= */
+
+    .admin-form-container .primary-btn {
+        border: none;
+        border-radius: 10px;
+        padding: 11px 20px;
+        background: #e35486;
+        color: #fff;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s ease;
+    }
+
+    .admin-form-container .primary-btn:hover {
+        background: #d94778;
+        transform: translateY(-1px);
+    }
+
+
+    /* =========================================================
+       OUTLINE BUTTON
+    ========================================================= */
+
+    .admin-form-container .outline-btn {
+        border: 1px solid #d9b9c5;
+        border-radius: 10px;
+        padding: 10px 20px;
+        background: #fff;
+        color: #4a2635;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s ease;
+    }
+
+    .admin-form-container .outline-btn:hover {
+        border-color: #e35486;
+        color: #e35486;
+        background: #fff7fa;
+    }
+
+
+    /* =========================================================
+       FORM MESSAGE
+    ========================================================= */
+
+    .form-message {
+        margin-top: 10px;
+        min-height: 20px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+
+    /* =========================================================
+       LIST AREA
+    ========================================================= */
+
+    #relationshipsContent,
+    #festivalsContent,
+    #categoriesContent {
+        margin-top: 24px;
+    }
+
+
+    /* =========================================================
+       RESPONSIVE
+    ========================================================= */
+
+    @media (max-width: 768px) {
+
+        .admin-form-container {
+            padding: 18px;
+            border-radius: 12px;
+        }
+
+        .form-header h3 {
+            font-size: 19px;
+        }
+
+        .admin-form-container .form-actions {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .admin-form-container .primary-btn,
+        .admin-form-container .outline-btn {
+            width: 100%;
+        }
+    }

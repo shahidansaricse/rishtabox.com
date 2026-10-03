@@ -10088,14 +10088,14 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 });
+
 // =========================================================
 // FESTIVAL MANAGEMENT
 // =========================================================
 
 async function loadAdminFestivals() {
 
-    const container =
-        document.getElementById("festivalsContent");
+    const container = document.getElementById("festivalsContent");
 
     if (!container) return;
 
@@ -10116,83 +10116,343 @@ async function loadAdminFestivals() {
         if (!festivals.length) {
 
             container.innerHTML = `
-                <div class="empty-state">
-                    No festivals found.
-                </div>
-            `;
+<div class="empty-state">
+    No festivals found.
+</div>
+`;
 
             return;
         }
 
         container.innerHTML = festivals.map(festival => `
 
-            <div class="panel-card festival-admin-card">
+<div class="panel-card festival-admin-card">
 
-                <div class="section-toolbar">
+    <div class="section-toolbar">
 
-                    <div>
+    <div>
 
-                        <h3>
-                            ${festival.name}
-                        </h3>
+    <h3>${escapeAdminHtml(festival.name)}</h3>
 
-                        <p class="muted">
-                            ID: ${festival.id}
-                        </p>
+<p class="muted">
+    ID: ${escapeAdminHtml(festival.id)}
+</p>
 
-                        ${
-            festival.description
-                ? `
-                                    <p>
-                                        ${festival.description}
-                                    </p>
-                                  `
-                : ""
-        }
+${
+    festival.description
+        ? `<p>${escapeAdminHtml(festival.description)}</p>`
+        : ""
+}
 
-                    </div>
+${
+    festival.image
+        ? `<p class="muted">
+                                    Image: ${escapeAdminHtml(festival.image)}
+                                   </p>`
+        : ""
+}
 
-                    <div>
+</div>
 
-                        <button
-                            type="button"
-                            class="${
-            festival.pinned
-                ? "outline-btn"
-                : "primary-btn"
-        }"
-                            onclick="toggleFestivalPin(
-                                '${festival.id}',
+<div class="admin-action-buttons">
+
+    <button
+        type="button"
+        class="outline-btn"
+        onclick="editFestival('${escapeJs(festival.id)}')"
+    >
+        ✏️ Edit
+    </button>
+
+    <button
+        type="button"
+        class="danger-btn"
+        onclick="deleteFestival('${escapeJs(festival.id)}')"
+    >
+        🗑️ Delete
+    </button>
+
+    <button
+        type="button"
+        class="${
+                                festival.pinned
+                                    ? "outline-btn"
+                                    : "primary-btn"
+                            }"
+        onclick="toggleFestivalPin(
+                                '${escapeJs(festival.id)}',
                                 ${!festival.pinned}
                             )"
-                        >
-                            ${
-            festival.pinned
-                ? "📌 Unpin"
-                : "📍 Pin"
-        }
-                        </button>
+    >
+        ${
+        festival.pinned
+            ? "📌 Unpin"
+            : "📍 Pin"
+    }
+    </button>
 
-                    </div>
+</div>
 
-                </div>
+</div>
 
-            </div>
+</div>
 
-        `).join("");
+`).join("");
 
     } catch (error) {
 
-        console.error(
-            "Festival loading error:",
-            error
-        );
+        console.error("Festival loading error:", error);
 
         container.innerHTML = `
-            <div class="message error">
-                Unable to load festivals.
-            </div>
-        `;
+<div class="message error">
+    Unable to load festivals.
+</div>
+`;
+    }
+}
+
+
+// =========================================================
+// OPEN FESTIVAL FORM
+// =========================================================
+
+function openFestivalForm() {
+
+    const container =
+        document.getElementById("festivalFormContainer");
+
+    const form =
+        document.getElementById("festivalForm");
+
+    if (!container || !form) return;
+
+    form.reset();
+
+    document.getElementById("festivalId").value = "";
+
+    const title =
+        document.getElementById("festivalFormTitle");
+
+    if (title) {
+        title.textContent = "Add Festival";
+    }
+
+    container.classList.remove("hidden");
+}
+
+
+// =========================================================
+// CLOSE FESTIVAL FORM
+// =========================================================
+
+function closeFestivalForm() {
+
+    const container =
+        document.getElementById("festivalFormContainer");
+
+    if (container) {
+        container.classList.add("hidden");
+    }
+}
+
+
+// =========================================================
+// SAVE FESTIVAL
+// =========================================================
+
+async function saveFestival(event) {
+
+    event.preventDefault();
+
+    const id =
+        document.getElementById("festivalId").value.trim();
+
+    const name =
+        document.getElementById("festivalName").value.trim();
+
+    const image =
+        document.getElementById("festivalImage").value.trim();
+
+    const description =
+        document.getElementById("festivalDescription").value.trim();
+
+    const pinned =
+        document.getElementById("festivalPinned").checked;
+
+    const message =
+        document.getElementById("festivalFormMessage");
+
+    if (!name) {
+
+        if (message) {
+            message.textContent = "Festival name is required.";
+            message.className = "message error";
+        }
+
+        return;
+    }
+
+    /*
+     * New festival needs an ID because Festival.id
+     * is String and is not auto-generated by JPA.
+     */
+    const festivalId =
+        id || createSlug(name);
+
+    const festivalData = {
+        id: festivalId,
+        name: name,
+        image: image || null,
+        description: description || null,
+        pinned: pinned
+    };
+
+    try {
+
+        const url = id
+            ? `${API_BASE_URL}/api/festivals/${encodeURIComponent(id)}`
+            : `${API_BASE_URL}/api/festivals`;
+
+        const response = await fetch(url, {
+
+            method: id ? "PUT" : "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify(festivalData)
+        });
+
+        const responseText = await response.text();
+
+        if (!response.ok) {
+            throw new Error(
+                responseText || "Failed to save festival"
+            );
+        }
+
+        if (message) {
+
+            message.textContent =
+                id
+                    ? "Festival updated successfully."
+                    : "Festival added successfully.";
+
+            message.className = "message success";
+        }
+
+        closeFestivalForm();
+
+        await loadAdminFestivals();
+
+    } catch (error) {
+
+        console.error("Save festival error:", error);
+
+        if (message) {
+
+            message.textContent =
+                error.message || "Unable to save festival.";
+
+            message.className = "message error";
+        }
+    }
+}
+
+
+// =========================================================
+// EDIT FESTIVAL
+// =========================================================
+
+async function editFestival(festivalId) {
+
+    try {
+
+        const response = await fetch(
+            `${API_BASE_URL}/api/festivals/${encodeURIComponent(festivalId)}`
+        );
+
+        if (!response.ok) {
+            throw new Error("Festival not found");
+        }
+
+        const festival = await response.json();
+
+        document.getElementById("festivalId").value =
+            festival.id || "";
+
+        document.getElementById("festivalName").value =
+            festival.name || "";
+
+        document.getElementById("festivalImage").value =
+            festival.image || "";
+
+        document.getElementById("festivalDescription").value =
+            festival.description || "";
+
+        document.getElementById("festivalPinned").checked =
+            festival.pinned === true;
+
+        const title =
+            document.getElementById("festivalFormTitle");
+
+        if (title) {
+            title.textContent = "Edit Festival";
+        }
+
+        document
+            .getElementById("festivalFormContainer")
+            .classList.remove("hidden");
+
+    } catch (error) {
+
+        console.error("Edit festival error:", error);
+
+        alert("Unable to load festival.");
+    }
+}
+
+
+// =========================================================
+// DELETE FESTIVAL
+// =========================================================
+
+async function deleteFestival(festivalId) {
+
+    if (!confirm("Are you sure you want to delete this festival?")) {
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            `${API_BASE_URL}/api/festivals/${encodeURIComponent(festivalId)}`,
+            {
+                method: "DELETE"
+            }
+        );
+
+        const responseText = await response.text();
+
+        if (!response.ok) {
+            throw new Error(
+                responseText || "Failed to delete festival"
+            );
+        }
+
+        alert("Festival deleted successfully.");
+
+        await loadAdminFestivals();
+
+    } catch (error) {
+
+        console.error("Delete festival error:", error);
+
+        alert(
+            "Unable to delete festival.\n\n" +
+            (error.message || "")
+        );
     }
 }
 
@@ -10201,125 +10461,42 @@ async function loadAdminFestivals() {
 // PIN / UNPIN FESTIVAL
 // =========================================================
 
-async function toggleFestivalPin(
-    festivalId,
-    pinned
-) {
+async function toggleFestivalPin(festivalId, pinned) {
 
     try {
 
         const response = await fetch(
-            `${API_BASE_URL}/api/festivals/${festivalId}/pin?pinned=${pinned}`,
-            {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            }
-        );
-
-        if (!response.ok) {
-
-            const errorText =
-                await response.text();
-
-            throw new Error(errorText);
-        }
-
-        const festival =
-            await response.json();
-
-        console.log(
-            "Festival pin updated:",
-            festival
-        );
-
-        await loadAdminFestivals();
-
-    } catch (error) {
-
-        console.error(
-            "Festival pin error:",
-            error
-        );
-
-        alert(
-            "Unable to update festival pin status."
-        );
-    }
+            `${API_BASE_URL}/api/festivals/${encodeURIComponent(festivalId)}/pin?pinned=${pinned}`,
+{
+    method: "PUT",
+        headers: {
+    "Content-Type": "application/json"
 }
-/* =========================================================
-   ADMIN SECTION NAVIGATION
-========================================================= */
+}
+);
 
-document.addEventListener("DOMContentLoaded", function () {
+if (!response.ok) {
 
-    const navButtons =
-        document.querySelectorAll(".nav-btn");
+    const errorText =
+        await response.text();
 
-    const sections =
-        document.querySelectorAll(".admin-section");
+    throw new Error(errorText);
+}
 
+await loadAdminFestivals();
 
-    navButtons.forEach(function (button) {
+} catch (error) {
 
-        button.addEventListener("click", function () {
+    console.error("Festival pin error:", error);
 
-            const sectionId =
-                button.getAttribute("data-section");
-
-
-            /* Hide all sections */
-
-            sections.forEach(function (section) {
-
-                section.classList.add("hidden");
-
-            });
+    alert("Unable to update festival pin status.");
+}
+}
 
 
-            /* Remove active from all buttons */
-
-            navButtons.forEach(function (btn) {
-
-                btn.classList.remove("active");
-
-            });
-
-
-            /* Show selected section */
-
-            const selectedSection =
-                document.getElementById(sectionId);
-
-            if (selectedSection) {
-
-                selectedSection.classList.remove("hidden");
-
-            }
-
-
-            /* Make button active */
-
-            button.classList.add("active");
-
-
-            /* Load festivals */
-
-            if (sectionId === "festivals") {
-
-                loadAdminFestivals();
-
-            }
-
-        });
-
-    });
-
-});
-/* =========================================================
-   CATEGORY MANAGEMENT
-========================================================= */
+// =========================================================
+// CATEGORY MANAGEMENT
+// =========================================================
 
 async function loadAdminCategories() {
 
@@ -10331,26 +10508,18 @@ async function loadAdminCategories() {
     container.innerHTML =
         "Loading categories...";
 
-
     try {
 
         const response = await fetch(
             `${API_BASE_URL}/api/categories`
         );
 
-
         if (!response.ok) {
-
-            throw new Error(
-                "Failed to load categories"
-            );
-
+            throw new Error("Failed to load categories");
         }
-
 
         const categories =
             await response.json();
-
 
         if (!categories.length) {
 
@@ -10363,7 +10532,6 @@ async function loadAdminCategories() {
             return;
         }
 
-
         container.innerHTML =
             categories.map(category => `
 
@@ -10374,27 +10542,48 @@ async function loadAdminCategories() {
                         <div>
 
                             <h3>
-                                ${category.name}
+                                ${escapeAdminHtml(category.name)}
                             </h3>
 
                             <p class="muted">
-                                ID: ${category.id}
+                                ID: ${escapeAdminHtml(category.id)}
                             </p>
 
                             ${
                 category.description
-                    ? `
-                                        <p>
-                                            ${category.description}
-                                        </p>
-                                      `
+                    ? `<p>
+                                        ${escapeAdminHtml(category.description)}
+                                       </p>`
+                    : ""
+            }
+
+                            ${
+                category.image
+                    ? `<p class="muted">
+                                        Image: ${escapeAdminHtml(category.image)}
+                                       </p>`
                     : ""
             }
 
                         </div>
 
+                        <div class="admin-action-buttons">
 
-                        <div>
+                            <button
+                                type="button"
+                                class="outline-btn"
+                                onclick="editCategory('${escapeJs(category.id)}')"
+                            >
+                                ✏️ Edit
+                            </button>
+
+                            <button
+                                type="button"
+                                class="danger-btn"
+                                onclick="deleteCategory('${escapeJs(category.id)}')"
+                            >
+                                🗑️ Delete
+                            </button>
 
                             <button
                                 type="button"
@@ -10404,7 +10593,7 @@ async function loadAdminCategories() {
                     : "primary-btn"
             }"
                                 onclick="toggleCategoryPin(
-                                    '${category.id}',
+                                    '${escapeJs(category.id)}',
                                     ${!category.pinned}
                                 )"
                             >
@@ -10423,38 +10612,331 @@ async function loadAdminCategories() {
 
             `).join("");
 
-
     } catch (error) {
 
-        console.error(
-            "Category loading error:",
-            error
-        );
-
+        console.error("Category loading error:", error);
 
         container.innerHTML = `
             <div class="message error">
                 Unable to load categories.
             </div>
         `;
-
     }
 }
 
 
-/* =========================================================
-   TOGGLE CATEGORY PIN
-========================================================= */
+// =========================================================
+// OPEN CATEGORY FORM
+// =========================================================
 
-async function toggleCategoryPin(
-    categoryId,
-    pinned
-) {
+function openCategoryForm() {
+
+    const container =
+        document.getElementById("categoryFormContainer");
+
+    const form =
+        document.getElementById("categoryForm");
+
+    if (!container || !form) return;
+
+    form.reset();
+
+    document.getElementById("categoryId").value = "";
+
+    const title =
+        document.getElementById("categoryFormTitle");
+
+    if (title) {
+        title.textContent = "Add Category";
+    }
+
+    container.classList.remove("hidden");
+}
+
+
+// =========================================================
+// CLOSE CATEGORY FORM
+// =========================================================
+
+function closeCategoryForm() {
+
+    const container =
+        document.getElementById("categoryFormContainer");
+
+    if (container) {
+        container.classList.add("hidden");
+    }
+}
+
+
+// =========================================================
+// SAVE CATEGORY
+// =========================================================
+
+async function saveCategory(event) {
+
+    event.preventDefault();
+
+    const id =
+        document.getElementById("categoryId").value.trim();
+
+    const name =
+        document.getElementById("categoryName").value.trim();
+
+    const image =
+        document.getElementById("categoryImage").value.trim();
+
+    const description =
+        document.getElementById("categoryDescription").value.trim();
+
+    const pinned =
+        document.getElementById("categoryPinned").checked;
+
+    const message =
+        document.getElementById("categoryFormMessage");
+
+    if (!name) {
+
+        if (message) {
+            message.textContent = "Category name is required.";
+            message.className = "message error";
+        }
+
+        return;
+    }
+
+    try {
+
+        let categoryId = id;
+
+        // ================================================
+        // CREATE
+        // Current CategoryController uses @RequestParam name
+        // ================================================
+
+        if (!id) {
+
+            const createResponse = await fetch(
+                `${API_BASE_URL}/api/categories?name=${encodeURIComponent(name)}`,
+                {
+                    method: "POST"
+                }
+            );
+
+            const createText =
+                await createResponse.text();
+
+            if (!createResponse.ok) {
+                throw new Error(
+                    createText || "Failed to create category"
+                );
+            }
+
+            const createdCategory =
+                JSON.parse(createText);
+
+            categoryId =
+                createdCategory.id;
+
+        }
+
+        // ================================================
+        // UPDATE
+        // Also used after CREATE to save image/description/pin
+        // ================================================
+
+        const updateResponse = await fetch(
+            `${API_BASE_URL}/api/categories/${encodeURIComponent(categoryId)}`,
+            {
+                method: "PUT",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    id: categoryId,
+                    name: name,
+                    image: image || null,
+                    description: description || null,
+                    pinned: pinned
+                })
+            }
+        );
+
+        const updateText =
+            await updateResponse.text();
+
+        if (!updateResponse.ok) {
+            throw new Error(
+                updateText || "Failed to update category"
+            );
+        }
+
+        if (message) {
+
+            message.textContent =
+                id
+                    ? "Category updated successfully."
+                    : "Category added successfully.";
+
+            message.className = "message success";
+        }
+
+        closeCategoryForm();
+
+        await loadAdminCategories();
+
+    } catch (error) {
+
+        console.error("Save category error:", error);
+
+        if (message) {
+
+            message.textContent =
+                error.message || "Unable to save category.";
+
+            message.className = "message error";
+        }
+    }
+}
+
+
+// =========================================================
+// EDIT CATEGORY
+// =========================================================
+
+async function editCategory(categoryId) {
 
     try {
 
         const response = await fetch(
-            `${API_BASE_URL}/api/categories/${categoryId}/pin?pinned=${pinned}`,
+            `${API_BASE_URL}/api/categories/${encodeURIComponent(categoryId)}`
+        );
+
+        /*
+         * Current CategoryController does not have GET /{id}.
+         * Therefore get the complete list and find the category.
+         */
+
+        let category;
+
+        if (response.ok) {
+
+            category = await response.json();
+
+        } else {
+
+            const listResponse = await fetch(
+                `${API_BASE_URL}/api/categories`
+            );
+
+            if (!listResponse.ok) {
+                throw new Error("Unable to load categories");
+            }
+
+            const categories =
+                await listResponse.json();
+
+            category =
+                categories.find(
+                    item => item.id === categoryId
+                );
+        }
+
+        if (!category) {
+            throw new Error("Category not found");
+        }
+
+        document.getElementById("categoryId").value =
+            category.id || "";
+
+        document.getElementById("categoryName").value =
+            category.name || "";
+
+        document.getElementById("categoryImage").value =
+            category.image || "";
+
+        document.getElementById("categoryDescription").value =
+            category.description || "";
+
+        document.getElementById("categoryPinned").checked =
+            category.pinned === true;
+
+        const title =
+            document.getElementById("categoryFormTitle");
+
+        if (title) {
+            title.textContent = "Edit Category";
+        }
+
+        document
+            .getElementById("categoryFormContainer")
+            .classList.remove("hidden");
+
+    } catch (error) {
+
+        console.error("Edit category error:", error);
+
+        alert("Unable to load category.");
+    }
+}
+
+
+// =========================================================
+// DELETE CATEGORY
+// =========================================================
+
+async function deleteCategory(categoryId) {
+
+    if (!confirm("Are you sure you want to delete this category?")) {
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            `${API_BASE_URL}/api/categories/${encodeURIComponent(categoryId)}`,
+            {
+                method: "DELETE"
+            }
+        );
+
+        const responseText =
+            await response.text();
+
+        if (!response.ok) {
+            throw new Error(
+                responseText || "Failed to delete category"
+            );
+        }
+
+        alert("Category deleted successfully.");
+
+        await loadAdminCategories();
+
+    } catch (error) {
+
+        console.error("Delete category error:", error);
+
+        alert(
+            "Unable to delete category.\n\n" +
+            (error.message || "")
+        );
+    }
+}
+
+
+// =========================================================
+// TOGGLE CATEGORY PIN
+// =========================================================
+
+async function toggleCategoryPin(categoryId, pinned) {
+
+    try {
+
+        const response = await fetch(
+            `${API_BASE_URL}/api/categories/${encodeURIComponent(categoryId)}/pin?pinned=${pinned}`,
             {
                 method: "PUT",
                 headers: {
@@ -10463,47 +10945,28 @@ async function toggleCategoryPin(
             }
         );
 
-
         if (!response.ok) {
 
             const errorText =
                 await response.text();
 
             throw new Error(errorText);
-
         }
-
-
-        const category =
-            await response.json();
-
-
-        console.log(
-            "Category pin updated:",
-            category
-        );
-
 
         await loadAdminCategories();
 
-
     } catch (error) {
 
-        console.error(
-            "Category pin error:",
-            error
-        );
+        console.error("Category pin error:", error);
 
-
-        alert(
-            "Unable to update category pin status."
-        );
-
+        alert("Unable to update category pin status.");
     }
 }
-/* =========================================================
-   RELATIONSHIP MANAGEMENT
-========================================================= */
+
+
+// =========================================================
+// RELATIONSHIP MANAGEMENT
+// =========================================================
 
 async function loadAdminRelationships() {
 
@@ -10515,26 +10978,18 @@ async function loadAdminRelationships() {
     container.innerHTML =
         "Loading relationships...";
 
-
     try {
 
         const response = await fetch(
             `${API_BASE_URL}/api/relationships`
         );
 
-
         if (!response.ok) {
-
-            throw new Error(
-                "Failed to load relationships"
-            );
-
+            throw new Error("Failed to load relationships");
         }
-
 
         const relationships =
             await response.json();
-
 
         if (!relationships.length) {
 
@@ -10547,7 +11002,6 @@ async function loadAdminRelationships() {
             return;
         }
 
-
         container.innerHTML =
             relationships.map(relationship => `
 
@@ -10558,27 +11012,48 @@ async function loadAdminRelationships() {
                         <div>
 
                             <h3>
-                                ${relationship.name}
+                                ${escapeAdminHtml(relationship.name)}
                             </h3>
 
                             <p class="muted">
-                                ID: ${relationship.id}
+                                ID: ${escapeAdminHtml(relationship.id)}
                             </p>
 
                             ${
                 relationship.description
-                    ? `
-                                        <p>
-                                            ${relationship.description}
-                                        </p>
-                                      `
+                    ? `<p>
+                                        ${escapeAdminHtml(relationship.description)}
+                                       </p>`
+                    : ""
+            }
+
+                            ${
+                relationship.image
+                    ? `<p class="muted">
+                                        Image: ${escapeAdminHtml(relationship.image)}
+                                       </p>`
                     : ""
             }
 
                         </div>
 
+                        <div class="admin-action-buttons">
 
-                        <div>
+                            <button
+                                type="button"
+                                class="outline-btn"
+                                onclick="editRelationship('${escapeJs(relationship.id)}')"
+                            >
+                                ✏️ Edit
+                            </button>
+
+                            <button
+                                type="button"
+                                class="danger-btn"
+                                onclick="deleteRelationship('${escapeJs(relationship.id)}')"
+                            >
+                                🗑️ Delete
+                            </button>
 
                             <button
                                 type="button"
@@ -10588,7 +11063,7 @@ async function loadAdminRelationships() {
                     : "primary-btn"
             }"
                                 onclick="toggleRelationshipPin(
-                                    '${relationship.id}',
+                                    '${escapeJs(relationship.id)}',
                                     ${!relationship.pinned}
                                 )"
                             >
@@ -10607,28 +11082,295 @@ async function loadAdminRelationships() {
 
             `).join("");
 
-
     } catch (error) {
 
-        console.error(
-            "Relationship loading error:",
-            error
-        );
-
+        console.error("Relationship loading error:", error);
 
         container.innerHTML = `
             <div class="message error">
                 Unable to load relationships.
             </div>
         `;
-
     }
 }
 
 
-/* =========================================================
-   TOGGLE RELATIONSHIP PIN
-========================================================= */
+// =========================================================
+// OPEN RELATIONSHIP FORM
+// =========================================================
+
+function openRelationshipForm() {
+
+    const container =
+        document.getElementById("relationshipFormContainer");
+
+    const form =
+        document.getElementById("relationshipForm");
+
+    if (!container || !form) return;
+
+    form.reset();
+
+    document.getElementById("relationshipId").value = "";
+
+    const title =
+        document.getElementById("relationshipFormTitle");
+
+    if (title) {
+        title.textContent = "Add Relationship";
+    }
+
+    container.classList.remove("hidden");
+}
+
+
+// =========================================================
+// CLOSE RELATIONSHIP FORM
+// =========================================================
+
+function closeRelationshipForm() {
+
+    const container =
+        document.getElementById("relationshipFormContainer");
+
+    if (container) {
+        container.classList.add("hidden");
+    }
+}
+
+
+// =========================================================
+// SAVE RELATIONSHIP
+// =========================================================
+
+async function saveRelationship(event) {
+
+    event.preventDefault();
+
+    const id =
+        document.getElementById("relationshipId").value.trim();
+
+    const name =
+        document.getElementById("relationshipName").value.trim();
+
+    const image =
+        document.getElementById("relationshipImage").value.trim();
+
+    const description =
+        document.getElementById("relationshipDescription").value.trim();
+
+    const pinned =
+        document.getElementById("relationshipPinned").checked;
+
+    const message =
+        document.getElementById("relationshipFormMessage");
+
+    if (!name) {
+
+        if (message) {
+            message.textContent =
+                "Relationship name is required.";
+
+            message.className =
+                "message error";
+        }
+
+        return;
+    }
+
+    const relationshipId =
+        id || createSlug(name);
+
+    const relationshipData = {
+
+        id: relationshipId,
+
+        name: name,
+
+        image: image || null,
+
+        description: description || null,
+
+        pinned: pinned
+    };
+
+    try {
+
+        const url = id
+            ? `${API_BASE_URL}/api/relationships/${encodeURIComponent(id)}`
+            : `${API_BASE_URL}/api/relationships`;
+
+        const response = await fetch(url, {
+
+            method: id ? "PUT" : "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify(relationshipData)
+        });
+
+        const responseText =
+            await response.text();
+
+        if (!response.ok) {
+
+            throw new Error(
+                responseText || "Failed to save relationship"
+            );
+        }
+
+        if (message) {
+
+            message.textContent =
+                id
+                    ? "Relationship updated successfully."
+                    : "Relationship added successfully.";
+
+            message.className =
+                "message success";
+        }
+
+        closeRelationshipForm();
+
+        await loadAdminRelationships();
+
+    } catch (error) {
+
+        console.error(
+            "Save relationship error:",
+            error
+        );
+
+        if (message) {
+
+            message.textContent =
+                error.message ||
+                "Unable to save relationship.";
+
+            message.className =
+                "message error";
+        }
+    }
+}
+
+
+// =========================================================
+// EDIT RELATIONSHIP
+// =========================================================
+
+async function editRelationship(relationshipId) {
+
+    try {
+
+        const response = await fetch(
+            `${API_BASE_URL}/api/relationships/${encodeURIComponent(relationshipId)}`
+        );
+
+        if (!response.ok) {
+            throw new Error("Relationship not found");
+        }
+
+        const relationship =
+            await response.json();
+
+        document.getElementById("relationshipId").value =
+            relationship.id || "";
+
+        document.getElementById("relationshipName").value =
+            relationship.name || "";
+
+        document.getElementById("relationshipImage").value =
+            relationship.image || "";
+
+        document.getElementById("relationshipDescription").value =
+            relationship.description || "";
+
+        document.getElementById("relationshipPinned").checked =
+            relationship.pinned === true;
+
+        const title =
+            document.getElementById("relationshipFormTitle");
+
+        if (title) {
+            title.textContent = "Edit Relationship";
+        }
+
+        document
+            .getElementById("relationshipFormContainer")
+            .classList.remove("hidden");
+
+    } catch (error) {
+
+        console.error(
+            "Edit relationship error:",
+            error
+        );
+
+        alert("Unable to load relationship.");
+    }
+}
+
+
+// =========================================================
+// DELETE RELATIONSHIP
+// =========================================================
+
+async function deleteRelationship(relationshipId) {
+
+    if (
+        !confirm(
+            "Are you sure you want to delete this relationship?"
+        )
+    ) {
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            `${API_BASE_URL}/api/relationships/${encodeURIComponent(relationshipId)}`,
+            {
+                method: "DELETE"
+            }
+        );
+
+        const responseText =
+            await response.text();
+
+        if (!response.ok) {
+
+            throw new Error(
+                responseText ||
+                "Failed to delete relationship"
+            );
+        }
+
+        alert(
+            "Relationship deleted successfully."
+        );
+
+        await loadAdminRelationships();
+
+    } catch (error) {
+
+        console.error(
+            "Delete relationship error:",
+            error
+        );
+
+        alert(
+            "Unable to delete relationship.\n\n" +
+            (error.message || "")
+        );
+    }
+}
+
+
+// =========================================================
+// PIN / UNPIN RELATIONSHIP
+// =========================================================
 
 async function toggleRelationshipPin(
     relationshipId,
@@ -10638,7 +11380,7 @@ async function toggleRelationshipPin(
     try {
 
         const response = await fetch(
-            `${API_BASE_URL}/api/relationships/${relationshipId}/pin?pinned=${pinned}`,
+            `${API_BASE_URL}/api/relationships/${encodeURIComponent(relationshipId)}/pin?pinned=${pinned}`,
             {
                 method: "PUT",
                 headers: {
@@ -10647,29 +11389,15 @@ async function toggleRelationshipPin(
             }
         );
 
-
         if (!response.ok) {
 
             const errorText =
                 await response.text();
 
             throw new Error(errorText);
-
         }
 
-
-        const relationship =
-            await response.json();
-
-
-        console.log(
-            "Relationship pin updated:",
-            relationship
-        );
-
-
         await loadAdminRelationships();
-
 
     } catch (error) {
 
@@ -10678,10 +11406,174 @@ async function toggleRelationshipPin(
             error
         );
 
-
         alert(
             "Unable to update relationship pin status."
         );
-
     }
 }
+
+
+// =========================================================
+// CREATE SLUG / ID
+// =========================================================
+
+function createSlug(value) {
+
+    let slug = value
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+
+    if (!slug) {
+        slug = "item-" + Date.now();
+    }
+
+    return slug;
+}
+
+
+// =========================================================
+// HTML ESCAPE
+// =========================================================
+
+function escapeAdminHtml(value) {
+
+    if (value === null || value === undefined) {
+        return "";
+    }
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+
+// =========================================================
+// JAVASCRIPT STRING ESCAPE
+// =========================================================
+
+function escapeJs(value) {
+
+    if (value === null || value === undefined) {
+        return "";
+    }
+
+    return String(value)
+        .replace(/\\/g, "\\\\")
+        .replace(/'/g, "\\'")
+        .replace(/\n/g, "\\n")
+        .replace(/\r/g, "\\r");
+}
+
+
+// =========================================================
+// ADMIN SECTION NAVIGATION
+// =========================================================
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const navButtons =
+        document.querySelectorAll(".nav-btn");
+
+    const sections =
+        document.querySelectorAll(".admin-section");
+
+
+    navButtons.forEach(function (button) {
+
+        button.addEventListener("click", function () {
+
+            const sectionId =
+                button.getAttribute("data-section");
+
+
+            // Hide all sections
+
+            sections.forEach(function (section) {
+                section.classList.add("hidden");
+            });
+
+
+            // Remove active from all buttons
+
+            navButtons.forEach(function (btn) {
+                btn.classList.remove("active");
+            });
+
+
+            // Show selected section
+
+            const selectedSection =
+                document.getElementById(sectionId);
+
+            if (selectedSection) {
+                selectedSection.classList.remove("hidden");
+            }
+
+
+            // Active button
+
+            button.classList.add("active");
+
+
+            // Load selected data
+
+            if (sectionId === "festivals") {
+                loadAdminFestivals();
+            }
+
+            if (sectionId === "categories") {
+                loadAdminCategories();
+            }
+
+            if (sectionId === "relationships") {
+                loadAdminRelationships();
+            }
+
+        });
+
+    });
+
+
+    // =====================================================
+    // FORM SUBMIT EVENTS
+    // =====================================================
+
+    const festivalForm =
+        document.getElementById("festivalForm");
+
+    if (festivalForm) {
+        festivalForm.addEventListener(
+            "submit",
+            saveFestival
+        );
+    }
+
+
+    const categoryForm =
+        document.getElementById("categoryForm");
+
+    if (categoryForm) {
+        categoryForm.addEventListener(
+            "submit",
+            saveCategory
+        );
+    }
+
+
+    const relationshipForm =
+        document.getElementById("relationshipForm");
+
+    if (relationshipForm) {
+        relationshipForm.addEventListener(
+            "submit",
+            saveRelationship
+        );
+    }
+
+});
+

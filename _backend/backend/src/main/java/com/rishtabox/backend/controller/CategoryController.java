@@ -75,4 +75,22 @@ public class CategoryController {
                 )
         );
     }
+
+    // =========================
+    // DELETE CATEGORY
+    // =========================
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteCategory(
+            @PathVariable String id) {
+
+        categoryService.deleteCategory(id);
+
+        return ResponseEntity.ok(
+                java.util.Map.of(
+                        "message",
+                        "Category deleted successfully"
+                )
+        );
+    }
 }
