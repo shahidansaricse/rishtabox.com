@@ -5214,26 +5214,7 @@ function renderTestimonials() {
 
     if (!container) return;
 
-    const testimonials = [
-        {
-            name: "Rahul Sharma",
-            rating: 5,
-            image: "https://i.pravatar.cc/100?img=12",
-            message: "The groom mala was beautiful and the quality was excellent. Highly recommended!"
-        },
-        {
-            name: "Priya Singh",
-            rating: 5,
-            image: "https://i.pravatar.cc/100?img=47",
-            message: "I ordered a personalized mug for my anniversary. It was exactly as shown in the picture."
-        },
-        {
-            name: "Amit Kumar",
-            rating: 4,
-            image: "https://i.pravatar.cc/100?img=33",
-            message: "Good product quality, reasonable prices and quick delivery."
-        }
-    ];
+
 
     container.innerHTML = testimonials.map(testimonial => {
 
@@ -5746,7 +5727,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             setTimeout(function () {
                 resumeBlogAutoScroll();
-            }, 2000);
+            }, 5000);
 
         },
         { passive: true }
@@ -6331,14 +6312,43 @@ document.addEventListener("DOMContentLoaded", function () {
 
 });
 
+
+
 /* =========================================================
-   RISTHABOX LOGIN / SIGNUP SYSTEM
+   API BASE URL
 ========================================================= */
 
+window.RISHTABOX_API_BASE_URL =
+    window.RISHTABOX_API_BASE_URL ||
+    (
+        window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1"
+            ? "http://localhost:8080"
+            : ""
+    );
 
-/* =========================
+
+function rbApiUrl(path) {
+
+    return window.RISHTABOX_API_BASE_URL + path;
+
+}
+
+/* =========================================================
+   SIGNUP DATA
+========================================================= */
+
+let signupData = {
+    name: "",
+    mobile: "",
+    email: "",
+    password: ""
+};
+
+
+/* =========================================================
    OPEN ACCOUNT
-========================= */
+========================================================= */
 
 function openAccount() {
 
@@ -6347,23 +6357,29 @@ function openAccount() {
 
     if (loggedIn === "true") {
 
-        showPage("account");
+        if (typeof showPage === "function") {
+            showPage("account");
+        }
 
         loadLoggedInUser();
 
     } else {
 
-        showPage("login");
+        if (typeof showPage === "function") {
+            showPage("login");
+        }
 
         showLogin();
-
     }
 }
 
-
-/* =========================
+/* =========================================================
    SHOW LOGIN
-========================= */
+========================================================= */
+
+/* =========================================================
+   SHOW LOGIN
+========================================================= */
 
 function showLogin() {
 
@@ -6378,16 +6394,20 @@ function showLogin() {
     }
 
     loginSection.classList.remove("hidden");
-
     signupSection.classList.add("hidden");
 
     clearAuthMessages();
+
+    // Reset login OTP state
+    window.loginOtpEmail = null;
+    window.loginOtpVerified = false;
+    window.loginOtpVerificationRunning = false;
 }
 
 
-/* =========================
+/* =========================================================
    SHOW SIGNUP
-========================= */
+========================================================= */
 
 function showSignup() {
 
@@ -6402,277 +6422,1778 @@ function showSignup() {
     }
 
     loginSection.classList.add("hidden");
-
     signupSection.classList.remove("hidden");
 
     clearAuthMessages();
+
+    // Reset signup OTP state
+    signupData.emailVerified = false;
+    window.emailOtpVerificationRunning = false;
 }
 
 
-/* =========================
+/* =========================================================
    PASSWORD SHOW / HIDE
-========================= */
+========================================================= */
 
 function togglePassword(inputId, button) {
 
     const input =
         document.getElementById(inputId);
 
-    if (!input) {
+    if (!input || !button) {
         return;
     }
 
     if (input.type === "password") {
 
         input.type = "text";
-
         button.textContent = "Hide";
 
     } else {
 
         input.type = "password";
-
         button.textContent = "Show";
     }
 }
 
 
-/* =========================
-   SIGNUP
-========================= */
+/* =========================================================
+   SEND EMAIL OTP - SIGNUP
+========================================================= */
 
-const signupForm =
-    document.getElementById("signupForm");
+async function sendEmailOtp() {
 
+    const emailInput =
+        document.getElementById("signupEmail");
 
-if (signupForm) {
+    const email =
+        emailInput?.value
+            .trim()
+            .toLowerCase() || "";
 
-    signupForm.addEventListener(
-        "submit",
-        function (event) {
+    const emailPattern =
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-            event.preventDefault();
 
+    /* =====================================================
+       EMAIL VALIDATION
+    ===================================================== */
 
-            const name =
-                document.getElementById("signupName")
-                    .value
-                    .trim();
+    if (!emailPattern.test(email)) {
 
+        showSignupError(
+            "Please enter a valid email address."
+        );
 
-            const mobile =
-                document.getElementById("signupMobile")
-                    .value
-                    .trim();
+        return;
+    }
 
 
-            const email =
-                document.getElementById("signupEmail")
-                    .value
-                    .trim();
+    /* =====================================================
+       GET SIGNUP DATA
+    ===================================================== */
 
+    const nameInput =
+        document.getElementById("signupName");
 
-            const password =
-                document.getElementById("signupPassword")
-                    .value;
+    const mobileInput =
+        document.getElementById("signupMobile");
 
+    const passwordInput =
+        document.getElementById("signupPassword");
 
-            const confirmPassword =
-                document.getElementById("confirmPassword")
-                    .value;
 
+    signupData.name =
+        nameInput?.value.trim() || "";
 
-            const message =
-                document.getElementById("signupMessage");
+    signupData.mobile =
+        mobileInput?.value.trim() || "";
 
+    signupData.email =
+        email;
 
-            message.textContent = "";
+    signupData.password =
+        passwordInput?.value || "";
 
-            message.className =
-                "auth-message";
+    // New OTP means email is not verified yet
+    signupData.emailVerified = false;
 
 
-            /* Name */
+    /* =====================================================
+       MESSAGE / BUTTON
+    ===================================================== */
 
-            if (name.length < 2) {
+    const message =
+        document.getElementById(
+            "emailSendOtpMessage"
+        );
 
-                showSignupError(
-                    "Please enter your full name."
-                );
+    const button =
+        document.getElementById(
+            "sendEmailOtpBtn"
+        );
 
-                return;
-            }
 
+    if (message) {
 
-            /* Mobile */
+        message.textContent =
+            "Sending email OTP...";
 
-            if (!/^[6-9]\d{9}$/.test(mobile)) {
+        message.className =
+            "auth-message";
+    }
 
-                showSignupError(
-                    "Please enter a valid 10-digit mobile number."
-                );
 
-                return;
-            }
+    if (button) {
 
+        button.disabled = true;
+        button.textContent =
+            "Sending...";
+    }
 
-            /* Email */
 
-            const emailPattern =
-                /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    try {
 
-
-            if (!emailPattern.test(email)) {
-
-                showSignupError(
-                    "Please enter a valid email address."
-                );
-
-                return;
-            }
-
-
-            /* Password */
-
-            if (password.length < 6) {
-
-                showSignupError(
-                    "Password must contain at least 6 characters."
-                );
-
-                return;
-            }
-
-
-            /* Confirm Password */
-
-            if (password !== confirmPassword) {
-
-                showSignupError(
-                    "Passwords do not match."
-                );
-
-                return;
-            }
-
-
-            /* Get users */
-
-            const users =
-                JSON.parse(
-                    localStorage.getItem(
-                        "rishtaBoxUsers"
-                    )
-                ) || [];
-
-
-            /* Existing email */
-
-            const emailExists =
-                users.some(function (user) {
-
-                    return user.email.toLowerCase() ===
-                        email.toLowerCase();
-
-                });
-
-
-            if (emailExists) {
-
-                showSignupError(
-                    "This email is already registered."
-                );
-
-                return;
-            }
-
-
-            /* Existing mobile */
-
-            const mobileExists =
-                users.some(function (user) {
-
-                    return user.mobile === mobile;
-
-                });
-
-
-            if (mobileExists) {
-
-                showSignupError(
-                    "This mobile number is already registered."
-                );
-
-                return;
-            }
-
-
-            /* Create user */
-
-            const newUser = {
-
-                id: Date.now(),
-
-                name: name,
-
-                mobile: mobile,
-
-                email: email,
-
-                password: password
-
-            };
-
-
-            users.push(newUser);
-
-
-            localStorage.setItem(
-                "rishtaBoxUsers",
-                JSON.stringify(users)
+        const response =
+            await fetch(
+                rbApiUrl(
+                    "/api/auth/register/send-otp"
+                ),
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        email:
+                        signupData.email
+                    })
+                }
             );
 
 
-            /* Success */
+        const data =
+            await response
+                .json()
+                .catch(() => ({}));
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.message ||
+                "Could not send email OTP."
+            );
+        }
+
+
+        /* =================================================
+           SHOW OTP SECTION
+        ================================================= */
+
+        const emailOtpSection =
+            document.getElementById(
+                "emailOtpSection"
+            );
+
+
+        if (emailOtpSection) {
+
+            emailOtpSection.classList.remove(
+                "hidden"
+            );
+        }
+
+
+        /* =================================================
+           SUCCESS MESSAGE
+        ================================================= */
+
+        if (message) {
+
+            message.textContent =
+                "OTP sent to your email address.";
+
+            message.className =
+                "auth-message success";
+        }
+
+
+        /* =================================================
+           OTP INPUT
+        ================================================= */
+
+        const otpInput =
+            document.getElementById(
+                "emailOtp"
+            );
+
+
+        if (otpInput) {
+
+            otpInput.value = "";
+            otpInput.disabled = false;
+            otpInput.focus();
+        }
+
+
+        const verifyButton =
+            document.getElementById(
+                "verifyEmailOtpBtn"
+            );
+
+
+        if (verifyButton) {
+
+            verifyButton.disabled = false;
+            verifyButton.textContent =
+                "Verify OTP";
+        }
+
+
+    } catch (error) {
+
+        console.error(
+            "SEND EMAIL OTP ERROR:",
+            error
+        );
+
+
+        if (message) {
+
+            message.textContent =
+                error.message ||
+                "Could not send email OTP.";
+
+            message.className =
+                "auth-message error";
+        }
+
+
+    } finally {
+
+        if (button) {
+
+            button.disabled = false;
+            button.textContent =
+                "Send OTP";
+        }
+    }
+}
+
+
+/* =========================================================
+   VERIFY EMAIL OTP - SIGNUP
+========================================================= */
+
+async function verifyEmailOtp() {
+
+    if (window.emailOtpVerificationRunning) {
+        return;
+    }
+
+
+    window.emailOtpVerificationRunning =
+        true;
+
+
+    const otpInput =
+        document.getElementById(
+            "emailOtp"
+        );
+
+    const message =
+        document.getElementById(
+            "emailOtpMessage"
+        );
+
+    const button =
+        document.getElementById(
+            "verifyEmailOtpBtn"
+        );
+
+
+    if (!otpInput) {
+
+        window.emailOtpVerificationRunning =
+            false;
+
+        return;
+    }
+
+
+    const otp =
+        otpInput.value.trim();
+
+
+    /* =====================================================
+       OTP VALIDATION
+    ===================================================== */
+
+    if (!/^\d{6}$/.test(otp)) {
+
+        if (message) {
+
+            message.textContent =
+                "Please enter a valid 6-digit OTP.";
+
+            message.className =
+                "auth-message error";
+        }
+
+
+        window.emailOtpVerificationRunning =
+            false;
+
+        return;
+    }
+
+
+    if (!signupData.email) {
+
+        if (message) {
+
+            message.textContent =
+                "Please enter your email and request OTP first.";
+
+            message.className =
+                "auth-message error";
+        }
+
+
+        window.emailOtpVerificationRunning =
+            false;
+
+        return;
+    }
+
+
+    /* =====================================================
+       BUTTON
+    ===================================================== */
+
+    if (button) {
+
+        button.disabled = true;
+        button.textContent =
+            "Verifying...";
+    }
+
+
+    if (message) {
+
+        message.textContent =
+            "Verifying email OTP...";
+
+        message.className =
+            "auth-message";
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                rbApiUrl(
+                    "/api/auth/register/verify-otp"
+                ),
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        email:
+                        signupData.email,
+
+                        otp:
+                        otp
+                    })
+                }
+            );
+
+
+        const data =
+            await response
+                .json()
+                .catch(() => ({}));
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.message ||
+                "Invalid or expired email OTP."
+            );
+        }
+
+
+        /* =================================================
+           EMAIL VERIFIED
+        ================================================= */
+
+        signupData.emailVerified =
+            true;
+
+
+        if (message) {
+
+            message.textContent =
+                "Email verified successfully.";
+
+            message.className =
+                "auth-message success";
+        }
+
+
+        /* =================================================
+           DISABLE VERIFIED OTP
+        ================================================= */
+
+        otpInput.disabled = true;
+
+
+        if (button) {
+
+            button.disabled = true;
+            button.textContent =
+                "Email Verified ✓";
+        }
+
+
+        /* =================================================
+           FOCUS PASSWORD
+        ================================================= */
+
+        const passwordInput =
+            document.getElementById(
+                "signupPassword"
+            );
+
+
+        if (passwordInput) {
+
+            passwordInput.focus();
+        }
+
+
+    } catch (error) {
+
+        console.error(
+            "VERIFY EMAIL OTP ERROR:",
+            error
+        );
+
+
+        signupData.emailVerified =
+            false;
+
+
+        if (message) {
+
+            message.textContent =
+                error.message ||
+                "Invalid email OTP.";
+
+            message.className =
+                "auth-message error";
+        }
+
+
+    } finally {
+
+        if (!signupData.emailVerified) {
+
+            if (button) {
+
+                button.disabled = false;
+                button.textContent =
+                    "Verify OTP";
+            }
+        }
+
+
+        window.emailOtpVerificationRunning =
+            false;
+    }
+}
+
+
+/* =========================================================
+   CREATE ACCOUNT
+========================================================= */
+
+async function createAccount() {
+
+    const name =
+        document.getElementById(
+            "signupName"
+        )?.value.trim() || "";
+
+
+    const mobile =
+        document.getElementById(
+            "signupMobile"
+        )?.value.trim() || "";
+
+
+    const email =
+        document.getElementById(
+            "signupEmail"
+        )?.value.trim()
+            .toLowerCase() || "";
+
+
+    const password =
+        document.getElementById(
+            "signupPassword"
+        )?.value || "";
+
+
+    const confirmPassword =
+        document.getElementById(
+            "confirmPassword"
+        )?.value || "";
+
+
+    /* =====================================================
+       NAME
+    ===================================================== */
+
+    if (!name || name.length < 2) {
+
+        showSignupError(
+            "Please enter your full name."
+        );
+
+        return;
+    }
+
+
+    /* =====================================================
+       MOBILE
+       MOBILE OTP IS NOT REQUIRED
+    ===================================================== */
+
+    if (!/^[6-9]\d{9}$/.test(mobile)) {
+
+        showSignupError(
+            "Please enter a valid 10-digit mobile number."
+        );
+
+        return;
+    }
+
+
+    /* =====================================================
+       EMAIL
+    ===================================================== */
+
+    if (
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+    ) {
+
+        showSignupError(
+            "Please enter a valid email address."
+        );
+
+        return;
+    }
+
+
+    /* =====================================================
+       EMAIL OTP
+    ===================================================== */
+
+    if (!signupData.emailVerified) {
+
+        showSignupError(
+            "Please verify your email OTP first."
+        );
+
+        return;
+    }
+
+
+    /* =====================================================
+       MAKE SURE VERIFIED EMAIL IS SAME
+    ===================================================== */
+
+    if (
+        signupData.email.toLowerCase() !==
+        email
+    ) {
+
+        signupData.emailVerified =
+            false;
+
+        showSignupError(
+            "Email changed. Please request and verify a new OTP."
+        );
+
+        return;
+    }
+
+
+    /* =====================================================
+       PASSWORD
+    ===================================================== */
+
+    if (password.length < 6) {
+
+        showSignupError(
+            "Password must contain at least 6 characters."
+        );
+
+        return;
+    }
+
+
+    /* =====================================================
+       CONFIRM PASSWORD
+    ===================================================== */
+
+    if (password !== confirmPassword) {
+
+        showSignupError(
+            "Passwords do not match."
+        );
+
+        return;
+    }
+
+
+    /* =====================================================
+       SAVE SIGNUP DATA
+    ===================================================== */
+
+    signupData = {
+
+        name:
+        name,
+
+        mobile:
+        mobile,
+
+        email:
+        email,
+
+        password:
+        password,
+
+        emailVerified:
+            true
+    };
+
+
+    await createVerifiedAccount();
+}
+
+
+/* =========================================================
+   CREATE VERIFIED ACCOUNT
+========================================================= */
+
+async function createVerifiedAccount() {
+
+    const message =
+        document.getElementById(
+            "signupMessage"
+        );
+
+    const button =
+        document.getElementById(
+            "createAccountBtn"
+        );
+
+
+    if (!signupData.emailVerified) {
+
+        showSignupError(
+            "Please verify your email first."
+        );
+
+        return;
+    }
+
+
+    if (button) {
+
+        button.disabled = true;
+        button.textContent =
+            "Creating Account...";
+    }
+
+
+    if (message) {
+
+        message.textContent =
+            "Creating your account...";
+
+        message.className =
+            "auth-message";
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                rbApiUrl(
+                    "/api/auth/register"
+                ),
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        name:
+                        signupData.name,
+
+                        /*
+                         * Mobile number is stored
+                         * in the database.
+                         *
+                         * NO mobile OTP.
+                         */
+                        phone:
+                        signupData.mobile,
+
+                        email:
+                        signupData.email,
+
+                        password:
+                        signupData.password
+                    })
+                }
+            );
+
+
+        const data =
+            await response
+                .json()
+                .catch(() => ({}));
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.message ||
+                "Could not create account."
+            );
+        }
+
+
+        const registeredEmail =
+            signupData.email;
+
+
+        if (message) {
 
             message.textContent =
                 "Account created successfully! ❤️";
 
             message.className =
                 "auth-message success";
+        }
 
 
-            signupForm.reset();
+        /* =================================================
+           RESET SIGNUP DATA
+        ================================================= */
+
+        signupData = {
+
+            name: "",
+            mobile: "",
+            email: "",
+            password: "",
+            emailVerified: false
+        };
 
 
-            /* Open login */
+        /* =================================================
+           CLEAR INPUTS
+        ================================================= */
 
-            setTimeout(function () {
+        [
+            "signupName",
+            "signupMobile",
+            "signupEmail",
+            "signupPassword",
+            "confirmPassword",
+            "emailOtp"
+        ].forEach(function (id) {
 
-                showLogin();
+            const field =
+                document.getElementById(id);
 
+            if (field) {
+
+                field.value = "";
+            }
+        });
+
+
+        /* =================================================
+           RESET OTP INPUT
+        ================================================= */
+
+        const emailOtp =
+            document.getElementById(
+                "emailOtp"
+            );
+
+        if (emailOtp) {
+
+            emailOtp.disabled = false;
+        }
+
+
+        /* =================================================
+           HIDE OTP SECTION
+        ================================================= */
+
+        const emailOtpSection =
+            document.getElementById(
+                "emailOtpSection"
+            );
+
+        if (emailOtpSection) {
+
+            emailOtpSection.classList.add(
+                "hidden"
+            );
+        }
+
+
+        /* =================================================
+           RESET VERIFY BUTTON
+        ================================================= */
+
+        const verifyEmailOtpBtn =
+            document.getElementById(
+                "verifyEmailOtpBtn"
+            );
+
+        if (verifyEmailOtpBtn) {
+
+            verifyEmailOtpBtn.disabled = false;
+
+            verifyEmailOtpBtn.textContent =
+                "Verify OTP";
+        }
+
+
+        /* =================================================
+           GO TO LOGIN
+        ================================================= */
+
+        setTimeout(function () {
+
+            showLogin();
+
+
+            const loginEmail =
                 document.getElementById(
                     "loginEmail"
-                ).value = email;
+                );
 
-            }, 1200);
 
+            if (loginEmail) {
+
+                loginEmail.value =
+                    registeredEmail;
+            }
+
+
+            const loginPassword =
+                document.getElementById(
+                    "loginPassword"
+                );
+
+
+            if (loginPassword) {
+
+                loginPassword.value = "";
+            }
+
+
+        }, 1500);
+
+
+    } catch (error) {
+
+        console.error(
+            "CREATE ACCOUNT ERROR:",
+            error
+        );
+
+
+        if (message) {
+
+            message.textContent =
+                error.message ||
+                "Could not create account.";
+
+            message.className =
+                "auth-message error";
         }
-    );
 
+
+    } finally {
+
+        if (button) {
+
+            button.disabled = false;
+            button.textContent =
+                "Create Account";
+        }
+    }
 }
 
 
-/* =========================
-   LOGIN
-========================= */
+/* =========================================================
+   SEND LOGIN OTP
+   EMAIL ONLY
+========================================================= */
 
-const loginForm =
-    document.getElementById("loginForm");
+async function sendLoginOtp() {
 
-/* =========================
+    const loginInput =
+        document.getElementById(
+            "loginEmail"
+        );
+
+
+    const loginValue =
+        loginInput?.value.trim()
+            .toLowerCase() || "";
+
+
+    const message =
+        document.getElementById(
+            "loginSendOtpMessage"
+        );
+
+
+    const button =
+        document.getElementById(
+            "sendLoginOtpBtn"
+        );
+
+
+    const otpSection =
+        document.getElementById(
+            "loginOtpSection"
+        );
+
+
+    const otpInput =
+        document.getElementById(
+            "loginOtp"
+        );
+
+
+    /* =====================================================
+       NEW OTP = RESET PREVIOUS VERIFICATION
+    ===================================================== */
+
+    window.loginOtpVerified =
+        false;
+
+
+    /* =====================================================
+       EMAIL VALIDATION
+    ===================================================== */
+
+    if (!loginValue) {
+
+        showLoginError(
+            "Please enter your registered email."
+        );
+
+        return;
+    }
+
+
+    if (
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+            loginValue
+        )
+    ) {
+
+        showLoginError(
+            "Please enter a valid registered email address."
+        );
+
+        return;
+    }
+
+
+    /* =====================================================
+       SAVE EMAIL
+    ===================================================== */
+
+    window.loginOtpEmail =
+        loginValue;
+
+
+    /* =====================================================
+       MESSAGE
+    ===================================================== */
+
+    if (message) {
+
+        message.textContent =
+            "Sending email OTP...";
+
+        message.className =
+            "auth-message";
+    }
+
+
+    /* =====================================================
+       BUTTON
+    ===================================================== */
+
+    if (button) {
+
+        button.disabled = true;
+        button.textContent =
+            "Sending...";
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                rbApiUrl(
+                    "/api/auth/login/send-otp"
+                ),
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        email:
+                        window.loginOtpEmail
+                    })
+                }
+            );
+
+
+        const data =
+            await response
+                .json()
+                .catch(() => ({}));
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.message ||
+                "Could not send login OTP."
+            );
+        }
+
+
+        /* =================================================
+           SHOW OTP
+        ================================================= */
+
+        if (otpSection) {
+
+            otpSection.classList.remove(
+                "hidden"
+            );
+        }
+
+
+        /* =================================================
+           SUCCESS
+        ================================================= */
+
+        if (message) {
+
+            message.textContent =
+                "OTP sent to your email address.";
+
+            message.className =
+                "auth-message success";
+        }
+
+
+        /* =================================================
+           RESET OTP FIELD
+        ================================================= */
+
+        if (otpInput) {
+
+            otpInput.value = "";
+            otpInput.disabled = false;
+            otpInput.focus();
+        }
+
+
+        const verifyButton =
+            document.getElementById(
+                "verifyLoginOtpBtn"
+            );
+
+
+        if (verifyButton) {
+
+            verifyButton.disabled = false;
+            verifyButton.textContent =
+                "Verify OTP";
+        }
+
+
+        const resendButton =
+            document.getElementById(
+                "resendLoginOtpBtn"
+            );
+
+
+        if (resendButton) {
+
+            resendButton.disabled = false;
+        }
+
+
+    } catch (error) {
+
+        console.error(
+            "SEND LOGIN OTP ERROR:",
+            error
+        );
+
+
+        if (message) {
+
+            message.textContent =
+                error.message ||
+                "Could not send login OTP.";
+
+            message.className =
+                "auth-message error";
+        }
+
+
+    } finally {
+
+        if (button) {
+
+            button.disabled = false;
+            button.textContent =
+                "Send OTP";
+        }
+    }
+}
+
+
+/* =========================================================
+   VERIFY LOGIN OTP
+========================================================= */
+
+async function verifyLoginOtp() {
+
+    if (window.loginOtpVerificationRunning) {
+        return;
+    }
+
+
+    window.loginOtpVerificationRunning =
+        true;
+
+
+    const otpInput =
+        document.getElementById(
+            "loginOtp"
+        );
+
+
+    const message =
+        document.getElementById(
+            "loginOtpMessage"
+        );
+
+
+    const button =
+        document.getElementById(
+            "verifyLoginOtpBtn"
+        );
+
+
+    const email =
+        window.loginOtpEmail ||
+        "";
+
+
+    /* =====================================================
+       EMAIL CHECK
+    ===================================================== */
+
+    if (!email) {
+
+        if (message) {
+
+            message.textContent =
+                "Please enter your email and request OTP first.";
+
+            message.className =
+                "auth-message error";
+        }
+
+
+        window.loginOtpVerificationRunning =
+            false;
+
+        return;
+    }
+
+
+    if (!otpInput) {
+
+        window.loginOtpVerificationRunning =
+            false;
+
+        return;
+    }
+
+
+    const otp =
+        otpInput.value.trim();
+
+
+    /* =====================================================
+       OTP VALIDATION
+    ===================================================== */
+
+    if (!/^\d{6}$/.test(otp)) {
+
+        if (message) {
+
+            message.textContent =
+                "Please enter a valid 6-digit OTP.";
+
+            message.className =
+                "auth-message error";
+        }
+
+
+        window.loginOtpVerificationRunning =
+            false;
+
+        return;
+    }
+
+
+    /* =====================================================
+       BUTTON
+    ===================================================== */
+
+    if (button) {
+
+        button.disabled = true;
+        button.textContent =
+            "Verifying...";
+    }
+
+
+    if (message) {
+
+        message.textContent =
+            "Verifying email OTP...";
+
+        message.className =
+            "auth-message";
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                rbApiUrl(
+                    "/api/auth/login/verify-otp"
+                ),
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        email:
+                        email,
+
+                        otp:
+                        otp
+                    })
+                }
+            );
+
+
+        const data =
+            await response
+                .json()
+                .catch(() => ({}));
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.message ||
+                "Invalid or expired OTP."
+            );
+        }
+
+
+        /* =================================================
+           OTP VERIFIED
+        ================================================= */
+
+        window.loginOtpVerified =
+            true;
+
+
+        if (message) {
+
+            message.textContent =
+                "Email OTP verified successfully.";
+
+            message.className =
+                "auth-message success";
+        }
+
+
+        /* =================================================
+           DISABLE OTP
+        ================================================= */
+
+        otpInput.disabled = true;
+
+
+        if (button) {
+
+            button.disabled = true;
+            button.textContent =
+                "OTP Verified ✓";
+        }
+
+
+        /* =================================================
+           DISABLE RESEND AFTER VERIFY
+        ================================================= */
+
+        const resendButton =
+            document.getElementById(
+                "resendLoginOtpBtn"
+            );
+
+
+        if (resendButton) {
+
+            resendButton.disabled = true;
+        }
+
+
+        /* =================================================
+           FOCUS PASSWORD
+        ================================================= */
+
+        const passwordInput =
+            document.getElementById(
+                "loginPassword"
+            );
+
+
+        if (passwordInput) {
+
+            passwordInput.focus();
+        }
+
+
+    } catch (error) {
+
+        console.error(
+            "VERIFY LOGIN OTP ERROR:",
+            error
+        );
+
+
+        window.loginOtpVerified =
+            false;
+
+
+        if (message) {
+
+            message.textContent =
+                error.message ||
+                "Invalid or expired OTP.";
+
+            message.className =
+                "auth-message error";
+        }
+
+
+    } finally {
+
+        if (
+            button &&
+            !window.loginOtpVerified
+        ) {
+
+            button.disabled = false;
+            button.textContent =
+                "Verify OTP";
+        }
+
+
+        window.loginOtpVerificationRunning =
+            false;
+    }
+}
+
+
+/* =========================================================
+   LOGIN WITH PASSWORD
+========================================================= */
+
+async function loginWithPassword() {
+
+    const loginEmailInput =
+        document.getElementById(
+            "loginEmail"
+        );
+
+
+    const passwordInput =
+        document.getElementById(
+            "loginPassword"
+        );
+
+
+    const rememberMe =
+        document.getElementById(
+            "rememberMe"
+        );
+
+
+    const message =
+        document.getElementById(
+            "loginMessage"
+        );
+
+
+    const email =
+        loginEmailInput?.value
+            .trim()
+            .toLowerCase() || "";
+
+
+    const password =
+        passwordInput?.value || "";
+
+
+    /* =====================================================
+       EMAIL
+    ===================================================== */
+
+    if (!email) {
+
+        showLoginError(
+            "Please enter your registered email."
+        );
+
+        return;
+    }
+
+
+    if (
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+            email
+        )
+    ) {
+
+        showLoginError(
+            "Please enter a valid email address."
+        );
+
+        return;
+    }
+
+
+    /* =====================================================
+       OTP EMAIL
+    ===================================================== */
+
+    if (!window.loginOtpEmail) {
+
+        showLoginError(
+            "Please request an email OTP first."
+        );
+
+        return;
+    }
+
+
+    /* =====================================================
+       SAME EMAIL CHECK
+    ===================================================== */
+
+    if (
+        email !==
+        window.loginOtpEmail.toLowerCase()
+    ) {
+
+        window.loginOtpVerified =
+            false;
+
+
+        showLoginError(
+            "Email changed. Please request a new OTP."
+        );
+
+        return;
+    }
+
+
+    /* =====================================================
+       OTP VERIFIED
+    ===================================================== */
+
+    if (!window.loginOtpVerified) {
+
+        showLoginError(
+            "Please verify your email OTP first."
+        );
+
+        return;
+    }
+
+
+    /* =====================================================
+       PASSWORD
+    ===================================================== */
+
+    if (!password) {
+
+        showLoginError(
+            "Please enter your password."
+        );
+
+        return;
+    }
+
+
+    if (message) {
+
+        message.textContent =
+            "Signing in...";
+
+        message.className =
+            "auth-message";
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                rbApiUrl(
+                    "/api/auth/login/password"
+                ),
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        email:
+                        email,
+
+                        password:
+                        password
+                    })
+                }
+            );
+
+
+        const data =
+            await response
+                .json()
+                .catch(() => ({}));
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.message ||
+                "Invalid email or password."
+            );
+        }
+
+
+        /* =================================================
+           SAVE USER
+        ================================================= */
+
+        localStorage.setItem(
+            "userData",
+            JSON.stringify(data)
+        );
+
+
+        localStorage.setItem(
+            "rishtaBoxCurrentUser",
+            JSON.stringify(data)
+        );
+
+
+        /* =================================================
+           SAVE JWT
+        ================================================= */
+
+        if (data.token) {
+
+            localStorage.setItem(
+                "token",
+                data.token
+            );
+
+
+            localStorage.setItem(
+                "jwtToken",
+                data.token
+            );
+        }
+
+
+        localStorage.setItem(
+            "rishtaBoxLoggedIn",
+            "true"
+        );
+
+
+        /* =================================================
+           REMEMBER ME
+        ================================================= */
+
+        if (
+            rememberMe &&
+            rememberMe.checked
+        ) {
+
+            localStorage.setItem(
+                "rishtaBoxRememberMe",
+                "true"
+            );
+
+        } else {
+
+            localStorage.removeItem(
+                "rishtaBoxRememberMe"
+            );
+        }
+
+
+        /* =================================================
+           SUCCESS
+        ================================================= */
+
+        if (message) {
+
+            message.textContent =
+                "Login successful!";
+
+            message.className =
+                "auth-message success";
+        }
+
+
+        updateAccountNav(data);
+
+
+        /* =================================================
+           RESET OTP STATE
+        ================================================= */
+
+        window.loginOtpEmail = null;
+        window.loginOtpVerified = false;
+        window.loginOtpVerificationRunning = false;
+
+
+        setTimeout(function () {
+
+            if (
+                typeof showPage ===
+                "function"
+            ) {
+
+                showPage("homePage");
+
+            } else {
+
+                window.location.reload();
+            }
+
+        }, 500);
+
+
+    } catch (error) {
+
+        console.error(
+            "LOGIN ERROR:",
+            error
+        );
+
+
+        if (message) {
+
+            message.textContent =
+                error.message ||
+                "Login failed.";
+
+            message.className =
+                "auth-message error";
+        }
+    }
+}
+
+
+/* =========================================================
    UPDATE ACCOUNT NAV
-========================= */
+========================================================= */
 
 function updateAccountNav(user) {
 
@@ -6681,61 +8202,106 @@ function updateAccountNav(user) {
             "accountNavText"
         );
 
+
     if (!accountText) {
         return;
     }
 
 
-    if (user) {
-
-        accountText.textContent =
-            user.name;
-
-    } else {
-
-        accountText.textContent =
-            "Account";
-    }
+    accountText.textContent =
+        user?.name || "Account";
 }
 
 
-/* =========================
+/* =========================================================
    LOAD LOGGED USER
-========================= */
+========================================================= */
 
 function loadLoggedInUser() {
 
-    const savedUser = localStorage.getItem("userData");
+    const savedUser =
+        localStorage.getItem(
+            "userData"
+        );
 
-    console.log("Saved userData:", savedUser);
 
     if (!savedUser) {
-        console.log("No user found in localStorage");
         return;
     }
 
-    const user = JSON.parse(savedUser);
 
-    console.log("Loaded user:", user);
-    console.log("Loaded User ID:", user.id);
+    try {
 
-    currentUser = user;
+        const user =
+            JSON.parse(savedUser);
 
-    updateAccountNav(user);
 
-    const name = document.getElementById("userName");
-    const email = document.getElementById("userEmail");
-    const phone = document.getElementById("userPhone");
+        if (
+            typeof currentUser !==
+            "undefined"
+        ) {
 
-    if (name) name.value = user.name || "";
-    if (email) email.value = user.email || "";
-    if (phone) phone.value = user.mobile || user.phone || "";
+            currentUser = user;
+        }
+
+
+        updateAccountNav(user);
+
+
+        const name =
+            document.getElementById(
+                "userName"
+            );
+
+
+        const email =
+            document.getElementById(
+                "userEmail"
+            );
+
+
+        const phone =
+            document.getElementById(
+                "userPhone"
+            );
+
+
+        if (name) {
+
+            name.value =
+                user.name || "";
+        }
+
+
+        if (email) {
+
+            email.value =
+                user.email || "";
+        }
+
+
+        if (phone) {
+
+            phone.value =
+                user.phone ||
+                user.mobile ||
+                "";
+        }
+
+
+    } catch (error) {
+
+        console.error(
+            "Could not load user:",
+            error
+        );
+    }
 }
 
 
-/* =========================
+/* =========================================================
    LOGIN ERROR
-========================= */
+========================================================= */
 
 function showLoginError(message) {
 
@@ -6744,20 +8310,24 @@ function showLoginError(message) {
             "loginMessage"
         );
 
+
     if (!element) {
         return;
     }
 
-    element.textContent = message;
+
+    element.textContent =
+        message;
+
 
     element.className =
         "auth-message error";
 }
 
 
-/* =========================
+/* =========================================================
    SIGNUP ERROR
-========================= */
+========================================================= */
 
 function showSignupError(message) {
 
@@ -6766,60 +8336,62 @@ function showSignupError(message) {
             "signupMessage"
         );
 
+
     if (!element) {
         return;
     }
 
-    element.textContent = message;
+
+    element.textContent =
+        message;
+
 
     element.className =
         "auth-message error";
 }
 
 
-/* =========================
-   CLEAR MESSAGES
-========================= */
+/* =========================================================
+   CLEAR AUTH MESSAGES
+========================================================= */
 
 function clearAuthMessages() {
 
-    const loginMessage =
-        document.getElementById(
-            "loginMessage"
-        );
+    [
+        "loginMessage",
+        "signupMessage",
+        "loginOtpMessage",
+        "emailOtpMessage",
+        "loginSendOtpMessage",
+        "emailSendOtpMessage"
+    ].forEach(function (id) {
 
-    const signupMessage =
-        document.getElementById(
-            "signupMessage"
-        );
-
-
-    if (loginMessage) {
-
-        loginMessage.textContent = "";
-
-        loginMessage.className =
-            "auth-message";
-    }
+        const element =
+            document.getElementById(id);
 
 
-    if (signupMessage) {
+        if (element) {
 
-        signupMessage.textContent = "";
+            element.textContent = "";
 
-        signupMessage.className =
-            "auth-message";
-    }
+            element.className =
+                "auth-message";
+        }
+    });
 }
 
 
-/* =========================
+/* =========================================================
    FORGOT PASSWORD
-========================= */
+========================================================= */
 
 function forgotPassword(event) {
 
-    event.preventDefault();
+    if (event) {
+
+        event.preventDefault();
+    }
+
 
     alert(
         "Password recovery will be connected to email/OTP later."
@@ -6827,9 +8399,71 @@ function forgotPassword(event) {
 }
 
 
-/* =========================
-   INITIAL LOGIN STATE
-========================= */
+/* =========================================================
+   LOGOUT
+========================================================= */
+
+function logout() {
+
+    [
+        "userData",
+        "rishtaBoxCurrentUser",
+        "token",
+        "jwtToken",
+        "rishtaBoxLoggedIn"
+    ].forEach(function (key) {
+
+        localStorage.removeItem(key);
+    });
+
+
+    /* =====================================================
+       RESET LOGIN OTP STATE
+    ===================================================== */
+
+    window.loginOtpEmail = null;
+    window.loginOtpVerified = false;
+    window.loginOtpVerificationRunning = false;
+
+
+    /* =====================================================
+       RESET SIGNUP OTP STATE
+    ===================================================== */
+
+    window.emailOtpVerificationRunning = false;
+
+
+    signupData = {
+
+        name: "",
+        mobile: "",
+        email: "",
+        password: "",
+        emailVerified: false
+    };
+
+
+    updateAccountNav(null);
+
+
+    if (
+        typeof showPage ===
+        "function"
+    ) {
+
+        showPage("login");
+        showLogin();
+
+    } else {
+
+        window.location.reload();
+    }
+}
+
+
+/* =========================================================
+   INITIALIZE AUTH
+========================================================= */
 
 document.addEventListener(
     "DOMContentLoaded",
@@ -6841,17 +8475,26 @@ document.addEventListener(
             );
 
 
-        const user =
-            JSON.parse(
-                localStorage.getItem(
-                    "rishtaBoxCurrentUser"
-                )
-            );
+        let user = null;
+
+
+        try {
+
+            user =
+                JSON.parse(
+                    localStorage.getItem(
+                        "rishtaBoxCurrentUser"
+                    )
+                );
+
+        } catch (error) {
+
+            user = null;
+        }
 
 
         if (
-            loggedIn === "true"
-            &&
+            loggedIn === "true" &&
             user
         ) {
 
@@ -6860,11 +8503,10 @@ document.addEventListener(
         } else {
 
             updateAccountNav(null);
-
         }
-
     }
-);async function payWithRazorpay(backendOrderId, orderData) {
+);
+async function payWithRazorpay(backendOrderId, orderData) {
 
     console.log("===== RAZORPAY PAYMENT START =====");
     console.log("Backend Order ID:", backendOrderId);
@@ -10433,7 +12075,7 @@ function startTestimonialAutoSlide() {
 
             moveTestimonialSlide();
 
-        }, 3500);
+        }, 4000);
 }
 
 

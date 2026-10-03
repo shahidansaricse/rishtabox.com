@@ -53,8 +53,6 @@
         </button>
 
     </div>
-    <!-- ================= SHOP NAVIGATION ================= -->
-
     <div class="shop-nav-wrapper">
 
         <!-- BACK BUTTON -->
@@ -886,18 +884,29 @@
 
     </section>
     <!-- ================= END ORDER SUCCESS PAGE ================= -->
-    <!-- ================= LOGIN / SIGNUP PAGE ================= -->
+
+
+    <!-- =========================================================
+         LOGIN / SIGNUP PAGE
+    ========================================================= -->
 
     <section id="loginPage" class="page hidden">
 
         <div class="auth-container">
 
-            <!-- ================= LEFT SIDE ================= -->
+
+            <!-- =====================================================
+                 LEFT SIDE
+            ====================================================== -->
 
             <div class="auth-welcome">
 
                 <div class="auth-gift-icon">
-                    <img src="images/logo.jpeg" alt="RishtaBox Logo" >
+
+                    <img
+                            src="images/logo.jpeg"
+                            alt="RishtaBox Logo"
+                    >
 
                 </div>
 
@@ -935,12 +944,16 @@
             </div>
 
 
-            <!-- ================= RIGHT SIDE ================= -->
+            <!-- =====================================================
+                 RIGHT SIDE
+            ====================================================== -->
 
             <div class="auth-box">
 
 
-                <!-- ================= SIGN IN ================= -->
+                <!-- =================================================
+                     LOGIN SECTION
+                ================================================== -->
 
                 <div id="loginSection">
 
@@ -954,125 +967,214 @@
 
                     </div>
 
+                    <!-- =================================================
+                         EMAIL ONLY
+                    ================================================== -->
 
-                    <form id="loginForm">
+                    <div class="auth-input-group">
+
+                        <label for="loginEmail">
+                            Email Address
+                        </label>
+
+                        <div class="auth-input">
+
+                            <span>✉️</span>
+
+                            <input
+                                    type="email"
+                                    id="loginEmail"
+                                    placeholder="Enter your registered email"
+                                    autocomplete="email"
+                            >
+
+                        </div>
+
+                    </div>
+
+                    <!-- =================================================
+                         SEND LOGIN OTP
+                    ================================================== -->
+
+                    <button
+                            type="button"
+                            id="sendLoginOtpBtn"
+                            class="auth-main-btn"
+                            onclick="sendLoginOtp()"
+                    >
+                        Send OTP
+                    </button>
 
 
-                        <!-- Email / Mobile -->
+                    <div
+                            id="loginSendOtpMessage"
+                            class="auth-message"
+                    ></div>
+
+
+                    <!-- =================================================
+                         LOGIN OTP
+                    ================================================== -->
+
+                    <div id="loginOtpSection">
 
                         <div class="auth-input-group">
 
-                            <label for="loginEmail">
-                                Email or Mobile Number
+                            <label for="loginOtp">
+                                Enter OTP
                             </label>
 
                             <div class="auth-input">
 
-                                <span>👤</span>
+                                <span>🔐</span>
 
                                 <input
                                         type="text"
-                                        id="loginEmail"
-                                        placeholder="Enter email or mobile number"
-                                        autocomplete="username"
+                                        id="loginOtp"
+                                        placeholder="Enter 6-digit OTP"
+                                        maxlength="6"
+                                        inputmode="numeric"
+                                        autocomplete="one-time-code"
                                 >
 
                             </div>
 
                         </div>
 
-
-                        <!-- Password -->
-
-                        <div class="auth-input-group">
-
-                            <div class="auth-label-row">
-
-                                <label for="loginPassword">
-                                    Password
-                                </label>
-
-                                <a href="#"
-                                   onclick="forgotPassword(event)">
-                                    Forgot password?
-                                </a>
-
-                            </div>
-
-
-                            <div class="auth-input">
-
-                                <span>🔒</span>
-
-                                <input
-                                        type="password"
-                                        id="loginPassword"
-                                        placeholder="Enter your password"
-                                        autocomplete="current-password"
-                                >
-
-                                <button
-                                        type="button"
-                                        onclick="togglePassword('loginPassword', this)"
-                                        class="password-toggle">
-
-                                    Show
-
-                                </button>
-
-                            </div>
-
-                        </div>
-
-
-                        <!-- Remember Me -->
-
-                        <label class="remember-me">
-
-                            <input
-                                    type="checkbox"
-                                    id="rememberMe"
-                            >
-
-                            Remember me
-
-                        </label>
-
-
-                        <!-- Login -->
 
                         <button
-                                type="submit"
-                                class="auth-main-btn">
+                                type="button"
+                                id="verifyLoginOtpBtn"
+                                class="auth-main-btn"
+                                onclick="verifyLoginOtp()"
+                        >
+                            Verify OTP
+                        </button>
 
-                            Sign In
 
+                        <button
+                                type="button"
+                                id="resendLoginOtpBtn"
+                                class="auth-outline-btn"
+                                onclick="sendLoginOtp()"
+                        >
+                            Resend OTP
                         </button>
 
 
                         <div
-                                id="loginMessage"
-                                class="auth-message">
+                                id="loginOtpMessage"
+                                class="auth-message"
+                        ></div>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         LOGIN PASSWORD
+                    ================================================== -->
+
+                    <div class="auth-input-group">
+
+                        <div class="auth-label-row">
+
+                            <label for="loginPassword">
+                                Password
+                            </label>
+
+                            <a
+                                    href="#"
+                                    onclick="forgotPassword(event)"
+                            >
+                                Forgot password?
+                            </a>
+
                         </div>
 
-                    </form>
+
+                        <div class="auth-input">
+
+                            <span>🔒</span>
+
+                            <input
+                                    type="password"
+                                    id="loginPassword"
+                                    placeholder="Enter your password"
+                                    autocomplete="current-password"
+                            >
+
+                            <button
+                                    type="button"
+                                    class="password-toggle"
+                                    onclick="togglePassword(
+                                    'loginPassword',
+                                    this
+                                )"
+                            >
+                                Show
+                            </button>
+
+                        </div>
+
+                    </div>
 
 
-                    <!-- Create Account -->
+                    <!-- =================================================
+                         REMEMBER ME
+                    ================================================== -->
+
+                    <label class="remember-me">
+
+                        <input
+                                type="checkbox"
+                                id="rememberMe"
+                        >
+
+                        Remember me
+
+                    </label>
+
+
+                    <!-- =================================================
+                         SIGN IN
+                    ================================================== -->
+
+                    <button
+                            type="button"
+                            id="loginBtn"
+                            class="auth-main-btn"
+                            onclick="loginWithPassword()"
+                    >
+                        Sign In
+                    </button>
+
+
+                    <div
+                            id="loginMessage"
+                            class="auth-message"
+                    ></div>
+
+
+                    <!-- =================================================
+                         CREATE ACCOUNT
+                    ================================================== -->
 
                     <div class="auth-switch">
 
                         <div class="auth-divider">
-                            <span>New to RishtaBox?</span>
+
+                        <span>
+                            New to RishtaBox?
+                        </span>
+
                         </div>
 
                         <button
                                 type="button"
                                 class="auth-outline-btn"
-                                onclick="showSignup()">
-
+                                onclick="showSignup()"
+                        >
                             Create your RishtaBox account
-
                         </button>
 
                     </div>
@@ -1080,10 +1182,14 @@
                 </div>
 
 
+                <!-- =====================================================
+                     SIGNUP SECTION
+                ====================================================== -->
 
-                <!-- ================= SIGN UP ================= -->
-
-                <div id="signupSection" class="hidden">
+                <div
+                        id="signupSection"
+                        class="hidden"
+                >
 
                     <div class="auth-heading">
 
@@ -1096,62 +1202,117 @@
                     </div>
 
 
-                    <form id="signupForm">
+                    <!-- =================================================
+                         NAME
+                    ================================================== -->
 
+                    <div class="auth-input-group">
 
-                        <!-- Name -->
+                        <label for="signupName">
+                            Your Name
+                        </label>
 
-                        <div class="auth-input-group">
+                        <div class="auth-input">
 
-                            <label for="signupName">
-                                Your Name
-                            </label>
+                            <span>👤</span>
 
-                            <div class="auth-input">
-
-                                <span>👤</span>
-
-                                <input
-                                        type="text"
-                                        id="signupName"
-                                        placeholder="Enter your full name"
-                                >
-
-                            </div>
+                            <input
+                                    type="text"
+                                    id="signupName"
+                                    placeholder="Enter your full name"
+                                    autocomplete="name"
+                            >
 
                         </div>
 
+                    </div>
 
-                        <!-- Mobile -->
 
-                        <div class="auth-input-group">
+                    <!-- =================================================
+                         MOBILE NUMBER
+                         MOBILE OTP REMOVED
+                    ================================================== -->
 
-                            <label for="signupMobile">
-                                Mobile Number
-                            </label>
+                    <div class="auth-input-group">
 
-                            <div class="auth-input">
+                        <label for="signupMobile">
+                            Mobile Number
+                        </label>
 
-                                <span>📱</span>
+                        <div class="auth-input">
 
-                                <input
-                                        type="tel"
-                                        id="signupMobile"
-                                        placeholder="Enter 10-digit mobile number"
-                                        maxlength="10"
-                                >
+                            <span>📱</span>
 
-                            </div>
+                            <input
+                                    type="tel"
+                                    id="signupMobile"
+                                    placeholder="Enter 10-digit mobile number"
+                                    maxlength="10"
+                                    inputmode="numeric"
+                                    autocomplete="tel"
+                            >
 
                         </div>
 
+                    </div>
 
-                        <!-- Email -->
+
+                    <!-- =================================================
+                         EMAIL
+                    ================================================== -->
+
+                    <div class="auth-input-group">
+
+                        <label for="signupEmail">
+                            Email Address
+                        </label>
+
+                        <div class="auth-input">
+
+                            <span>✉️</span>
+
+                            <input
+                                    type="email"
+                                    id="signupEmail"
+                                    placeholder="Enter your email"
+                                    autocomplete="email"
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         SEND EMAIL OTP
+                    ================================================== -->
+
+                    <button
+                            type="button"
+                            id="sendEmailOtpBtn"
+                            class="auth-main-btn"
+                            onclick="sendEmailOtp()"
+                    >
+                        Send OTP
+                    </button>
+
+
+                    <div
+                            id="emailSendOtpMessage"
+                            class="auth-message"
+                    ></div>
+
+
+                    <!-- =================================================
+                         EMAIL OTP
+                    ================================================== -->
+
+                    <div id="emailOtpSection">
 
                         <div class="auth-input-group">
 
-                            <label for="signupEmail">
-                                Email Address
+                            <label for="emailOtp">
+                                Email OTP
                             </label>
 
                             <div class="auth-input">
@@ -1159,110 +1320,172 @@
                                 <span>✉️</span>
 
                                 <input
-                                        type="email"
-                                        id="signupEmail"
-                                        placeholder="Enter your email"
+                                        type="text"
+                                        id="emailOtp"
+                                        placeholder="Enter 6-digit OTP"
+                                        maxlength="6"
+                                        inputmode="numeric"
+                                        autocomplete="one-time-code"
                                 >
 
                             </div>
 
                         </div>
 
-
-                        <!-- Password -->
-
-                        <div class="auth-input-group">
-
-                            <label for="signupPassword">
-                                Password
-                            </label>
-
-                            <div class="auth-input">
-
-                                <span>🔒</span>
-
-                                <input
-                                        type="password"
-                                        id="signupPassword"
-                                        placeholder="At least 6 characters"
-                                >
-
-                                <button
-                                        type="button"
-                                        onclick="togglePassword('signupPassword', this)"
-                                        class="password-toggle">
-
-                                    Show
-
-                                </button>
-
-                            </div>
-
-                        </div>
-
-
-                        <!-- Confirm Password -->
-
-                        <div class="auth-input-group">
-
-                            <label for="confirmPassword">
-                                Confirm Password
-                            </label>
-
-                            <div class="auth-input">
-
-                                <span>🔒</span>
-
-                                <input
-                                        type="password"
-                                        id="confirmPassword"
-                                        placeholder="Re-enter your password"
-                                >
-
-                            </div>
-
-                        </div>
-
-
-                        <p class="password-hint">
-                            🔐 Password must contain at least 6 characters.
-                        </p>
-
-
-                        <!-- Signup -->
 
                         <button
-                                type="submit"
-                                class="auth-main-btn">
+                                type="button"
+                                id="verifyEmailOtpBtn"
+                                class="auth-main-btn"
+                                onclick="verifyEmailOtp()"
+                        >
+                            Verify OTP
+                        </button>
 
-                            Create Account
 
+                        <button
+                                type="button"
+                                id="resendEmailOtpBtn"
+                                class="auth-outline-btn"
+                                onclick="sendEmailOtp()"
+                        >
+                            Resend OTP
                         </button>
 
 
                         <div
-                                id="signupMessage"
-                                class="auth-message">
+                                id="emailOtpMessage"
+                                class="auth-message"
+                        ></div>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         PASSWORD
+                    ================================================== -->
+
+                    <div class="auth-input-group">
+
+                        <label for="signupPassword">
+                            Password
+                        </label>
+
+                        <div class="auth-input">
+
+                            <span>🔒</span>
+
+                            <input
+                                    type="password"
+                                    id="signupPassword"
+                                    placeholder="At least 6 characters"
+                                    autocomplete="new-password"
+                            >
+
+                            <button
+                                    type="button"
+                                    class="password-toggle"
+                                    onclick="togglePassword(
+                                    'signupPassword',
+                                    this
+                                )"
+                            >
+                                Show
+                            </button>
+
                         </div>
 
-                    </form>
+                    </div>
 
 
-                    <!-- Login -->
+                    <!-- =================================================
+                         CONFIRM PASSWORD
+                    ================================================== -->
+
+                    <div class="auth-input-group">
+
+                        <label for="confirmPassword">
+                            Confirm Password
+                        </label>
+
+                        <div class="auth-input">
+
+                            <span>🔒</span>
+
+                            <input
+                                    type="password"
+                                    id="confirmPassword"
+                                    placeholder="Re-enter your password"
+                                    autocomplete="new-password"
+                            >
+
+                            <button
+                                    type="button"
+                                    class="password-toggle"
+                                    onclick="togglePassword(
+                                    'confirmPassword',
+                                    this
+                                )"
+                            >
+                                Show
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         PASSWORD HINT
+                    ================================================== -->
+
+                    <p class="password-hint">
+
+                        🔐 Password must contain at least 6 characters.
+
+                    </p>
+
+
+                    <!-- =================================================
+                         CREATE ACCOUNT
+                    ================================================== -->
+
+                    <button
+                            type="button"
+                            id="createAccountBtn"
+                            class="auth-main-btn"
+                            onclick="createAccount()"
+                    >
+                        Create Account
+                    </button>
+
+
+                    <div
+                            id="signupMessage"
+                            class="auth-message"
+                    ></div>
+
+
+                    <!-- =================================================
+                         SIGN IN
+                    ================================================== -->
 
                     <div class="auth-switch">
 
                         <div class="auth-divider">
-                            <span>Already have an account?</span>
+
+                        <span>
+                            Already have an account?
+                        </span>
+
                         </div>
 
                         <button
                                 type="button"
                                 class="auth-outline-btn"
-                                onclick="showLogin()">
-
+                                onclick="showLogin()"
+                        >
                             Sign In
-
                         </button>
 
                     </div>
@@ -1274,6 +1497,7 @@
         </div>
 
     </section>
+
 
     <!-- ================= END LOGIN / SIGNUP ================= -->
     <!-- ================= ACCOUNT PAGE ================= -->

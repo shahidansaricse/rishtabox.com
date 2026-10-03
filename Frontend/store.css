@@ -186,11 +186,6 @@ h1,h2,h3,h4,h5,h6 {
 
 }
 
-
-/* =========================================================
-   LAPTOP
-========================================================= */
-
 /* =========================================================
    LAPTOP
 ========================================================= */
@@ -11727,9 +11722,9 @@ body {
 
     /* COMPLETE OUTER PINK STRIP */
     .shop-nav-wrapper {
-        height: 40px !important;
-        min-height: 40px !important;
-        max-height: 40px !important;
+        height: 30px !important;
+        min-height: 30px !important;
+        max-height: 30px !important;
 
         padding: 0 !important;
         margin: 0 !important;
@@ -11742,9 +11737,9 @@ body {
 
     /* BACK + MORE */
     .nav-scroll-btn {
-        height: 40px !important;
-        min-height: 40px !important;
-        max-height: 40px !important;
+        height: 30px !important;
+        min-height: 30px !important;
+        max-height: 30px !important;
 
         padding-top: 0 !important;
         padding-bottom: 0 !important;
@@ -11755,9 +11750,9 @@ body {
 
     /* SCROLL AREA */
     .shop-nav-scroll {
-        height: 40px !important;
-        min-height: 40px !important;
-        max-height: 40px !important;
+        height: 30px !important;
+        min-height: 30px !important;
+        max-height: 30px !important;
 
         padding: 0 !important;
         margin: 0 !important;
@@ -11771,9 +11766,9 @@ body {
 
     /* INNER PINK PANEL */
     .shop-nav-scroll .panel {
-        height: 40px !important;
-        min-height: 40px !important;
-        max-height: 40px !important;
+        height: 30px !important;
+        min-height: 30px !important;
+        max-height: 30px !important;
 
         padding: 0 !important;
         margin: 0 !important;
@@ -11784,9 +11779,9 @@ body {
 
     /* EVERY ITEM INSIDE PANEL */
     .shop-nav-scroll .panel > * {
-        height: 40px !important;
-        min-height: 40px !important;
-        max-height: 40px !important;
+        height: 30px !important;
+        min-height: 30px !important;
+        max-height: 30px !important;
 
         padding-top: 0 !important;
         padding-bottom: 0 !important;
@@ -11802,9 +11797,9 @@ body {
     .shop-nav-scroll .panel-all,
     .shop-nav-scroll .panel-all a {
 
-        height: 40px !important;
-        min-height: 40px !important;
-        max-height: 40px !important;
+        height: 30px !important;
+        min-height: 30px !important;
+        max-height: 30px !important;
 
         box-sizing: border-box !important;
     }
@@ -11814,9 +11809,9 @@ body {
     .shop-nav-scroll .nav-dropdown,
     .shop-nav-scroll .dropdown-btn {
 
-        height: 40px !important;
-        min-height: 40px !important;
-        max-height: 40px !important;
+        height: 30px !important;
+        min-height: 30px !important;
+        max-height: 30px !important;
 
         box-sizing: border-box !important;
     }
@@ -11826,10 +11821,75 @@ body {
     .shop-nav-scroll .panel-deals,
     .shop-nav-scroll .panel-deals a {
 
-        height: 40px !important;
-        min-height: 40px !important;
-        max-height: 40px !important;
+        height: 30px !important;
+        min-height: 30px !important;
+        max-height: 30px !important;
 
         box-sizing: border-box !important;
     }
 }
+
+
+.auth-back-btn {
+    display: block;
+    width: 100%;
+    margin-top: 15px;
+    padding: 10px;
+    border: none;
+    background: transparent;
+    color: #e35486;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.auth-back-btn:hover {
+    text-decoration: underline;
+}
+
+/* =========================================================
+   OTP BUTTONS - WHITE BACKGROUND
+========================================================= */
+
+#sendMobileOtpBtn,
+#sendEmailOtpBtn,
+#sendLoginOtpBtn,
+#verifyMobileOtpBtn,
+#verifyEmailOtpBtn,
+#verifyLoginOtpBtn {
+
+    background: #ffffff;
+    color: #e35486;
+    border: 1px solid #e35486;
+    border-radius: 8px;
+    padding: 11px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* Hover */
+#sendMobileOtpBtn:hover,
+#sendEmailOtpBtn:hover,
+#sendLoginOtpBtn:hover,
+#verifyMobileOtpBtn:hover,
+#verifyEmailOtpBtn:hover,
+#verifyLoginOtpBtn:hover {
+
+    background: #fff5f8;
+    color: #d94376;
+    border-color: #d94376;
+}
+
+/* Disabled */
+#sendMobileOtpBtn:disabled,
+#sendEmailOtpBtn:disabled,
+#sendLoginOtpBtn:disabled,
+#verifyMobileOtpBtn:disabled,
+#verifyEmailOtpBtn:disabled,
+#verifyLoginOtpBtn:disabled {
+
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+

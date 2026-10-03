@@ -17,11 +17,6 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
-
-    // =========================================================
-    // CONSTRUCTOR
-    // =========================================================
-
     public AuthService(
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
@@ -32,42 +27,25 @@ public class AuthService {
         this.jwtService = jwtService;
     }
 
-
     // =========================================================
-    // STORE REGISTER
-    // PUBLIC SIGNUP = USER
+    // REGISTER
     // =========================================================
 
     public User register(RegisterRequest request) {
 
-        // -----------------------------------------------------
-        // VALIDATE REQUEST
-        // -----------------------------------------------------
-
         validateRegisterRequest(request);
-
-
-        // -----------------------------------------------------
-        // NORMALIZE EMAIL
-        // -----------------------------------------------------
 
         String email =
                 request.getEmail()
                         .trim()
                         .toLowerCase();
 
-
-        // -----------------------------------------------------
-        // NORMALIZE PHONE
-        // -----------------------------------------------------
-
         String phone =
                 request.getPhone()
                         .trim();
 
-
         // -----------------------------------------------------
-        // CHECK DUPLICATE EMAIL
+        // CHECK EMAIL
         // -----------------------------------------------------
 
         if (userRepository.existsByEmail(email)) {
@@ -77,9 +55,9 @@ public class AuthService {
             );
         }
 
-
         // -----------------------------------------------------
-        // CHECK DUPLICATE PHONE
+        // CHECK PHONE
+        // Mobile number is stored, but NO mobile OTP
         // -----------------------------------------------------
 
         if (userRepository.existsByPhone(phone)) {
@@ -89,24 +67,26 @@ public class AuthService {
             );
         }
 
-
         // -----------------------------------------------------
         // CREATE USER
         // -----------------------------------------------------
 
         User user = new User();
 
-
         user.setName(
-                request.getName().trim()
+                request.getName()
+                        .trim()
         );
-
 
         user.setEmail(email);
 
-
+        // Mobile number is saved normally
+        // No OTP verification is performed
         user.setPhone(phone);
 
+        // -----------------------------------------------------
+        // PASSWORD
+        // -----------------------------------------------------
 
         user.setPassword(
                 passwordEncoder.encode(
@@ -114,31 +94,22 @@ public class AuthService {
                 )
         );
 
-
         // -----------------------------------------------------
-        // PUBLIC REGISTRATION ALWAYS CREATES USER
+        // ROLE
         // -----------------------------------------------------
 
         user.setRole(
                 User.Role.USER
         );
 
-
         // -----------------------------------------------------
-        // NEW ACCOUNT IS ACTIVE
+        // ACTIVE
         // -----------------------------------------------------
 
         user.setActive(true);
 
-
         // -----------------------------------------------------
-        // INITIAL TOKEN VERSION
-        // -----------------------------------------------------
-        //
-        // This makes the first JWT version:
-        //
-        // 0
-        //
+        // TOKEN VERSION
         // -----------------------------------------------------
 
         if (user.getTokenVersion() == null) {
@@ -146,6 +117,9 @@ public class AuthService {
             user.setTokenVersion(0L);
         }
 
+        // -----------------------------------------------------
+        // SAVE USER
+        // -----------------------------------------------------
 
         return userRepository.save(user);
     }
@@ -154,16 +128,10 @@ public class AuthService {
     // =========================================================
     // ADMIN REGISTER
     // =========================================================
-    //
-    // Public ADMIN registration is disabled.
-    //
-    // ADMIN accounts will be created by SUPER_ADMIN through
-    // the admin user-management system.
-    //
-    // =========================================================
 
     @Deprecated
-    public User registerAdmin(RegisterRequest request) {
+    public User registerAdmin(
+            RegisterRequest request) {
 
         throw new RuntimeException(
                 "Public admin registration is disabled. " +
@@ -173,65 +141,14 @@ public class AuthService {
 
 
     // =========================================================
-    // COMMON REGISTER VALIDATION
+    // NORMAL LOGIN
     // =========================================================
 
-    private void validateRegisterRequest(
-            RegisterRequest request) {
-
-        if (request == null) {
-
-            throw new RuntimeException(
-                    "Registration data is required"
-            );
-        }
-
-
-        if (request.getName() == null ||
-                request.getName().isBlank()) {
-
-            throw new RuntimeException(
-                    "Name is required"
-            );
-        }
-
-
-        if (request.getEmail() == null ||
-                request.getEmail().isBlank()) {
-
-            throw new RuntimeException(
-                    "Email is required"
-            );
-        }
-
-
-        if (request.getPhone() == null ||
-                request.getPhone().isBlank()) {
-
-            throw new RuntimeException(
-                    "Phone is required"
-            );
-        }
-
-
-        if (request.getPassword() == null ||
-                request.getPassword().isBlank()) {
-
-            throw new RuntimeException(
-                    "Password is required"
-            );
-        }
-    }
-
-
-    // =========================================================
-    // LOGIN
-    // =========================================================
-
-    public AuthResponse login(LoginRequest request) {
+    public AuthResponse login(
+            LoginRequest request) {
 
         // -----------------------------------------------------
-        // VALIDATE LOGIN REQUEST
+        // VALIDATE REQUEST
         // -----------------------------------------------------
 
         if (request == null) {
@@ -241,6 +158,9 @@ public class AuthService {
             );
         }
 
+        // -----------------------------------------------------
+        // EMAIL
+        // -----------------------------------------------------
 
         if (request.getEmail() == null ||
                 request.getEmail().isBlank()) {
@@ -250,6 +170,9 @@ public class AuthService {
             );
         }
 
+        // -----------------------------------------------------
+        // PASSWORD
+        // -----------------------------------------------------
 
         if (request.getPassword() == null ||
                 request.getPassword().isBlank()) {
@@ -259,16 +182,10 @@ public class AuthService {
             );
         }
 
-
-        // -----------------------------------------------------
-        // NORMALIZE EMAIL
-        // -----------------------------------------------------
-
         String email =
                 request.getEmail()
                         .trim()
                         .toLowerCase();
-
 
         // -----------------------------------------------------
         // FIND USER
@@ -283,13 +200,8 @@ public class AuthService {
                                 )
                         );
 
-
         // -----------------------------------------------------
-        // CHECK ACCOUNT STATUS
-        // -----------------------------------------------------
-        //
-        // BLOCKED USER CANNOT LOGIN.
-        //
+        // ACCOUNT STATUS
         // -----------------------------------------------------
 
         if (!user.isActive()) {
@@ -298,7 +210,6 @@ public class AuthService {
                     "Your account has been blocked"
             );
         }
-
 
         // -----------------------------------------------------
         // CHECK PASSWORD
@@ -313,9 +224,121 @@ public class AuthService {
             );
         }
 
+        // -----------------------------------------------------
+        // CREATE JWT RESPONSE
+        // -----------------------------------------------------
+
+        return createAuthResponse(user);
+    }
+
+
+    // =========================================================
+    // LOGIN AFTER EMAIL OTP VERIFICATION + PASSWORD
+    // =========================================================
+    //
+    // Flow:
+    //
+    // Email
+    //   ↓
+    // Email OTP
+    //   ↓
+    // Verify Email OTP
+    //   ↓
+    // Password
+    //   ↓
+    // This method
+    //   ↓
+    // JWT
+    //
+    // Mobile OTP is NOT used.
+    // =========================================================
+
+    public AuthResponse loginAfterOtp(
+            String email,
+            String password) {
 
         // -----------------------------------------------------
-        // ENSURE TOKEN VERSION EXISTS
+        // EMAIL
+        // -----------------------------------------------------
+
+        if (email == null ||
+                email.isBlank()) {
+
+            throw new RuntimeException(
+                    "Email is required"
+            );
+        }
+
+        // -----------------------------------------------------
+        // PASSWORD
+        // -----------------------------------------------------
+
+        if (password == null ||
+                password.isBlank()) {
+
+            throw new RuntimeException(
+                    "Password is required"
+            );
+        }
+
+        email =
+                email.trim()
+                        .toLowerCase();
+
+        // -----------------------------------------------------
+        // FIND USER
+        // -----------------------------------------------------
+
+        User user =
+                userRepository
+                        .findByEmail(email)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "User not found"
+                                )
+                        );
+
+        // -----------------------------------------------------
+        // ACCOUNT STATUS
+        // -----------------------------------------------------
+
+        if (!user.isActive()) {
+
+            throw new RuntimeException(
+                    "Your account has been blocked"
+            );
+        }
+
+        // -----------------------------------------------------
+        // PASSWORD CHECK
+        // -----------------------------------------------------
+
+        if (!passwordEncoder.matches(
+                password,
+                user.getPassword())) {
+
+            throw new RuntimeException(
+                    "Invalid password"
+            );
+        }
+
+        // -----------------------------------------------------
+        // CREATE JWT
+        // -----------------------------------------------------
+
+        return createAuthResponse(user);
+    }
+
+
+    // =========================================================
+    // CREATE JWT RESPONSE
+    // =========================================================
+
+    private AuthResponse createAuthResponse(
+            User user) {
+
+        // -----------------------------------------------------
+        // TOKEN VERSION
         // -----------------------------------------------------
 
         if (user.getTokenVersion() == null) {
@@ -325,33 +348,15 @@ public class AuthService {
             userRepository.save(user);
         }
 
-
         // -----------------------------------------------------
         // GENERATE JWT
-        // -----------------------------------------------------
-        //
-        // IMPORTANT:
-        //
-        // Use the User entity here.
-        //
-        // This puts the CURRENT tokenVersion into the JWT.
-        //
-        // JWT contains:
-        //
-        // email
-        // role
-        // tokenVersion
-        // issuedAt
-        // expiration
-        //
         // -----------------------------------------------------
 
         String token =
                 jwtService.generateToken(user);
 
-
         // -----------------------------------------------------
-        // RETURN LOGIN RESPONSE
+        // RETURN AUTH RESPONSE
         // -----------------------------------------------------
 
         return new AuthResponse(
@@ -362,5 +367,78 @@ public class AuthService {
                 user.getRole().name(),
                 token
         );
+    }
+
+
+    // =========================================================
+    // VALIDATE REGISTER REQUEST
+    // =========================================================
+
+    private void validateRegisterRequest(
+            RegisterRequest request) {
+
+        // -----------------------------------------------------
+        // REQUEST
+        // -----------------------------------------------------
+
+        if (request == null) {
+
+            throw new RuntimeException(
+                    "Registration data is required"
+            );
+        }
+
+        // -----------------------------------------------------
+        // NAME
+        // -----------------------------------------------------
+
+        if (request.getName() == null ||
+                request.getName().isBlank()) {
+
+            throw new RuntimeException(
+                    "Name is required"
+            );
+        }
+
+        // -----------------------------------------------------
+        // EMAIL
+        // -----------------------------------------------------
+
+        if (request.getEmail() == null ||
+                request.getEmail().isBlank()) {
+
+            throw new RuntimeException(
+                    "Email is required"
+            );
+        }
+
+        // -----------------------------------------------------
+        // PHONE
+        // -----------------------------------------------------
+        //
+        // Phone is REQUIRED.
+        // Phone is stored in DB.
+        // NO mobile OTP is required.
+        // -----------------------------------------------------
+
+        if (request.getPhone() == null ||
+                request.getPhone().isBlank()) {
+
+            throw new RuntimeException(
+                    "Phone is required"
+            );
+        }
+
+        // -----------------------------------------------------
+        // PASSWORD
+        // -----------------------------------------------------
+
+        if (request.getPassword() == null ||
+                request.getPassword().isBlank()) {
+
+            throw new RuntimeException(
+                    "Password is required"
+            );
+        }
     }
 }
