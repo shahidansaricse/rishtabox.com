@@ -171,6 +171,9 @@
                     Users
                 </button>
 
+                <button type="button" class="nav-btn" data-section="subscribers">
+                    Subscribers
+                </button>
 
                 <button type="button" class="nav-btn" data-section="blogs">
                     Blogs
@@ -966,7 +969,84 @@
 
                 </section>
 
+                <!-- ==================== SUBSCRIBERS SECTION ==================== -->
+                <section id="subscribers" class="admin-section">
 
+                    <div class="section-header">
+                        <div>
+                            <h2>Subscribers</h2>
+                            <p>Manage newsletter subscribers</p>
+                        </div>
+
+                        <button
+                                type="button"
+                                class="admin-refresh-btn"
+                                onclick="loadSubscribers()">
+                            <i class="fas fa-sync-alt"></i>
+                            Refresh
+                        </button>
+                    </div>
+
+                    <!-- Subscriber Count -->
+                    <div class="subscriber-stats">
+
+                        <div class="subscriber-stat-card">
+                            <div class="subscriber-stat-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+
+                            <div>
+                                <span>Total Subscribers</span>
+                                <strong id="subscriberTotalCount">0</strong>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Search -->
+                    <div class="subscriber-toolbar">
+
+                        <div class="subscriber-search">
+                            <i class="fas fa-search"></i>
+
+                            <input
+                                    type="text"
+                                    id="subscriberSearch"
+                                    placeholder="Search subscriber email..."
+                                    oninput="filterSubscribers()">
+                        </div>
+
+                    </div>
+
+                    <!-- Subscribers Table -->
+                    <div class="subscriber-table-container">
+
+                        <table class="subscriber-table">
+
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Email</th>
+                                <th>Subscribed At</th>
+                                <th>Action</th>
+                            </tr>
+                            </thead>
+
+                            <tbody id="subscribersTableBody">
+
+                            <tr>
+                                <td colspan="4" class="subscriber-loading">
+                                    Loading subscribers...
+                                </td>
+                            </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </section>
 
                 <!-- =================================================
                  BLOGS
@@ -1301,7 +1381,6 @@
                                 </strong>
 
                             </article>
-
 
                             <article class="stat-card">
 

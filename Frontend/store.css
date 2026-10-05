@@ -11893,3 +11893,13 @@ body {
     cursor: not-allowed;
 }
 
+/* =========================================================
+   RISHTABOX - DISCOUNT BADGE VISIBILITY FIX
+========================================================= */
+
+.discount {
+    background: #e53935 !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    opacity: 1 !important;
+}

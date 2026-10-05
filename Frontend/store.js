@@ -92,73 +92,344 @@ function saveUserData() {
     }
 }
 function loadUserData() {
-    try {
-        const savedUser = localStorage.getItem("userData");
 
-        if (savedUser) {
-            currentUser = JSON.parse(savedUser);
+    try {
+
+        const savedCurrentUser =
+            localStorage.getItem(
+                "rishtaBoxCurrentUser"
+            );
+
+        const savedUserData =
+            localStorage.getItem(
+                "userData"
+            );
+
+        let savedUser = null;
+
+        // =====================================================
+        // FIRST: rishtaBoxCurrentUser
+        // =====================================================
+
+        if (savedCurrentUser) {
+
+            try {
+
+                savedUser =
+                    JSON.parse(
+                        savedCurrentUser
+                    );
+
+            } catch (error) {
+
+                console.error(
+                    "Invalid rishtaBoxCurrentUser:",
+                    error
+                );
+            }
         }
-        if (!currentUser || typeof currentUser !== "object") {
+
+        // =====================================================
+        // FALLBACK: userData
+        // =====================================================
+
+        if (
+            !savedUser &&
+            savedUserData
+        ) {
+
+            try {
+
+                savedUser =
+                    JSON.parse(
+                        savedUserData
+                    );
+
+            } catch (error) {
+
+                console.error(
+                    "Invalid userData:",
+                    error
+                );
+            }
+        }
+
+        // =====================================================
+        // RESTORE USER
+        // =====================================================
+
+        if (
+            savedUser &&
+            typeof savedUser === "object" &&
+            (
+                savedUser.id ||
+                savedUser.userId
+            )
+        ) {
+
             currentUser = {
-                name: "",
-                email: "",
-                phone: "",
-                address: ""
+
+                id:
+                    savedUser.id ??
+                    savedUser.userId,
+
+                name:
+                    savedUser.name || "",
+
+                email:
+                    savedUser.email || "",
+
+                phone:
+                    savedUser.phone ||
+                    savedUser.mobile ||
+                    "",
+
+                address:
+                    savedUser.address || "",
+
+                city:
+                    savedUser.city || "",
+
+                state:
+                    savedUser.state || "",
+
+                pincode:
+                    savedUser.pincode || "",
+
+                role:
+                    savedUser.role || "USER"
             };
+
+            console.log(
+                "USER RESTORED:",
+                currentUser
+            );
+
+        } else {
+
+            currentUser = null;
+
+            console.log(
+                "NO SAVED USER FOUND"
+            );
         }
+
     } catch (error) {
-        console.error("Could not load user data:", error);
-    }
-}
-function saveCartData() {
-    try {
-        localStorage.setItem("cart",JSON.stringify(cart));
-    } catch (error) {
-        console.error("Storage not available:",error);
-    }
-}
-function loadCartData() {
-    try {
-        const savedCart =localStorage.getItem("cart");
-        if (savedCart) {
-            cart =JSON.parse(savedCart);
-        }
-        if (!Array.isArray(cart)) {
-            cart = [];
-        }
-    } catch (error) {
-        console.error("Could not load cart:",error);
-        cart = [];
-    }
-}
-function saveOrdersData() {
-    try {
-        localStorage.setItem(
-            "orders",
-            JSON.stringify(orders)
+
+        console.error(
+            "Could not load user data:",
+            error
         );
+
+        currentUser = null;
+    }
+}
+// =====================================================
+// SAVE ORDERS DATA
+// =====================================================
+
+function saveOrdersData() {
+
+    if (
+        !currentUser ||
+        !currentUser.id
+    ) {
+
+        console.warn(
+            "Orders not saved: user is not logged in."
+        );
+
+        return;
+    }
+
+    const userId =
+        Number(currentUser.id);
+
+    if (
+        !userId ||
+        isNaN(userId)
+    ) {
+
+        console.warn(
+            "Orders not saved: invalid user ID."
+        );
+
+        return;
+    }
+
+    const storageKey =
+        `orders_user_${userId}`;
+
+    try {
+
+        localStorage.setItem(
+            storageKey,
+            JSON.stringify(
+                orders || []
+            )
+        );
+
+        console.log(
+            "Orders saved for user:",
+            userId,
+            orders
+        );
+
     } catch (error) {
+
         console.error(
             "Could not save orders:",
             error
         );
     }
 }
+function saveCartData() {
 
-function loadOrdersData() {
+    if (
+        !currentUser ||
+        !currentUser.id
+    ) {
+        console.warn(
+            "Cart not saved: user is not logged in."
+        );
+        return;
+    }
+
+    const userId =
+        Number(currentUser.id);
+
+    if (
+        !userId ||
+        isNaN(userId)
+    ) {
+        console.warn(
+            "Cart not saved: invalid user ID."
+        );
+        return;
+    }
+
+    const storageKey =
+        `cart_user_${userId}`;
+
+    localStorage.setItem(
+        storageKey,
+        JSON.stringify(cart || [])
+    );
+
+    // Keep existing frontend code compatible
+    localStorage.setItem(
+        "cart",
+        JSON.stringify(cart || [])
+    );
+
+    console.log(
+        "Cart saved for user:",
+        userId
+    );
+}
+function loadCartData() {
+
     try {
-        const savedOrders =localStorage.getItem("orders");
-        if (savedOrders) {
-            orders =JSON.parse(savedOrders);
+
+        // =====================================================
+        // USER LOGIN CHECK
+        // =====================================================
+
+        if (
+            !currentUser ||
+            !currentUser.id
+        ) {
+
+            cart = [];
+
+            console.log(
+                "Cart not loaded: no logged-in user."
+            );
+
+            return;
         }
-        if (!Array.isArray(orders)) {
-            orders = [];
+
+        const userId =
+            Number(currentUser.id);
+
+        if (
+            !userId ||
+            isNaN(userId)
+        ) {
+
+            cart = [];
+
+            console.warn(
+                "Cart not loaded: invalid user ID."
+            );
+
+            return;
         }
+
+        // =====================================================
+        // USER-SPECIFIC CART KEY
+        // =====================================================
+
+        const storageKey =
+            `cart_user_${userId}`;
+
+        const savedCart =
+            localStorage.getItem(
+                storageKey
+            );
+
+        if (savedCart) {
+
+            cart =
+                JSON.parse(
+                    savedCart
+                );
+
+        } else {
+
+            cart = [];
+
+        }
+
+        // =====================================================
+        // ARRAY CHECK
+        // =====================================================
+
+        if (
+            !Array.isArray(cart)
+        ) {
+
+            cart = [];
+
+        }
+
+        console.log(
+            "User cart loaded:",
+            userId,
+            cart
+        );
+
     } catch (error) {
-        console.error("Could not load orders:",error);
-        orders = [];
+
+        console.error(
+            "Could not load user cart:",
+            error
+        );
+
+        cart = [];
     }
 }
+
+function loadOrdersData() {
+
+    console.log(
+        "loadOrdersData skipped: orders are loaded from backend."
+    );
+
+    return;
+}
+
+
 function saveRecentlyViewed() {
     try {
         localStorage.setItem("recentlyViewed",JSON.stringify(recentlyViewed));
@@ -534,15 +805,40 @@ async function loadData() {
 
 /* =========================================================
    INITIALIZE APP
-========================================================= */
+====/* =====================================================
+   INITIALIZE APPLICATION
+===================================================== */
 
-function initializeApp() {
+async function initializeApp() {
+
+    // =====================================================
+    // LOAD USER
+    // =====================================================
 
     loadUserData();
 
+
+    // =====================================================
+    // LOAD CART
+    // =====================================================
+
     loadCartData();
 
-    loadOrdersData();
+
+    // =====================================================
+    // LOAD ORDERS FROM BACKEND
+    // =====================================================
+
+    console.log(
+        "🚀🚀🚀 CALLING BACKEND ORDERS 🚀🚀🚀"
+    );
+
+    await loadOrdersFromBackend();
+
+
+    // =====================================================
+    // LOAD RECENTLY VIEWED
+    // =====================================================
 
     loadRecentlyViewed();
 
@@ -577,7 +873,9 @@ function initializeApp() {
     );
 
 
-    renderProducts(filteredProducts);
+    renderProducts(
+        filteredProducts
+    );
 
 
     // =====================================================
@@ -592,8 +890,43 @@ function initializeApp() {
     // =====================================================
 
     showPage("home");
-}
 
+
+    // =====================================================
+    // FINAL DEBUG
+    // =====================================================
+
+    console.log(
+        "================================="
+    );
+
+    console.log(
+        "✅ APPLICATION INITIALIZED"
+    );
+
+    console.log(
+        "✅ CURRENT USER:",
+        currentUser
+    );
+
+    console.log(
+        "✅ CART COUNT:",
+        Array.isArray(cart)
+            ? cart.length
+            : 0
+    );
+
+    console.log(
+        "✅ ORDERS COUNT:",
+        Array.isArray(orders)
+            ? orders.length
+            : 0
+    );
+
+    console.log(
+        "================================="
+    );
+}
 /* =========================================================
    DOM READY
 ========================================================= */
@@ -2599,20 +2932,43 @@ function showProduct(productId) {
 /* =========================================================
    ADD TO CART
 ========================================================= */
-async function addToCart(productId) {
+async function addToCart(productId, showSuccessAlert = true) {
 
-    // =====================================================
-    // 1. USER LOGIN CHECK
-    // =====================================================
 
-    if (!currentUser || !currentUser.id) {
-        alert("Please login first.");
+    // ==========================================
+    // LOGIN REQUIRED
+    // ==========================================
+
+    if (
+        !currentUser ||
+        !currentUser.id
+    ) {
+
+        alert(
+            "Please login first to add products to cart."
+        );
+
         showPage("login");
+
+        return false;
+    }
+
+    const token =
+        localStorage.getItem("token");
+
+    if (!token) {
+
+        alert(
+            "Please login again."
+        );
+
+        showPage("login");
+
         return false;
     }
 
     // =====================================================
-    // 2. FIND PRODUCT
+    // 3. FIND PRODUCT
     // =====================================================
 
     const allProducts = [
@@ -2622,30 +2978,49 @@ async function addToCart(productId) {
     ];
 
     const product = allProducts.find(
-        product => String(product.id) === String(productId)
+        item =>
+            String(item.id) === String(productId)
     );
 
     if (!product) {
-        console.error("Product not found:", productId);
+
+        console.error(
+            "Product not found:",
+            productId
+        );
+
         alert("Product not found.");
-        return false;
-    }
-
-    // =====================================================
-    // 3. CHECK PRODUCT AVAILABILITY
-    // =====================================================
-
-    const stock = Number(product.stock || 0);
-
-    if (product.active !== true || stock <= 0) {
-
-        alert("This product is currently out of stock.");
 
         return false;
     }
 
     // =====================================================
-    // 4. GET COLOR / SIZE
+    // 4. CHECK PRODUCT STATUS / STOCK
+    // =====================================================
+
+    const stock =
+        Number(product.stock || 0);
+
+    if (product.active !== true) {
+
+        alert(
+            "This product is currently unavailable."
+        );
+
+        return false;
+    }
+
+    if (stock <= 0) {
+
+        alert(
+            "This product is currently out of stock."
+        );
+
+        return false;
+    }
+
+    // =====================================================
+    // 5. GET SELECTED COLOR / SIZE
     // =====================================================
 
     const colorElement =
@@ -2655,27 +3030,43 @@ async function addToCart(productId) {
         document.getElementById("selectedSize");
 
     const selectedColor =
-        colorElement ? colorElement.value : "";
+        colorElement
+            ? colorElement.value
+            : "";
 
     const selectedSize =
-        sizeElement ? sizeElement.value : "";
+        sizeElement
+            ? sizeElement.value
+            : "";
 
     // =====================================================
-    // 5. CHECK CURRENT LOCAL CART QUANTITY
+    // 6. CHECK EXISTING LOCAL CART ITEM
     // =====================================================
 
-    const existingItem = cart.find(item =>
-        String(item.id) === String(product.id) &&
-        item.color === selectedColor &&
-        item.size === selectedSize
-    );
+    const existingItem =
+        cart.find(item =>
 
-    const currentCartQuantity = existingItem
-        ? Number(existingItem.quantity || 0)
-        : 0;
+            String(item.id) ===
+            String(product.id)
+
+            &&
+
+            String(item.color || "") ===
+            String(selectedColor || "")
+
+            &&
+
+            String(item.size || "") ===
+            String(selectedSize || "")
+        );
+
+    const currentCartQuantity =
+        existingItem
+            ? Number(existingItem.quantity || 0)
+            : 0;
 
     // =====================================================
-    // 6. STOCK LIMIT CHECK
+    // 7. STOCK LIMIT CHECK
     // =====================================================
 
     if (currentCartQuantity >= stock) {
@@ -2688,40 +3079,41 @@ async function addToCart(productId) {
     }
 
     // =====================================================
-    // 7. SAVE TO BACKEND FIRST
+    // 8. SAVE TO BACKEND
     // =====================================================
 
     try {
 
-        const token =
-            localStorage.getItem("token");
+        const response =
+            await fetch(
+                rbApiUrl("/api/cart/add"),
+                {
+                    method: "POST",
 
-        if (!token) {
+                    headers: {
+                        "Content-Type":
+                            "application/json",
 
-            alert("Please login again.");
+                        "Authorization":
+                            `Bearer ${token}`
+                    },
 
-            showPage("login");
+                    body: JSON.stringify({
 
-            return false;
-        }
+                        userId:
+                            Number(currentUser.id),
 
-        const response = await fetch(
-            "http://localhost:8080/api/cart/add",
-            {
-                method: "POST",
+                        productId:
+                            Number(product.id),
 
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                },
+                        quantity: 1
+                    })
+                }
+            );
 
-                body: JSON.stringify({
-                    userId: currentUser.id,
-                    productId: Number(product.id),
-                    quantity: 1
-                })
-            }
-        );
+        // =================================================
+        // 9. READ RESPONSE
+        // =================================================
 
         const responseText =
             await response.text();
@@ -2729,11 +3121,15 @@ async function addToCart(productId) {
         let data = {};
 
         try {
-            data = responseText
-                ? JSON.parse(responseText)
-                : {};
-        } catch (e) {
-            console.log(
+
+            data =
+                responseText
+                    ? JSON.parse(responseText)
+                    : {};
+
+        } catch (error) {
+
+            console.warn(
                 "Backend response:",
                 responseText
             );
@@ -2750,27 +3146,26 @@ async function addToCart(productId) {
         );
 
         // =================================================
-        // BACKEND FAILED
+        // 10. BACKEND ERROR
         // =================================================
 
         if (!response.ok) {
 
             alert(
-                "Cart could not be saved in database.\n" +
+                "Cart could not be saved.\n\n" +
                 (
                     data.message ||
                     responseText ||
-                    "Unknown error"
+                    "Unknown server error."
                 )
             );
 
             return false;
         }
 
-        // =====================================================
-        // 8. BACKEND SUCCESS
-        //    NOW UPDATE LOCAL CART
-        // =====================================================
+        // =================================================
+        // 11. UPDATE LOCAL CART
+        // =================================================
 
         if (existingItem) {
 
@@ -2781,7 +3176,8 @@ async function addToCart(productId) {
 
             cart.push({
 
-                id: product.id,
+                id:
+                product.id,
 
                 name:
                     product.name || "",
@@ -2813,27 +3209,32 @@ async function addToCart(productId) {
             });
         }
 
-        // =====================================================
-        // 9. SAVE LOCAL CART
-        // =====================================================
+        // =================================================
+        // 12. SAVE LOCAL CART
+        // =================================================
 
         saveCartData();
 
         updateCartCount();
 
         console.log(
-            "Product successfully saved to backend cart."
+            "Product successfully added to cart."
         );
 
-        alert("Product added to cart.");
+        // =================================================
+        // 13. SUCCESS ALERT
+        // =================================================
+
+        if (showSuccessAlert) {
+
+            alert(
+                "Product added to cart."
+            );
+        }
 
         return true;
 
     } catch (error) {
-
-        // =====================================================
-        // NETWORK / SERVER ERROR
-        // =====================================================
 
         console.error(
             "Cart API Error:",
@@ -2841,7 +3242,7 @@ async function addToCart(productId) {
         );
 
         alert(
-            "Could not connect to backend. " +
+            "Could not connect to backend.\n" +
             "Product was not added to cart."
         );
 
@@ -2852,6 +3253,25 @@ async function addToCart(productId) {
    BUY NOW
 ========================================================= */
 async function buyNow(productId) {
+
+    if (!currentUser || !currentUser.id) {
+
+        localStorage.setItem(
+            "pendingBuyNowProductId",
+            String(productId)
+        );
+
+        console.log(
+            "Pending Buy Now product:",
+            productId
+        );
+
+        alert("Please login first.");
+
+        showPage("login");
+
+        return false;
+    }
 
     const success = await addToCart(productId);
 
@@ -3316,12 +3736,24 @@ async function placeOrder() {
     // ==========================================
     // 2. CHECK LOGIN / USER
     // ==========================================
-
     if (!currentUser || !currentUser.id) {
-        alert("User ID not found. Please login again.");
-        return;
-    }
 
+        localStorage.setItem(
+            "pendingBuyNowProductId",
+            String(productId)
+        );
+
+        console.log(
+            "Pending Buy Now product:",
+            productId
+        );
+
+        alert("Please login first.");
+
+        showPage("login");
+
+        return false;
+    }
     console.log("Current User:", currentUser);
     console.log("User ID:", currentUser.id);
 
@@ -3786,10 +4218,22 @@ async function placeOrder() {
 // RENDER ORDERS
 // ======================================================
 function renderOrders() {
+
     const ordersList =
         document.getElementById("ordersList");
+
     if (!ordersList) return;
-    if (orders.length === 0) {
+
+
+    // =====================================================
+    // NO ORDERS
+    // =====================================================
+
+    if (
+        !Array.isArray(orders) ||
+        orders.length === 0
+    ) {
+
         ordersList.innerHTML = `
             <p>
                 No orders found.
@@ -3801,246 +4245,885 @@ function renderOrders() {
                 </a>
             </p>
         `;
+
         return;
     }
+
+
+    // =====================================================
+    // SAFE DATE
+    // =====================================================
+
+    function getSafeDate(value) {
+
+        if (!value) {
+            return null;
+        }
+
+        const date =
+            new Date(value);
+
+        if (
+            isNaN(
+                date.getTime()
+            )
+        ) {
+            return null;
+        }
+
+        return date;
+    }
+
+
+    // =====================================================
+    // FORMAT DATE
+    // =====================================================
+
+    function formatDate(value) {
+
+        const date =
+            getSafeDate(value);
+
+        if (!date) {
+            return "Not available";
+        }
+
+        return date.toLocaleDateString(
+            "en-IN",
+            {
+                day: "2-digit",
+                month: "short",
+                year: "numeric"
+            }
+        );
+    }
+
+
+    // =====================================================
+    // CLEAR OLD HTML
+    // =====================================================
+
     ordersList.innerHTML = "";
-    const sortedOrders = [...orders].sort(
-        (a, b) =>
-            new Date(b.orderDate) -
-            new Date(a.orderDate)
-    );
-    sortedOrders.forEach((order) => {
-        const currentDate =
-            new Date();
-        const deliveryDate =
-            new Date(order.deliveryDate);
-        const orderDate =
-            new Date(order.orderDate);
-        const isDelivered =
-            currentDate >= deliveryDate;
-        const orderDiv =
-            document.createElement("div");
-        orderDiv.className =
-            "order-card";
-        let orderItemsHtml = "";
-        order.items.forEach((item) => {
-            orderItemsHtml += `
-                <div class="cart-item">
-                    <img
-                        src="${getImagePath(item.image)}"
-                        alt="${item.name}"
-                    >
-                    <div class="cart-item-details">
-                        <h3>
-                            ${item.name}
-                        </h3>
-                        <div class="product-brand">
-                            ${item.brand || ""}
+
+
+    // =====================================================
+    // SORT ORDERS
+    // =====================================================
+
+    const sortedOrders =
+        [...orders].sort(
+            (a, b) => {
+
+                const dateA =
+                    getSafeDate(
+                        a.createdAt ||
+                        a.orderDate
+                    );
+
+                const dateB =
+                    getSafeDate(
+                        b.createdAt ||
+                        b.orderDate
+                    );
+
+                if (!dateA && !dateB) {
+                    return 0;
+                }
+
+                if (!dateA) {
+                    return 1;
+                }
+
+                if (!dateB) {
+                    return -1;
+                }
+
+                return (
+                    dateB.getTime() -
+                    dateA.getTime()
+                );
+            }
+        );
+
+
+    // =====================================================
+    // RENDER EACH ORDER
+    // =====================================================
+
+    sortedOrders.forEach(
+        (order) => {
+
+            // =================================================
+            // ORDER ID / NUMBER
+            // =================================================
+
+            const orderId =
+                order.id;
+
+            const orderNumber =
+                order.orderNumber ||
+                order.order_number ||
+                `ORD${orderId}`;
+
+
+            // =================================================
+            // ORDER DATE
+            // =================================================
+
+            const rawOrderDate =
+                order.createdAt ||
+                order.orderDate ||
+                order.created_at ||
+                null;
+
+            const orderDate =
+                getSafeDate(
+                    rawOrderDate
+                );
+
+
+            // =================================================
+            // DELIVERY DATE
+            // =================================================
+
+            let deliveryDate =
+                getSafeDate(
+                    order.deliveryDate ||
+                    order.expectedDeliveryDate ||
+                    order.estimatedDeliveryDate
+                );
+
+
+            /*
+             * If backend does not have deliveryDate,
+             * create a safe estimated delivery date.
+             */
+
+            if (!deliveryDate && orderDate) {
+
+                deliveryDate =
+                    new Date(
+                        orderDate.getTime()
+                    );
+
+                deliveryDate.setDate(
+                    deliveryDate.getDate() + 5
+                );
+            }
+
+
+            // =================================================
+            // CURRENT DATE
+            // =================================================
+
+            const currentDate =
+                new Date();
+
+
+            // =================================================
+            // DELIVERED CHECK
+            // =================================================
+
+            const backendStatus =
+                String(
+                    order.orderStatus ||
+                    order.status ||
+                    ""
+                )
+                    .trim()
+                    .toUpperCase();
+
+
+            const isCancelled =
+                backendStatus ===
+                "CANCELLED" ||
+                backendStatus ===
+                "CANCELED";
+
+
+            const isDelivered =
+                backendStatus ===
+                "DELIVERED" ||
+                (
+                    deliveryDate &&
+                    currentDate >=
+                    deliveryDate &&
+                    !isCancelled
+                );
+
+
+            // =================================================
+            // DISPLAY STATUS
+            // =================================================
+
+            let displayStatus =
+                "On the way";
+
+            let statusClass =
+                "on-way";
+
+
+            if (isCancelled) {
+
+                displayStatus =
+                    "Cancelled";
+
+                statusClass =
+                    "cancelled";
+
+            } else if (isDelivered) {
+
+                displayStatus =
+                    "Delivered";
+
+                statusClass =
+                    "delivered";
+            }
+
+
+            // =================================================
+            // PAYMENT METHOD
+            // =================================================
+
+            const paymentMethod =
+                String(
+                    order.paymentMethod ||
+                    "COD"
+                );
+
+
+            // =================================================
+            // TOTAL
+            // =================================================
+
+            let itemsTotal =
+                Number(
+                    order.totalAmount ??
+                    order.total ??
+                    order.amount ??
+                    0
+                );
+
+            if (
+                isNaN(itemsTotal) ||
+                itemsTotal < 0
+            ) {
+                itemsTotal = 0;
+            }
+
+
+            let deliveryCharges =
+                Number(
+                    order.deliveryCharges ??
+                    order.deliveryFee ??
+                    order.shippingFee ??
+                    0
+                );
+
+            if (
+                isNaN(deliveryCharges) ||
+                deliveryCharges < 0
+            ) {
+                deliveryCharges = 0;
+            }
+
+
+            /*
+             * Backend totalAmount may already include
+             * delivery charges.
+             *
+             * Prefer explicit grand total if available.
+             */
+
+            let grandTotal =
+                Number(
+                    order.grandTotal ??
+                    order.totalPayable ??
+                    order.finalAmount ??
+                    NaN
+                );
+
+
+            if (
+                isNaN(grandTotal)
+            ) {
+
+                grandTotal =
+                    itemsTotal +
+                    deliveryCharges;
+            }
+
+
+            // =================================================
+            // ORDER ITEMS
+            // =================================================
+
+            const backendItems =
+                Array.isArray(order.items)
+                    ? order.items
+                    : (
+                        Array.isArray(
+                            order.orderItems
+                        )
+                            ? order.orderItems
+                            : []
+                    );
+
+
+            const orderItems =
+                backendItems.map(
+                    (item) => {
+
+                        const product =
+                            item.product ||
+                            item.productData ||
+                            {};
+
+
+                        const itemPrice =
+                            Number(
+                                item.price ??
+                                item.unitPrice ??
+                                product.price ??
+                                0
+                            );
+
+
+                        const itemQuantity =
+                            Number(
+                                item.quantity
+                            ) || 1;
+
+
+                        return {
+
+                            id:
+                                product.id ??
+                                item.productId ??
+                                item.id,
+
+                            name:
+                                product.name ||
+                                item.name ||
+                                "Product",
+
+                            brand:
+                                product.brand ||
+                                item.brand ||
+                                "",
+
+                            image:
+                                product.image ||
+                                item.image ||
+                                "",
+
+                            color:
+                                item.color ||
+                                product.color ||
+                                "",
+
+                            size:
+                                item.size ||
+                                product.size ||
+                                "",
+
+                            quantity:
+                            itemQuantity,
+
+                            price:
+                            itemPrice
+                        };
+                    }
+                );
+
+
+            // =================================================
+            // CUSTOMER INFORMATION
+            // =================================================
+
+            const customerName =
+                order.name ||
+                order.customerName ||
+                order.user?.name ||
+                currentUser?.name ||
+                "";
+
+
+            const customerPhone =
+                order.phone ||
+                order.customerPhone ||
+                order.mobile ||
+                order.user?.phone ||
+                currentUser?.phone ||
+                "";
+
+
+            // =================================================
+            // ADDRESS
+            // =================================================
+
+            const address =
+                order.shippingAddress ||
+                order.address ||
+                "";
+
+
+            const city =
+                order.shippingCity ||
+                order.city ||
+                "";
+
+
+            const state =
+                order.shippingState ||
+                order.state ||
+                "";
+
+
+            const pincode =
+                order.shippingPincode ||
+                order.pincode ||
+                "";
+
+
+            const fullAddress =
+                [
+                    address,
+                    city,
+                    state,
+                    pincode
+                ]
+                    .filter(
+                        value =>
+                            value !== null &&
+                            value !== undefined &&
+                            String(value).trim() !== ""
+                    )
+                    .join(", ");
+
+
+            // =================================================
+            // CREATE ORDER CARD
+            // =================================================
+
+            const orderDiv =
+                document.createElement(
+                    "div"
+                );
+
+
+            orderDiv.className =
+                "order-card";
+
+
+            // =================================================
+            // ORDER ITEMS HTML
+            // =================================================
+
+            let orderItemsHtml =
+                "";
+
+
+            orderItems.forEach(
+                (item) => {
+
+                    const image =
+                        item.image
+                            ? getImagePath(
+                                item.image
+                            )
+                            : "";
+
+
+                    orderItemsHtml += `
+
+                        <div class="cart-item">
+
+                            ${
+                        image
+                            ? `
+                                    <img
+                                        src="${image}"
+                                        alt="${item.name}"
+                                        onerror="this.style.display='none';"
+                                    >
+                                    `
+                            : ""
+                    }
+
+                            <div class="cart-item-details">
+
+                                <h3>
+                                    ${item.name}
+                                </h3>
+
+                                <div class="product-brand">
+                                    ${item.brand || ""}
+                                </div>
+
+                                ${
+                        item.color
+                            ? `
+                                        <p>
+                                            Color:
+                                            ${item.color}
+                                        </p>
+                                        `
+                            : ""
+                    }
+
+                                ${
+                        item.size
+                            ? `
+                                        <p>
+                                            Size:
+                                            ${item.size}
+                                        </p>
+                                        `
+                            : ""
+                    }
+
+                                <p>
+                                    Quantity:
+                                    ${item.quantity}
+                                </p>
+
+                                <p>
+                                    Price:
+                                    ₹${(
+                        item.price *
+                        item.quantity
+                    ).toFixed(2)}
+                                </p>
+
+                            </div>
+
                         </div>
-                        ${
-                item.color
-                    ? `<p>Color: ${item.color}</p>`
-                    : ""
-            }
-                        ${
-                item.size
-                    ? `<p>Size: ${item.size}</p>`
-                    : ""
-            }
-                        <p>
-                            Quantity:
-                            ${item.quantity}
-                        </p>
-                        <p>
-                            Price:
-                            ₹${Number(item.price) * Number(item.quantity)}
-                        </p>
-                    </div>
-                </div>
-            `;
-        });
-        orderDiv.innerHTML = `
-            <div
-                class="order-header"
-                onclick="toggleOrderDetails('${order.id}')"
-            >
-                <div class="order-summary">
-                    <h3>
-                        Order ID:
-                        ${order.id}
-                    </h3>
-              <span
-    class="status-badge ${
-            order.status === "Cancelled"
-                ? "cancelled"
-                : isDelivered
-                    ? "delivered"
-                    : "on-way"
-        }"
->
-    ${
-            order.status === "Cancelled"
-                ? "Cancelled"
-                : isDelivered
-                    ? "Delivered"
-                    : "On the way"
-        }
-</span>
-                </div>
-                <div class="order-meta">
-                    <p>
-                        <strong>
-                            Order Date:
-                        </strong>
+                    `;
+                }
+            );
 
-                        ${orderDate.toLocaleDateString()}
-                    </p>
-                    <p>
-                        <strong>
-                            Total:
-                        </strong>
-                        ₹${
-            Number(order.total) +
-            Number(order.deliveryCharges)
-        }
-                    </p>
-                    <p>
-                        <strong>
-                            Items:
-                        </strong>
-                        ${order.items.length}
-                        ${
-            order.items.length > 1
-                ? "items"
-                : "item"
-        }
-                    </p>
-                    <div class="dropdown-arrow">
-                        <span class="arrow-icon">
-                            ▼
+
+            // =================================================
+            // ORDER CARD HTML
+            // =================================================
+
+            orderDiv.innerHTML = `
+
+                <div
+                    class="order-header"
+                    onclick="toggleOrderDetails('${orderId}')"
+                >
+
+                    <div class="order-summary">
+
+                        <h3>
+                            Order ID:
+                            ${orderNumber}
+                        </h3>
+
+                        <span
+                            class="status-badge ${statusClass}"
+                        >
+                            ${displayStatus}
                         </span>
+
                     </div>
+
+
+                    <div class="order-meta">
+
+                        <p>
+
+                            <strong>
+                                Order Date:
+                            </strong>
+
+                            ${
+                formatDate(
+                    rawOrderDate
+                )
+            }
+
+                        </p>
+
+
+                        <p>
+
+                            <strong>
+                                Total:
+                            </strong>
+
+                            ₹${grandTotal.toFixed(2)}
+
+                        </p>
+
+
+                        <p>
+
+                            <strong>
+                                Items:
+                            </strong>
+
+                            ${orderItems.length}
+
+                            ${
+                orderItems.length !== 1
+                    ? " items"
+                    : " item"
+            }
+
+                        </p>
+
+
+                        <div class="dropdown-arrow">
+
+                            <span class="arrow-icon">
+                                ▼
+                            </span>
+
+                        </div>
+
+                    </div>
+
                 </div>
-            </div>
-            <div
-                class="order-details"
-                id="details-${order.id}"
-                style="display: none;"
-            >
-                <div class="order-info">
-                    <p>
-                        <strong>
-                            Delivery Date:
-                        </strong>
 
-                        ${deliveryDate.toLocaleDateString()}
-                    </p>
-                    <p>
-                        <strong>
-                            Payment Method:
-                        </strong>
 
-                        ${order.paymentMethod.toUpperCase()}
-                    </p>
-                    <div class="address-section">
+                <div
+                    class="order-details"
+                    id="details-${orderId}"
+                    style="display:none;"
+                >
+
+                    <div class="order-info">
+
+
+                        <p>
+
+                            <strong>
+                                Delivery Date:
+                            </strong>
+
+                            ${
+                deliveryDate
+                    ? formatDate(
+                        deliveryDate
+                    )
+                    : "Not available"
+            }
+
+                        </p>
+
+
+                        <p>
+
+                            <strong>
+                                Payment Method:
+                            </strong>
+
+                            ${paymentMethod.toUpperCase()}
+
+                        </p>
+
+
+                        <div class="address-section">
+
+                            <h4>
+                                Delivery Address:
+                            </h4>
+
+
+                            ${
+                customerName
+                    ? `
+                                    <p>
+                                        ${customerName}
+                                    </p>
+                                    `
+                    : ""
+            }
+
+
+                            ${
+                customerPhone
+                    ? `
+                                    <p>
+                                        ${customerPhone}
+                                    </p>
+                                    `
+                    : ""
+            }
+
+
+                            ${
+                fullAddress
+                    ? `
+                                    <p>
+                                        ${fullAddress}
+                                    </p>
+                                    `
+                    : `
+                                    <p>
+                                        Address not available
+                                    </p>
+                                    `
+            }
+
+                        </div>
+
+
                         <h4>
-                            Delivery Address:
+                            Order Items:
                         </h4>
 
-                        <p>${order.name}</p>
 
-                        <p>${order.phone}</p>
+                        ${
+                orderItemsHtml ||
+                `
+                            <p>
+                                No item information available.
+                            </p>
+                            `
+            }
 
-                        <p>${order.address}</p>
-                    </div>
-                    <h4>
-                        Order Items:
-                    </h4>
-                    ${orderItemsHtml}
-                    <div class="cart-summary">
-                        <div class="summary-row">
-                            <span>
-                                Items Total:
-                            </span>
-                            <span>
-                                ₹${order.total}
-                            </span>
-                        </div>
-                        <div class="summary-row">
-                            <span>
-                                Delivery Charges:
-                            </span>
-                            <span>
+
+                        <div class="cart-summary">
+
+
+                            <div class="summary-row">
+
+                                <span>
+                                    Items Total:
+                                </span>
+
+                                <span>
+                                    ₹${itemsTotal.toFixed(2)}
+                                </span>
+
+                            </div>
+
+
+                            <div class="summary-row">
+
+                                <span>
+                                    Delivery Charges:
+                                </span>
+
+                                <span>
+
+                                    ${
+                deliveryCharges === 0
+                    ? "FREE"
+                    : "₹" +
+                    deliveryCharges.toFixed(2)
+            }
+
+                                </span>
+
+                            </div>
+
+
+                            <div class="summary-divider"></div>
+
+
+                            <div class="summary-row summary-total">
+
+                                <span>
+                                    Total Amount:
+                                </span>
+
+                                <span>
+                                    ₹${grandTotal.toFixed(2)}
+                                </span>
+
+                            </div>
+
+
+                            <div class="order-actions">
+
                                 ${
-            Number(order.deliveryCharges) === 0
-                ? "FREE"
-                : "₹" + order.deliveryCharges
-        }
-                            </span>
+                !isDelivered &&
+                !isCancelled
+                    ? `
+                                        <button
+                                            type="button"
+                                            class="cancel-order-btn"
+                                            onclick="
+                                                cancelOrder('${orderId}');
+                                                event.stopPropagation();
+                                            "
+                                        >
+                                            ❌ Cancel Order
+                                        </button>
+                                        `
+                    : ""
+            }
+
+
+                                ${
+                !isCancelled
+                    ? `
+                                        <button
+                                            type="button"
+                                            class="track-order-btn"
+                                            onclick="
+                                                showOrderTracking('${orderId}');
+                                                event.stopPropagation();
+                                            "
+                                        >
+                                            🚚 Track Order
+                                        </button>
+                                        `
+                    : ""
+            }
+
+                            </div>
+
+
+                            <div
+                                id="tracking-${orderId}"
+                                class="order-tracking"
+                                style="display:none;"
+                            ></div>
+
+
                         </div>
-                        <div class="summary-divider"></div>
-                        <div class="summary-row summary-total">
-                            <span>
-                                Total Amount:
-                            </span>
-                            <span>
-                                ₹${
-            Number(order.total) +
-            Number(order.deliveryCharges)
-        }
-                            </span>
-                        </div>
-  <div class="order-actions">
 
-    ${
-            !isDelivered && order.status !== "Cancelled"
-                ? `
-                <button
-                    type="button"
-                    class="cancel-order-btn"
-                    onclick="cancelOrder('${order.id}'); event.stopPropagation();">
-                    ❌ Cancel Order
-                </button>
-            `
-                : ""
-        }
-
-    ${
-            order.status !== "Cancelled"
-                ? `
-                <button
-                    type="button"
-                    class="track-order-btn"
-                    onclick="showOrderTracking('${order.id}'); event.stopPropagation();">
-                    🚚 Track Order
-                </button>
-            `
-                : ""
-        }
-
-</div>
-
-<div
-    id="tracking-${order.id}"
-    class="order-tracking"
-    style="display:none;">
-</div>
                     </div>
+
                 </div>
-            </div>
-        `;
-        ordersList.appendChild(orderDiv);
-    });
+            `;
+
+
+            ordersList.appendChild(
+                orderDiv
+            );
+
+        }
+    );
 }
 function showOrderTracking(orderId) {
 
     const order =
-        orders.find(o => o.id === orderId);
+        orders.find(
+            o =>
+                String(o.id) ===
+                String(orderId)
+        );
 
     if (!order) {
+
+        console.error(
+            "Order not found:",
+            orderId,
+            orders
+        );
+
         alert("Order not found.");
+
         return;
     }
+
 
     const trackingElement =
         document.getElementById(
@@ -4048,35 +5131,93 @@ function showOrderTracking(orderId) {
         );
 
     if (!trackingElement) {
+
         console.error(
             "Tracking element not found:",
             `tracking-${orderId}`
         );
+
         return;
     }
+
 
     /* =========================================================
        TOGGLE TRACKING
     ========================================================= */
 
-    if (trackingElement.style.display === "block") {
+    if (
+        trackingElement.style.display ===
+        "block"
+    ) {
 
-        trackingElement.style.display = "none";
-        trackingElement.innerHTML = "";
+        trackingElement.style.display =
+            "none";
+
+        trackingElement.innerHTML =
+            "";
 
         return;
     }
 
 
     /* =========================================================
-       DATES
+       SAFE DATES
     ========================================================= */
 
-    const orderDate =
-        new Date(order.orderDate);
+    const rawOrderDate =
+        order.createdAt ||
+        order.orderDate ||
+        order.created_at ||
+        null;
 
-    const deliveryDate =
-        new Date(order.deliveryDate);
+    const rawDeliveryDate =
+        order.deliveryDate ||
+        order.expectedDeliveryDate ||
+        order.estimatedDeliveryDate ||
+        null;
+
+
+    const orderDate =
+        rawOrderDate
+            ? new Date(rawOrderDate)
+            : null;
+
+
+    let deliveryDate =
+        rawDeliveryDate
+            ? new Date(rawDeliveryDate)
+            : null;
+
+
+    /* =========================================================
+       FALLBACK DELIVERY DATE
+    ========================================================= */
+
+    if (
+        !deliveryDate ||
+        isNaN(
+            deliveryDate.getTime()
+        )
+    ) {
+
+        if (
+            orderDate &&
+            !isNaN(
+                orderDate.getTime()
+            )
+        ) {
+
+            deliveryDate =
+                new Date(
+                    orderDate.getTime()
+                );
+
+            deliveryDate.setDate(
+                deliveryDate.getDate() + 5
+            );
+        }
+    }
+
 
     const currentDate =
         new Date();
@@ -4086,24 +5227,69 @@ function showOrderTracking(orderId) {
        PROGRESS
     ========================================================= */
 
-    const totalTime =
-        deliveryDate.getTime() -
-        orderDate.getTime();
+    let progress = 0;
 
-    const elapsedTime =
-        currentDate.getTime() -
-        orderDate.getTime();
 
-    let progress =
-        totalTime > 0
-            ? elapsedTime / totalTime
-            : 1;
+    if (
+        orderDate &&
+        !isNaN(
+            orderDate.getTime()
+        ) &&
+        deliveryDate &&
+        !isNaN(
+            deliveryDate.getTime()
+        )
+    ) {
+
+        const totalTime =
+            deliveryDate.getTime() -
+            orderDate.getTime();
+
+        const elapsedTime =
+            currentDate.getTime() -
+            orderDate.getTime();
+
+        progress =
+            totalTime > 0
+                ? elapsedTime / totalTime
+                : 1;
+    }
+
 
     progress =
         Math.max(
             0,
-            Math.min(1, progress)
+            Math.min(
+                1,
+                progress
+            )
         );
+
+
+    /* =========================================================
+       STATUS
+    ========================================================= */
+
+    const orderStatus =
+        String(
+            order.orderStatus ||
+            order.status ||
+            ""
+        )
+            .trim()
+            .toUpperCase();
+
+
+    const isCancelled =
+        orderStatus ===
+        "CANCELLED" ||
+        orderStatus ===
+        "CANCELED";
+
+
+    const isDelivered =
+        orderStatus ===
+        "DELIVERED";
 
 
     /* =========================================================
@@ -4112,11 +5298,12 @@ function showOrderTracking(orderId) {
 
     let currentStep = 1;
 
-    if (order.status === "Cancelled") {
+
+    if (isCancelled) {
 
         currentStep = -1;
 
-    } else if (progress >= 1) {
+    } else if (isDelivered) {
 
         currentStep = 4;
 
@@ -4128,6 +5315,9 @@ function showOrderTracking(orderId) {
 
         currentStep = 2;
 
+    } else {
+
+        currentStep = 1;
     }
 
 
@@ -4138,36 +5328,56 @@ function showOrderTracking(orderId) {
     const steps = [
 
         {
-            title: "Order Placed",
-            icon: "✓",
+            title:
+                "Order Placed",
+
+            icon:
+                "✓",
+
             description:
                 "Your order has been placed"
         },
 
         {
-            title: "Confirmed",
-            icon: "✓",
+            title:
+                "Confirmed",
+
+            icon:
+                "✓",
+
             description:
                 "Your order has been confirmed"
         },
 
         {
-            title: "Shipped",
-            icon: "🚚",
+            title:
+                "Shipped",
+
+            icon:
+                "🚚",
+
             description:
                 "Your order has been shipped"
         },
 
         {
-            title: "Out for Delivery",
-            icon: "🚚",
+            title:
+                "Out for Delivery",
+
+            icon:
+                "🚚",
+
             description:
                 "Your order is out for delivery"
         },
 
         {
-            title: "Delivered",
-            icon: "✓",
+            title:
+                "Delivered",
+
+            icon:
+                "✓",
+
             description:
                 "Your order has been delivered"
         }
@@ -4185,27 +5395,27 @@ function showOrderTracking(orderId) {
     steps.forEach(
         function (step, index) {
 
-            const stepNumber = index;
-
             let className = "";
 
 
             if (currentStep === -1) {
 
-                className = "cancelled";
+                className =
+                    "cancelled";
 
             } else if (
-                stepNumber < currentStep
+                index < currentStep
             ) {
 
-                className = "completed";
+                className =
+                    "completed";
 
             } else if (
-                stepNumber === currentStep
+                index === currentStep
             ) {
 
-                className = "current";
-
+                className =
+                    "current";
             }
 
 
@@ -4220,7 +5430,6 @@ function showOrderTracking(orderId) {
                     >
                         ${step.icon}
                     </div>
-
 
                     <div
                         class="tracking-step-content"
@@ -4249,6 +5458,7 @@ function showOrderTracking(orderId) {
 
     const displayOrderId =
         order.orderNumber ||
+        order.order_number ||
         order.id ||
         "Not available";
 
@@ -4260,6 +5470,7 @@ function showOrderTracking(orderId) {
     const trackingId =
         order.awbCode ||
         order.trackingId ||
+        order.tracking_id ||
         "Not available yet";
 
 
@@ -4269,6 +5480,7 @@ function showOrderTracking(orderId) {
 
     const courierName =
         order.courierName ||
+        order.courier_name ||
         "";
 
 
@@ -4278,6 +5490,7 @@ function showOrderTracking(orderId) {
 
     const trackingUrl =
         order.trackingUrl ||
+        order.tracking_url ||
         "";
 
 
@@ -4306,7 +5519,6 @@ function showOrderTracking(orderId) {
             </p>
 
         `;
-
     }
 
 
@@ -4332,7 +5544,6 @@ function showOrderTracking(orderId) {
             </p>
 
         `;
-
     }
 
 
@@ -4343,7 +5554,7 @@ function showOrderTracking(orderId) {
     let trackingContentHTML = "";
 
 
-    if (order.status === "Cancelled") {
+    if (isCancelled) {
 
         trackingContentHTML = `
 
@@ -4370,7 +5581,33 @@ function showOrderTracking(orderId) {
             </div>
 
         `;
+    }
 
+
+    /* =========================================================
+       EXPECTED DELIVERY
+    ========================================================= */
+
+    let expectedDelivery =
+        "Not available";
+
+
+    if (
+        deliveryDate &&
+        !isNaN(
+            deliveryDate.getTime()
+        )
+    ) {
+
+        expectedDelivery =
+            deliveryDate.toLocaleDateString(
+                "en-IN",
+                {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric"
+                }
+            );
     }
 
 
@@ -4424,13 +5661,7 @@ function showOrderTracking(orderId) {
                     Expected Delivery:
                 </strong>
 
-                ${
-        isNaN(
-            deliveryDate.getTime()
-        )
-            ? "Not available"
-            : deliveryDate.toLocaleDateString()
-    }
+                ${expectedDelivery}
 
             </p>
 
@@ -4439,7 +5670,6 @@ function showOrderTracking(orderId) {
 
 
             ${trackingContentHTML}
-
 
         </div>
 
@@ -4454,7 +5684,6 @@ function showOrderTracking(orderId) {
         "block";
 }
 /*--------------------------------------------------*/
-/*--------------------------------------------------*/
 /* CANCEL ORDER */
 /*--------------------------------------------------*/
 
@@ -4468,153 +5697,205 @@ async function cancelOrder(orderId) {
         return;
     }
 
+    // ==========================================
+    // FIND ORDER
+    // ==========================================
+
     const orderIndex = orders.findIndex(
-        order => String(order.id) === String(orderId)
+        order =>
+            String(order.id) ===
+            String(orderId)
     );
 
     if (orderIndex === -1) {
-        alert("Order not found.");
-        return;
-    }
 
-    const order = orders[orderIndex];
-
-    const currentDate = new Date();
-
-    const deliveryDate =
-        new Date(order.deliveryDate);
-
-    // Don't allow cancellation after delivery date
-    if (currentDate >= deliveryDate) {
-        alert(
-            "This order cannot be cancelled because it has already been delivered."
+        console.error(
+            "ORDER NOT FOUND:",
+            orderId,
+            orders
         );
+
+        alert("Order not found.");
+
         return;
     }
 
+    const order =
+        orders[orderIndex];
+
+    console.log(
+        "SELECTED ORDER:",
+        order
+    );
+
     // ==========================================
-    // BACKEND ORDER ID CHECK
+    // REAL DATABASE ORDER ID
     // ==========================================
 
-    if (!order.backendOrderId) {
+    const backendOrderId =
+        Number(order.id);
+
+    console.log(
+        "BACKEND ORDER ID:",
+        backendOrderId
+    );
+
+    if (
+        !backendOrderId ||
+        isNaN(backendOrderId)
+    ) {
 
         alert(
             "Backend Order ID not found."
         );
 
-        console.error(
-            "backendOrderId missing:",
-            order
+        return;
+    }
+
+    // ==========================================
+    // TOKEN
+    // ==========================================
+
+    const token =
+        localStorage.getItem("token");
+
+    if (!token) {
+
+        alert(
+            "Login session expired. Please login again."
         );
+
+        showPage("login");
 
         return;
     }
 
+    // ==========================================
+    // CANCEL ORDER
+    // ==========================================
+
     try {
 
-        const token =
-            localStorage.getItem("token");
+        const apiUrl =
+            rbApiUrl(
+                `/api/orders/${backendOrderId}/cancel`
+);
 
-        // ==========================================
-        // CANCEL ORDER IN MYSQL
-        // ==========================================
+console.log(
+    "CANCEL API URL:",
+    apiUrl
+);
 
-        const response = await fetch(
-            `http://localhost:8080/api/orders/${order.backendOrderId}/cancel`,
-            {
-                method: "PUT",
+const response =
+    await fetch(
+        apiUrl,
+        {
+            method: "PUT",
 
-                headers: {
-                    "Content-Type": "application/json",
+            headers: {
+                "Authorization":
+                    `Bearer ${token}`,
 
-                    "Authorization":
-                        `Bearer ${token}`
-                }
+                "Content-Type":
+                    "application/json"
             }
-        );
+        }
+    );
 
-        const responseText =
-            await response.text();
+const responseText =
+    await response.text();
 
-        let responseData = {};
+console.log(
+    "CANCEL STATUS:",
+    response.status
+);
 
-        try {
-            responseData =
-                JSON.parse(responseText);
-        } catch (e) {
-            console.log(
-                "Backend response:",
+console.log(
+    "CANCEL RESPONSE:",
+    responseText
+);
+
+let responseData = {};
+
+try {
+
+    responseData =
+        responseText
+            ? JSON.parse(
                 responseText
-            );
-        }
+            )
+            : {};
 
-        console.log(
-            "Cancel API Status:",
-            response.status
-        );
+} catch (error) {
 
-        console.log(
-            "Cancel API Response:",
-            responseData
-        );
-
-        // ==========================================
-        // CHECK BACKEND RESPONSE
-        // ==========================================
-
-        if (!response.ok) {
-
-            alert(
-                responseData.message ||
-                responseText ||
-                "Order cancellation failed."
-            );
-
-            return;
-        }
-
-        // ==========================================
-        // UPDATE FRONTEND ORDER
-        // ==========================================
-
-        orders[orderIndex].status =
-            "Cancelled";
-
-        orders[orderIndex].cancelledDate =
-            new Date().toISOString();
-
-        // ==========================================
-        // SAVE LOCAL STORAGE
-        // ==========================================
-
-        localStorage.setItem(
-            "orders",
-            JSON.stringify(orders)
-        );
-
-        alert(
-            "Order cancelled successfully."
-        );
-
-        // ==========================================
-        // REFRESH ORDERS
-        // ==========================================
-
-        renderOrders();
-
-    } catch (error) {
-
-        console.error(
-            "Cancel Order Error:",
-            error
-        );
-
-        alert(
-            "Unable to cancel order.\n\n" +
-            error.message
-        );
-    }
+    console.warn(
+        "Response is not JSON."
+    );
 }
+
+// ==========================================
+// BACKEND ERROR
+// ==========================================
+
+if (!response.ok) {
+
+    console.error(
+        "CANCEL ORDER FAILED:",
+        response.status,
+        responseData,
+        responseText
+    );
+
+    alert(
+        responseData.message ||
+        responseData.error ||
+        responseText ||
+        `Order cancellation failed. HTTP ${response.status}`
+    );
+
+    return;
+}
+
+// ==========================================
+// SUCCESS
+// ==========================================
+
+console.log(
+    "ORDER CANCELLED SUCCESSFULLY:",
+    responseData
+);
+
+orders[orderIndex].status =
+    "Cancelled";
+
+orders[orderIndex].orderStatus =
+    "CANCELLED";
+
+orders[orderIndex].cancelledDate =
+    new Date().toISOString();
+
+saveOrdersData();
+
+renderOrders();
+
+alert(
+    "Order cancelled successfully."
+);
+
+} catch (error) {
+
+    console.error(
+        "CANCEL ORDER NETWORK ERROR:",
+        error
+    );
+
+    alert(
+        "Unable to cancel order.\n\n" +
+        error.message
+    );
+}
+}
+
 // ======================================================
 // TOGGLE ORDER DETAILS
 // ======================================================
@@ -5262,113 +6543,147 @@ function renderOrderSteps() {
    FOOTER NEWSLETTER SUBSCRIPTION
 ========================================================= */
 
-function initFooter() {
+async function footerSubscribe(event) {
 
-    const newsletterForm =
-        document.querySelector(".newsletter-form");
-
-    if (!newsletterForm) {
-        return;
+    if (event) {
+        event.preventDefault();
     }
-
-    if (newsletterForm.dataset.initialized === "true") {
-        return;
-    }
-
-    newsletterForm.dataset.initialized = "true";
 
     const emailInput =
-        newsletterForm.querySelector(
-            "input[type='email']"
-        );
+        document.getElementById("footerNewsletterEmail");
 
     const subscribeBtn =
-        newsletterForm.querySelector("button");
+        document.querySelector(".newsletter-form button");
+
 
     if (!emailInput || !subscribeBtn) {
+        console.error(
+            "Newsletter elements not found."
+        );
         return;
     }
 
-    subscribeBtn.addEventListener(
-        "click",
-        async function (event) {
 
-            event.preventDefault();
+    const email =
+        emailInput.value.trim();
 
-            const email =
-                emailInput.value.trim();
 
-            if (!email) {
-                alert("Please enter your email address.");
-                emailInput.focus();
-                return;
-            }
+    /* =====================================================
+       EMAIL VALIDATION
+    ===================================================== */
 
-            const emailPattern =
-                /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) {
 
-            if (!emailPattern.test(email)) {
-                alert("Please enter a valid email address.");
-                emailInput.focus();
-                return;
-            }
+        alert(
+            "Please enter your email address."
+        );
 
-            subscribeBtn.disabled = true;
-            subscribeBtn.textContent = "Subscribing...";
+        emailInput.focus();
 
-            try {
+        return;
+    }
 
-                const response = await fetch(
-                    "http://localhost:8080/api/subscribers",
-                    {
-                        method: "POST",
 
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
+    const emailPattern =
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-                        body: JSON.stringify({
-                            email: email
-                        })
-                    }
-                );
 
-                const result =
-                    await response.json();
+    if (!emailPattern.test(email)) {
 
-                if (!response.ok) {
-                    throw new Error(
-                        result.message ||
-                        "Subscription failed."
-                    );
+        alert(
+            "Please enter a valid email address."
+        );
+
+        emailInput.focus();
+
+        return;
+    }
+
+
+    /* =====================================================
+       LOADING
+    ===================================================== */
+
+    subscribeBtn.disabled = true;
+
+    subscribeBtn.textContent =
+        "Subscribing...";
+
+
+    /* =====================================================
+       API REQUEST
+    ===================================================== */
+
+    try {
+
+        const response =
+            await fetch(
+                "http://localhost:8080/api/subscribers",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        email: email
+                    })
                 }
+            );
 
-                alert(result.message);
 
-                emailInput.value = "";
+        const result =
+            await response.json();
 
-            } catch (error) {
 
-                console.error(
-                    "Newsletter subscription error:",
-                    error
-                );
+        /* =================================================
+           API ERROR
+        ================================================= */
 
-                alert(
-                    error.message ||
-                    "Unable to subscribe. Please try again."
-                );
+        if (!response.ok) {
 
-            } finally {
-
-                subscribeBtn.disabled = false;
-                subscribeBtn.textContent = "Subscribe";
-            }
+            throw new Error(
+                result.message ||
+                "Subscription failed."
+            );
         }
-    );
+
+
+        /* =================================================
+           SUCCESS
+        ================================================= */
+
+        alert(
+            result.message ||
+            "Thank you for subscribing to RishtaBox!"
+        );
+
+        emailInput.value = "";
+
+
+    } catch (error) {
+
+        console.error(
+            "Newsletter subscription error:",
+            error
+        );
+
+        alert(
+            error.message ||
+            "Unable to subscribe. Please try again."
+        );
+
+
+    } finally {
+
+        subscribeBtn.disabled = false;
+
+        subscribeBtn.textContent =
+            "Subscribe";
+    }
 }
-
-
 /* =========================================================
    INITIALIZE FOOTER
 ========================================================= */
@@ -8392,34 +9707,22 @@ async function verifyLoginOtp() {
 async function loginWithPassword() {
 
     const loginEmailInput =
-        document.getElementById(
-            "loginEmail"
-        );
-
+        document.getElementById("loginEmail");
 
     const passwordInput =
-        document.getElementById(
-            "loginPassword"
-        );
-
+        document.getElementById("loginPassword");
 
     const rememberMe =
-        document.getElementById(
-            "rememberMe"
-        );
-
+        document.getElementById("rememberMe");
 
     const message =
-        document.getElementById(
-            "loginMessage"
-        );
+        document.getElementById("loginMessage");
 
 
     const email =
         loginEmailInput?.value
             .trim()
             .toLowerCase() || "";
-
 
     const password =
         passwordInput?.value || "";
@@ -8440,9 +9743,7 @@ async function loginWithPassword() {
 
 
     if (
-        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
-            email
-        )
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
     ) {
 
         showLoginError(
@@ -8476,9 +9777,7 @@ async function loginWithPassword() {
         window.loginOtpEmail.toLowerCase()
     ) {
 
-        window.loginOtpVerified =
-            false;
-
+        window.loginOtpVerified = false;
 
         showLoginError(
             "Email changed. Please request a new OTP."
@@ -8528,6 +9827,10 @@ async function loginWithPassword() {
 
     try {
 
+        /* =================================================
+           LOGIN API
+        ================================================= */
+
         const response =
             await fetch(
                 rbApiUrl(
@@ -8543,11 +9846,9 @@ async function loginWithPassword() {
 
                     body: JSON.stringify({
 
-                        email:
-                        email,
+                        email: email,
 
-                        password:
-                        password
+                        password: password
                     })
                 }
             );
@@ -8568,15 +9869,20 @@ async function loginWithPassword() {
         }
 
 
+        console.log(
+            "LOGIN API RESPONSE:",
+            data
+        );
+
+
         /* =================================================
-           SAVE USER
+           SAVE USER DATA
         ================================================= */
 
         localStorage.setItem(
             "userData",
             JSON.stringify(data)
         );
-
 
         localStorage.setItem(
             "rishtaBoxCurrentUser",
@@ -8595,7 +9901,6 @@ async function loginWithPassword() {
                 data.token
             );
 
-
             localStorage.setItem(
                 "jwtToken",
                 data.token
@@ -8607,6 +9912,92 @@ async function loginWithPassword() {
             "rishtaBoxLoggedIn",
             "true"
         );
+
+
+        /* =================================================
+           SET CURRENT USER
+           IMPORTANT
+        ================================================= */
+
+        currentUser = {
+
+            id:
+                data.id ??
+                data.userId,
+
+            name:
+                data.name || "",
+
+            email:
+                data.email || email,
+
+            phone:
+                data.phone ||
+                data.mobile ||
+                "",
+
+            address:
+                data.address || "",
+
+            city:
+                data.city || "",
+
+            state:
+                data.state || "",
+
+            pincode:
+                data.pincode || "",
+
+            role:
+                data.role || "USER"
+        };
+
+
+        console.log(
+            "CURRENT USER AFTER LOGIN:",
+            currentUser
+        );
+
+        console.log(
+            "CURRENT USER ID:",
+            currentUser.id
+        );
+
+        console.log(
+            "CURRENT TOKEN:",
+            localStorage.getItem("token")
+        );
+
+
+        /* =================================================
+           SAFETY CHECK
+        ================================================= */
+
+        if (!currentUser.id) {
+
+            console.error(
+                "Login succeeded but USER ID is missing.",
+                data
+            );
+
+            throw new Error(
+                "Login successful, but user ID was not received."
+            );
+        }
+
+
+        if (
+            !localStorage.getItem("token")
+        ) {
+
+            console.error(
+                "Login succeeded but JWT token is missing."
+            );
+
+            throw new Error(
+                "Login successful, but authentication token was not received."
+            );
+        }
 
 
         /* =================================================
@@ -8632,7 +10023,16 @@ async function loginWithPassword() {
 
 
         /* =================================================
-           SUCCESS
+           UPDATE ACCOUNT UI
+        ================================================= */
+
+        updateAccountNav(
+            currentUser
+        );
+
+
+        /* =================================================
+           SUCCESS MESSAGE
         ================================================= */
 
         if (message) {
@@ -8645,33 +10045,116 @@ async function loginWithPassword() {
         }
 
 
-        updateAccountNav(data);
-
-
         /* =================================================
            RESET OTP STATE
         ================================================= */
 
         window.loginOtpEmail = null;
+
         window.loginOtpVerified = false;
-        window.loginOtpVerificationRunning = false;
+
+        window.loginOtpVerificationRunning =
+            false;
+
+        /* =================================================
+           LOAD CURRENT USER CART + ORDERS AFTER LOGIN
+        ================================================= */
+
+        console.log(
+            "Loading data for logged-in user:",
+            currentUser.id
+        );
+
+// =====================================================
+// LOAD CART
+// =====================================================
+
+        await loadCartFromBackend();
+
+        console.log(
+            "CART AFTER LOGIN:",
+            cart
+        );
+
+// =====================================================
+// LOAD ORDERS
+// =====================================================
+
+        await loadOrdersFromBackend();
+
+        console.log(
+            "ORDERS AFTER LOGIN:",
+            orders
+        );
+        /* =================================================
+           CHECK PENDING BUY NOW
+        ================================================= */
+
+        const pendingBuyNowProductId =
+            localStorage.getItem(
+                "pendingBuyNowProductId"
+            );
 
 
-        setTimeout(function () {
+        console.log(
+            "PENDING BUY NOW PRODUCT:",
+            pendingBuyNowProductId
+        );
 
-            if (
-                typeof showPage ===
-                "function"
-            ) {
 
-                showPage("homePage");
+        /* =================================================
+           CONTINUE BUY NOW
+        ================================================= */
+
+        if (pendingBuyNowProductId) {
+
+            // Remove immediately so it cannot
+            // create an infinite login loop.
+
+            localStorage.removeItem(
+                "pendingBuyNowProductId"
+            );
+
+
+            console.log(
+                "Continuing Buy Now for product:",
+                pendingBuyNowProductId
+            );
+
+
+            const success =
+                await addToCart(
+                    pendingBuyNowProductId
+                );
+
+
+            if (success) {
+
+                console.log(
+                    "BUY NOW SUCCESS - OPENING CART"
+                );
+
+                showPage("cart");
 
             } else {
 
-                window.location.reload();
+                console.error(
+                    "BUY NOW FAILED AFTER LOGIN"
+                );
+
+                showPage("homePage");
             }
 
-        }, 500);
+
+            return;
+        }
+
+
+        /* =================================================
+           NORMAL LOGIN
+        ================================================= */
+
+        showPage("homePage");
 
 
     } catch (error) {
@@ -8693,7 +10176,6 @@ async function loginWithPassword() {
         }
     }
 }
-
 
 /* =========================================================
    UPDATE ACCOUNT NAV
@@ -8903,111 +10385,322 @@ function forgotPassword(event) {
 }
 
 
+
 /* =========================================================
    LOGOUT
 ========================================================= */
-
 function logout() {
 
-    [
-        "userData",
-        "rishtaBoxCurrentUser",
-        "token",
-        "jwtToken",
+    console.log(
+        "========== LOGOUT START =========="
+    );
+
+    // =====================================================
+    // SAVE CURRENT USER ID BEFORE CLEARING USER
+    // =====================================================
+
+    const loggedOutUserId =
+        currentUser &&
+        currentUser.id
+            ? Number(currentUser.id)
+            : null;
+
+    console.log(
+        "Logging out user:",
+        loggedOutUserId
+    );
+
+    // =====================================================
+    // CLEAR MEMORY
+    // =====================================================
+
+    currentUser = null;
+
+    cart = [];
+
+    orders = [];
+
+    // =====================================================
+    // CLEAR AUTHENTICATION
+    // =====================================================
+
+    localStorage.removeItem(
+        "userData"
+    );
+
+    localStorage.removeItem(
+        "rishtaBoxCurrentUser"
+    );
+
+    localStorage.removeItem(
+        "token"
+    );
+
+    localStorage.removeItem(
+        "jwtToken"
+    );
+
+    localStorage.removeItem(
         "rishtaBoxLoggedIn"
-    ].forEach(function (key) {
+    );
 
-        localStorage.removeItem(key);
-    });
+    localStorage.removeItem(
+        "rishtaBoxRememberMe"
+    );
 
+    // =====================================================
+    // CLEAR ONLY GENERIC / SESSION DATA
+    // =====================================================
 
-    /* =====================================================
-       RESET LOGIN OTP STATE
-    ===================================================== */
+    localStorage.removeItem(
+        "cart"
+    );
 
-    window.loginOtpEmail = null;
-    window.loginOtpVerified = false;
-    window.loginOtpVerificationRunning = false;
+    localStorage.removeItem(
+        "orders"
+    );
 
+    localStorage.removeItem(
+        "recentlyViewed"
+    );
 
-    /* =====================================================
-       RESET SIGNUP OTP STATE
-    ===================================================== */
+    localStorage.removeItem(
+        "currentOrderSteps"
+    );
 
-    window.emailOtpVerificationRunning = false;
+    localStorage.removeItem(
+        "pendingBuyNowProductId"
+    );
 
+    // =====================================================
+    // IMPORTANT
+    // =====================================================
+    // DO NOT DELETE:
+    //
+    // cart_user_X
+    // orders_user_X
+    //
+    // These belong to individual users and can remain
+    // in localStorage for that user's next login.
+    // =====================================================
 
-    signupData = {
+    if (loggedOutUserId) {
 
-        name: "",
-        mobile: "",
-        email: "",
-        password: "",
-        emailVerified: false
-    };
+        console.log(
+            "Keeping user-specific storage:",
+            `cart_user_${loggedOutUserId}`,
+            `orders_user_${loggedOutUserId}`
+        );
+    }
 
+    // =====================================================
+    // UPDATE MEMORY/UI
+    // =====================================================
 
-    updateAccountNav(null);
-
+    updateCartCount();
 
     if (
-        typeof showPage ===
+        typeof renderCart ===
         "function"
     ) {
 
-        showPage("login");
-        showLogin();
-
-    } else {
-
-        window.location.reload();
+        renderCart();
     }
+
+    if (
+        typeof renderOrders ===
+        "function"
+    ) {
+
+        renderOrders();
+    }
+
+    if (
+        typeof updateAuthUI ===
+        "function"
+    ) {
+
+        updateAuthUI();
+    }
+
+    // =====================================================
+    // GO HOME
+    // =====================================================
+
+    showPage(
+        "home"
+    );
+
+    // =====================================================
+    // DEBUG
+    // =====================================================
+
+    console.log(
+        "currentUser after logout:",
+        currentUser
+    );
+
+    console.log(
+        "cart after logout:",
+        cart
+    );
+
+    console.log(
+        "orders after logout:",
+        orders
+    );
+
+    console.log(
+        "userData:",
+        localStorage.getItem(
+            "userData"
+        )
+    );
+
+    console.log(
+        "token:",
+        localStorage.getItem(
+            "token"
+        )
+    );
+
+    console.log(
+        "========== LOGOUT COMPLETE =========="
+    );
 }
 
 
 /* =========================================================
    INITIALIZE AUTH
 ========================================================= */
-
 document.addEventListener(
     "DOMContentLoaded",
-    function () {
+    async function () {
+
+        console.log(
+            "========== STARTUP =========="
+        );
 
         const loggedIn =
             localStorage.getItem(
                 "rishtaBoxLoggedIn"
             );
 
-
         let user = null;
-
 
         try {
 
-            user =
-                JSON.parse(
-                    localStorage.getItem(
-                        "rishtaBoxCurrentUser"
-                    )
+            const storedUser =
+                localStorage.getItem(
+                    "rishtaBoxCurrentUser"
                 );
 
+            if (storedUser) {
+
+                user =
+                    JSON.parse(
+                        storedUser
+                    );
+            }
+
         } catch (error) {
+
+            console.error(
+                "Could not restore user:",
+                error
+            );
 
             user = null;
         }
 
+        // =========================================
+        // LOGGED-IN USER
+        // =========================================
 
         if (
             loggedIn === "true" &&
-            user
+            user &&
+            user.id
         ) {
 
-            updateAccountNav(user);
+            currentUser = user;
 
-        } else {
+            console.log(
+                "User restored:",
+                currentUser
+            );
+
+            updateAccountNav(
+                currentUser
+            );
+
+            // Load ONLY this user's data
+            await loadCartFromBackend();
+            await loadOrdersFromBackend();
+
+        }
+
+            // =========================================
+            // LOGGED-OUT USER
+        // =========================================
+
+        else {
+
+            console.log(
+                "No logged-in user found."
+            );
+
+            currentUser = null;
+
+            cart = [];
+            orders = [];
+
+            // Clear only frontend/session data
+            localStorage.removeItem(
+                "cart"
+            );
+
+            localStorage.removeItem(
+                "orders"
+            );
+
+            updateCartCount();
+
+            if (
+                typeof renderCart ===
+                "function"
+            ) {
+                renderCart();
+            }
+
+            if (
+                typeof renderOrders ===
+                "function"
+            ) {
+                renderOrders();
+            }
 
             updateAccountNav(null);
         }
+
+        console.log(
+            "========== STARTUP COMPLETE =========="
+        );
+
+        console.log(
+            "currentUser:",
+            currentUser
+        );
+
+        console.log(
+            "cart:",
+            cart
+        );
+
+        console.log(
+            "orders:",
+            orders
+        );
     }
 );
 async function payWithRazorpay(backendOrderId, orderData) {
@@ -9081,7 +10774,17 @@ async function payWithRazorpay(backendOrderId, orderData) {
             backendOrderId
         );
 
-
+        console.log("========== ORDER DEBUG ==========");
+        console.log("STATUS:", response.status);
+        console.log("RAW RESPONSE:", responseText);
+        console.log("PARSED DATA:", data);
+        console.log("IS ARRAY:", Array.isArray(data));
+        console.log(
+            "DATA KEYS:",
+            data && typeof data === "object"
+                ? Object.keys(data)
+                : []
+        );
         const paymentOrderResponse = await fetch(
             "http://localhost:8080/api/payments/create-order",
             {
@@ -12973,3 +14676,1045 @@ function scrollNavBack() {
     }, 100);
 
 })();
+
+// ======================================================
+// LOAD ORDERS FROM BACKEND
+// ======================================================
+
+async function loadOrdersFromBackend() {
+
+    console.log(
+        "🔥🔥🔥 loadOrdersFromBackend() CALLED 🔥🔥🔥"
+    );
+
+
+    // ==================================================
+    // 1. CHECK CURRENT USER
+    // ==================================================
+
+    if (
+        !currentUser ||
+        !currentUser.id
+    ) {
+
+        console.error(
+            "❌ Orders loading skipped: currentUser missing.",
+            currentUser
+        );
+
+        orders = [];
+
+        return;
+    }
+
+
+    // ==================================================
+    // 2. CHECK TOKEN
+    // ==================================================
+
+    const token =
+        localStorage.getItem("token");
+
+    if (!token) {
+
+        console.error(
+            "❌ Orders loading skipped: token not found."
+        );
+
+        orders = [];
+
+        return;
+    }
+
+
+    // ==================================================
+    // 3. GET USER ID
+    // ==================================================
+
+    const userId =
+        Number(
+            currentUser.id
+        );
+
+    if (
+        !userId ||
+        isNaN(userId)
+    ) {
+
+        console.error(
+            "❌ Invalid current user ID:",
+            currentUser
+        );
+
+        orders = [];
+
+        return;
+    }
+
+
+    console.log(
+        "📦 Loading orders for user:",
+        userId
+    );
+
+
+    try {
+
+        // ==================================================
+        // 4. BUILD API URL
+        // ==================================================
+
+        const apiUrl =
+            rbApiUrl(
+                `/api/orders/user/${userId}`
+            );
+
+
+        console.log(
+            "🌐 Orders API URL:",
+            apiUrl
+        );
+
+
+        // ==================================================
+        // 5. CALL BACKEND
+        // ==================================================
+
+        const response =
+            await fetch(
+                apiUrl,
+                {
+                    method: "GET",
+
+                    headers: {
+
+                        "Authorization":
+                            `Bearer ${token}`,
+
+                        "Content-Type":
+                            "application/json"
+                    }
+                }
+            );
+
+
+        console.log(
+            "📡 Orders API Status:",
+            response.status
+        );
+
+
+        // ==================================================
+        // 6. READ RESPONSE
+        // ==================================================
+
+        const responseText =
+            await response.text();
+
+
+        console.log(
+            "📥 Orders RAW Response:",
+            responseText
+        );
+
+
+        // ==================================================
+        // 7. PARSE JSON
+        // ==================================================
+
+        let data = null;
+
+
+        try {
+
+            data =
+                responseText
+                    ? JSON.parse(
+                        responseText
+                    )
+                    : null;
+
+        } catch (parseError) {
+
+            console.error(
+                "❌ Orders JSON Parse Error:",
+                parseError
+            );
+
+            console.error(
+                "Raw Response:",
+                responseText
+            );
+
+            orders = [];
+
+            return;
+        }
+
+
+        console.log(
+            "📦 Orders Parsed Data:",
+            data
+        );
+
+
+        // ==================================================
+        // 8. CHECK API RESPONSE
+        // ==================================================
+
+        if (
+            !response.ok
+        ) {
+
+            console.error(
+                "❌ Orders API Error:",
+                response.status,
+                data
+            );
+
+            orders = [];
+
+            return;
+        }
+
+
+        // ==================================================
+        // 9. EXTRACT BACKEND ORDERS
+        // ==================================================
+
+        let backendOrders = [];
+
+
+        if (
+            Array.isArray(data)
+        ) {
+
+            backendOrders =
+                data;
+
+        }
+
+        else if (
+            data &&
+            Array.isArray(
+                data.orders
+            )
+        ) {
+
+            backendOrders =
+                data.orders;
+
+        }
+
+        else if (
+            data &&
+            Array.isArray(
+                data.content
+            )
+        ) {
+
+            backendOrders =
+                data.content;
+
+        }
+
+        else {
+
+            console.error(
+                "❌ Unknown orders response format:",
+                data
+            );
+
+            backendOrders = [];
+        }
+
+
+        console.log(
+            "📦 Backend Orders:",
+            backendOrders
+        );
+
+
+        console.log(
+            "📊 Backend Orders Count:",
+            backendOrders.length
+        );
+
+
+        // ==================================================
+        // 10. MAP ORDERS
+        // ==================================================
+
+        orders =
+            backendOrders.map(
+                order => {
+
+                    // ======================================
+                    // SHIPPING ADDRESS
+                    // ======================================
+
+                    const shippingAddress =
+                        order.shippingAddress ||
+                        order.address ||
+                        "";
+
+
+                    const shippingCity =
+                        order.shippingCity ||
+                        order.city ||
+                        "";
+
+
+                    const shippingState =
+                        order.shippingState ||
+                        order.state ||
+                        "";
+
+
+                    const shippingPincode =
+                        order.shippingPincode ||
+                        order.pincode ||
+                        "";
+
+
+                    // ======================================
+                    // ORDER ITEMS
+                    // ======================================
+
+                    const backendItems =
+                        Array.isArray(
+                            order.items
+                        )
+                            ? order.items
+                            : Array.isArray(
+                                order.orderItems
+                            )
+                                ? order.orderItems
+                                : [];
+
+
+                    const frontendItems =
+                        backendItems.map(
+                            item => {
+
+                                const product =
+                                    item.product ||
+                                    item.productData ||
+                                    {};
+
+
+                                const price =
+                                    Number(
+                                        item.price ??
+                                        item.unitPrice ??
+                                        product.price ??
+                                        0
+                                    );
+
+
+                                const quantity =
+                                    Number(
+                                        item.quantity
+                                    ) || 1;
+
+
+                                return {
+
+                                    id:
+                                        product.id ??
+                                        item.productId ??
+                                        item.id,
+
+
+                                    name:
+                                        product.name ||
+                                        item.name ||
+                                        "Product",
+
+
+                                    brand:
+                                        product.brand ||
+                                        item.brand ||
+                                        "",
+
+
+                                    image:
+                                        product.image ||
+                                        item.image ||
+                                        "",
+
+
+                                    color:
+                                        item.color ||
+                                        "",
+
+
+                                    size:
+                                        item.size ||
+                                        "",
+
+
+                                    quantity:
+                                        quantity,
+
+
+                                    price:
+                                        price,
+
+
+                                    subtotal:
+                                        Number(
+                                            item.subtotal ??
+                                            (
+                                                price *
+                                                quantity
+                                            )
+                                        )
+                                };
+                            }
+                        );
+
+
+                    // ======================================
+                    // TOTAL
+                    // ======================================
+
+                    const totalAmount =
+                        Number(
+                            order.totalAmount ??
+                            order.total ??
+                            order.amount ??
+                            0
+                        );
+
+
+                    const deliveryCharges =
+                        Number(
+                            order.deliveryCharges ??
+                            order.deliveryFee ??
+                            order.shippingFee ??
+                            0
+                        );
+
+
+                    // ======================================
+                    // DATES
+                    // ======================================
+
+                    const createdAt =
+                        order.createdAt ||
+                        order.orderDate ||
+                        order.created_at ||
+                        null;
+
+
+                    const deliveryDate =
+                        order.deliveryDate ||
+                        order.expectedDeliveryDate ||
+                        order.estimatedDeliveryDate ||
+                        null;
+
+
+                    // ======================================
+                    // STATUS
+                    // ======================================
+
+                    const orderStatus =
+                        order.orderStatus ||
+                        order.status ||
+                        "PLACED";
+
+
+                    // ======================================
+                    // CUSTOMER
+                    // ======================================
+
+                    const customerName =
+                        order.name ||
+                        order.customerName ||
+                        (
+                            order.user &&
+                            order.user.name
+                        ) ||
+                        currentUser.name ||
+                        "";
+
+
+                    const customerPhone =
+                        order.phone ||
+                        order.customerPhone ||
+                        order.mobile ||
+                        (
+                            order.user &&
+                            order.user.phone
+                        ) ||
+                        currentUser.phone ||
+                        "";
+
+
+                    // ======================================
+                    // RETURN FRONTEND ORDER
+                    // ======================================
+
+                    return {
+
+                        id:
+                            order.id,
+
+
+                        orderNumber:
+                            order.orderNumber ||
+                            `ORD${order.id}`,
+
+
+                        orderDate:
+                            createdAt,
+
+
+                        createdAt:
+                            createdAt,
+
+
+                        deliveryDate:
+                            deliveryDate,
+
+
+                        status:
+                            orderStatus,
+
+
+                        orderStatus:
+                            orderStatus,
+
+
+                        paymentMethod:
+                            order.paymentMethod ||
+                            "COD",
+
+
+                        paymentStatus:
+                            order.paymentStatus ||
+                            "",
+
+
+                        total:
+                            totalAmount,
+
+
+                        totalAmount:
+                            totalAmount,
+
+
+                        deliveryCharges:
+                            deliveryCharges,
+
+
+                        items:
+                            frontendItems,
+
+
+                        name:
+                            customerName,
+
+
+                        phone:
+                            customerPhone,
+
+
+                        address:
+                            shippingAddress,
+
+
+                        shippingAddress:
+                            shippingAddress,
+
+
+                        city:
+                            shippingCity,
+
+
+                        state:
+                            shippingState,
+
+
+                        pincode:
+                            shippingPincode,
+
+
+                        courierName:
+                            order.courierName ||
+                            "",
+
+
+                        trackingId:
+                            order.trackingId ||
+                            "",
+
+
+                        awbCode:
+                            order.awbCode ||
+                            "",
+
+
+                        trackingUrl:
+                            order.trackingUrl ||
+                            "",
+
+
+                        shipmentStatus:
+                            order.shipmentStatus ||
+                            "",
+
+
+                        shippingMode:
+                            order.shippingMode ||
+                            ""
+                    };
+                }
+            );
+
+
+        // ==================================================
+        // 11. SAVE ORDERS
+        // ==================================================
+
+        if (
+            typeof saveOrdersData ===
+            "function"
+        ) {
+
+            saveOrdersData();
+        }
+
+
+        // ==================================================
+        // 12. FINAL LOG
+        // ==================================================
+
+        console.log(
+            "===================================="
+        );
+
+
+        console.log(
+            "✅ ORDERS RESTORED"
+        );
+
+
+        console.log(
+            "USER ID:",
+            userId
+        );
+
+
+        console.log(
+            "FINAL ORDERS:",
+            orders
+        );
+
+
+        console.log(
+            "FINAL ORDERS COUNT:",
+            orders.length
+        );
+
+
+        console.log(
+            "===================================="
+        );
+
+
+        // ==================================================
+        // 13. RENDER
+        // ==================================================
+
+        if (
+            typeof renderOrders ===
+            "function"
+        ) {
+
+            renderOrders();
+        }
+
+    }
+
+
+    // ==================================================
+    // ERROR
+    // ==================================================
+
+    catch (error) {
+
+        console.error(
+            "❌ Load Orders Error:",
+            error
+        );
+
+        orders = [];
+
+
+        if (
+            typeof renderOrders ===
+            "function"
+        ) {
+
+            renderOrders();
+        }
+    }
+}
+
+
+async function loadCartFromBackend() {
+
+    // =====================================================
+    // 1. USER LOGIN CHECK
+    // =====================================================
+
+    if (
+        !currentUser ||
+        !currentUser.id
+    ) {
+
+        console.log(
+            "Cart load skipped: user is logged out."
+        );
+
+        cart = [];
+
+        localStorage.removeItem("cart");
+
+        updateCartCount();
+
+        if (
+            typeof renderCart === "function"
+        ) {
+            renderCart();
+        }
+
+        return;
+    }
+
+    // =====================================================
+    // 2. TOKEN CHECK
+    // =====================================================
+
+    const token =
+        localStorage.getItem("token");
+
+    if (!token) {
+
+        console.log(
+            "Cart load skipped: token not found."
+        );
+
+        cart = [];
+
+        localStorage.removeItem("cart");
+
+        updateCartCount();
+
+        if (
+            typeof renderCart === "function"
+        ) {
+            renderCart();
+        }
+
+        return;
+    }
+
+    // =====================================================
+    // 3. USER ID
+    // =====================================================
+
+    const userId =
+        Number(currentUser.id);
+
+    if (
+        !userId ||
+        isNaN(userId)
+    ) {
+
+        console.error(
+            "Invalid currentUser.id:",
+            currentUser
+        );
+
+        cart = [];
+
+        localStorage.removeItem("cart");
+
+        updateCartCount();
+
+        return;
+    }
+
+    // =====================================================
+    // 4. LOAD USER CART FROM BACKEND
+    // =====================================================
+
+    try {
+
+        console.log(
+            "Loading cart for user:",
+            userId
+        );
+
+        const response =
+            await fetch(
+                rbApiUrl(
+                    `/api/cart/${userId}`
+                ),
+                {
+                    method: "GET",
+
+                    headers: {
+                        "Authorization":
+                            `Bearer ${token}`,
+
+                        "Content-Type":
+                            "application/json"
+                    }
+                }
+            );
+
+        const responseText =
+            await response.text();
+
+        let data = null;
+
+        try {
+
+            data =
+                responseText
+                    ? JSON.parse(
+                        responseText
+                    )
+                    : null;
+
+        } catch (error) {
+
+            console.error(
+                "Cart JSON parse error:",
+                responseText
+            );
+
+            cart = [];
+
+            localStorage.removeItem("cart");
+
+            updateCartCount();
+
+            if (
+                typeof renderCart === "function"
+            ) {
+                renderCart();
+            }
+
+            return;
+        }
+
+        console.log(
+            "Cart API Status:",
+            response.status
+        );
+
+        console.log(
+            "Backend Cart:",
+            data
+        );
+
+        // =================================================
+        // 5. BACKEND ERROR
+        // =================================================
+
+        if (!response.ok) {
+
+            console.error(
+                "Cart API failed:",
+                response.status,
+                data
+            );
+
+            cart = [];
+
+            localStorage.removeItem("cart");
+
+            updateCartCount();
+
+            if (
+                typeof renderCart === "function"
+            ) {
+                renderCart();
+            }
+
+            return;
+        }
+
+        // =================================================
+        // 6. GET CART ITEMS
+        // =================================================
+
+        let backendItems = [];
+
+        if (
+            data &&
+            Array.isArray(data.items)
+        ) {
+
+            backendItems =
+                data.items;
+
+        } else if (
+            data &&
+            Array.isArray(data.cartItems)
+        ) {
+
+            backendItems =
+                data.cartItems;
+
+        } else if (
+            Array.isArray(data)
+        ) {
+
+            backendItems =
+                data;
+
+        }
+
+        // =================================================
+        // 7. CONVERT BACKEND CART TO FRONTEND CART
+        // =================================================
+
+        cart =
+            backendItems.map(
+                item => {
+
+                    const product =
+                        item.product ||
+                        item.productData ||
+                        {};
+
+                    const productId =
+                        product.id ??
+                        item.productId ??
+                        item.id;
+
+                    const price =
+                        Number(
+                            item.price ??
+                            item.unitPrice ??
+                            product.price ??
+                            0
+                        );
+
+                    const quantity =
+                        Number(
+                            item.quantity
+                        ) || 1;
+
+                    return {
+
+                        // Cart database ID
+                        cartItemId:
+                            item.id,
+
+                        // Product database ID
+                        id:
+                            productId,
+
+                        name:
+                            product.name ||
+                            item.name ||
+                            "Product",
+
+                        brand:
+                            product.brand ||
+                            item.brand ||
+                            "",
+
+                        price:
+                            price,
+
+                        originalPrice:
+                            Number(
+                                product.originalPrice ??
+                                item.originalPrice ??
+                                price
+                            ),
+
+                        discount:
+                            Number(
+                                product.discount ??
+                                item.discount ??
+                                0
+                            ),
+
+                        image:
+                            product.image ||
+                            item.image ||
+                            "",
+
+                        color:
+                            item.color ||
+                            "",
+
+                        size:
+                            item.size ||
+                            "",
+
+                        quantity:
+                            quantity,
+
+                        stock:
+                            Number(
+                                product.stock ??
+                                item.stock ??
+                                0
+                            )
+                    };
+                }
+            );
+
+        // =================================================
+        // 8. SAVE ONLY CURRENT USER CART
+        // =================================================
+
+        saveCartData();
+
+        // =================================================
+        // 9. UPDATE UI
+        // =================================================
+
+        updateCartCount();
+
+        if (
+            typeof renderCart === "function"
+        ) {
+            renderCart();
+        }
+
+        console.log(
+            "Cart restored successfully:",
+            cart
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Load Cart Error:",
+            error
+        );
+
+        cart = [];
+
+        localStorage.removeItem("cart");
+
+        updateCartCount();
+
+        if (
+            typeof renderCart === "function"
+        ) {
+            renderCart();
+        }
+    }
+}

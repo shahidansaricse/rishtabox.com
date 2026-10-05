@@ -11577,3 +11577,355 @@ document.addEventListener("DOMContentLoaded", function () {
 
 });
 
+/* =========================================================
+   RISHTABOX ADMIN - SUBSCRIBERS
+========================================================= */
+
+const SUBSCRIBERS_API =
+    "http://localhost:8080/api/subscribers";
+
+let allSubscribers = [];
+
+
+/* =========================================================
+   LOAD SUBSCRIBERS
+========================================================= */
+
+async function loadSubscribers() {
+
+    const tableBody =
+        document.getElementById("subscribersTableBody");
+
+    if (!tableBody) {
+        return;
+    }
+
+    tableBody.innerHTML = `
+        <tr>
+            <td colspan="4" class="subscriber-loading">
+                Loading subscribers...
+            </td>
+        </tr>
+    `;
+
+    try {
+
+        const response =
+            await fetch(SUBSCRIBERS_API);
+
+        if (!response.ok) {
+            throw new Error(
+                "Failed to load subscribers."
+            );
+        }
+
+        allSubscribers =
+            await response.json();
+
+        updateSubscriberCount();
+
+        renderSubscribers(allSubscribers);
+
+    } catch (error) {
+
+        console.error(
+            "Subscriber loading error:",
+            error
+        );
+
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="4" class="subscriber-error">
+                    Unable to load subscribers.
+                </td>
+            </tr>
+        `;
+    }
+}
+
+
+/* =========================================================
+   UPDATE COUNT
+========================================================= */
+
+function updateSubscriberCount() {
+
+    const countElement =
+        document.getElementById(
+            "subscriberTotalCount"
+        );
+
+    if (!countElement) {
+        return;
+    }
+
+    countElement.textContent =
+        allSubscribers.length;
+}
+
+
+/* =========================================================
+   RENDER SUBSCRIBERS
+========================================================= */
+
+function renderSubscribers(
+    subscribers
+) {
+
+    const tableBody =
+        document.getElementById(
+            "subscribersTableBody"
+        );
+
+    if (!tableBody) {
+        return;
+    }
+
+    if (
+        !subscribers ||
+        subscribers.length === 0
+    ) {
+
+        tableBody.innerHTML = `
+            <tr>
+                <td
+                    colspan="4"
+                    class="subscriber-empty">
+                    No subscribers found.
+                </td>
+            </tr>
+        `;
+
+        return;
+    }
+
+
+    tableBody.innerHTML =
+        subscribers.map(
+            (subscriber, index) => {
+
+                const date =
+                    subscriber.subscribedAt
+                        ? formatSubscriberDate(
+                            subscriber.subscribedAt
+                        )
+                        : "-";
+
+                return `
+                    <tr>
+
+                        <td>
+                            ${index + 1}
+                        </td>
+
+                        <td>
+                            <div class="subscriber-email">
+                                <i class="fas fa-envelope"></i>
+                                ${escapeSubscriberHtml(
+                    subscriber.email
+                )}
+                            </div>
+                        </td>
+
+                        <td>
+                            ${date}
+                        </td>
+
+                        <td>
+
+                            <button
+                                type="button"
+                                class="subscriber-delete-btn"
+                                onclick="deleteSubscriber(${subscriber.id})">
+
+                                <i class="fas fa-trash"></i>
+
+                                Delete
+
+                            </button>
+
+                        </td>
+
+                    </tr>
+                `;
+            }
+        ).join("");
+}
+
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+function filterSubscribers() {
+
+    const searchInput =
+        document.getElementById(
+            "subscriberSearch"
+        );
+
+    if (!searchInput) {
+        return;
+    }
+
+    const search =
+        searchInput.value
+            .trim()
+            .toLowerCase();
+
+    if (!search) {
+
+        renderSubscribers(
+            allSubscribers
+        );
+
+        return;
+    }
+
+    const filtered =
+        allSubscribers.filter(
+            subscriber =>
+                subscriber.email
+                    .toLowerCase()
+                    .includes(search)
+        );
+
+    renderSubscribers(filtered);
+}
+
+
+/* =========================================================
+   DELETE SUBSCRIBER
+========================================================= */
+
+async function deleteSubscriber(id) {
+
+    const subscriber =
+        allSubscribers.find(
+            item => item.id === id
+        );
+
+    const email =
+        subscriber
+            ? subscriber.email
+            : "this subscriber";
+
+
+    const confirmed =
+        confirm(
+            `Delete subscriber ${email}?`
+        );
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                `${SUBSCRIBERS_API}/${id}`,
+                {
+                    method: "DELETE"
+                }
+            );
+
+
+        const result =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                result.message ||
+                "Unable to delete subscriber."
+            );
+        }
+
+
+        alert(
+            result.message ||
+            "Subscriber deleted successfully."
+        );
+
+
+        await loadSubscribers();
+
+
+    } catch (error) {
+
+        console.error(
+            "Delete subscriber error:",
+            error
+        );
+
+        alert(
+            error.message ||
+            "Unable to delete subscriber."
+        );
+    }
+}
+
+
+/* =========================================================
+   DATE FORMAT
+========================================================= */
+
+function formatSubscriberDate(
+    dateString
+) {
+
+    try {
+
+        const date =
+            new Date(dateString);
+
+        return date.toLocaleString(
+            "en-IN",
+            {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+            }
+        );
+
+    } catch (error) {
+
+        return dateString;
+    }
+}
+
+
+/* =========================================================
+   HTML ESCAPE
+========================================================= */
+
+function escapeSubscriberHtml(
+    value
+) {
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+
+/* =========================================================
+   INITIAL LOAD
+========================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        loadSubscribers();
+
+    }
+);

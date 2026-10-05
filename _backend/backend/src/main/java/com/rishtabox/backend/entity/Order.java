@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "orders")
@@ -24,7 +25,8 @@ public class Order {
     @Column(
             name = "order_number",
             length = 100,
-            unique = true
+            unique = true,
+            nullable = false
     )
     private String orderNumber;
 
@@ -473,19 +475,36 @@ public class Order {
     @PrePersist
     protected void onCreate() {
 
+        // -------------------------------------------------
+        // CREATED DATE
+        // -------------------------------------------------
+
         if (createdAt == null) {
 
             createdAt =
                     LocalDateTime.now();
         }
 
+        // -------------------------------------------------
+        // UNIQUE ORDER NUMBER
+        // -------------------------------------------------
+
         if (orderNumber == null ||
                 orderNumber.isBlank()) {
 
             orderNumber =
                     "ORD"
-                            + System.currentTimeMillis();
+                            + System.currentTimeMillis()
+                            + UUID.randomUUID()
+                            .toString()
+                            .replace("-", "")
+                            .substring(0, 8)
+                            .toUpperCase();
         }
+
+        // -------------------------------------------------
+        // ORDER STATUS
+        // -------------------------------------------------
 
         if (orderStatus == null ||
                 orderStatus.isBlank()) {
@@ -493,6 +512,10 @@ public class Order {
             orderStatus =
                     "PLACED";
         }
+
+        // -------------------------------------------------
+        // PAYMENT STATUS
+        // -------------------------------------------------
 
         if (paymentStatus == null ||
                 paymentStatus.isBlank()) {
@@ -509,6 +532,10 @@ public class Order {
                         "PAID";
             }
         }
+
+        // -------------------------------------------------
+        // SHIPMENT STATUS
+        // -------------------------------------------------
 
         if (shipmentStatus == null ||
                 shipmentStatus.isBlank()) {
