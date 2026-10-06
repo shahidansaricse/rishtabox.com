@@ -21,66 +21,7 @@ let filteredProducts = [];
 let cart = [];
 let orders = [];
 let currentOrderSteps = 1;
-/* =========================================================
-   HERO SLIDER
-========================================================= */
-let currentSlide = 0;
 
-const slides = document.querySelectorAll(".hero-slide");
-const dots = document.querySelectorAll(".slider-dot");
-
-function showSlide(index) {
-
-    if (slides.length === 0) return;
-
-    if (index >= slides.length) {
-        currentSlide = 0;
-    } else if (index < 0) {
-        currentSlide = slides.length - 1;
-    } else {
-        currentSlide = index;
-    }
-
-    slides.forEach(slide => {
-        slide.classList.remove("active");
-    });
-
-    dots.forEach(dot => {
-        dot.classList.remove("active");
-    });
-
-    slides[currentSlide].classList.add("active");
-
-    if (dots[currentSlide]) {
-        dots[currentSlide].classList.add("active");
-    }
-}
-
-function changeSlide(direction) {
-    showSlide(currentSlide + direction);
-}
-
-function goToSlide(index) {
-    showSlide(index);
-}
-
-setInterval(() => {
-    changeSlide(1);
-}, 6000);
-function validateName(name){
-    const nameRegex = /^[a-zA-Z\s]{2,50}$/;
-    return nameRegex.test(name.trim())
-}
-
-function validateEmail(email){
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email.trim());
-}
-
-function validatePhone(phone){
-    const phoneRegex = /^[6-9]\d{9}$/;
-    return phoneRegex.test(phone.trim());
-}
 /* =========================================================
     LOCAL STORAGE
  ========================================================= */
@@ -853,7 +794,11 @@ async function initializeApp() {
 
     renderRelationships();
 
+    // =====================================================
+    // LOAD HOMEPAGE SLIDERS
+    // =====================================================
 
+    loadHomepageSliders();
     // =====================================================
     // RENDER NAVIGATION DROPDOWNS
     // =====================================================
@@ -15717,4 +15662,966 @@ async function loadCartFromBackend() {
             renderCart();
         }
     }
+}
+/* =========================================================
+   HOMEPAGE SLIDER
+========================================================= */
+
+
+/* =========================================================
+   VARIABLES
+========================================================= */
+
+let currentSlide = 0;
+
+let heroSliders = [];
+
+let sliderInterval = null;
+
+
+/* =========================================================
+   API
+========================================================= */
+
+const CUSTOMER_SLIDER_API =
+    `${API_BASE_URL}/api/sliders/active`;
+
+
+/* =========================================================
+   LOAD ACTIVE HOMEPAGE SLIDERS
+========================================================= */
+
+async function loadHomepageSliders() {
+
+    const heroSlider =
+        document.getElementById(
+            "heroSlider"
+        );
+
+
+    const sliderDots =
+        document.getElementById(
+            "sliderDots"
+        );
+
+
+    if (!heroSlider) {
+
+        console.warn(
+            "heroSlider element not found."
+        );
+
+        return;
+
+    }
+
+
+    /* =====================================================
+       LOADING
+    ===================================================== */
+
+    heroSlider.innerHTML = `
+
+        <div class="hero-loading">
+
+            Loading...
+
+        </div>
+
+    `;
+
+
+    try {
+
+        console.log(
+            "Loading homepage sliders..."
+        );
+
+
+        console.log(
+            "Slider API:",
+            CUSTOMER_SLIDER_API
+        );
+
+
+        /* =================================================
+           API REQUEST
+        ================================================= */
+
+        const response =
+            await fetch(
+                CUSTOMER_SLIDER_API,
+                {
+                    method: "GET"
+                }
+            );
+
+
+        console.log(
+            "Slider response status:",
+            response.status
+        );
+
+
+        /* =================================================
+           ERROR
+        ================================================= */
+
+        if (!response.ok) {
+
+            throw new Error(
+                `Slider API error: ${response.status}`
+            );
+
+        }
+
+
+        /* =================================================
+           RESPONSE
+        ================================================= */
+
+        const data =
+            await response.json();
+
+
+        console.log(
+            "Homepage sliders:",
+            data
+        );
+
+
+        /* =================================================
+           VALIDATE
+        ================================================= */
+
+        if (
+            !Array.isArray(data)
+        ) {
+
+            throw new Error(
+                "Slider API did not return an array."
+            );
+
+        }
+
+
+        /* =================================================
+           SAVE
+        ================================================= */
+
+        heroSliders = data;
+
+
+        /* =================================================
+           RENDER
+        ================================================= */
+
+        renderHomepageSliders();
+
+
+    } catch (error) {
+
+        console.error(
+            "Failed to load homepage sliders:",
+            error
+        );
+
+
+        /* =================================================
+           FALLBACK
+        ================================================= */
+
+        renderDefaultHomepageSlider();
+
+    }
+
+}
+
+
+/* =========================================================
+   RENDER HOMEPAGE SLIDERS
+========================================================= */
+
+function renderHomepageSliders() {
+
+    const heroSlider =
+        document.getElementById(
+            "heroSlider"
+        );
+
+
+    if (!heroSlider) {
+
+        return;
+
+    }
+
+
+    /* =====================================================
+       NO SLIDERS
+    ===================================================== */
+
+    if (
+        !heroSliders ||
+        heroSliders.length === 0
+    ) {
+
+        console.log(
+            "No active sliders found."
+        );
+
+
+        renderDefaultHomepageSlider();
+
+        return;
+
+    }
+
+
+    /* =====================================================
+       RESET CURRENT SLIDE
+    ===================================================== */
+
+    currentSlide = 0;
+
+
+    /* =====================================================
+       SORT BY DISPLAY ORDER
+    ===================================================== */
+
+    heroSliders.sort(
+        function (a, b) {
+
+            return (
+                Number(
+                    a.displayOrder ?? 0
+                ) -
+                Number(
+                    b.displayOrder ?? 0
+                )
+            );
+
+        }
+    );
+
+
+    /* =====================================================
+       CREATE SLIDES
+    ===================================================== */
+
+    const slidesHTML =
+        heroSliders
+            .map(
+                function (
+                    slider,
+                    index
+                ) {
+
+                    const image =
+                        getHomepageSliderImage(
+                            slider.image
+                        );
+
+
+                    const title =
+                        slider.title ||
+                        "";
+
+
+                    const subtitle =
+                        slider.subtitle ||
+                        "";
+
+
+                    const link =
+                        slider.link ||
+                        "#categories";
+
+
+                    return `
+
+                        <div
+                            class="
+                                hero-slide
+                                ${
+                        index === 0
+                            ? "active"
+                            : ""
+                    }
+                            ">
+
+
+                            <!-- =========================
+                                 IMAGE
+                            ========================== -->
+
+                            <img
+                                src="${escapeHtml(
+                        image
+                    )}"
+
+                                alt="${escapeHtml(
+                        title ||
+                        "RishtaBox Gifts"
+                    )}"
+
+                                class="hero-image"
+
+                                ${
+                        index === 0
+                            ? 'loading="eager"'
+                            : 'loading="lazy"'
+                    }
+                            >
+
+
+                            <!-- =========================
+                                 OVERLAY
+                            ========================== -->
+
+                            <div
+                                class="hero-overlay">
+                            </div>
+
+
+                            <!-- =========================
+                                 TITLE / SUBTITLE
+                            ========================== -->
+
+                            ${
+                        title ||
+                        subtitle
+                            ? `
+
+                                        <div
+                                            class="hero-content">
+
+
+                                            ${
+                                title
+                                    ? `
+
+                                                        <h1>
+
+                                                            ${escapeHtml(
+                                        title
+                                    )}
+
+                                                        </h1>
+
+                                                    `
+                                    : ""
+                            }
+
+
+                                            ${
+                                subtitle
+                                    ? `
+
+                                                        <p>
+
+                                                            ${escapeHtml(
+                                        subtitle
+                                    )}
+
+                                                        </p>
+
+                                                    `
+                                    : ""
+                            }
+
+
+                                        </div>
+
+                                    `
+                            : ""
+                    }
+
+
+                            <!-- =========================
+                                 SHOP BUTTON
+                            ========================== -->
+
+                            <div
+                                class="hero-content1">
+
+                                <a
+                                    href="${escapeHtml(
+                        link
+                    )}"
+
+                                    class="hero-btn">
+
+                                    Shop Now
+
+                                </a>
+
+                            </div>
+
+
+                        </div>
+
+                    `;
+
+                }
+            )
+            .join("");
+
+
+    /* =====================================================
+       CREATE DOTS
+    ===================================================== */
+
+    const dotsHTML =
+        heroSliders
+            .map(
+                function (
+                    slider,
+                    index
+                ) {
+
+                    return `
+
+                        <button
+                            type="button"
+
+                            class="
+                                slider-dot
+                                ${
+                        index === 0
+                            ? "active"
+                            : ""
+                    }
+                            "
+
+                            onclick="
+                                goToSlide(${index})
+                            "
+
+                            aria-label="
+                                Go to slide ${
+                        index + 1
+                    }
+                            ">
+                        </button>
+
+                    `;
+
+                }
+            )
+            .join("");
+
+
+    /* =====================================================
+       FINAL HTML
+    ===================================================== */
+
+    heroSlider.innerHTML = `
+
+        ${slidesHTML}
+
+
+        <!-- =============================================
+             PREVIOUS BUTTON
+        ============================================== -->
+
+        <button
+            type="button"
+            class="slider-btn slider-prev"
+            onclick="changeSlide(-1)"
+            aria-label="Previous slide">
+
+            ❮
+
+        </button>
+
+
+        <!-- =============================================
+             NEXT BUTTON
+        ============================================== -->
+
+        <button
+            type="button"
+            class="slider-btn slider-next"
+            onclick="changeSlide(1)"
+            aria-label="Next slide">
+
+            ❯
+
+        </button>
+
+
+        <!-- =============================================
+             DOTS
+        ============================================== -->
+
+        <div
+            class="slider-dots"
+            id="sliderDots">
+
+            ${dotsHTML}
+
+        </div>
+
+    `;
+
+
+    /* =====================================================
+       START AUTO PLAY
+    ===================================================== */
+
+    startSliderAutoPlay();
+
+}
+
+
+/* =========================================================
+   GET SLIDER IMAGE URL
+========================================================= */
+
+function getHomepageSliderImage(
+    image
+) {
+
+    /* =====================================================
+       EMPTY IMAGE
+    ===================================================== */
+
+    if (!image) {
+
+        return "images/RB.jpeg";
+
+    }
+
+
+    /* =====================================================
+       FULL URL
+    ===================================================== */
+
+    if (
+        image.startsWith(
+            "http://"
+        ) ||
+
+        image.startsWith(
+            "https://"
+        ) ||
+
+        image.startsWith(
+            "data:"
+        )
+    ) {
+
+        return image;
+
+    }
+
+
+    /* =====================================================
+       BACKEND ABSOLUTE PATH
+
+       Example:
+       /images/sliders/test.jpg
+    ===================================================== */
+
+    if (
+        image.startsWith("/")
+    ) {
+
+        return (
+            `${API_BASE_URL}${image}`
+        );
+
+    }
+
+
+    /* =====================================================
+       RELATIVE PATH
+    ===================================================== */
+
+    return (
+        `${API_BASE_URL}/${image}`
+    );
+
+}
+
+
+/* =========================================================
+   CHANGE SLIDE
+========================================================= */
+
+function changeSlide(
+    direction
+) {
+
+    if (
+        !heroSliders ||
+        heroSliders.length <= 1
+    ) {
+
+        return;
+
+    }
+
+
+    /* =====================================================
+       CHANGE INDEX
+    ===================================================== */
+
+    currentSlide += direction;
+
+
+    /* =====================================================
+       NEXT → FIRST
+    ===================================================== */
+
+    if (
+        currentSlide >=
+        heroSliders.length
+    ) {
+
+        currentSlide = 0;
+
+    }
+
+
+    /* =====================================================
+       PREVIOUS → LAST
+    ===================================================== */
+
+    if (
+        currentSlide < 0
+    ) {
+
+        currentSlide =
+            heroSliders.length - 1;
+
+    }
+
+
+    /* =====================================================
+       UPDATE
+    ===================================================== */
+
+    updateActiveSlide();
+
+}
+
+
+/* =========================================================
+   GO TO SPECIFIC SLIDE
+========================================================= */
+
+function goToSlide(
+    index
+) {
+
+    if (
+        !heroSliders ||
+        heroSliders.length === 0
+    ) {
+
+        return;
+
+    }
+
+
+    if (
+        index < 0 ||
+        index >= heroSliders.length
+    ) {
+
+        return;
+
+    }
+
+
+    currentSlide = index;
+
+
+    updateActiveSlide();
+
+
+    /* =====================================================
+       RESET AUTO PLAY
+    ===================================================== */
+
+    startSliderAutoPlay();
+
+}
+
+
+/* =========================================================
+   UPDATE ACTIVE SLIDE
+========================================================= */
+
+function updateActiveSlide() {
+
+    const slides =
+        document.querySelectorAll(
+            "#heroSlider .hero-slide"
+        );
+
+
+    const dots =
+        document.querySelectorAll(
+            "#sliderDots .slider-dot"
+        );
+
+
+    /* =====================================================
+       SLIDES
+    ===================================================== */
+
+    slides.forEach(
+        function (
+            slide,
+            index
+        ) {
+
+            slide.classList.toggle(
+                "active",
+                index === currentSlide
+            );
+
+        }
+    );
+
+
+    /* =====================================================
+       DOTS
+    ===================================================== */
+
+    dots.forEach(
+        function (
+            dot,
+            index
+        ) {
+
+            dot.classList.toggle(
+                "active",
+                index === currentSlide
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   AUTO PLAY
+========================================================= */
+
+function startSliderAutoPlay() {
+
+    /* =====================================================
+       CLEAR OLD TIMER
+    ===================================================== */
+
+    if (
+        sliderInterval
+    ) {
+
+        clearInterval(
+            sliderInterval
+        );
+
+    }
+
+
+    /* =====================================================
+       ONLY ONE SLIDE
+    ===================================================== */
+
+    if (
+        !heroSliders ||
+        heroSliders.length <= 1
+    ) {
+
+        return;
+
+    }
+
+
+    /* =====================================================
+       EVERY 5 SECONDS
+    ===================================================== */
+
+    sliderInterval =
+        setInterval(
+            function () {
+
+                changeSlide(1);
+
+            },
+            5000
+        );
+
+}
+
+
+/* =========================================================
+   DEFAULT FALLBACK SLIDER
+========================================================= */
+
+function renderDefaultHomepageSlider() {
+
+    const heroSlider =
+        document.getElementById(
+            "heroSlider"
+        );
+
+
+    if (!heroSlider) {
+
+        return;
+
+    }
+
+
+    /* =====================================================
+       STOP AUTO PLAY
+    ===================================================== */
+
+    if (
+        sliderInterval
+    ) {
+
+        clearInterval(
+            sliderInterval
+        );
+
+    }
+
+
+    /* =====================================================
+       RESET
+    ===================================================== */
+
+    currentSlide = 0;
+
+
+    /* =====================================================
+       DEFAULT SLIDE
+    ===================================================== */
+
+    heroSlider.innerHTML = `
+
+        <div
+            class="hero-slide active">
+
+
+            <img
+                src="images/RB.jpeg"
+                alt="RishtaBox Shopping"
+                class="hero-image">
+
+
+            <div
+                class="hero-overlay">
+            </div>
+
+
+            <div
+                class="hero-content1">
+
+                <a
+                    href="#categories"
+                    class="hero-btn">
+
+                    Shop Now
+
+                </a>
+
+            </div>
+
+
+        </div>
+
+
+        <!-- =============================================
+             PREVIOUS
+        ============================================== -->
+
+        <button
+            type="button"
+            class="slider-btn slider-prev"
+            onclick="changeSlide(-1)"
+            aria-label="Previous slide">
+
+            ❮
+
+        </button>
+
+
+        <!-- =============================================
+             NEXT
+        ============================================== -->
+
+        <button
+            type="button"
+            class="slider-btn slider-next"
+            onclick="changeSlide(1)"
+            aria-label="Next slide">
+
+            ❯
+
+        </button>
+
+
+        <!-- =============================================
+             DOTS
+        ============================================== -->
+
+        <div
+            class="slider-dots"
+            id="sliderDots">
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================================
+   HTML ESCAPE
+========================================================= */
+
+function escapeHtml(
+    value
+) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
+        return "";
+
+    }
+
+
+    return String(value)
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
 }

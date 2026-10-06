@@ -571,128 +571,1105 @@ h2 {
     transform: translateX(4px);
 }
 
-/* =========================
-   MAIN/ HERO/Slider
-========================= */
+/* =========================================================
+   MAIN / HERO / SLIDER
+   RISHTABOX RESPONSIVE SLIDER
+========================================================= */
+
 .main-content {
     width: 100%;
     min-height: 100vh;
 }
+
+
+/* =========================================================
+   HERO
+========================================================= */
+
 .hero {
     width: 100%;
     margin-top: 80px;
     position: relative;
     overflow: hidden;
-    background: #d8b892;
 }
+
+
+/* =========================================================
+   HERO SLIDER
+========================================================= */
+
 .hero-slider {
     width: 100%;
     position: relative;
+    overflow: hidden;
 }
+
+
+/* =========================================================
+   HERO SLIDE
+========================================================= */
+
 .hero-slide {
     display: none;
+
     width: 100%;
     position: relative;
+
+    overflow: hidden;
 }
+
+
 .hero-slide.active {
     display: block;
-    animation: fadeSlide .6s ease;
+
+    animation: fadeSlide 0.6s ease;
 }
+
+
+/* =========================================================
+   HERO IMAGE
+========================================================= */
+
 .hero-image {
     display: block;
+
     width: 100%;
     height: auto;
+
+    min-width: 100%;
+    max-width: 100%;
+
     object-fit: contain;
+    object-position: center;
+
+    margin: 0;
+    padding: 0;
 }
+
+
+/* =========================================================
+   FADE
+========================================================= */
+
 @keyframes fadeSlide {
-    from {opacity: 0;}
-    to {opacity: 1;}
+
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+
 }
+
+
+/* =========================================================
+   HERO OVERLAY
+========================================================= */
+
+.hero-overlay {
+
+    position: absolute;
+
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    background: linear-gradient(
+            90deg,
+            rgba(0, 0, 0, 0.45),
+            rgba(0, 0, 0, 0.12),
+            rgba(0, 0, 0, 0)
+    );
+
+    z-index: 1;
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   TITLE + SUBTITLE
+========================================================= */
+
 .hero-content {
+
     position: absolute;
-    top: 35%;
-    left: 40%;
-    transform: translate(-30%, -50%);
-    width: 38%;
-    max-width: 550px;
+
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+
+    width: 40%;
+    max-width: 600px;
+
     text-align: center;
-    z-index: 2;
-}
-.hero-content h1 {
-    font-size: 2.5rem;
-    margin-bottom: 15px;
-}
-.hero-content p {
-    font-size: 1rem;
-    line-height: 1.5;
-}
-.hero-content1 {
-    position: absolute;
-    top: 85%;
-    left: 40%;
-    transform: translate(-30%, -50%);
-    width: 38%;
-    text-align: center;
+
+    color: #ffffff;
+
     z-index: 3;
 }
+
+
+.hero-content h1 {
+
+    margin: 0 0 12px;
+
+    font-size: 38px;
+
+    line-height: 1.2;
+
+    font-weight: 700;
+
+    color: #ffffff;
+
+}
+
+
+.hero-content p {
+
+    margin: 0;
+
+    font-size: 17px;
+
+    line-height: 1.5;
+
+    color: #ffffff;
+
+}
+
+
+/* =========================================================
+   SHOP NOW BUTTON
+   ALWAYS CENTERED
+========================================================= */
+
+.hero-content1 {
+
+    position: absolute;
+
+    left: 50%;
+    bottom: 55px;
+
+    transform: translateX(-50%);
+
+    width: auto;
+
+    text-align: center;
+
+    z-index: 4;
+}
+
+
 .hero-btn {
+
     display: inline-block;
+
     padding: 14px 32px;
+
     border-radius: 50px;
+
     background: linear-gradient(
             135deg,
             var(--primary-color),
             var(--primary-light)
     );
+
     color: var(--white);
+
     text-decoration: none;
+
     font-size: 15px;
+
     font-weight: 700;
+
+    white-space: nowrap;
+
+    transition:
+            transform 0.25s ease,
+            box-shadow 0.25s ease;
 }
-/* =========================
-   SLIDER
-========================= */
+
+
+.hero-btn:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow:
+            0 8px 20px rgba(0, 0, 0, 0.20);
+}
+
+
+/* =========================================================
+   PREVIOUS / NEXT BUTTONS
+========================================================= */
+
 .slider-btn {
+
     position: absolute;
+
     top: 50%;
+
     transform: translateY(-50%);
+
     width: 45px;
     height: 45px;
+
     border: none;
+
     border-radius: 50%;
-    background: rgba(255,255,255,.9);
+
+    background: rgba(
+            255,
+            255,
+            255,
+            0.90
+    );
+
     color: #4a2d18;
+
     font-size: 25px;
+
     font-weight: bold;
+
     cursor: pointer;
+
     z-index: 10;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    transition:
+            background 0.2s ease,
+            transform 0.2s ease;
 }
+
+
+.slider-btn:hover {
+
+    background: #ffffff;
+
+    transform:
+            translateY(-50%)
+            scale(1.05);
+}
+
+
 .slider-prev {
     left: 20px;
 }
+
+
 .slider-next {
     right: 20px;
 }
+
+
+/* =========================================================
+   DOTS
+   FIXED AT BOTTOM
+========================================================= */
+
 .slider-dots {
+
     position: absolute;
-    bottom: 15px;
+
     left: 50%;
+
+    bottom: 18px;
+
     transform: translateX(-50%);
+
     z-index: 10;
+
     display: flex;
+
+    align-items: center;
+    justify-content: center;
+
     gap: 8px;
+
+    width: max-content;
+
+    pointer-events: auto;
 }
+
+
 .slider-dot {
+
     width: 10px;
     height: 10px;
-    border: 2px solid white;
+
+    padding: 0;
+
+    border: 2px solid #ffffff;
+
     border-radius: 50%;
-    background: rgba(255,255,255,.7);
+
+    background: rgba(
+            255,
+            255,
+            255,
+            0.70
+    );
+
     cursor: pointer;
+
+    transition:
+            transform 0.2s ease,
+            background 0.2s ease;
 }
+
+
 .slider-dot.active {
+
     background: var(--primary-color);
-    transform: scale(1.2);
+
+    transform: scale(1.25);
+}
+
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+.hero-loading {
+
+    width: 100%;
+
+    min-height: 300px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 20px;
+
+    color: #4a2d18;
+}
+
+
+/* =========================================================
+   LAPTOP
+   1200px+
+========================================================= */
+
+@media (min-width: 1200px) {
+
+    .hero-image {
+        width: 100%;
+        height: auto;
+    }
+
+    .hero-content {
+        width: 42%;
+    }
+
+}
+
+
+/* =========================================================
+   SMALL LAPTOP
+   1024px - 1199px
+========================================================= */
+
+@media (min-width: 1024px) and (max-width: 1199px) {
+
+    .hero {
+
+        margin-top: 75px;
+
+    }
+
+    .hero-content {
+
+        width: 48%;
+
+    }
+
+    .hero-content h1 {
+
+        font-size: 32px;
+
+    }
+
+    .hero-content p {
+
+        font-size: 15px;
+
+    }
+
+    .hero-content1 {
+
+        bottom: 55px;
+
+    }
+
+}
+
+
+/* =========================================================
+   TABLET
+   769px - 1023px
+
+   FULL IMAGE
+   NO CROPPING
+========================================================= */
+
+@media (min-width: 769px) and (max-width: 1023px) {
+
+    .hero {
+
+        margin-top: 70px;
+
+    }
+
+    .hero-slider {
+
+        width: 100%;
+        height: auto;
+
+    }
+
+    .hero-slide {
+
+        width: 100%;
+        height: auto;
+
+    }
+
+    .hero-image {
+
+        width: 100%;
+        height: auto;
+
+        min-width: 100%;
+        max-width: 100%;
+
+        object-fit: contain;
+
+    }
+
+    .hero-content {
+
+        width: 55%;
+
+        top: 45%;
+
+    }
+
+    .hero-content h1 {
+
+        font-size: 29px;
+
+    }
+
+    .hero-content p {
+
+        font-size: 14px;
+
+    }
+
+    .hero-content1 {
+
+        left: 50%;
+
+        bottom: 65px;
+
+    }
+
+    .slider-btn {
+
+        width: 38px;
+        height: 38px;
+
+        font-size: 18px;
+
+    }
+
+    .slider-prev {
+
+        left: 14px;
+
+    }
+
+    .slider-next {
+
+        right: 14px;
+
+    }
+
+    .slider-dots {
+
+        bottom: 15px;
+
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+   481px - 768px
+
+   FULL IMAGE
+   NO CROPPING
+========================================================= */
+
+@media (max-width: 768px) {
+
+    .hero {
+
+        margin-top: 65px;
+
+        width: 100%;
+
+    }
+
+    .hero-slider {
+
+        width: 100%;
+
+        height: auto;
+
+    }
+
+    .hero-slide {
+
+        width: 100%;
+
+        height: auto;
+
+    }
+
+    .hero-image {
+
+        display: block;
+
+        width: 100%;
+
+        height: auto;
+
+        min-width: 100%;
+        max-width: 100%;
+
+        object-fit: contain;
+
+    }
+
+    /* -----------------------------------------
+       TITLE / SUBTITLE
+    ----------------------------------------- */
+
+    .hero-content {
+
+        top: 42%;
+
+        left: 50%;
+
+        width: 75%;
+
+        max-width: 90%;
+
+        transform: translate(-50%, -50%);
+
+        text-align: center;
+
+    }
+
+    .hero-content h1 {
+
+        font-size: 25px;
+
+        line-height: 1.2;
+
+        margin-bottom: 8px;
+
+    }
+
+    .hero-content p {
+
+        font-size: 13px;
+
+        line-height: 1.4;
+
+    }
+
+
+    /* -----------------------------------------
+       SHOP BUTTON
+       CENTER
+    ----------------------------------------- */
+
+    .hero-content1 {
+
+        left: 50%;
+
+        bottom: 45px;
+
+        transform: translateX(-50%);
+
+        width: auto;
+
+        text-align: center;
+
+    }
+
+    .hero-btn {
+
+        padding: 9px 20px;
+
+        font-size: 13px;
+
+    }
+
+
+    /* -----------------------------------------
+       ARROWS
+    ----------------------------------------- */
+
+    .slider-btn {
+
+        width: 34px;
+        height: 34px;
+
+        font-size: 16px;
+
+    }
+
+    .slider-prev {
+
+        left: 8px;
+
+    }
+
+    .slider-next {
+
+        right: 8px;
+
+    }
+
+
+    /* -----------------------------------------
+       DOTS
+    ----------------------------------------- */
+
+    .slider-dots {
+
+        bottom: 10px;
+
+        gap: 6px;
+
+    }
+
+    .slider-dot {
+
+        width: 7px;
+        height: 7px;
+
+    }
+
+}
+
+
+/* =========================================================
+   NORMAL MOBILE
+   376px - 480px
+========================================================= */
+
+@media (max-width: 480px) {
+
+    .hero {
+
+        margin-top: 60px;
+
+    }
+
+    .hero-image {
+
+        width: 100%;
+
+        height: auto;
+
+        object-fit: contain;
+
+    }
+
+
+    .hero-content {
+
+        top: 40%;
+
+        width: 78%;
+
+    }
+
+    .hero-content h1 {
+
+        font-size: 21px;
+
+        line-height: 1.2;
+
+        margin-bottom: 6px;
+
+    }
+
+    .hero-content p {
+
+        font-size: 11px;
+
+        line-height: 1.35;
+
+    }
+
+
+    /* SHOP BUTTON */
+
+    .hero-content1 {
+
+        bottom: 38px;
+
+    }
+
+    .hero-btn {
+
+        padding: 8px 17px;
+
+        font-size: 12px;
+
+    }
+
+
+    /* ARROWS */
+
+    .slider-btn {
+
+        width: 30px;
+        height: 30px;
+
+        font-size: 14px;
+
+    }
+
+    .slider-prev {
+
+        left: 5px;
+
+    }
+
+    .slider-next {
+
+        right: 5px;
+
+    }
+
+
+    /* DOTS */
+
+    .slider-dots {
+
+        bottom: 8px;
+
+        gap: 5px;
+
+    }
+
+    .slider-dot {
+
+        width: 6px;
+        height: 6px;
+
+    }
+
+}
+
+
+/* =========================================================
+   MINI MOBILE
+   321px - 375px
+========================================================= */
+
+@media (max-width: 375px) {
+
+    .hero {
+
+        margin-top: 58px;
+
+    }
+
+    .hero-content {
+
+        top: 38%;
+
+        width: 75%;
+
+    }
+
+    .hero-content h1 {
+
+        font-size: 18px;
+
+        line-height: 1.2;
+
+        margin-bottom: 5px;
+
+    }
+
+    .hero-content p {
+
+        font-size: 10px;
+
+        line-height: 1.3;
+
+    }
+
+
+    /* SHOP BUTTON */
+
+    .hero-content1 {
+
+        bottom: 32px;
+
+    }
+
+    .hero-btn {
+
+        padding: 7px 14px;
+
+        font-size: 11px;
+
+    }
+
+
+    /* ARROWS */
+
+    .slider-btn {
+
+        width: 27px;
+        height: 27px;
+
+        font-size: 12px;
+
+    }
+
+
+    /* DOTS */
+
+    .slider-dots {
+
+        bottom: 7px;
+
+        gap: 4px;
+
+    }
+
+    .slider-dot {
+
+        width: 5px;
+        height: 5px;
+
+    }
+
+}
+
+
+/* =========================================================
+   VERY SMALL MOBILE
+   320px AND BELOW
+========================================================= */
+
+@media (max-width: 320px) {
+
+    .hero {
+
+        margin-top: 55px;
+
+    }
+
+    .hero-content {
+
+        top: 37%;
+
+        width: 72%;
+
+    }
+
+    .hero-content h1 {
+
+        font-size: 16px;
+
+        line-height: 1.2;
+
+        margin-bottom: 4px;
+
+    }
+
+    .hero-content p {
+
+        font-size: 9px;
+
+        line-height: 1.25;
+
+    }
+
+
+    /* SHOP BUTTON */
+
+    .hero-content1 {
+
+        bottom: 28px;
+
+    }
+
+    .hero-btn {
+
+        padding: 6px 12px;
+
+        font-size: 10px;
+
+    }
+
+
+    /* ARROWS */
+
+    .slider-btn {
+
+        width: 25px;
+        height: 25px;
+
+        font-size: 11px;
+
+    }
+
+    .slider-prev {
+
+        left: 4px;
+
+    }
+
+    .slider-next {
+
+        right: 4px;
+
+    }
+
+
+    /* DOTS */
+
+    .slider-dots {
+
+        bottom: 6px;
+
+        gap: 3px;
+
+    }
+
+    .slider-dot {
+
+        width: 5px;
+        height: 5px;
+
+    }
+
+}
+/* =========================================================
+   SHOP BUTTON - TABLET + MOBILE CENTER
+========================================================= */
+
+@media (max-width: 1023px) {
+
+    .hero-slide .hero-content1 {
+        position: absolute !important;
+
+        left: 0 !important;
+        right: 0 !important;
+
+        bottom: 35px !important;
+
+        top: auto !important;
+
+        width: 100% !important;
+        max-width: 100% !important;
+
+        margin: 0 !important;
+        padding: 0 !important;
+
+        transform: none !important;
+
+        display: flex !important;
+
+        justify-content: center !important;
+        align-items: center !important;
+
+        text-align: center !important;
+
+        z-index: 20 !important;
+    }
+
+
+    .hero-slide .hero-content1 .hero-btn {
+        display: inline-flex !important;
+
+        align-items: center !important;
+        justify-content: center !important;
+
+        margin: 0 auto !important;
+
+        text-align: center !important;
+    }
+
+}
+/* =========================================================
+   FORCE SHOP BUTTON POSITION - TABLET + MOBILE
+========================================================= */
+
+@media (max-width: 1023px) {
+
+    .hero-slide .hero-content1 {
+
+        position: absolute !important;
+
+        top: auto !important;
+        bottom: 20px !important;
+
+        left: 0 !important;
+        right: 0 !important;
+
+        width: 100% !important;
+        max-width: 100% !important;
+
+        margin: 0 !important;
+        padding: 0 !important;
+
+        transform: none !important;
+
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+
+        text-align: center !important;
+
+        z-index: 50 !important;
+    }
+
+    .hero-slide .hero-content1 .hero-btn {
+
+        margin: 0 !important;
+
+        position: relative !important;
+
+        top: 0 !important;
+        bottom: auto !important;
+
+        transform: none !important;
+    }
+
 }
 /* =========================
    CATEGORIES

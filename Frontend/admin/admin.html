@@ -175,6 +175,10 @@
                     Subscribers
                 </button>
 
+                <button type="button" class="nav-btn" data-section="sliders">
+                    Sliders
+                </button>
+
                 <button type="button" class="nav-btn" data-section="blogs">
                     Blogs
                 </button>
@@ -1206,6 +1210,321 @@
 
                 </section>
 
+
+                <!-- =========================================================
+                     SLIDERS
+                ========================================================= -->
+
+                <section id="sliders" class="admin-section hidden">
+
+                    <div class="panel-card">
+
+                        <!-- =================================================
+                             SLIDER HEADER
+                        ================================================= -->
+
+                        <div class="section-toolbar">
+
+                            <div>
+
+                                <p class="eyebrow">
+                                    SLIDER MANAGEMENT
+                                </p>
+
+                                <h2>
+                                    Homepage Sliders
+                                </h2>
+
+                                <p>
+                                    Add, edit, delete and manage homepage slider images.
+                                </p>
+
+                            </div>
+
+                            <div class="form-actions">
+
+                                <button
+                                        type="button"
+                                        class="primary-btn"
+                                        onclick="openSliderForm()">
+
+                                    + Add Slider
+
+                                </button>
+
+                                <button
+                                        type="button"
+                                        class="outline-btn"
+                                        onclick="loadAdminSliders()">
+
+                                    Refresh
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- =================================================
+                             SLIDER FORM
+                        ================================================= -->
+
+                        <div
+                                id="sliderFormContainer"
+                                class="admin-form-container hidden">
+
+                            <!-- FORM HEADER -->
+
+                            <div class="form-header">
+
+                                <div>
+
+                                    <p class="eyebrow">
+                                        SLIDER MANAGEMENT
+                                    </p>
+
+                                    <h3 id="sliderFormTitle">
+                                        Add Slider
+                                    </h3>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- FORM -->
+
+                            <form
+                                    id="sliderForm"
+                                    enctype="multipart/form-data">
+
+                                <!-- SLIDER ID -->
+
+                                <input
+                                        type="hidden"
+                                        id="sliderId">
+
+
+                                <!-- =================================================
+                                     TITLE - OPTIONAL
+                                ================================================= -->
+
+                                <div class="form-group">
+
+                                    <label for="sliderTitle">
+                                        Slider Title
+                                        <span class="muted">(Optional)</span>
+                                    </label>
+
+                                    <input
+                                            type="text"
+                                            id="sliderTitle"
+                                            placeholder="Example: Special Gifts for Every Relationship">
+
+                                </div>
+
+
+                                <!-- =================================================
+                                     SUBTITLE - OPTIONAL
+                                ================================================= -->
+
+                                <div class="form-group">
+
+                                    <label for="sliderSubtitle">
+                                        Slider Subtitle
+                                        <span class="muted">(Optional)</span>
+                                    </label>
+
+                                    <input
+                                            type="text"
+                                            id="sliderSubtitle"
+                                            placeholder="Example: Make every moment memorable">
+
+                                </div>
+
+
+                                <!-- =================================================
+                                     IMAGE UPLOAD
+                                ================================================= -->
+
+                                <div class="form-group">
+
+                                    <label for="sliderImage">
+                                        Slider Image
+                                        <span class="muted">(Required for new slider)</span>
+                                    </label>
+
+                                    <input
+                                            type="file"
+                                            id="sliderImage"
+                                            accept="image/jpeg,image/png,image/webp">
+
+                                    <small class="muted">
+                                        Upload JPG, PNG or WEBP image.
+                                        Leave empty while editing if you do not want
+                                        to change the existing image.
+                                    </small>
+
+                                </div>
+
+
+                                <!-- =================================================
+                                     IMAGE PREVIEW
+                                ================================================= -->
+
+                                <div
+                                        id="sliderImagePreviewContainer"
+                                        class="form-group hidden">
+
+                                    <label>
+                                        Image Preview
+                                    </label>
+
+                                    <div>
+
+                                        <img
+                                                id="sliderImagePreview"
+                                                src=""
+                                                alt="Slider Preview"
+                                                style="
+                                    width: 100%;
+                                    max-width: 500px;
+                                    height: 220px;
+                                    object-fit: contain;
+                                    background: #f5f5f5;
+                                    border-radius: 12px;
+                                    border: 1px solid #ddd;
+                                    display: block;
+                                ">
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- =================================================
+                                     LINK - OPTIONAL
+                                ================================================= -->
+
+                                <div class="form-group">
+
+                                    <label for="sliderLink">
+                                        Slider Link
+                                        <span class="muted">(Optional)</span>
+                                    </label>
+
+                                    <input
+                                            type="text"
+                                            id="sliderLink"
+                                            placeholder="Example: category.html?id=1">
+
+                                    <small class="muted">
+                                        Optional. Enter the page or product/category
+                                        link that should open when the slider is clicked.
+                                    </small>
+
+                                </div>
+
+
+                                <!-- =================================================
+                                     DISPLAY ORDER
+                                ================================================= -->
+
+                                <div class="form-group">
+
+                                    <label for="sliderOrder">
+                                        Display Order
+                                    </label>
+
+                                    <input
+                                            type="number"
+                                            id="sliderOrder"
+                                            min="0"
+                                            value="0">
+
+                                    <small class="muted">
+                                        Smaller numbers appear first.
+                                    </small>
+
+                                </div>
+
+
+                                <!-- =================================================
+                                     ACTIVE STATUS
+                                ================================================= -->
+
+                                <div class="form-group">
+
+                                    <label>
+
+                                        <input
+                                                type="checkbox"
+                                                id="sliderActive"
+                                                checked>
+
+                                        Active
+
+                                    </label>
+
+                                </div>
+
+
+                                <!-- =================================================
+                                     FORM MESSAGE
+                                ================================================= -->
+
+                                <div
+                                        id="sliderFormMessage"
+                                        class="form-message">
+                                </div>
+
+
+                                <!-- =================================================
+                                     FORM ACTIONS
+                                ================================================= -->
+
+                                <div class="form-actions">
+
+                                    <button
+                                            type="submit"
+                                            class="primary-btn">
+
+                                        Save Slider
+
+                                    </button>
+
+                                    <button
+                                            type="button"
+                                            class="outline-btn"
+                                            onclick="closeSliderForm()">
+
+                                        Cancel
+
+                                    </button>
+
+                                </div>
+
+                            </form>
+
+                        </div>
+
+
+                        <!-- =================================================
+                             SLIDER LIST
+                        ================================================= -->
+
+                        <div
+                                id="slidersContent"
+                                class="empty-state">
+
+                            Loading sliders...
+
+                        </div>
+
+                    </div>
+
+                </section>
 
 
                 <!-- =================================================

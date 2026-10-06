@@ -11929,3 +11929,1717 @@ document.addEventListener(
 
     }
 );
+/* ============================================================
+   SLIDER MANAGEMENT
+   ============================================================ */
+
+const SLIDER_API =
+    `${API_BASE_URL}/api/sliders`;
+
+
+/* ============================================================
+   DOM ELEMENTS
+   ============================================================ */
+
+const sliderForm =
+    document.getElementById("sliderForm");
+
+const sliderFormContainer =
+    document.getElementById(
+        "sliderFormContainer"
+    );
+
+const slidersContent =
+    document.getElementById(
+        "slidersContent"
+    );
+
+const sliderId =
+    document.getElementById(
+        "sliderId"
+    );
+
+const sliderTitle =
+    document.getElementById(
+        "sliderTitle"
+    );
+
+const sliderSubtitle =
+    document.getElementById(
+        "sliderSubtitle"
+    );
+
+const sliderImage =
+    document.getElementById(
+        "sliderImage"
+    );
+
+const sliderLink =
+    document.getElementById(
+        "sliderLink"
+    );
+
+const sliderOrder =
+    document.getElementById(
+        "sliderOrder"
+    );
+
+const sliderActive =
+    document.getElementById(
+        "sliderActive"
+    );
+
+const sliderImagePreview =
+    document.getElementById(
+        "sliderImagePreview"
+    );
+
+const sliderImagePreviewContainer =
+    document.getElementById(
+        "sliderImagePreviewContainer"
+    );
+
+
+/* ============================================================
+   OPEN SLIDER FORM
+   ============================================================ */
+
+function openSliderForm(slider = null) {
+
+    if (!sliderFormContainer) {
+
+        console.error(
+            "sliderFormContainer not found."
+        );
+
+        return;
+    }
+
+
+    sliderFormContainer
+        .classList
+        .remove("hidden");
+
+
+    /* ========================================================
+       EDIT MODE
+       ======================================================== */
+
+    if (slider) {
+
+        if (sliderId) {
+
+            sliderId.value =
+                slider.id || "";
+
+        }
+
+
+        if (sliderTitle) {
+
+            sliderTitle.value =
+                slider.title || "";
+
+        }
+
+
+        if (sliderSubtitle) {
+
+            sliderSubtitle.value =
+                slider.subtitle || "";
+
+        }
+
+
+        if (sliderLink) {
+
+            sliderLink.value =
+                slider.link || "";
+
+        }
+
+
+        if (sliderOrder) {
+
+            sliderOrder.value =
+                slider.displayOrder ?? 0;
+
+        }
+
+
+        if (sliderActive) {
+
+            sliderActive.checked =
+                slider.active !== false;
+
+        }
+
+
+        /*
+         * Existing image preview
+         */
+
+        const imageUrl =
+            getSliderImageUrl(
+                slider
+            );
+
+
+        if (
+            imageUrl &&
+            sliderImagePreview &&
+            sliderImagePreviewContainer
+        ) {
+
+            sliderImagePreview.src =
+                imageUrl;
+
+            sliderImagePreviewContainer
+                .classList
+                .remove("hidden");
+
+        }
+
+
+        /*
+         * New image is optional during edit.
+         */
+
+        if (sliderImage) {
+
+            sliderImage.value = "";
+
+        }
+
+
+        return;
+    }
+
+
+    /* ========================================================
+       CREATE MODE
+       ======================================================== */
+
+    resetSliderForm();
+
+}
+
+
+/* ============================================================
+   CLOSE SLIDER FORM
+   ============================================================ */
+
+function closeSliderForm() {
+
+    if (sliderFormContainer) {
+
+        sliderFormContainer
+            .classList
+            .add("hidden");
+
+    }
+
+
+    resetSliderForm();
+
+}
+
+
+/* ============================================================
+   RESET SLIDER FORM
+   ============================================================ */
+
+function resetSliderForm() {
+
+    if (sliderForm) {
+
+        sliderForm.reset();
+
+    }
+
+
+    if (sliderId) {
+
+        sliderId.value = "";
+
+    }
+
+
+    if (sliderOrder) {
+
+        sliderOrder.value = "0";
+
+    }
+
+
+    if (sliderActive) {
+
+        sliderActive.checked = true;
+
+    }
+
+
+    /*
+     * Clear image preview
+     */
+
+    if (sliderImagePreview) {
+
+        sliderImagePreview.src = "";
+
+    }
+
+
+    if (sliderImagePreviewContainer) {
+
+        sliderImagePreviewContainer
+            .classList
+            .add("hidden");
+
+    }
+
+}
+
+
+/* ============================================================
+   IMAGE VALIDATION + PREVIEW
+   ============================================================ */
+
+if (sliderImage) {
+
+    sliderImage.addEventListener(
+        "change",
+        function () {
+
+            const file =
+                this.files[0];
+
+
+            /* =================================================
+               NO FILE
+               ================================================= */
+
+            if (!file) {
+
+                if (
+                    sliderImagePreviewContainer
+                ) {
+
+                    sliderImagePreviewContainer
+                        .classList
+                        .add("hidden");
+
+                }
+
+                return;
+            }
+
+
+            /* =================================================
+               ALLOWED IMAGE TYPES
+               ================================================= */
+
+            const allowedTypes = [
+
+                "image/jpeg",
+
+                "image/png",
+
+                "image/webp"
+
+            ];
+
+
+            if (
+                !allowedTypes.includes(
+                    file.type
+                )
+            ) {
+
+                alert(
+                    "Only JPG, PNG and WEBP images are allowed."
+                );
+
+                this.value = "";
+
+                return;
+            }
+
+
+            /* =================================================
+               MAXIMUM SIZE = 5 MB
+               ================================================= */
+
+            const maxSize =
+                5 * 1024 * 1024;
+
+
+            if (
+                file.size > maxSize
+            ) {
+
+                alert(
+                    "Image size must be less than 5 MB."
+                );
+
+                this.value = "";
+
+                return;
+            }
+
+
+            /* =================================================
+               IMAGE PREVIEW
+               ================================================= */
+
+            const reader =
+                new FileReader();
+
+
+            reader.onload =
+                function (event) {
+
+                    if (sliderImagePreview) {
+
+                        sliderImagePreview.src =
+                            event.target.result;
+
+                    }
+
+
+                    if (
+                        sliderImagePreviewContainer
+                    ) {
+
+                        sliderImagePreviewContainer
+                            .classList
+                            .remove("hidden");
+
+                    }
+
+                };
+
+
+            reader.readAsDataURL(
+                file
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   SAVE SLIDER
+   ============================================================ */
+
+if (sliderForm) {
+
+    sliderForm.addEventListener(
+        "submit",
+        async function (event) {
+
+            event.preventDefault();
+
+
+            /* =================================================
+               GET FORM VALUES
+               ================================================= */
+
+            const id =
+                sliderId
+                    ? sliderId.value.trim()
+                    : "";
+
+
+            const title =
+                sliderTitle
+                    ? sliderTitle.value.trim()
+                    : "";
+
+
+            const subtitle =
+                sliderSubtitle
+                    ? sliderSubtitle.value.trim()
+                    : "";
+
+
+            const link =
+                sliderLink
+                    ? sliderLink.value.trim()
+                    : "";
+
+
+            const displayOrder =
+                sliderOrder
+                    ? sliderOrder.value
+                    : "0";
+
+
+            const active =
+                sliderActive
+                    ? sliderActive.checked
+                    : true;
+
+
+            const imageFile =
+                sliderImage &&
+                sliderImage.files.length > 0
+                    ? sliderImage.files[0]
+                    : null;
+
+
+
+
+            /* =================================================
+               IMAGE REQUIRED FOR NEW SLIDER
+               ================================================= */
+
+            if (
+                !id &&
+                !imageFile
+            ) {
+
+                alert(
+                    "Please select a slider image."
+                );
+
+                return;
+            }
+
+
+            /* =================================================
+               IMAGE VALIDATION
+               ================================================= */
+
+            if (imageFile) {
+
+                const allowedTypes = [
+
+                    "image/jpeg",
+
+                    "image/png",
+
+                    "image/webp"
+
+                ];
+
+
+                if (
+                    !allowedTypes.includes(
+                        imageFile.type
+                    )
+                ) {
+
+                    alert(
+                        "Only JPG, PNG and WEBP images are allowed."
+                    );
+
+                    return;
+                }
+
+
+                if (
+                    imageFile.size >
+                    5 * 1024 * 1024
+                ) {
+
+                    alert(
+                        "Image size must be less than 5 MB."
+                    );
+
+                    return;
+                }
+
+            }
+
+
+            /* =================================================
+               CREATE FORMDATA
+               ================================================= */
+
+            const formData =
+                new FormData();
+
+
+            formData.append(
+                "title",
+                title
+            );
+
+
+            formData.append(
+                "subtitle",
+                subtitle
+            );
+
+
+            formData.append(
+                "link",
+                link
+            );
+
+
+            formData.append(
+                "displayOrder",
+                displayOrder
+            );
+
+
+            formData.append(
+                "active",
+                active
+            );
+
+
+            /* =================================================
+               ADD ACTUAL IMAGE FILE
+               ================================================= */
+
+            if (imageFile) {
+
+                formData.append(
+                    "image",
+                    imageFile
+                );
+
+            }
+
+
+            /* =================================================
+               CREATE OR UPDATE
+               ================================================= */
+
+            let url =
+                SLIDER_API;
+
+            let method =
+                "POST";
+
+
+            if (id) {
+
+                url =
+                    `${SLIDER_API}/${id}`;
+
+                method =
+                    "PUT";
+
+            }
+
+
+            try {
+
+                /* =============================================
+                   SAVE BUTTON
+                   ============================================= */
+
+                const submitButton =
+                    sliderForm.querySelector(
+                        'button[type="submit"]'
+                    );
+
+
+                if (submitButton) {
+
+                    submitButton.disabled =
+                        true;
+
+                    submitButton.textContent =
+                        "Saving...";
+
+                }
+
+
+                /* =============================================
+                   API REQUEST
+                   ============================================= */
+
+                const response =
+                    await fetch(
+                        url,
+                        {
+                            method: method,
+
+                            headers:
+                                getAdminHeaders(),
+
+                            body:
+                            formData
+                        }
+                    );
+
+
+                /* =============================================
+                   RESPONSE
+                   ============================================= */
+
+                let data = null;
+
+
+                try {
+
+                    data =
+                        await response.json();
+
+                } catch (error) {
+
+                    console.warn(
+                        "Response is not JSON."
+                    );
+
+                }
+
+
+                /* =============================================
+                   API ERROR
+                   ============================================= */
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        data?.message ||
+                        data?.error ||
+                        `Request failed with status ${response.status}`
+                    );
+
+                }
+
+
+                /* =============================================
+                   SUCCESS
+                   ============================================= */
+
+                alert(
+                    id
+                        ? "Slider updated successfully."
+                        : "Slider added successfully."
+                );
+
+
+                /* =============================================
+                   RESET
+                   ============================================= */
+
+                resetSliderForm();
+
+
+                /* =============================================
+                   CLOSE FORM
+                   ============================================= */
+
+                if (sliderFormContainer) {
+
+                    sliderFormContainer
+                        .classList
+                        .add("hidden");
+
+                }
+
+
+                /* =============================================
+                   RELOAD SLIDERS
+                   ============================================= */
+
+                await loadAdminSliders();
+
+
+            } catch (error) {
+
+                console.error(
+                    "Slider save error:",
+                    error
+                );
+
+
+                alert(
+                    error.message ||
+                    "Failed to save slider."
+                );
+
+
+            } finally {
+
+                /* =============================================
+                   ENABLE SAVE BUTTON
+                   ============================================= */
+
+                const submitButton =
+                    sliderForm.querySelector(
+                        'button[type="submit"]'
+                    );
+
+
+                if (submitButton) {
+
+                    submitButton.disabled =
+                        false;
+
+                    submitButton.textContent =
+                        "Save Slider";
+
+                }
+
+            }
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   LOAD ALL SLIDERS
+   ============================================================ */
+async function loadAdminSliders() {
+
+    console.log("========== LOAD SLIDERS ==========");
+
+    console.log(
+        "SLIDER_API:",
+        SLIDER_API
+    );
+
+    console.log(
+        "isAdmin:",
+        isAdmin()
+    );
+
+    console.log(
+        "slidersContent:",
+        slidersContent
+    );
+
+    if (!slidersContent) {
+
+        console.error(
+            "slidersContent element not found."
+        );
+
+        return;
+    }
+
+    slidersContent.innerHTML = `
+        <div class="empty-state">
+            Loading sliders...
+        </div>
+    `;
+
+    try {
+
+        const headers =
+            getAdminHeaders();
+
+        console.log(
+            "Admin headers:",
+            headers
+        );
+
+        const response =
+            await fetch(
+                SLIDER_API,
+                {
+                    method: "GET",
+                    headers: headers
+                }
+            );
+
+        console.log(
+            "Slider response status:",
+            response.status
+        );
+
+        console.log(
+            "Slider response OK:",
+            response.ok
+        );
+
+        const responseText =
+            await response.text();
+
+        console.log(
+            "Slider raw response:",
+            responseText
+        );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                `HTTP ${response.status}: ${responseText}`
+            );
+
+        }
+
+
+        let sliders = [];
+
+        if (responseText.trim()) {
+
+            sliders =
+                JSON.parse(responseText);
+
+        }
+
+
+        console.log(
+            "Parsed sliders:",
+            sliders
+        );
+
+
+        if (!Array.isArray(sliders)) {
+
+            throw new Error(
+                "Slider API did not return an array."
+            );
+
+        }
+
+
+        renderAdminSliders(
+            sliders
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "LOAD SLIDERS ERROR:",
+            error
+        );
+
+        slidersContent.innerHTML = `
+
+            <div class="empty-state">
+
+                <h3>
+                    Failed to load sliders.
+                </h3>
+
+                <p>
+                    ${escapeHtml(
+            error.message ||
+            "Unknown error"
+        )}
+                </p>
+
+                <button
+                    type="button"
+                    class="outline-btn"
+                    onclick="loadAdminSliders()">
+
+                    Try Again
+
+                </button>
+
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+/* ============================================================
+   RENDER ADMIN SLIDERS
+   ============================================================ */
+
+function renderAdminSliders(
+    sliders
+) {
+
+    if (!slidersContent) {
+
+        return;
+
+    }
+
+
+    /* =========================================================
+       EMPTY
+       ========================================================= */
+
+    if (
+        !sliders ||
+        sliders.length === 0
+    ) {
+
+        slidersContent.innerHTML = `
+
+            <div class="empty-state">
+
+                <h3>
+                    No sliders found
+                </h3>
+
+                <p>
+                    Add your first homepage slider.
+                </p>
+
+                <button
+                    type="button"
+                    class="primary-btn"
+                    onclick="openSliderForm()">
+
+                    + Add Slider
+
+                </button>
+
+            </div>
+
+        `;
+
+        return;
+    }
+
+
+    /* =========================================================
+       SORT BY DISPLAY ORDER
+       ========================================================= */
+
+    sliders.sort(
+        function (a, b) {
+
+            return (
+                Number(
+                    a.displayOrder ?? 0
+                ) -
+                Number(
+                    b.displayOrder ?? 0
+                )
+            );
+
+        }
+    );
+
+
+    /* =========================================================
+       RENDER
+       ========================================================= */
+
+    slidersContent.innerHTML =
+        sliders
+            .map(
+                createAdminSliderCard
+            )
+            .join("");
+
+}
+
+
+/* ============================================================
+   CREATE SLIDER CARD
+   ============================================================ */
+
+function createAdminSliderCard(
+    slider
+) {
+
+    const imageUrl =
+        getSliderImageUrl(
+            slider
+        );
+
+
+    const isActive =
+        slider.active !== false;
+
+
+    const status =
+        isActive
+            ? "Active"
+            : "Inactive";
+
+
+    const statusClass =
+        isActive
+            ? "active"
+            : "inactive";
+
+
+    return `
+
+        <div
+            class="admin-card slider-admin-card"
+            data-slider-id="${slider.id}">
+
+            <!-- IMAGE -->
+
+            <div
+                class="slider-admin-image">
+
+                ${
+        imageUrl
+
+            ? `
+
+                            <img
+                                src="${escapeHtml(imageUrl)}"
+                                alt="${escapeHtml(
+                slider.title ||
+                "Slider"
+            )}"
+                                loading="lazy"
+                                onerror="this.style.display='none';">
+
+                          `
+
+            : `
+
+                            <div class="empty-image">
+
+                                No Image
+
+                            </div>
+
+                          `
+    }
+
+            </div>
+
+
+            <!-- DETAILS -->
+
+            <div
+                class="slider-admin-info">
+
+
+                <div
+                    class="slider-admin-header">
+
+
+                    <h3>
+
+                        ${escapeHtml(
+        slider.title ||
+        "Untitled Slider"
+    )}
+
+                    </h3>
+
+
+                    <span
+                        class="slider-status ${statusClass}">
+
+                        ${status}
+
+                    </span>
+
+
+                </div>
+
+
+                ${
+        slider.subtitle
+
+            ? `
+
+                            <p>
+
+                                ${escapeHtml(
+                slider.subtitle
+            )}
+
+                            </p>
+
+                          `
+
+            : ""
+    }
+
+
+                <div
+                    class="slider-meta">
+
+
+                    <span>
+
+                        Order:
+
+                        <strong>
+
+                            ${slider.displayOrder ?? 0}
+
+                        </strong>
+
+                    </span>
+
+
+                    ${
+        slider.link
+
+            ? `
+
+                                <span>
+
+                                    Link:
+
+                                    ${escapeHtml(
+                slider.link
+            )}
+
+                                </span>
+
+                              `
+
+            : ""
+    }
+
+
+                </div>
+
+
+                <!-- ACTIONS -->
+
+                <div
+                    class="slider-actions">
+
+
+                    <button
+                        type="button"
+                        class="outline-btn"
+                        onclick="editSliderById(${slider.id})">
+
+                        Edit
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="outline-btn"
+                        onclick="toggleSliderStatus(
+                            ${slider.id},
+                            ${isActive}
+                        )">
+
+                        ${
+        isActive
+            ? "Deactivate"
+            : "Activate"
+    }
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="danger-btn"
+                        onclick="deleteSlider(
+                            ${slider.id}
+                        )">
+
+                        Delete
+
+                    </button>
+
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+
+/* ============================================================
+   GET SLIDER IMAGE URL
+   ============================================================ */
+
+function getSliderImageUrl(
+    slider
+) {
+
+    if (!slider) {
+
+        return "";
+
+    }
+
+
+    const image =
+        slider.image ||
+        slider.imageUrl ||
+        slider.imagePath ||
+        slider.filePath ||
+        "";
+
+
+    if (!image) {
+
+        return "";
+
+    }
+
+
+    /* =========================================================
+       FULL URL
+       ========================================================= */
+
+    if (
+        image.startsWith(
+            "http://"
+        ) ||
+        image.startsWith(
+            "https://"
+        ) ||
+        image.startsWith(
+            "data:"
+        )
+    ) {
+
+        return image;
+
+    }
+
+
+    /* =========================================================
+       ABSOLUTE PATH
+       Example:
+       /uploads/sliders/test.jpg
+       ========================================================= */
+
+    if (
+        image.startsWith("/")
+    ) {
+
+        return `${API_BASE_URL}${image}`;
+
+    }
+
+
+    /* =========================================================
+       RELATIVE PATH
+       Example:
+       uploads/sliders/test.jpg
+       ========================================================= */
+
+    return `${API_BASE_URL}/${image}`;
+
+}
+
+
+/* ============================================================
+   EDIT SLIDER BY ID
+   ============================================================ */
+
+async function editSliderById(
+    id
+) {
+
+    try {
+
+        const response =
+            await fetch(
+                `${SLIDER_API}/${id}`,
+                {
+                    method: "GET",
+
+                    headers:
+                        getAdminHeaders()
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data?.message ||
+                data?.error ||
+                "Failed to load slider."
+            );
+
+        }
+
+
+        openSliderForm(
+            data
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Edit slider error:",
+            error
+        );
+
+
+        alert(
+            error.message ||
+            "Failed to load slider."
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   EDIT SLIDER
+   ============================================================ */
+
+function editSlider(
+    slider
+) {
+
+    openSliderForm(
+        slider
+    );
+
+}
+
+
+/* ============================================================
+   TOGGLE SLIDER STATUS
+   ============================================================ */
+
+async function toggleSliderStatus(
+    id,
+    currentStatus
+) {
+
+    const newStatus =
+        !currentStatus;
+
+
+    const confirmed =
+        confirm(
+            newStatus
+                ? "Activate this slider?"
+                : "Deactivate this slider?"
+        );
+
+
+    if (!confirmed) {
+
+        return;
+
+    }
+
+
+    try {
+
+        /*
+         * Backend endpoint:
+         *
+         * PATCH /api/sliders/{id}/status
+         *
+         * Request:
+         *
+         * active=true
+         */
+
+        const body =
+            new URLSearchParams();
+
+
+        body.append(
+            "active",
+            String(newStatus)
+        );
+
+
+        const response =
+            await fetch(
+                `${SLIDER_API}/${id}/status`,
+                {
+                    method: "PATCH",
+
+                    headers:
+                        getAdminHeaders(),
+
+                    body:
+                    body
+                }
+            );
+
+
+        let data = null;
+
+
+        try {
+
+            data =
+                await response.json();
+
+        } catch (error) {
+
+            console.warn(
+                "Status response is not JSON."
+            );
+
+        }
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data?.message ||
+                data?.error ||
+                "Failed to change slider status."
+            );
+
+        }
+
+
+        alert(
+            newStatus
+                ? "Slider activated."
+                : "Slider deactivated."
+        );
+
+
+        await loadAdminSliders();
+
+
+    } catch (error) {
+
+        console.error(
+            "Toggle slider error:",
+            error
+        );
+
+
+        alert(
+            error.message ||
+            "Failed to update slider."
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   DELETE SLIDER
+   ============================================================ */
+
+async function deleteSlider(
+    id
+) {
+
+    const confirmed =
+        confirm(
+            "Are you sure you want to delete this slider?"
+        );
+
+
+    if (!confirmed) {
+
+        return;
+
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                `${SLIDER_API}/${id}`,
+                {
+                    method: "DELETE",
+
+                    headers:
+                        getAdminHeaders()
+                }
+            );
+
+
+        let data = null;
+
+
+        try {
+
+            data =
+                await response.json();
+
+        } catch (error) {
+
+            console.warn(
+                "Delete response is not JSON."
+            );
+
+        }
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data?.message ||
+                data?.error ||
+                "Failed to delete slider."
+            );
+
+        }
+
+
+        alert(
+            "Slider deleted successfully."
+        );
+
+
+        await loadAdminSliders();
+
+
+    } catch (error) {
+
+        console.error(
+            "Delete slider error:",
+            error
+        );
+
+
+        alert(
+            error.message ||
+            "Failed to delete slider."
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   HTML ESCAPE
+   ============================================================ */
+
+function escapeHtml(
+    value
+) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
+        return "";
+
+    }
+
+
+    return String(value)
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+/* ============================================================
+   LOAD SLIDERS WHEN ADMIN OPENS SLIDER SECTION
+   ============================================================ */
+
+document.addEventListener(
+    "click",
+    function (event) {
+
+        const button =
+            event.target.closest(
+                ".nav-btn"
+            );
+
+
+        if (!button) {
+
+            return;
+
+        }
+
+
+        const section =
+            button.dataset.section;
+
+
+        if (
+            section === "sliders"
+        ) {
+
+            loadAdminSliders();
+
+        }
+
+    }
+);
+
+
+/* ============================================================
+   LOAD SLIDERS ON PAGE LOAD
+   ============================================================ */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const sliderSection =
+            document.getElementById(
+                "sliders"
+            );
+
+
+        if (
+            sliderSection &&
+            !sliderSection.classList.contains(
+                "hidden"
+            )
+        ) {
+
+            loadAdminSliders();
+
+        }
+
+    }
+);
+/* ============================================================
+   ADMIN API HEADERS
+   ============================================================ */
+
+function getAdminHeaders() {
+
+    const token =
+        localStorage.getItem("token");
+
+    const headers = {};
+
+    if (token) {
+
+        headers["Authorization"] =
+            `Bearer ${token}`;
+
+    }
+
+    return headers;
+}
