@@ -10091,125 +10091,69 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // =========================================================
 // FESTIVAL MANAGEMENT
+// IMAGE UPLOAD VERSION
 // =========================================================
 
-async function loadAdminFestivals() {
+const FESTIVAL_API =
+    `${API_BASE_URL}/api/festivals`;
 
-    const container = document.getElementById("festivalsContent");
 
-    if (!container) return;
+// =========================================================
+// FESTIVAL DOM ELEMENTS
+// =========================================================
 
-    container.innerHTML = "Loading festivals...";
+const festivalForm =
+    document.getElementById("festivalForm");
 
-    try {
+const festivalFormContainer =
+    document.getElementById(
+        "festivalFormContainer"
+    );
 
-        const response = await fetch(
-            `${API_BASE_URL}/api/festivals`
-        );
+const festivalsContent =
+    document.getElementById(
+        "festivalsContent"
+    );
 
-        if (!response.ok) {
-            throw new Error("Failed to load festivals");
-        }
+const festivalId =
+    document.getElementById(
+        "festivalId"
+    );
 
-        const festivals = await response.json();
+const festivalName =
+    document.getElementById(
+        "festivalName"
+    );
 
-        if (!festivals.length) {
+const festivalImage =
+    document.getElementById(
+        "festivalImage"
+    );
 
-            container.innerHTML = `
-<div class="empty-state">
-    No festivals found.
-</div>
-`;
+const festivalDescription =
+    document.getElementById(
+        "festivalDescription"
+    );
 
-            return;
-        }
+const festivalPinned =
+    document.getElementById(
+        "festivalPinned"
+    );
 
-        container.innerHTML = festivals.map(festival => `
+const festivalFormMessage =
+    document.getElementById(
+        "festivalFormMessage"
+    );
 
-<div class="panel-card festival-admin-card">
+const festivalImagePreviewContainer =
+    document.getElementById(
+        "festivalImagePreviewContainer"
+    );
 
-    <div class="section-toolbar">
-
-    <div>
-
-    <h3>${escapeAdminHtml(festival.name)}</h3>
-
-<p class="muted">
-    ID: ${escapeAdminHtml(festival.id)}
-</p>
-
-${
-    festival.description
-        ? `<p>${escapeAdminHtml(festival.description)}</p>`
-        : ""
-}
-
-${
-    festival.image
-        ? `<p class="muted">
-                                    Image: ${escapeAdminHtml(festival.image)}
-                                   </p>`
-        : ""
-}
-
-</div>
-
-<div class="admin-action-buttons">
-
-    <button
-        type="button"
-        class="outline-btn"
-        onclick="editFestival('${escapeJs(festival.id)}')"
-    >
-        ✏️ Edit
-    </button>
-
-    <button
-        type="button"
-        class="danger-btn"
-        onclick="deleteFestival('${escapeJs(festival.id)}')"
-    >
-        🗑️ Delete
-    </button>
-
-    <button
-        type="button"
-        class="${
-                                festival.pinned
-                                    ? "outline-btn"
-                                    : "primary-btn"
-                            }"
-        onclick="toggleFestivalPin(
-                                '${escapeJs(festival.id)}',
-                                ${!festival.pinned}
-                            )"
-    >
-        ${
-        festival.pinned
-            ? "📌 Unpin"
-            : "📍 Pin"
-    }
-    </button>
-
-</div>
-
-</div>
-
-</div>
-
-`).join("");
-
-    } catch (error) {
-
-        console.error("Festival loading error:", error);
-
-        container.innerHTML = `
-<div class="message error">
-    Unable to load festivals.
-</div>
-`;
-    }
-}
+const festivalImagePreview =
+    document.getElementById(
+        "festivalImagePreview"
+    );
 
 
 // =========================================================
@@ -10218,26 +10162,72 @@ ${
 
 function openFestivalForm() {
 
-    const container =
-        document.getElementById("festivalFormContainer");
-
     const form =
-        document.getElementById("festivalForm");
+        document.getElementById(
+            "festivalForm"
+        );
 
-    if (!container || !form) return;
+    const container =
+        document.getElementById(
+            "festivalFormContainer"
+        );
+
+    if (!form || !container) {
+        return;
+    }
+
 
     form.reset();
 
-    document.getElementById("festivalId").value = "";
 
-    const title =
-        document.getElementById("festivalFormTitle");
-
-    if (title) {
-        title.textContent = "Add Festival";
+    if (festivalId) {
+        festivalId.value = "";
     }
 
-    container.classList.remove("hidden");
+
+    if (festivalImage) {
+        festivalImage.value = "";
+    }
+
+
+    if (festivalImagePreview) {
+        festivalImagePreview.src = "";
+    }
+
+
+    if (festivalImagePreviewContainer) {
+
+        festivalImagePreviewContainer
+            .classList
+            .add("hidden");
+    }
+
+
+    if (festivalFormMessage) {
+
+        festivalFormMessage.textContent = "";
+
+        festivalFormMessage.className =
+            "form-message";
+    }
+
+
+    const title =
+        document.getElementById(
+            "festivalFormTitle"
+        );
+
+
+    if (title) {
+
+        title.textContent =
+            "Add Festival";
+    }
+
+
+    container.classList.remove(
+        "hidden"
+    );
 }
 
 
@@ -10248,11 +10238,160 @@ function openFestivalForm() {
 function closeFestivalForm() {
 
     const container =
-        document.getElementById("festivalFormContainer");
+        document.getElementById(
+            "festivalFormContainer"
+        );
 
     if (container) {
-        container.classList.add("hidden");
+
+        container.classList.add(
+            "hidden"
+        );
     }
+}
+
+
+// =========================================================
+// FESTIVAL IMAGE PREVIEW
+// =========================================================
+
+if (festivalImage) {
+
+    festivalImage.addEventListener(
+        "change",
+        function () {
+
+            const file =
+                this.files &&
+                this.files[0];
+
+
+            if (!file) {
+
+                if (festivalImagePreview) {
+
+                    festivalImagePreview.src = "";
+                }
+
+
+                if (
+                    festivalImagePreviewContainer
+                ) {
+
+                    festivalImagePreviewContainer
+                        .classList
+                        .add("hidden");
+                }
+
+                return;
+            }
+
+
+            // =================================================
+            // VALID IMAGE TYPE
+            // =================================================
+
+            const allowedTypes = [
+                "image/jpeg",
+                "image/png",
+                "image/webp"
+            ];
+
+
+            if (
+                !allowedTypes.includes(
+                    file.type
+                )
+            ) {
+
+                alert(
+                    "Only JPG, PNG and WEBP images are allowed."
+                );
+
+
+                this.value = "";
+
+
+                if (
+                    festivalImagePreviewContainer
+                ) {
+
+                    festivalImagePreviewContainer
+                        .classList
+                        .add("hidden");
+                }
+
+
+                return;
+            }
+
+
+            // =================================================
+            // VALID IMAGE SIZE
+            // =================================================
+
+            const maxSize =
+                5 * 1024 * 1024;
+
+
+            if (file.size > maxSize) {
+
+                alert(
+                    "Image size must be less than 5 MB."
+                );
+
+
+                this.value = "";
+
+
+                if (
+                    festivalImagePreviewContainer
+                ) {
+
+                    festivalImagePreviewContainer
+                        .classList
+                        .add("hidden");
+                }
+
+
+                return;
+            }
+
+
+            // =================================================
+            // SHOW IMAGE PREVIEW
+            // =================================================
+
+            const reader =
+                new FileReader();
+
+
+            reader.onload =
+                function (event) {
+
+                    if (festivalImagePreview) {
+
+                        festivalImagePreview.src =
+                            event.target.result;
+                    }
+
+
+                    if (
+                        festivalImagePreviewContainer
+                    ) {
+
+                        festivalImagePreviewContainer
+                            .classList
+                            .remove("hidden");
+                    }
+                };
+
+
+            reader.readAsDataURL(
+                file
+            );
+        }
+    );
 }
 
 
@@ -10260,104 +10399,554 @@ function closeFestivalForm() {
 // SAVE FESTIVAL
 // =========================================================
 
+if (festivalForm) {
+
+    festivalForm.addEventListener(
+        "submit",
+        saveFestival
+    );
+}
+
+
 async function saveFestival(event) {
 
     event.preventDefault();
 
+
+    // =====================================================
+    // GET VALUES
+    // =====================================================
+
     const id =
-        document.getElementById("festivalId").value.trim();
+        festivalId
+            ? festivalId.value.trim()
+            : "";
+
 
     const name =
-        document.getElementById("festivalName").value.trim();
+        festivalName
+            ? festivalName.value.trim()
+            : "";
 
-    const image =
-        document.getElementById("festivalImage").value.trim();
 
     const description =
-        document.getElementById("festivalDescription").value.trim();
+        festivalDescription
+            ? festivalDescription.value.trim()
+            : "";
+
 
     const pinned =
-        document.getElementById("festivalPinned").checked;
+        festivalPinned
+            ? festivalPinned.checked
+            : false;
 
-    const message =
-        document.getElementById("festivalFormMessage");
+
+    const imageFile =
+        festivalImage &&
+        festivalImage.files &&
+        festivalImage.files[0]
+            ? festivalImage.files[0]
+            : null;
+
+
+    // =====================================================
+    // VALIDATE NAME
+    // =====================================================
 
     if (!name) {
 
-        if (message) {
-            message.textContent = "Festival name is required.";
-            message.className = "message error";
+        if (festivalFormMessage) {
+
+            festivalFormMessage.textContent =
+                "Festival name is required.";
+
+            festivalFormMessage.className =
+                "message error";
         }
 
         return;
     }
 
-    /*
-     * New festival needs an ID because Festival.id
-     * is String and is not auto-generated by JPA.
-     */
-    const festivalId =
-        id || createSlug(name);
 
-    const festivalData = {
-        id: festivalId,
-        name: name,
-        image: image || null,
-        description: description || null,
-        pinned: pinned
-    };
+    // =====================================================
+    // VALIDATE IMAGE
+    // =====================================================
+
+    if (imageFile) {
+
+        const allowedTypes = [
+            "image/jpeg",
+            "image/png",
+            "image/webp"
+        ];
+
+
+        if (
+            !allowedTypes.includes(
+                imageFile.type
+            )
+        ) {
+
+            if (festivalFormMessage) {
+
+                festivalFormMessage.textContent =
+                    "Only JPG, PNG and WEBP images are allowed.";
+
+                festivalFormMessage.className =
+                    "message error";
+            }
+
+            return;
+        }
+
+
+        const maxSize =
+            5 * 1024 * 1024;
+
+
+        if (imageFile.size > maxSize) {
+
+            if (festivalFormMessage) {
+
+                festivalFormMessage.textContent =
+                    "Image size must be less than 5 MB.";
+
+                festivalFormMessage.className =
+                    "message error";
+            }
+
+            return;
+        }
+    }
+
+
+    // =====================================================
+    // FORM DATA
+    // =====================================================
+
+    const formData =
+        new FormData();
+
+
+    formData.append(
+        "name",
+        name
+    );
+
+
+    formData.append(
+        "description",
+        description
+    );
+
+
+    formData.append(
+        "pinned",
+        String(pinned)
+    );
+
+
+    // =====================================================
+    // ADD IMAGE IF SELECTED
+    // =====================================================
+
+    if (imageFile) {
+
+        formData.append(
+            "image",
+            imageFile
+        );
+    }
+
+
+    // =====================================================
+    // SAVE
+    // =====================================================
 
     try {
 
-        const url = id
-            ? `${API_BASE_URL}/api/festivals/${encodeURIComponent(id)}`
-            : `${API_BASE_URL}/api/festivals`;
+        let response;
 
-        const response = await fetch(url, {
 
-            method: id ? "PUT" : "POST",
+        // =================================================
+        // CREATE
+        // =================================================
 
-            headers: {
-                "Content-Type": "application/json"
-            },
+        if (!id) {
 
-            body: JSON.stringify(festivalData)
-        });
+            response =
+                await fetch(
+                    FESTIVAL_API,
+                    {
+                        method: "POST",
 
-        const responseText = await response.text();
+                        headers:
+                            getAdminHeaders(),
+
+                        body: formData
+                    }
+                );
+        }
+
+
+            // =================================================
+            // UPDATE
+        // =================================================
+
+        else {
+
+            response =
+                await fetch(
+                    `${FESTIVAL_API}/${encodeURIComponent(id)}`,
+
+                    {
+                        method: "PUT",
+
+                        headers:
+                            getAdminHeaders(),
+
+                        body: formData
+                    }
+                );
+        }
+
+
+        // =================================================
+        // RESPONSE
+        // =================================================
+
+        const responseText =
+            await response.text();
+
 
         if (!response.ok) {
+
             throw new Error(
-                responseText || "Failed to save festival"
+                responseText ||
+                "Failed to save festival"
             );
         }
 
-        if (message) {
 
-            message.textContent =
+        // =================================================
+        // SUCCESS
+        // =================================================
+
+        if (festivalFormMessage) {
+
+            festivalFormMessage.textContent =
                 id
                     ? "Festival updated successfully."
                     : "Festival added successfully.";
 
-            message.className = "message success";
+            festivalFormMessage.className =
+                "message success";
         }
+
 
         closeFestivalForm();
 
+
         await loadAdminFestivals();
 
-    } catch (error) {
+    }
 
-        console.error("Save festival error:", error);
+    catch (error) {
 
-        if (message) {
+        console.error(
+            "Save festival error:",
+            error
+        );
 
-            message.textContent =
-                error.message || "Unable to save festival.";
 
-            message.className = "message error";
+        if (festivalFormMessage) {
+
+            festivalFormMessage.textContent =
+                error.message ||
+                "Unable to save festival.";
+
+            festivalFormMessage.className =
+                "message error";
         }
     }
+}
+
+
+// =========================================================
+// LOAD FESTIVALS
+// =========================================================
+
+async function loadAdminFestivals() {
+
+    const container =
+        document.getElementById(
+            "festivalsContent"
+        );
+
+
+    if (!container) {
+        return;
+    }
+
+
+    container.innerHTML =
+        "Loading festivals...";
+
+
+    try {
+
+        const response =
+            await fetch(
+                FESTIVAL_API
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Failed to load festivals"
+            );
+        }
+
+
+        const festivals =
+            await response.json();
+
+
+        if (
+            !festivals ||
+            !festivals.length
+        ) {
+
+            container.innerHTML = `
+                <div class="empty-state">
+                    No festivals found.
+                </div>
+            `;
+
+            return;
+        }
+
+
+        container.innerHTML =
+            festivals
+                .map(
+                    festival =>
+                        createAdminFestivalCard(
+                            festival
+                        )
+                )
+                .join("");
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Festival loading error:",
+            error
+        );
+
+
+        container.innerHTML = `
+            <div class="message error">
+                Unable to load festivals.
+            </div>
+        `;
+    }
+}
+
+
+// =========================================================
+// CREATE FESTIVAL CARD
+// =========================================================
+
+function createAdminFestivalCard(
+    festival
+) {
+
+    const imageUrl =
+        getFestivalImageUrl(
+            festival.image
+        );
+
+
+    return `
+        <div class="panel-card festival-admin-card">
+
+            <div class="section-toolbar">
+
+                <div>
+
+                    ${
+        imageUrl
+            ? `
+                                <img
+                                    src="${escapeAdminHtml(imageUrl)}"
+                                    alt="${escapeAdminHtml(
+                festival.name ||
+                "Festival"
+            )}"
+                                    style="
+                                        width:120px;
+                                        height:90px;
+                                        object-fit:cover;
+                                        border-radius:10px;
+                                        margin-bottom:10px;
+                                    "
+                                    onerror="this.style.display='none';"
+                                >
+                            `
+            : ""
+    }
+
+
+                    <h3>
+                        ${escapeAdminHtml(
+        festival.name
+    )}
+                    </h3>
+
+
+                    <p class="muted">
+                        ID:
+                        ${escapeAdminHtml(
+        festival.id
+    )}
+                    </p>
+
+
+                    ${
+        festival.description
+            ? `
+                                <p>
+                                    ${escapeAdminHtml(
+                festival.description
+            )}
+                                </p>
+                            `
+            : ""
+    }
+
+
+                    ${
+        festival.image
+            ? `
+                                <p class="muted">
+                                    Image:
+                                    ${escapeAdminHtml(
+                festival.image
+            )}
+                                </p>
+                            `
+            : ""
+    }
+
+                </div>
+
+
+                <div class="admin-action-buttons">
+
+                    <button
+                        type="button"
+                        class="outline-btn"
+                        onclick="
+                            editFestival(
+                                '${escapeJs(
+        festival.id
+    )}'
+                            )
+                        "
+                    >
+                        ✏️ Edit
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="danger-btn"
+                        onclick="
+                            deleteFestival(
+                                '${escapeJs(
+        festival.id
+    )}'
+                            )
+                        "
+                    >
+                        🗑️ Delete
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="${
+        festival.pinned
+            ? "outline-btn"
+            : "primary-btn"
+    }"
+                        onclick="
+                            toggleFestivalPin(
+                                '${escapeJs(
+        festival.id
+    )}',
+                                ${!festival.pinned}
+                            )
+                        "
+                    >
+                        ${
+        festival.pinned
+            ? "📌 Unpin"
+            : "📍 Pin"
+    }
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+    `;
+}
+
+
+// =========================================================
+// GET FESTIVAL IMAGE URL
+// =========================================================
+
+function getFestivalImageUrl(
+    image
+) {
+
+    if (!image) {
+        return "";
+    }
+
+
+    image =
+        String(image).trim();
+
+
+    if (!image) {
+        return "";
+    }
+
+
+    if (
+        image.startsWith("http://") ||
+        image.startsWith("https://")
+    ) {
+
+        return image;
+    }
+
+
+    if (image.startsWith("/")) {
+
+        return image;
+    }
+
+
+    return image;
 }
 
 
@@ -10365,51 +10954,214 @@ async function saveFestival(event) {
 // EDIT FESTIVAL
 // =========================================================
 
-async function editFestival(festivalId) {
+async function editFestival(
+    festivalIdValue
+) {
 
     try {
 
-        const response = await fetch(
-            `${API_BASE_URL}/api/festivals/${encodeURIComponent(festivalId)}`
-        );
+        let festival;
 
-        if (!response.ok) {
-            throw new Error("Festival not found");
+
+        // =================================================
+        // TRY SINGLE FESTIVAL
+        // =================================================
+
+        const response =
+            await fetch(
+                `${FESTIVAL_API}/${encodeURIComponent(
+                    festivalIdValue
+                )}`
+            );
+
+
+        if (response.ok) {
+
+            festival =
+                await response.json();
+
         }
 
-        const festival = await response.json();
+        else {
 
-        document.getElementById("festivalId").value =
-            festival.id || "";
+            // =============================================
+            // FALLBACK: LOAD ALL
+            // =============================================
 
-        document.getElementById("festivalName").value =
-            festival.name || "";
+            const listResponse =
+                await fetch(
+                    FESTIVAL_API
+                );
 
-        document.getElementById("festivalImage").value =
-            festival.image || "";
 
-        document.getElementById("festivalDescription").value =
-            festival.description || "";
+            if (!listResponse.ok) {
 
-        document.getElementById("festivalPinned").checked =
-            festival.pinned === true;
+                throw new Error(
+                    "Unable to load festivals"
+                );
+            }
+
+
+            const festivals =
+                await listResponse.json();
+
+
+            festival =
+                festivals.find(
+                    item =>
+                        String(item.id) ===
+                        String(festivalIdValue)
+                );
+        }
+
+
+        if (!festival) {
+
+            throw new Error(
+                "Festival not found"
+            );
+        }
+
+
+        // =================================================
+        // FILL ID
+        // =================================================
+
+        if (festivalId) {
+
+            festivalId.value =
+                festival.id || "";
+        }
+
+
+        // =================================================
+        // FILL NAME
+        // =================================================
+
+        if (festivalName) {
+
+            festivalName.value =
+                festival.name || "";
+        }
+
+
+        // =================================================
+        // FILL DESCRIPTION
+        // =================================================
+
+        if (festivalDescription) {
+
+            festivalDescription.value =
+                festival.description || "";
+        }
+
+
+        // =================================================
+        // FILL PINNED
+        // =================================================
+
+        if (festivalPinned) {
+
+            festivalPinned.checked =
+                festival.pinned === true;
+        }
+
+
+        // =================================================
+        // FILE INPUT MUST STAY EMPTY
+        // Browser does not allow existing file
+        // to be placed inside file input.
+        // =================================================
+
+        if (festivalImage) {
+
+            festivalImage.value =
+                "";
+        }
+
+
+        // =================================================
+        // EXISTING IMAGE PREVIEW
+        // =================================================
+
+        const existingImage =
+            getFestivalImageUrl(
+                festival.image
+            );
+
+
+        if (
+            existingImage &&
+            festivalImagePreview &&
+            festivalImagePreviewContainer
+        ) {
+
+            festivalImagePreview.src =
+                existingImage;
+
+
+            festivalImagePreviewContainer
+                .classList
+                .remove("hidden");
+
+        }
+
+        else if (
+            festivalImagePreviewContainer
+        ) {
+
+            festivalImagePreviewContainer
+                .classList
+                .add("hidden");
+        }
+
+
+        // =================================================
+        // CHANGE TITLE
+        // =================================================
 
         const title =
-            document.getElementById("festivalFormTitle");
+            document.getElementById(
+                "festivalFormTitle"
+            );
+
 
         if (title) {
-            title.textContent = "Edit Festival";
+
+            title.textContent =
+                "Edit Festival";
         }
 
-        document
-            .getElementById("festivalFormContainer")
-            .classList.remove("hidden");
 
-    } catch (error) {
+        // =================================================
+        // OPEN FORM
+        // =================================================
 
-        console.error("Edit festival error:", error);
+        const container =
+            document.getElementById(
+                "festivalFormContainer"
+            );
 
-        alert("Unable to load festival.");
+
+        if (container) {
+
+            container.classList
+                .remove("hidden");
+        }
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Edit festival error:",
+            error
+        );
+
+
+        alert(
+            "Unable to load festival."
+        );
     }
 }
 
@@ -10418,211 +11170,180 @@ async function editFestival(festivalId) {
 // DELETE FESTIVAL
 // =========================================================
 
-async function deleteFestival(festivalId) {
+async function deleteFestival(
+    festivalIdValue
+) {
 
-    if (!confirm("Are you sure you want to delete this festival?")) {
+    if (
+        !confirm(
+            "Are you sure you want to delete this festival?"
+        )
+    ) {
+
         return;
     }
 
+
     try {
 
-        const response = await fetch(
-            `${API_BASE_URL}/api/festivals/${encodeURIComponent(festivalId)}`,
-            {
-                method: "DELETE"
-            }
-        );
+        const response =
+            await fetch(
+                `${FESTIVAL_API}/${encodeURIComponent(
+                    festivalIdValue
+                )}`,
+                {
+                    method: "DELETE",
 
-        const responseText = await response.text();
+                    headers:
+                        getAdminHeaders()
+                }
+            );
+
+
+        const responseText =
+            await response.text();
+
 
         if (!response.ok) {
+
             throw new Error(
-                responseText || "Failed to delete festival"
+                responseText ||
+                "Failed to delete festival"
             );
         }
 
-        alert("Festival deleted successfully.");
+
+        alert(
+            "Festival deleted successfully."
+        );
+
 
         await loadAdminFestivals();
 
-    } catch (error) {
+    }
 
-        console.error("Delete festival error:", error);
+    catch (error) {
+
+        console.error(
+            "Delete festival error:",
+            error
+        );
+
 
         alert(
             "Unable to delete festival.\n\n" +
-            (error.message || "")
+            (
+                error.message ||
+                ""
+            )
         );
     }
 }
 
 
 // =========================================================
-// PIN / UNPIN FESTIVAL
+// TOGGLE FESTIVAL PIN
 // =========================================================
 
-async function toggleFestivalPin(festivalId, pinned) {
+async function toggleFestivalPin(
+    festivalIdValue,
+    pinned
+) {
 
     try {
 
-        const response = await fetch(
-            `${API_BASE_URL}/api/festivals/${encodeURIComponent(festivalId)}/pin?pinned=${pinned}`,
-{
-    method: "PUT",
-        headers: {
-    "Content-Type": "application/json"
-}
-}
-);
+        const response =
+            await fetch(
+                `${FESTIVAL_API}/${encodeURIComponent(
+                    festivalIdValue
+                )}/pin?pinned=${pinned}`,
+                {
+                    method: "PUT",
 
-if (!response.ok) {
+                    headers:
+                        getAdminHeaders()
+                }
+            );
 
-    const errorText =
-        await response.text();
-
-    throw new Error(errorText);
-}
-
-await loadAdminFestivals();
-
-} catch (error) {
-
-    console.error("Festival pin error:", error);
-
-    alert("Unable to update festival pin status.");
-}
-}
-
-
-// =========================================================
-// CATEGORY MANAGEMENT
-// =========================================================
-
-async function loadAdminCategories() {
-
-    const container =
-        document.getElementById("categoriesContent");
-
-    if (!container) return;
-
-    container.innerHTML =
-        "Loading categories...";
-
-    try {
-
-        const response = await fetch(
-            `${API_BASE_URL}/api/categories`
-        );
 
         if (!response.ok) {
-            throw new Error("Failed to load categories");
+
+            const errorText =
+                await response.text();
+
+
+            throw new Error(
+                errorText
+            );
         }
 
-        const categories =
-            await response.json();
 
-        if (!categories.length) {
+        await loadAdminFestivals();
 
-            container.innerHTML = `
-                <div class="empty-state">
-                    No categories found.
-                </div>
-            `;
+    }
 
-            return;
-        }
+    catch (error) {
 
-        container.innerHTML =
-            categories.map(category => `
+        console.error(
+            "Festival pin error:",
+            error
+        );
 
-                <div class="panel-card category-admin-card">
 
-                    <div class="section-toolbar">
-
-                        <div>
-
-                            <h3>
-                                ${escapeAdminHtml(category.name)}
-                            </h3>
-
-                            <p class="muted">
-                                ID: ${escapeAdminHtml(category.id)}
-                            </p>
-
-                            ${
-                category.description
-                    ? `<p>
-                                        ${escapeAdminHtml(category.description)}
-                                       </p>`
-                    : ""
-            }
-
-                            ${
-                category.image
-                    ? `<p class="muted">
-                                        Image: ${escapeAdminHtml(category.image)}
-                                       </p>`
-                    : ""
-            }
-
-                        </div>
-
-                        <div class="admin-action-buttons">
-
-                            <button
-                                type="button"
-                                class="outline-btn"
-                                onclick="editCategory('${escapeJs(category.id)}')"
-                            >
-                                ✏️ Edit
-                            </button>
-
-                            <button
-                                type="button"
-                                class="danger-btn"
-                                onclick="deleteCategory('${escapeJs(category.id)}')"
-                            >
-                                🗑️ Delete
-                            </button>
-
-                            <button
-                                type="button"
-                                class="${
-                category.pinned
-                    ? "outline-btn"
-                    : "primary-btn"
-            }"
-                                onclick="toggleCategoryPin(
-                                    '${escapeJs(category.id)}',
-                                    ${!category.pinned}
-                                )"
-                            >
-                                ${
-                category.pinned
-                    ? "📌 Unpin"
-                    : "📍 Pin"
-            }
-                            </button>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            `).join("");
-
-    } catch (error) {
-
-        console.error("Category loading error:", error);
-
-        container.innerHTML = `
-            <div class="message error">
-                Unable to load categories.
-            </div>
-        `;
+        alert(
+            "Unable to update festival pin status."
+        );
     }
 }
+// =========================================================
+// CATEGORY MANAGEMENT
+// IMAGE UPLOAD VERSION
+// =========================================================
+
+const CATEGORY_API =
+    `${API_BASE_URL}/api/categories`;
+
+
+// =========================================================
+// CATEGORY DOM ELEMENTS
+// =========================================================
+
+const categoryForm =
+    document.getElementById("categoryForm");
+
+const categoryFormContainer =
+    document.getElementById("categoryFormContainer");
+
+const categoriesContent =
+    document.getElementById("categoriesContent");
+
+const categoryId =
+    document.getElementById("categoryId");
+
+const categoryName =
+    document.getElementById("categoryName");
+
+const categoryImage =
+    document.getElementById("categoryImage");
+
+const categoryDescription =
+    document.getElementById("categoryDescription");
+
+const categoryPinned =
+    document.getElementById("categoryPinned");
+
+const categoryFormMessage =
+    document.getElementById("categoryFormMessage");
+
+const categoryImagePreviewContainer =
+    document.getElementById(
+        "categoryImagePreviewContainer"
+    );
+
+const categoryImagePreview =
+    document.getElementById(
+        "categoryImagePreview"
+    );
 
 
 // =========================================================
@@ -10631,23 +11352,52 @@ async function loadAdminCategories() {
 
 function openCategoryForm() {
 
-    const container =
-        document.getElementById("categoryFormContainer");
-
     const form =
         document.getElementById("categoryForm");
 
-    if (!container || !form) return;
+    const container =
+        document.getElementById(
+            "categoryFormContainer"
+        );
+
+    if (!form || !container) {
+        return;
+    }
 
     form.reset();
 
-    document.getElementById("categoryId").value = "";
+    if (categoryId) {
+        categoryId.value = "";
+    }
+
+    if (categoryImage) {
+        categoryImage.value = "";
+    }
+
+    if (categoryImagePreview) {
+        categoryImagePreview.src = "";
+    }
+
+    if (categoryImagePreviewContainer) {
+        categoryImagePreviewContainer
+            .classList
+            .add("hidden");
+    }
+
+    if (categoryFormMessage) {
+        categoryFormMessage.textContent = "";
+        categoryFormMessage.className =
+            "form-message";
+    }
 
     const title =
-        document.getElementById("categoryFormTitle");
+        document.getElementById(
+            "categoryFormTitle"
+        );
 
     if (title) {
-        title.textContent = "Add Category";
+        title.textContent =
+            "Add Category";
     }
 
     container.classList.remove("hidden");
@@ -10661,7 +11411,9 @@ function openCategoryForm() {
 function closeCategoryForm() {
 
     const container =
-        document.getElementById("categoryFormContainer");
+        document.getElementById(
+            "categoryFormContainer"
+        );
 
     if (container) {
         container.classList.add("hidden");
@@ -10670,135 +11422,645 @@ function closeCategoryForm() {
 
 
 // =========================================================
+// CATEGORY IMAGE PREVIEW
+// =========================================================
+
+if (categoryImage) {
+
+    categoryImage.addEventListener(
+        "change",
+        function () {
+
+            const file =
+                this.files &&
+                this.files[0];
+
+            if (!file) {
+
+                if (categoryImagePreview) {
+                    categoryImagePreview.src = "";
+                }
+
+                if (categoryImagePreviewContainer) {
+                    categoryImagePreviewContainer
+                        .classList
+                        .add("hidden");
+                }
+
+                return;
+            }
+
+
+            // =================================================
+            // VALIDATE IMAGE TYPE
+            // =================================================
+
+            const allowedTypes = [
+                "image/jpeg",
+                "image/png",
+                "image/webp"
+            ];
+
+            if (
+                !allowedTypes.includes(
+                    file.type
+                )
+            ) {
+
+                alert(
+                    "Only JPG, PNG and WEBP images are allowed."
+                );
+
+                this.value = "";
+
+                if (categoryImagePreviewContainer) {
+                    categoryImagePreviewContainer
+                        .classList
+                        .add("hidden");
+                }
+
+                return;
+            }
+
+
+            // =================================================
+            // VALIDATE IMAGE SIZE
+            // =================================================
+
+            const maxSize =
+                5 * 1024 * 1024;
+
+            if (file.size > maxSize) {
+
+                alert(
+                    "Image size must be less than 5 MB."
+                );
+
+                this.value = "";
+
+                if (categoryImagePreviewContainer) {
+                    categoryImagePreviewContainer
+                        .classList
+                        .add("hidden");
+                }
+
+                return;
+            }
+
+
+            // =================================================
+            // SHOW PREVIEW
+            // =================================================
+
+            const reader =
+                new FileReader();
+
+            reader.onload =
+                function (event) {
+
+                    if (categoryImagePreview) {
+
+                        categoryImagePreview.src =
+                            event.target.result;
+                    }
+
+                    if (
+                        categoryImagePreviewContainer
+                    ) {
+
+                        categoryImagePreviewContainer
+                            .classList
+                            .remove("hidden");
+                    }
+                };
+
+            reader.readAsDataURL(file);
+        }
+    );
+}
+
+
+// =========================================================
 // SAVE CATEGORY
 // =========================================================
+
+if (categoryForm) {
+
+    categoryForm.addEventListener(
+        "submit",
+        saveCategory
+    );
+}
+
 
 async function saveCategory(event) {
 
     event.preventDefault();
 
+
+    // =====================================================
+    // GET FORM VALUES
+    // =====================================================
+
     const id =
-        document.getElementById("categoryId").value.trim();
+        categoryId
+            ? categoryId.value.trim()
+            : "";
 
     const name =
-        document.getElementById("categoryName").value.trim();
-
-    const image =
-        document.getElementById("categoryImage").value.trim();
+        categoryName
+            ? categoryName.value.trim()
+            : "";
 
     const description =
-        document.getElementById("categoryDescription").value.trim();
+        categoryDescription
+            ? categoryDescription.value.trim()
+            : "";
 
     const pinned =
-        document.getElementById("categoryPinned").checked;
+        categoryPinned
+            ? categoryPinned.checked
+            : false;
 
-    const message =
-        document.getElementById("categoryFormMessage");
+    const imageFile =
+        categoryImage &&
+        categoryImage.files &&
+        categoryImage.files[0]
+            ? categoryImage.files[0]
+            : null;
+
+
+    // =====================================================
+    // VALIDATE NAME
+    // =====================================================
 
     if (!name) {
 
-        if (message) {
-            message.textContent = "Category name is required.";
-            message.className = "message error";
+        if (categoryFormMessage) {
+
+            categoryFormMessage.textContent =
+                "Category name is required.";
+
+            categoryFormMessage.className =
+                "message error";
         }
 
         return;
     }
 
+
+    // =====================================================
+    // VALIDATE IMAGE
+    // =====================================================
+
+    if (imageFile) {
+
+        const allowedTypes = [
+            "image/jpeg",
+            "image/png",
+            "image/webp"
+        ];
+
+        if (
+            !allowedTypes.includes(
+                imageFile.type
+            )
+        ) {
+
+            if (categoryFormMessage) {
+
+                categoryFormMessage.textContent =
+                    "Only JPG, PNG and WEBP images are allowed.";
+
+                categoryFormMessage.className =
+                    "message error";
+            }
+
+            return;
+        }
+
+
+        const maxSize =
+            5 * 1024 * 1024;
+
+        if (imageFile.size > maxSize) {
+
+            if (categoryFormMessage) {
+
+                categoryFormMessage.textContent =
+                    "Image size must be less than 5 MB.";
+
+                categoryFormMessage.className =
+                    "message error";
+            }
+
+            return;
+        }
+    }
+
+
+    // =====================================================
+    // FORM DATA
+    // =====================================================
+
+    const formData =
+        new FormData();
+
+    formData.append(
+        "name",
+        name
+    );
+
+    formData.append(
+        "description",
+        description || ""
+    );
+
+    formData.append(
+        "pinned",
+        String(pinned)
+    );
+
+
+    // =====================================================
+    // ADD IMAGE ONLY IF SELECTED
+    // =====================================================
+
+    if (imageFile) {
+
+        formData.append(
+            "image",
+            imageFile
+        );
+    }
+
+
+    // =====================================================
+    // SAVE
+    // =====================================================
+
     try {
 
-        let categoryId = id;
+        let response;
 
-        // ================================================
+
+        // =================================================
         // CREATE
-        // Current CategoryController uses @RequestParam name
-        // ================================================
+        // =================================================
 
         if (!id) {
 
-            const createResponse = await fetch(
-                `${API_BASE_URL}/api/categories?name=${encodeURIComponent(name)}`,
-                {
-                    method: "POST"
-                }
-            );
-
-            const createText =
-                await createResponse.text();
-
-            if (!createResponse.ok) {
-                throw new Error(
-                    createText || "Failed to create category"
+            response =
+                await fetch(
+                    CATEGORY_API,
+                    {
+                        method: "POST",
+                        headers:
+                            getAdminHeaders(),
+                        body: formData
+                    }
                 );
-            }
-
-            const createdCategory =
-                JSON.parse(createText);
-
-            categoryId =
-                createdCategory.id;
 
         }
 
-        // ================================================
-        // UPDATE
-        // Also used after CREATE to save image/description/pin
-        // ================================================
 
-        const updateResponse = await fetch(
-            `${API_BASE_URL}/api/categories/${encodeURIComponent(categoryId)}`,
-            {
-                method: "PUT",
+            // =================================================
+            // UPDATE
+        // =================================================
 
-                headers: {
-                    "Content-Type": "application/json"
-                },
+        else {
 
-                body: JSON.stringify({
-                    id: categoryId,
-                    name: name,
-                    image: image || null,
-                    description: description || null,
-                    pinned: pinned
-                })
-            }
-        );
+            response =
+                await fetch(
+                    `${CATEGORY_API}/${encodeURIComponent(id)}`,
+                    {
+                        method: "PUT",
+                        headers:
+                            getAdminHeaders(),
+                        body: formData
+                    }
+                );
+        }
 
-        const updateText =
-            await updateResponse.text();
 
-        if (!updateResponse.ok) {
+        // =================================================
+        // RESPONSE
+        // =================================================
+
+        const responseText =
+            await response.text();
+
+
+        if (!response.ok) {
+
             throw new Error(
-                updateText || "Failed to update category"
+                responseText ||
+                "Failed to save category"
             );
         }
 
-        if (message) {
 
-            message.textContent =
+        // =================================================
+        // SUCCESS
+        // =================================================
+
+        if (categoryFormMessage) {
+
+            categoryFormMessage.textContent =
                 id
                     ? "Category updated successfully."
                     : "Category added successfully.";
 
-            message.className = "message success";
+            categoryFormMessage.className =
+                "message success";
         }
+
 
         closeCategoryForm();
 
         await loadAdminCategories();
 
-    } catch (error) {
+    }
 
-        console.error("Save category error:", error);
+    catch (error) {
 
-        if (message) {
+        console.error(
+            "Save category error:",
+            error
+        );
 
-            message.textContent =
-                error.message || "Unable to save category.";
+        if (categoryFormMessage) {
 
-            message.className = "message error";
+            categoryFormMessage.textContent =
+                error.message ||
+                "Unable to save category.";
+
+            categoryFormMessage.className =
+                "message error";
         }
     }
+}
+
+
+// =========================================================
+// LOAD CATEGORIES
+// =========================================================
+
+async function loadAdminCategories() {
+
+    const container =
+        document.getElementById(
+            "categoriesContent"
+        );
+
+    if (!container) {
+        return;
+    }
+
+
+    container.innerHTML =
+        "Loading categories...";
+
+
+    try {
+
+        const response =
+            await fetch(
+                CATEGORY_API
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Failed to load categories"
+            );
+        }
+
+
+        const categories =
+            await response.json();
+
+
+        if (
+            !categories ||
+            !categories.length
+        ) {
+
+            container.innerHTML = `
+                <div class="empty-state">
+                    No categories found.
+                </div>
+            `;
+
+            return;
+        }
+
+
+        // =================================================
+        // RENDER
+        // =================================================
+
+        container.innerHTML =
+            categories
+                .map(
+                    category =>
+                        createAdminCategoryCard(
+                            category
+                        )
+                )
+                .join("");
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Category loading error:",
+            error
+        );
+
+        container.innerHTML = `
+            <div class="message error">
+                Unable to load categories.
+            </div>
+        `;
+    }
+}
+
+
+// =========================================================
+// CREATE CATEGORY CARD
+// =========================================================
+
+function createAdminCategoryCard(
+    category
+) {
+
+    const imageUrl =
+        getCategoryImageUrl(
+            category.image
+        );
+
+
+    return `
+        <div class="panel-card category-admin-card">
+
+            <div class="section-toolbar">
+
+                <div>
+
+                    ${
+        imageUrl
+            ? `
+                                <img
+                                    src="${escapeAdminHtml(imageUrl)}"
+                                    alt="${escapeAdminHtml(category.name || "Category")}"
+                                    style="
+                                        width:120px;
+                                        height:90px;
+                                        object-fit:cover;
+                                        border-radius:10px;
+                                        margin-bottom:10px;
+                                    "
+                                    onerror="this.style.display='none';"
+                                >
+                            `
+            : ""
+    }
+
+                    <h3>
+                        ${escapeAdminHtml(
+        category.name
+    )}
+                    </h3>
+
+                    <p class="muted">
+                        ID:
+                        ${escapeAdminHtml(
+        category.id
+    )}
+                    </p>
+
+                    ${
+        category.description
+            ? `
+                                <p>
+                                    ${escapeAdminHtml(
+                category.description
+            )}
+                                </p>
+                            `
+            : ""
+    }
+
+                    ${
+        category.image
+            ? `
+                                <p class="muted">
+                                    Image:
+                                    ${escapeAdminHtml(
+                category.image
+            )}
+                                </p>
+                            `
+            : ""
+    }
+
+                </div>
+
+
+                <div class="admin-action-buttons">
+
+                    <button
+                        type="button"
+                        class="outline-btn"
+                        onclick="editCategory('${escapeJs(category.id)}')"
+                    >
+                        ✏️ Edit
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="danger-btn"
+                        onclick="deleteCategory('${escapeJs(category.id)}')"
+                    >
+                        🗑️ Delete
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="${
+        category.pinned
+            ? "outline-btn"
+            : "primary-btn"
+    }"
+                        onclick="
+                            toggleCategoryPin(
+                                '${escapeJs(category.id)}',
+                                ${!category.pinned}
+                            )
+                        "
+                    >
+                        ${
+        category.pinned
+            ? "📌 Unpin"
+            : "📍 Pin"
+    }
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+    `;
+}
+
+
+// =========================================================
+// GET CATEGORY IMAGE URL
+// =========================================================
+
+function getCategoryImageUrl(
+    image
+) {
+
+    if (!image) {
+        return "";
+    }
+
+
+    image =
+        String(image).trim();
+
+
+    if (!image) {
+        return "";
+    }
+
+
+    // Full URL
+    if (
+        image.startsWith("http://") ||
+        image.startsWith("https://")
+    ) {
+
+        return image;
+    }
+
+
+    // Absolute path
+    if (image.startsWith("/")) {
+
+        return image;
+    }
+
+
+    // Relative path
+    return image;
 }
 
 
@@ -10806,79 +12068,196 @@ async function saveCategory(event) {
 // EDIT CATEGORY
 // =========================================================
 
-async function editCategory(categoryId) {
+async function editCategory(
+    categoryIdValue
+) {
 
     try {
 
-        const response = await fetch(
-            `${API_BASE_URL}/api/categories/${encodeURIComponent(categoryId)}`
-        );
-
-        /*
-         * Current CategoryController does not have GET /{id}.
-         * Therefore get the complete list and find the category.
-         */
-
         let category;
+
+
+        // =================================================
+        // TRY SINGLE CATEGORY
+        // =================================================
+
+        const response =
+            await fetch(
+                `${CATEGORY_API}/${encodeURIComponent(categoryIdValue)}`
+            );
+
 
         if (response.ok) {
 
-            category = await response.json();
+            category =
+                await response.json();
 
-        } else {
+        }
 
-            const listResponse = await fetch(
-                `${API_BASE_URL}/api/categories`
-            );
+        else {
+
+            // =============================================
+            // FALLBACK: LOAD ALL
+            // =============================================
+
+            const listResponse =
+                await fetch(
+                    CATEGORY_API
+                );
+
 
             if (!listResponse.ok) {
-                throw new Error("Unable to load categories");
+
+                throw new Error(
+                    "Unable to load categories"
+                );
             }
+
 
             const categories =
                 await listResponse.json();
 
+
             category =
                 categories.find(
-                    item => item.id === categoryId
+                    item =>
+                        String(item.id) ===
+                        String(categoryIdValue)
                 );
         }
 
+
         if (!category) {
-            throw new Error("Category not found");
+
+            throw new Error(
+                "Category not found"
+            );
         }
 
-        document.getElementById("categoryId").value =
-            category.id || "";
 
-        document.getElementById("categoryName").value =
-            category.name || "";
+        // =================================================
+        // FILL FORM
+        // =================================================
 
-        document.getElementById("categoryImage").value =
-            category.image || "";
+        if (categoryId) {
 
-        document.getElementById("categoryDescription").value =
-            category.description || "";
+            categoryId.value =
+                category.id || "";
+        }
 
-        document.getElementById("categoryPinned").checked =
-            category.pinned === true;
+
+        if (categoryName) {
+
+            categoryName.value =
+                category.name || "";
+        }
+
+
+        if (categoryDescription) {
+
+            categoryDescription.value =
+                category.description || "";
+        }
+
+
+        if (categoryPinned) {
+
+            categoryPinned.checked =
+                category.pinned === true;
+        }
+
+
+        // =================================================
+        // IMPORTANT:
+        // FILE INPUT CANNOT BE FILLED PROGRAMMATICALLY
+        // =================================================
+
+        if (categoryImage) {
+
+            categoryImage.value = "";
+        }
+
+
+        // =================================================
+        // SHOW EXISTING IMAGE
+        // =================================================
+
+        const existingImage =
+            getCategoryImageUrl(
+                category.image
+            );
+
+
+        if (
+            existingImage &&
+            categoryImagePreview &&
+            categoryImagePreviewContainer
+        ) {
+
+            categoryImagePreview.src =
+                existingImage;
+
+            categoryImagePreviewContainer
+                .classList
+                .remove("hidden");
+
+        }
+
+        else if (
+            categoryImagePreviewContainer
+        ) {
+
+            categoryImagePreviewContainer
+                .classList
+                .add("hidden");
+        }
+
+
+        // =================================================
+        // FORM TITLE
+        // =================================================
 
         const title =
-            document.getElementById("categoryFormTitle");
+            document.getElementById(
+                "categoryFormTitle"
+            );
+
 
         if (title) {
-            title.textContent = "Edit Category";
+
+            title.textContent =
+                "Edit Category";
         }
 
-        document
-            .getElementById("categoryFormContainer")
-            .classList.remove("hidden");
 
-    } catch (error) {
+        // =================================================
+        // OPEN FORM
+        // =================================================
 
-        console.error("Edit category error:", error);
+        const container =
+            document.getElementById(
+                "categoryFormContainer"
+            );
 
-        alert("Unable to load category.");
+
+        if (container) {
+
+            container.classList
+                .remove("hidden");
+        }
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Edit category error:",
+            error
+        );
+
+        alert(
+            "Unable to load category."
+        );
     }
 }
 
@@ -10887,41 +12266,68 @@ async function editCategory(categoryId) {
 // DELETE CATEGORY
 // =========================================================
 
-async function deleteCategory(categoryId) {
+async function deleteCategory(
+    categoryIdValue
+) {
 
-    if (!confirm("Are you sure you want to delete this category?")) {
+    if (
+        !confirm(
+            "Are you sure you want to delete this category?"
+        )
+    ) {
+
         return;
     }
 
+
     try {
 
-        const response = await fetch(
-            `${API_BASE_URL}/api/categories/${encodeURIComponent(categoryId)}`,
-            {
-                method: "DELETE"
-            }
-        );
+        const response =
+            await fetch(
+                `${CATEGORY_API}/${encodeURIComponent(categoryIdValue)}`,
+                {
+                    method: "DELETE",
+                    headers:
+                        getAdminHeaders()
+                }
+            );
+
 
         const responseText =
             await response.text();
 
+
         if (!response.ok) {
+
             throw new Error(
-                responseText || "Failed to delete category"
+                responseText ||
+                "Failed to delete category"
             );
         }
 
-        alert("Category deleted successfully.");
+
+        alert(
+            "Category deleted successfully."
+        );
+
 
         await loadAdminCategories();
 
-    } catch (error) {
+    }
 
-        console.error("Delete category error:", error);
+    catch (error) {
+
+        console.error(
+            "Delete category error:",
+            error
+        );
 
         alert(
             "Unable to delete category.\n\n" +
-            (error.message || "")
+            (
+                error.message ||
+                ""
+            )
         );
     }
 }
@@ -10931,67 +12337,707 @@ async function deleteCategory(categoryId) {
 // TOGGLE CATEGORY PIN
 // =========================================================
 
-async function toggleCategoryPin(categoryId, pinned) {
+async function toggleCategoryPin(
+    categoryIdValue,
+    pinned
+) {
 
     try {
 
-        const response = await fetch(
-            `${API_BASE_URL}/api/categories/${encodeURIComponent(categoryId)}/pin?pinned=${pinned}`,
-            {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json"
+        const response =
+            await fetch(
+                `${CATEGORY_API}/${encodeURIComponent(categoryIdValue)}/pin?pinned=${pinned}`,
+                {
+                    method: "PUT",
+                    headers:
+                        getAdminHeaders()
                 }
-            }
-        );
+            );
+
 
         if (!response.ok) {
 
             const errorText =
                 await response.text();
 
-            throw new Error(errorText);
+            throw new Error(
+                errorText
+            );
         }
+
 
         await loadAdminCategories();
 
-    } catch (error) {
+    }
 
-        console.error("Category pin error:", error);
+    catch (error) {
 
-        alert("Unable to update category pin status.");
+        console.error(
+            "Category pin error:",
+            error
+        );
+
+        alert(
+            "Unable to update category pin status."
+        );
     }
 }
 
 
 // =========================================================
+// LOAD CATEGORY WHEN ADMIN SECTION OPENS
+// =========================================================
+
+if (
+    typeof loadAdminCategories ===
+    "function"
+) {
+
+    // Keep this only if your existing
+    // admin.js already loads categories here.
+}
+
+
+// =========================================================
 // RELATIONSHIP MANAGEMENT
+// IMAGE UPLOAD VERSION
+// =========================================================
+
+const RELATIONSHIP_API =
+    `${API_BASE_URL}/api/relationships`;
+
+
+// =========================================================
+// RELATIONSHIP DOM ELEMENTS
+// =========================================================
+
+const relationshipForm =
+    document.getElementById("relationshipForm");
+
+const relationshipFormContainer =
+    document.getElementById(
+        "relationshipFormContainer"
+    );
+
+const relationshipsContent =
+    document.getElementById(
+        "relationshipsContent"
+    );
+
+const relationshipId =
+    document.getElementById(
+        "relationshipId"
+    );
+
+const relationshipName =
+    document.getElementById(
+        "relationshipName"
+    );
+
+const relationshipImage =
+    document.getElementById(
+        "relationshipImage"
+    );
+
+const relationshipDescription =
+    document.getElementById(
+        "relationshipDescription"
+    );
+
+const relationshipPinned =
+    document.getElementById(
+        "relationshipPinned"
+    );
+
+const relationshipFormMessage =
+    document.getElementById(
+        "relationshipFormMessage"
+    );
+
+const relationshipImagePreviewContainer =
+    document.getElementById(
+        "relationshipImagePreviewContainer"
+    );
+
+const relationshipImagePreview =
+    document.getElementById(
+        "relationshipImagePreview"
+    );
+
+
+// =========================================================
+// OPEN RELATIONSHIP FORM
+// =========================================================
+
+function openRelationshipForm() {
+
+    const form =
+        document.getElementById(
+            "relationshipForm"
+        );
+
+    const container =
+        document.getElementById(
+            "relationshipFormContainer"
+        );
+
+    if (!form || !container) {
+        return;
+    }
+
+
+    form.reset();
+
+
+    if (relationshipId) {
+
+        relationshipId.value = "";
+    }
+
+
+    if (relationshipImage) {
+
+        relationshipImage.value = "";
+    }
+
+
+    if (relationshipImagePreview) {
+
+        relationshipImagePreview.src = "";
+    }
+
+
+    if (
+        relationshipImagePreviewContainer
+    ) {
+
+        relationshipImagePreviewContainer
+            .classList
+            .add("hidden");
+    }
+
+
+    if (relationshipFormMessage) {
+
+        relationshipFormMessage.textContent =
+            "";
+
+        relationshipFormMessage.className =
+            "form-message";
+    }
+
+
+    const title =
+        document.getElementById(
+            "relationshipFormTitle"
+        );
+
+
+    if (title) {
+
+        title.textContent =
+            "Add Relationship";
+    }
+
+
+    container.classList.remove(
+        "hidden"
+    );
+}
+
+
+// =========================================================
+// CLOSE RELATIONSHIP FORM
+// =========================================================
+
+function closeRelationshipForm() {
+
+    const container =
+        document.getElementById(
+            "relationshipFormContainer"
+        );
+
+    if (container) {
+
+        container.classList.add(
+            "hidden"
+        );
+    }
+}
+
+
+// =========================================================
+// RELATIONSHIP IMAGE PREVIEW
+// =========================================================
+
+if (relationshipImage) {
+
+    relationshipImage.addEventListener(
+        "change",
+        function () {
+
+            const file =
+                this.files &&
+                this.files[0];
+
+
+            if (!file) {
+
+                if (relationshipImagePreview) {
+
+                    relationshipImagePreview.src =
+                        "";
+                }
+
+
+                if (
+                    relationshipImagePreviewContainer
+                ) {
+
+                    relationshipImagePreviewContainer
+                        .classList
+                        .add("hidden");
+                }
+
+                return;
+            }
+
+
+            // =================================================
+            // VALID IMAGE TYPE
+            // =================================================
+
+            const allowedTypes = [
+                "image/jpeg",
+                "image/png",
+                "image/webp"
+            ];
+
+
+            if (
+                !allowedTypes.includes(
+                    file.type
+                )
+            ) {
+
+                alert(
+                    "Only JPG, PNG and WEBP images are allowed."
+                );
+
+
+                this.value = "";
+
+
+                if (
+                    relationshipImagePreviewContainer
+                ) {
+
+                    relationshipImagePreviewContainer
+                        .classList
+                        .add("hidden");
+                }
+
+                return;
+            }
+
+
+            // =================================================
+            // VALID IMAGE SIZE
+            // =================================================
+
+            const maxSize =
+                5 * 1024 * 1024;
+
+
+            if (file.size > maxSize) {
+
+                alert(
+                    "Image size must be less than 5 MB."
+                );
+
+
+                this.value = "";
+
+
+                if (
+                    relationshipImagePreviewContainer
+                ) {
+
+                    relationshipImagePreviewContainer
+                        .classList
+                        .add("hidden");
+                }
+
+                return;
+            }
+
+
+            // =================================================
+            // SHOW PREVIEW
+            // =================================================
+
+            const reader =
+                new FileReader();
+
+
+            reader.onload =
+                function (event) {
+
+                    if (
+                        relationshipImagePreview
+                    ) {
+
+                        relationshipImagePreview.src =
+                            event.target.result;
+                    }
+
+
+                    if (
+                        relationshipImagePreviewContainer
+                    ) {
+
+                        relationshipImagePreviewContainer
+                            .classList
+                            .remove("hidden");
+                    }
+                };
+
+
+            reader.readAsDataURL(
+                file
+            );
+        }
+    );
+}
+
+
+// =========================================================
+// SAVE RELATIONSHIP
+// =========================================================
+
+if (relationshipForm) {
+
+    relationshipForm.addEventListener(
+        "submit",
+        saveRelationship
+    );
+}
+
+
+async function saveRelationship(event) {
+
+    event.preventDefault();
+
+
+    // =====================================================
+    // GET FORM VALUES
+    // =====================================================
+
+    const id =
+        relationshipId
+            ? relationshipId.value.trim()
+            : "";
+
+
+    const name =
+        relationshipName
+            ? relationshipName.value.trim()
+            : "";
+
+
+    const description =
+        relationshipDescription
+            ? relationshipDescription.value.trim()
+            : "";
+
+
+    const pinned =
+        relationshipPinned
+            ? relationshipPinned.checked
+            : false;
+
+
+    const imageFile =
+        relationshipImage &&
+        relationshipImage.files &&
+        relationshipImage.files[0]
+            ? relationshipImage.files[0]
+            : null;
+
+
+    // =====================================================
+    // VALIDATE NAME
+    // =====================================================
+
+    if (!name) {
+
+        if (relationshipFormMessage) {
+
+            relationshipFormMessage.textContent =
+                "Relationship name is required.";
+
+            relationshipFormMessage.className =
+                "message error";
+        }
+
+
+        return;
+    }
+
+
+    // =====================================================
+    // VALIDATE IMAGE
+    // =====================================================
+
+    if (imageFile) {
+
+        const allowedTypes = [
+            "image/jpeg",
+            "image/png",
+            "image/webp"
+        ];
+
+
+        if (
+            !allowedTypes.includes(
+                imageFile.type
+            )
+        ) {
+
+            if (relationshipFormMessage) {
+
+                relationshipFormMessage.textContent =
+                    "Only JPG, PNG and WEBP images are allowed.";
+
+                relationshipFormMessage.className =
+                    "message error";
+            }
+
+
+            return;
+        }
+
+
+        const maxSize =
+            5 * 1024 * 1024;
+
+
+        if (imageFile.size > maxSize) {
+
+            if (relationshipFormMessage) {
+
+                relationshipFormMessage.textContent =
+                    "Image size must be less than 5 MB.";
+
+                relationshipFormMessage.className =
+                    "message error";
+            }
+
+
+            return;
+        }
+    }
+
+
+    // =====================================================
+    // FORM DATA
+    // =====================================================
+
+    const formData =
+        new FormData();
+
+
+    formData.append(
+        "name",
+        name
+    );
+
+
+    formData.append(
+        "description",
+        description
+    );
+
+
+    formData.append(
+        "pinned",
+        String(pinned)
+    );
+
+
+    // =====================================================
+    // ADD IMAGE IF SELECTED
+    // =====================================================
+
+    if (imageFile) {
+
+        formData.append(
+            "image",
+            imageFile
+        );
+    }
+
+
+    // =====================================================
+    // SAVE
+    // =====================================================
+
+    try {
+
+        let response;
+
+
+        // =================================================
+        // CREATE
+        // =================================================
+
+        if (!id) {
+
+            response =
+                await fetch(
+                    RELATIONSHIP_API,
+                    {
+                        method: "POST",
+
+                        headers:
+                            getAdminHeaders(),
+
+                        body: formData
+                    }
+                );
+        }
+
+
+            // =================================================
+            // UPDATE
+        // =================================================
+
+        else {
+
+            response =
+                await fetch(
+                    `${RELATIONSHIP_API}/${encodeURIComponent(
+                        id
+                    )}`,
+
+                    {
+                        method: "PUT",
+
+                        headers:
+                            getAdminHeaders(),
+
+                        body: formData
+                    }
+                );
+        }
+
+
+        // =================================================
+        // RESPONSE
+        // =================================================
+
+        const responseText =
+            await response.text();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                responseText ||
+                "Failed to save relationship"
+            );
+        }
+
+
+        // =================================================
+        // SUCCESS
+        // =================================================
+
+        if (relationshipFormMessage) {
+
+            relationshipFormMessage.textContent =
+                id
+                    ? "Relationship updated successfully."
+                    : "Relationship added successfully.";
+
+            relationshipFormMessage.className =
+                "message success";
+        }
+
+
+        closeRelationshipForm();
+
+
+        await loadAdminRelationships();
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Save relationship error:",
+            error
+        );
+
+
+        if (relationshipFormMessage) {
+
+            relationshipFormMessage.textContent =
+                error.message ||
+                "Unable to save relationship.";
+
+            relationshipFormMessage.className =
+                "message error";
+        }
+    }
+}
+
+
+// =========================================================
+// LOAD RELATIONSHIPS
 // =========================================================
 
 async function loadAdminRelationships() {
 
     const container =
-        document.getElementById("relationshipsContent");
+        document.getElementById(
+            "relationshipsContent"
+        );
 
-    if (!container) return;
+
+    if (!container) {
+        return;
+    }
+
 
     container.innerHTML =
         "Loading relationships...";
 
+
     try {
 
-        const response = await fetch(
-            `${API_BASE_URL}/api/relationships`
-        );
+        const response =
+            await fetch(
+                RELATIONSHIP_API
+            );
+
 
         if (!response.ok) {
-            throw new Error("Failed to load relationships");
+
+            throw new Error(
+                "Failed to load relationships"
+            );
         }
+
 
         const relationships =
             await response.json();
 
-        if (!relationships.length) {
+
+        if (
+            !relationships ||
+            !relationships.length
+        ) {
 
             container.innerHTML = `
                 <div class="empty-state">
@@ -10999,92 +13045,34 @@ async function loadAdminRelationships() {
                 </div>
             `;
 
+
             return;
         }
 
+
+        // =================================================
+        // RENDER
+        // =================================================
+
         container.innerHTML =
-            relationships.map(relationship => `
+            relationships
+                .map(
+                    relationship =>
+                        createAdminRelationshipCard(
+                            relationship
+                        )
+                )
+                .join("");
 
-                <div class="panel-card relationship-admin-card">
+    }
 
-                    <div class="section-toolbar">
+    catch (error) {
 
-                        <div>
+        console.error(
+            "Relationship loading error:",
+            error
+        );
 
-                            <h3>
-                                ${escapeAdminHtml(relationship.name)}
-                            </h3>
-
-                            <p class="muted">
-                                ID: ${escapeAdminHtml(relationship.id)}
-                            </p>
-
-                            ${
-                relationship.description
-                    ? `<p>
-                                        ${escapeAdminHtml(relationship.description)}
-                                       </p>`
-                    : ""
-            }
-
-                            ${
-                relationship.image
-                    ? `<p class="muted">
-                                        Image: ${escapeAdminHtml(relationship.image)}
-                                       </p>`
-                    : ""
-            }
-
-                        </div>
-
-                        <div class="admin-action-buttons">
-
-                            <button
-                                type="button"
-                                class="outline-btn"
-                                onclick="editRelationship('${escapeJs(relationship.id)}')"
-                            >
-                                ✏️ Edit
-                            </button>
-
-                            <button
-                                type="button"
-                                class="danger-btn"
-                                onclick="deleteRelationship('${escapeJs(relationship.id)}')"
-                            >
-                                🗑️ Delete
-                            </button>
-
-                            <button
-                                type="button"
-                                class="${
-                relationship.pinned
-                    ? "outline-btn"
-                    : "primary-btn"
-            }"
-                                onclick="toggleRelationshipPin(
-                                    '${escapeJs(relationship.id)}',
-                                    ${!relationship.pinned}
-                                )"
-                            >
-                                ${
-                relationship.pinned
-                    ? "📌 Unpin"
-                    : "📍 Pin"
-            }
-                            </button>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            `).join("");
-
-    } catch (error) {
-
-        console.error("Relationship loading error:", error);
 
         container.innerHTML = `
             <div class="message error">
@@ -11096,163 +13084,197 @@ async function loadAdminRelationships() {
 
 
 // =========================================================
-// OPEN RELATIONSHIP FORM
+// CREATE RELATIONSHIP CARD
 // =========================================================
 
-function openRelationshipForm() {
+function createAdminRelationshipCard(
+    relationship
+) {
 
-    const container =
-        document.getElementById("relationshipFormContainer");
-
-    const form =
-        document.getElementById("relationshipForm");
-
-    if (!container || !form) return;
-
-    form.reset();
-
-    document.getElementById("relationshipId").value = "";
-
-    const title =
-        document.getElementById("relationshipFormTitle");
-
-    if (title) {
-        title.textContent = "Add Relationship";
-    }
-
-    container.classList.remove("hidden");
-}
-
-
-// =========================================================
-// CLOSE RELATIONSHIP FORM
-// =========================================================
-
-function closeRelationshipForm() {
-
-    const container =
-        document.getElementById("relationshipFormContainer");
-
-    if (container) {
-        container.classList.add("hidden");
-    }
-}
-
-
-// =========================================================
-// SAVE RELATIONSHIP
-// =========================================================
-
-async function saveRelationship(event) {
-
-    event.preventDefault();
-
-    const id =
-        document.getElementById("relationshipId").value.trim();
-
-    const name =
-        document.getElementById("relationshipName").value.trim();
-
-    const image =
-        document.getElementById("relationshipImage").value.trim();
-
-    const description =
-        document.getElementById("relationshipDescription").value.trim();
-
-    const pinned =
-        document.getElementById("relationshipPinned").checked;
-
-    const message =
-        document.getElementById("relationshipFormMessage");
-
-    if (!name) {
-
-        if (message) {
-            message.textContent =
-                "Relationship name is required.";
-
-            message.className =
-                "message error";
-        }
-
-        return;
-    }
-
-    const relationshipId =
-        id || createSlug(name);
-
-    const relationshipData = {
-
-        id: relationshipId,
-
-        name: name,
-
-        image: image || null,
-
-        description: description || null,
-
-        pinned: pinned
-    };
-
-    try {
-
-        const url = id
-            ? `${API_BASE_URL}/api/relationships/${encodeURIComponent(id)}`
-            : `${API_BASE_URL}/api/relationships`;
-
-        const response = await fetch(url, {
-
-            method: id ? "PUT" : "POST",
-
-            headers: {
-                "Content-Type": "application/json"
-            },
-
-            body: JSON.stringify(relationshipData)
-        });
-
-        const responseText =
-            await response.text();
-
-        if (!response.ok) {
-
-            throw new Error(
-                responseText || "Failed to save relationship"
-            );
-        }
-
-        if (message) {
-
-            message.textContent =
-                id
-                    ? "Relationship updated successfully."
-                    : "Relationship added successfully.";
-
-            message.className =
-                "message success";
-        }
-
-        closeRelationshipForm();
-
-        await loadAdminRelationships();
-
-    } catch (error) {
-
-        console.error(
-            "Save relationship error:",
-            error
+    const imageUrl =
+        getRelationshipImageUrl(
+            relationship.image
         );
 
-        if (message) {
 
-            message.textContent =
-                error.message ||
-                "Unable to save relationship.";
+    return `
+        <div class="panel-card relationship-admin-card">
 
-            message.className =
-                "message error";
-        }
+            <div class="section-toolbar">
+
+                <div>
+
+                    ${
+        imageUrl
+            ? `
+                                <img
+                                    src="${escapeAdminHtml(
+                imageUrl
+            )}"
+                                    alt="${escapeAdminHtml(
+                relationship.name ||
+                "Relationship"
+            )}"
+                                    style="
+                                        width:120px;
+                                        height:90px;
+                                        object-fit:cover;
+                                        border-radius:10px;
+                                        margin-bottom:10px;
+                                    "
+                                    onerror="this.style.display='none';"
+                                >
+                            `
+            : ""
     }
+
+
+                    <h3>
+                        ${escapeAdminHtml(
+        relationship.name
+    )}
+                    </h3>
+
+
+                    <p class="muted">
+                        ID:
+                        ${escapeAdminHtml(
+        relationship.id
+    )}
+                    </p>
+
+
+                    ${
+        relationship.description
+            ? `
+                                <p>
+                                    ${escapeAdminHtml(
+                relationship.description
+            )}
+                                </p>
+                            `
+            : ""
+    }
+
+
+                    ${
+        relationship.image
+            ? `
+                                <p class="muted">
+                                    Image:
+                                    ${escapeAdminHtml(
+                relationship.image
+            )}
+                                </p>
+                            `
+            : ""
+    }
+
+                </div>
+
+
+                <div class="admin-action-buttons">
+
+                    <button
+                        type="button"
+                        class="outline-btn"
+                        onclick="
+                            editRelationship(
+                                '${escapeJs(
+        relationship.id
+    )}'
+                            )
+                        "
+                    >
+                        ✏️ Edit
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="danger-btn"
+                        onclick="
+                            deleteRelationship(
+                                '${escapeJs(
+        relationship.id
+    )}'
+                            )
+                        "
+                    >
+                        🗑️ Delete
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="${
+        relationship.pinned
+            ? "outline-btn"
+            : "primary-btn"
+    }"
+                        onclick="
+                            toggleRelationshipPin(
+                                '${escapeJs(
+        relationship.id
+    )}',
+                                ${!relationship.pinned}
+                            )
+                        "
+                    >
+                        ${
+        relationship.pinned
+            ? "📌 Unpin"
+            : "📍 Pin"
+    }
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+    `;
+}
+
+
+// =========================================================
+// GET RELATIONSHIP IMAGE URL
+// =========================================================
+
+function getRelationshipImageUrl(
+    image
+) {
+
+    if (!image) {
+        return "";
+    }
+
+
+    image =
+        String(image).trim();
+
+
+    if (!image) {
+        return "";
+    }
+
+
+    if (
+        image.startsWith("http://") ||
+        image.startsWith("https://")
+    ) {
+
+        return image;
+    }
+
+
+    if (image.startsWith("/")) {
+
+        return image;
+    }
+
+
+    return image;
 }
 
 
@@ -11260,55 +13282,212 @@ async function saveRelationship(event) {
 // EDIT RELATIONSHIP
 // =========================================================
 
-async function editRelationship(relationshipId) {
+async function editRelationship(
+    relationshipIdValue
+) {
 
     try {
 
-        const response = await fetch(
-            `${API_BASE_URL}/api/relationships/${encodeURIComponent(relationshipId)}`
-        );
+        let relationship;
 
-        if (!response.ok) {
-            throw new Error("Relationship not found");
+
+        // =================================================
+        // TRY SINGLE RELATIONSHIP
+        // =================================================
+
+        const response =
+            await fetch(
+                `${RELATIONSHIP_API}/${encodeURIComponent(
+                    relationshipIdValue
+                )}`
+            );
+
+
+        if (response.ok) {
+
+            relationship =
+                await response.json();
+
         }
 
-        const relationship =
-            await response.json();
+        else {
 
-        document.getElementById("relationshipId").value =
-            relationship.id || "";
+            // =============================================
+            // FALLBACK: LOAD ALL
+            // =============================================
 
-        document.getElementById("relationshipName").value =
-            relationship.name || "";
+            const listResponse =
+                await fetch(
+                    RELATIONSHIP_API
+                );
 
-        document.getElementById("relationshipImage").value =
-            relationship.image || "";
 
-        document.getElementById("relationshipDescription").value =
-            relationship.description || "";
+            if (!listResponse.ok) {
 
-        document.getElementById("relationshipPinned").checked =
-            relationship.pinned === true;
+                throw new Error(
+                    "Unable to load relationships"
+                );
+            }
+
+
+            const relationships =
+                await listResponse.json();
+
+
+            relationship =
+                relationships.find(
+                    item =>
+                        String(item.id) ===
+                        String(relationshipIdValue)
+                );
+        }
+
+
+        if (!relationship) {
+
+            throw new Error(
+                "Relationship not found"
+            );
+        }
+
+
+        // =================================================
+        // FILL ID
+        // =================================================
+
+        if (relationshipId) {
+
+            relationshipId.value =
+                relationship.id || "";
+        }
+
+
+        // =================================================
+        // FILL NAME
+        // =================================================
+
+        if (relationshipName) {
+
+            relationshipName.value =
+                relationship.name || "";
+        }
+
+
+        // =================================================
+        // FILL DESCRIPTION
+        // =================================================
+
+        if (relationshipDescription) {
+
+            relationshipDescription.value =
+                relationship.description || "";
+        }
+
+
+        // =================================================
+        // FILL PINNED
+        // =================================================
+
+        if (relationshipPinned) {
+
+            relationshipPinned.checked =
+                relationship.pinned === true;
+        }
+
+
+        // =================================================
+        // FILE INPUT CANNOT BE FILLED PROGRAMMATICALLY
+        // =================================================
+
+        if (relationshipImage) {
+
+            relationshipImage.value =
+                "";
+        }
+
+
+        // =================================================
+        // EXISTING IMAGE PREVIEW
+        // =================================================
+
+        const existingImage =
+            getRelationshipImageUrl(
+                relationship.image
+            );
+
+
+        if (
+            existingImage &&
+            relationshipImagePreview &&
+            relationshipImagePreviewContainer
+        ) {
+
+            relationshipImagePreview.src =
+                existingImage;
+
+
+            relationshipImagePreviewContainer
+                .classList
+                .remove("hidden");
+
+        }
+
+        else if (
+            relationshipImagePreviewContainer
+        ) {
+
+            relationshipImagePreviewContainer
+                .classList
+                .add("hidden");
+        }
+
+
+        // =================================================
+        // CHANGE TITLE
+        // =================================================
 
         const title =
-            document.getElementById("relationshipFormTitle");
+            document.getElementById(
+                "relationshipFormTitle"
+            );
+
 
         if (title) {
-            title.textContent = "Edit Relationship";
+
+            title.textContent =
+                "Edit Relationship";
         }
 
-        document
-            .getElementById("relationshipFormContainer")
-            .classList.remove("hidden");
 
-    } catch (error) {
+        // =================================================
+        // OPEN FORM
+        // =================================================
+
+        const container =
+            document.getElementById(
+                "relationshipFormContainer"
+            );
+
+
+        if (container) {
+
+            container.classList
+                .remove("hidden");
+        }
+
+    }
+
+    catch (error) {
 
         console.error(
             "Edit relationship error:",
             error
         );
 
-        alert("Unable to load relationship.");
+
+        alert(
+            "Unable to load relationship."
+        );
     }
 }
 
@@ -11317,27 +13496,40 @@ async function editRelationship(relationshipId) {
 // DELETE RELATIONSHIP
 // =========================================================
 
-async function deleteRelationship(relationshipId) {
+async function deleteRelationship(
+    relationshipIdValue
+) {
 
     if (
         !confirm(
             "Are you sure you want to delete this relationship?"
         )
     ) {
+
         return;
     }
 
+
     try {
 
-        const response = await fetch(
-            `${API_BASE_URL}/api/relationships/${encodeURIComponent(relationshipId)}`,
-            {
-                method: "DELETE"
-            }
-        );
+        const response =
+            await fetch(
+                `${RELATIONSHIP_API}/${encodeURIComponent(
+                    relationshipIdValue
+                )}`,
+
+                {
+                    method: "DELETE",
+
+                    headers:
+                        getAdminHeaders()
+                }
+            );
+
 
         const responseText =
             await response.text();
+
 
         if (!response.ok) {
 
@@ -11347,73 +13539,91 @@ async function deleteRelationship(relationshipId) {
             );
         }
 
+
         alert(
             "Relationship deleted successfully."
         );
 
+
         await loadAdminRelationships();
 
-    } catch (error) {
+    }
+
+    catch (error) {
 
         console.error(
             "Delete relationship error:",
             error
         );
 
+
         alert(
             "Unable to delete relationship.\n\n" +
-            (error.message || "")
+            (
+                error.message ||
+                ""
+            )
         );
     }
 }
 
 
 // =========================================================
-// PIN / UNPIN RELATIONSHIP
+// TOGGLE RELATIONSHIP PIN
 // =========================================================
 
 async function toggleRelationshipPin(
-    relationshipId,
+    relationshipIdValue,
     pinned
 ) {
 
     try {
 
-        const response = await fetch(
-            `${API_BASE_URL}/api/relationships/${encodeURIComponent(relationshipId)}/pin?pinned=${pinned}`,
-            {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json"
+        const response =
+            await fetch(
+                `${RELATIONSHIP_API}/${encodeURIComponent(
+                    relationshipIdValue
+                )}/pin?pinned=${pinned}`,
+
+                {
+                    method: "PUT",
+
+                    headers:
+                        getAdminHeaders()
                 }
-            }
-        );
+            );
+
 
         if (!response.ok) {
 
             const errorText =
                 await response.text();
 
-            throw new Error(errorText);
+
+            throw new Error(
+                errorText
+            );
         }
+
 
         await loadAdminRelationships();
 
-    } catch (error) {
+    }
+
+    catch (error) {
 
         console.error(
             "Relationship pin error:",
             error
         );
 
+
         alert(
             "Unable to update relationship pin status."
         );
     }
 }
-
-
-// =========================================================
+//=======================================================
 // CREATE SLUG / ID
 // =========================================================
 

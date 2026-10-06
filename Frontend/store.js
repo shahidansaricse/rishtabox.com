@@ -1128,16 +1128,25 @@ function searchProducts() {
         "searchProductGrid"
     );
 }
-/* =========================================================
+/* =====/* =====================================================
    IMAGE PATH
 ========================================================= */
 function getImagePath(image) {
+
     if (!image) {
         return "images/logo.jpeg";
     }
 
-    if (image.startsWith("http://") || image.startsWith("https://")) {
+    if (
+        image.startsWith("http://") ||
+        image.startsWith("https://")
+    ) {
         return image;
+    }
+
+    // Backend uploaded images
+    if (image.startsWith("/uploads/")) {
+        return "http://localhost:8080" + image;
     }
 
     if (image.startsWith("images/")) {

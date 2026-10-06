@@ -2001,13 +2001,38 @@
                                 <div class="form-group">
 
                                     <label for="relationshipImage">
-                                        Image
+                                        Relationship Image
                                     </label>
 
                                     <input
-                                            type="text"
+                                            type="file"
                                             id="relationshipImage"
-                                            placeholder="images/relationship/brother.jpeg">
+                                            name="image"
+                                            accept="image/jpeg,image/png,image/webp">
+
+                                    <small class="muted">
+                                        JPG, PNG or WEBP — Maximum 5 MB
+                                    </small>
+
+                                </div>
+
+                                <div
+                                        id="relationshipImagePreviewContainer"
+                                        class="hidden"
+                                        style="margin-top:15px;">
+
+                                    <img
+                                            id="relationshipImagePreview"
+                                            src=""
+                                            alt="Relationship Preview"
+                                            style="
+            width:220px;
+            height:160px;
+            object-fit:cover;
+            border-radius:10px;
+            border:1px solid #ddd;
+            display:block;
+        ">
 
                                 </div>
 
@@ -2169,13 +2194,38 @@
                                 <div class="form-group">
 
                                     <label for="festivalImage">
-                                        Image
+                                        Festival Image
                                     </label>
 
                                     <input
-                                            type="text"
+                                            type="file"
                                             id="festivalImage"
-                                            placeholder="images/festivals/diwali.jpeg">
+                                            name="image"
+                                            accept="image/jpeg,image/png,image/webp">
+
+                                    <small class="muted">
+                                        JPG, PNG or WEBP — Maximum 5 MB
+                                    </small>
+
+                                </div>
+
+                                <div
+                                        id="festivalImagePreviewContainer"
+                                        class="hidden"
+                                        style="margin-top:15px;">
+
+                                    <img
+                                            id="festivalImagePreview"
+                                            src=""
+                                            alt="Festival Preview"
+                                            style="
+            width:220px;
+            height:160px;
+            object-fit:cover;
+            border-radius:10px;
+            border:1px solid #ddd;
+            display:block;
+        ">
 
                                 </div>
 
@@ -2291,7 +2341,9 @@
                         </div>
 
 
-                        <!-- CATEGORY FORM -->
+                        <!-- ================================================
+                             CATEGORY FORM
+                        ================================================= -->
 
                         <div
                                 id="categoryFormContainer"
@@ -2312,12 +2364,18 @@
                             </div>
 
 
-                            <form id="categoryForm">
+                            <form
+                                    id="categoryForm"
+                                    enctype="multipart/form-data">
 
                                 <input
                                         type="hidden"
                                         id="categoryId">
 
+
+                                <!-- =========================================
+                                     CATEGORY NAME
+                                ========================================== -->
 
                                 <div class="form-group">
 
@@ -2334,19 +2392,57 @@
                                 </div>
 
 
+                                <!-- =========================================
+                                     CATEGORY IMAGE
+                                ========================================== -->
+
                                 <div class="form-group">
 
                                     <label for="categoryImage">
-                                        Image
+                                        Category Image
                                     </label>
 
                                     <input
-                                            type="text"
+                                            type="file"
                                             id="categoryImage"
-                                            placeholder="images/categories/birthday.jpeg">
+                                            name="image"
+                                            accept="image/jpeg,image/png,image/webp">
+
+                                    <small class="muted">
+                                        JPG, PNG or WEBP — Maximum 5 MB
+                                    </small>
 
                                 </div>
 
+
+                                <!-- =========================================
+                                     IMAGE PREVIEW
+                                ========================================== -->
+
+                                <div
+                                        id="categoryImagePreviewContainer"
+                                        class="hidden"
+                                        style="margin-top: 15px;">
+
+                                    <img
+                                            id="categoryImagePreview"
+                                            src=""
+                                            alt="Category Preview"
+                                            style="
+                        width: 220px;
+                        height: 160px;
+                        object-fit: cover;
+                        border-radius: 10px;
+                        border: 1px solid #ddd;
+                        display: block;
+                    ">
+
+                                </div>
+
+
+                                <!-- =========================================
+                                     DESCRIPTION
+                                ========================================== -->
 
                                 <div class="form-group">
 
@@ -2362,24 +2458,38 @@
                                 </div>
 
 
+                                <!-- =========================================
+                                     PINNED
+                                ========================================== -->
+
                                 <div class="form-group">
 
                                     <label>
+
                                         <input
                                                 type="checkbox"
                                                 id="categoryPinned">
 
                                         Pinned
+
                                     </label>
 
                                 </div>
 
+
+                                <!-- =========================================
+                                     MESSAGE
+                                ========================================== -->
 
                                 <div
                                         id="categoryFormMessage"
                                         class="form-message">
                                 </div>
 
+
+                                <!-- =========================================
+                                     ACTIONS
+                                ========================================== -->
 
                                 <div class="form-actions">
 
@@ -2403,7 +2513,9 @@
                         </div>
 
 
-                        <!-- CATEGORY LIST -->
+                        <!-- ================================================
+                             CATEGORY LIST
+                        ================================================= -->
 
                         <div id="categoriesContent">
                             Loading categories...
@@ -2411,8 +2523,8 @@
 
                     </div>
 
-                </section>
 
+                </section>
 
 
                 <!-- =====================================================
