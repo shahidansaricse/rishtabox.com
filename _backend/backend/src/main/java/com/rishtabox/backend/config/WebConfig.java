@@ -27,6 +27,15 @@ public class WebConfig implements WebMvcConfigurer {
     @Value("${rishtabox.relationship.upload-dir:./uploads/relationships}")
     private String relationshipUploadDir;
 
+    @Value("${rishtabox.testimonial.upload-dir:./uploads/testimonials}")
+    private String testimonialUploadDir;
+
+    @Value("${rishtabox.blog.upload-dir:./uploads/blogs}")
+    private String blogUploadDir;
+
+    @Value("${rishtabox.product.upload-dir:./uploads/products}")
+    private String productUploadDir;
+
 
     @Override
     public void addResourceHandlers(
@@ -102,6 +111,60 @@ public class WebConfig implements WebMvcConfigurer {
                 )
                 .addResourceLocations(
                         relationshipPath.toUri().toString()
+                );
+
+
+        // =====================================================
+        // TESTIMONIALS
+        // =====================================================
+
+        Path testimonialPath = Paths
+                .get(testimonialUploadDir)
+                .toAbsolutePath()
+                .normalize();
+
+        registry
+                .addResourceHandler(
+                        "/uploads/testimonials/**"
+                )
+                .addResourceLocations(
+                        testimonialPath.toUri().toString()
+                );
+
+
+        // =====================================================
+        // BLOGS
+        // =====================================================
+
+        Path blogPath = Paths
+                .get(blogUploadDir)
+                .toAbsolutePath()
+                .normalize();
+
+        registry
+                .addResourceHandler(
+                        "/uploads/blogs/**"
+                )
+                .addResourceLocations(
+                        blogPath.toUri().toString()
+                );
+
+
+        // =====================================================
+        // PRODUCTS
+        // =====================================================
+
+        Path productPath = Paths
+                .get(productUploadDir)
+                .toAbsolutePath()
+                .normalize();
+
+        registry
+                .addResourceHandler(
+                        "/uploads/products/**"
+                )
+                .addResourceLocations(
+                        productPath.toUri().toString()
                 );
     }
 }

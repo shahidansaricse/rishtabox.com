@@ -1030,58 +1030,34 @@ async function loadDashboardStats() {
     await loadUserCount();
 }
 
-
 /* =========================================================
-   PRODUCT COUNT
+   FORMAT DATE
 ========================================================= */
 
-async function loadProductCount() {
+function formatDate(dateValue) {
 
-    try {
-
-        const response =
-            await fetch(
-                `${API_BASE_URL}/api/products/admin/all`,
-                {
-                    method: "GET",
-                    headers: getAuthHeaders()
-                }
-            );
-
-        if (!response.ok) {
-
-            console.error(
-                "Product count request failed:",
-                response.status
-            );
-
-            return;
-        }
-
-        const products =
-            await response.json();
-
-        const count =
-            $("productCount");
-
-        if (count) {
-
-            count.textContent =
-                Array.isArray(products)
-                    ? products.length
-                    : "0";
-        }
-
-    } catch (error) {
-
-        console.error(
-            "Product count error:",
-            error
-        );
+    if (!dateValue) {
+        return "-";
     }
+
+    const date =
+        new Date(dateValue);
+
+    if (isNaN(date.getTime())) {
+        return "-";
+    }
+
+    return date.toLocaleString(
+        "en-IN",
+        {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
+        }
+    );
 }
-
-
 /* =========================================================
    ORDER STATS
 ========================================================= */
@@ -1222,6 +1198,235 @@ async function loadUserCount() {
     }
 }
 
+/* =========================================================
+   PRODUCT COUNT
+========================================================= */
+
+async function loadProductCount() {
+
+    try {
+
+        const response =
+            await fetch(
+                `${API_BASE_URL}/api/products/admin/all`,
+                {
+                    method: "GET",
+                    headers: getAuthHeaders()
+                }
+            );
+
+        if (!response.ok) {
+
+            console.error(
+                "Product count request failed:",
+                response.status
+            );
+
+            return;
+        }
+
+        const products =
+            await response.json();
+
+        const count =
+            $("productCount");
+
+        if (count) {
+
+            count.textContent =
+                Array.isArray(products)
+                    ? products.length
+                    : "0";
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Product count error:",
+            error
+        );
+    }
+}
+
+
+/* =========================================================
+   PRODUCT IMAGE URL
+========================================================= */
+
+function getAdminProductImage(image) {
+
+    if (!image) {
+
+        return "../images/logo.jpeg";
+    }
+
+    const value =
+        String(image).trim();
+
+
+    /* Full URL */
+
+    if (
+        value.startsWith("http://") ||
+        value.startsWith("https://")
+    ) {
+
+        return value;
+    }
+
+
+    /* Backend upload path */
+
+    if (value.startsWith("/")) {
+
+        return `${API_BASE_URL}${value}`;
+    }
+
+
+    /* uploads/products/... */
+
+    if (
+        value.startsWith("uploads/")
+    ) {
+
+        return `${API_BASE_URL}/${value}`;
+    }
+
+
+    /* images/... */
+
+    if (
+        value.startsWith("images/")
+    ) {
+
+        return `../${value}`;
+    }
+
+
+    return value;
+}
+
+
+/* =========================================================
+   PRODUCT IMAGE PREVIEW
+========================================================= */
+
+function previewProductImage(input) {
+
+    const preview =
+        $("productImagePreview");
+
+    if (!preview) {
+        return;
+    }
+
+    preview.innerHTML = "";
+
+
+    if (
+        !input ||
+        !input.files ||
+        input.files.length === 0
+    ) {
+
+        return;
+    }
+
+
+    const file =
+        input.files[0];
+
+
+    /* Allowed image types */
+
+    const allowedTypes = [
+
+        "image/jpeg",
+        "image/png",
+        "image/webp"
+
+    ];
+
+
+    if (
+        !allowedTypes.includes(
+            file.type
+        )
+    ) {
+
+        alert(
+            "Only JPG, PNG and WEBP images are allowed."
+        );
+
+        input.value = "";
+
+        return;
+    }
+
+
+    /* Maximum 5 MB */
+
+    if (
+        file.size >
+        5 * 1024 * 1024
+    ) {
+
+        alert(
+            "Image size must be less than 5 MB."
+        );
+
+        input.value = "";
+
+        return;
+    }
+
+
+    const reader =
+        new FileReader();
+
+
+    reader.onload =
+        function (event) {
+
+            preview.innerHTML = `
+
+                <div
+                    style="
+                        margin-top:15px;
+                    "
+                >
+
+                    <p
+                        style="
+                            margin-bottom:8px;
+                            font-weight:600;
+                        "
+                    >
+                        Image Preview
+                    </p>
+
+                    <img
+                        src="${event.target.result}"
+                        alt="Product Preview"
+                        style="
+                            width:120px;
+                            height:120px;
+                            object-fit:cover;
+                            border-radius:10px;
+                            border:1px solid #ddd;
+                            padding:3px;
+                        "
+                    >
+
+                </div>
+
+            `;
+        };
+
+
+    reader.readAsDataURL(file);
+}
+
 
 /* =========================================================
    PRODUCTS
@@ -1238,8 +1443,10 @@ async function loadProducts() {
         return;
     }
 
+
     const container =
         $("productsContent");
+
 
     if (!container) {
 
@@ -1249,6 +1456,7 @@ async function loadProducts() {
 
         return;
     }
+
 
     container.innerHTML = `
 
@@ -1263,11 +1471,8 @@ async function loadProducts() {
 
     `;
 
-    try {
 
-        console.log(
-            "Loading admin products..."
-        );
+    try {
 
         const response =
             await fetch(
@@ -1278,18 +1483,10 @@ async function loadProducts() {
                 }
             );
 
-        console.log(
-            "Admin products status:",
-            response.status
-        );
 
         const responseText =
             await response.text();
 
-        console.log(
-            "Admin products response:",
-            responseText
-        );
 
         if (!response.ok) {
 
@@ -1297,10 +1494,12 @@ async function loadProducts() {
                 responseText ||
                 `HTTP ${response.status}`;
 
+
             try {
 
                 const errorData =
                     JSON.parse(responseText);
+
 
                 message =
                     errorData.message ||
@@ -1309,12 +1508,15 @@ async function loadProducts() {
 
             } catch (error) {}
 
+
             throw new Error(
                 `HTTP ${response.status}: ${message}`
             );
         }
 
+
         let products = [];
+
 
         try {
 
@@ -1328,6 +1530,7 @@ async function loadProducts() {
             );
         }
 
+
         if (!Array.isArray(products)) {
 
             throw new Error(
@@ -1335,12 +1538,9 @@ async function loadProducts() {
             );
         }
 
-        console.log(
-            "Products loaded:",
-            products.length
-        );
 
         renderProducts(products);
+
 
     } catch (error) {
 
@@ -1348,6 +1548,7 @@ async function loadProducts() {
             "Load products error:",
             error
         );
+
 
         container.innerHTML = `
 
@@ -1393,9 +1594,11 @@ function renderProducts(products) {
     const container =
         $("productsContent");
 
+
     if (!container) {
         return;
     }
+
 
     if (
         !Array.isArray(products) ||
@@ -1421,6 +1624,7 @@ function renderProducts(products) {
 
         return;
     }
+
 
     let html = `
 
@@ -1461,6 +1665,7 @@ function renderProducts(products) {
 
     `;
 
+
     products.forEach(
         product => {
 
@@ -1470,43 +1675,79 @@ function renderProducts(products) {
                 product.active === "true" ||
                 product.active === "1";
 
+
             const stock =
                 Number(product.stock || 0);
 
+
             const image =
                 product.image || "";
+
+
+            const imageUrl =
+                getAdminProductImage(
+                    image
+                );
+
 
             const imageHtml =
                 image
 
                     ? `
+
                         <img
-                            src="${escapeHtml(image)}"
+                            src="${escapeHtml(imageUrl)}"
                             alt="${escapeHtml(product.name || "")}"
+
                             style="
                                 width:60px;
                                 height:60px;
                                 object-fit:cover;
                                 border-radius:8px;
+                                border:1px solid #ddd;
+                                display:block;
                             "
+
                             onerror="
-                                this.style.display='none';
+                                this.onerror=null;
+                                this.src='../images/logo.jpeg';
                             "
                         >
+
                     `
 
-                    : "No image";
+                    : `
+
+                        <img
+                            src="../images/logo.jpeg"
+                            alt="No image"
+
+                            style="
+                                width:60px;
+                                height:60px;
+                                object-fit:cover;
+                                border-radius:8px;
+                                border:1px solid #ddd;
+                            "
+                        >
+
+                    `;
+
 
             const categoryName =
                 product.category?.name || "-";
 
+
             const festivalName =
                 product.festival?.name || "-";
+
 
             const relationshipName =
                 product.relationship?.name || "-";
 
+
             let statusHtml = "";
+
 
             if (!active) {
 
@@ -1527,7 +1768,9 @@ function renderProducts(products) {
 
                 `;
 
-            } else if (stock <= 0) {
+            }
+
+            else if (stock <= 0) {
 
                 statusHtml = `
 
@@ -1546,7 +1789,9 @@ function renderProducts(products) {
 
                 `;
 
-            } else {
+            }
+
+            else {
 
                 statusHtml = `
 
@@ -1566,10 +1811,12 @@ function renderProducts(products) {
                 `;
             }
 
+
             const stockHtml =
                 stock <= 0
 
                     ? `
+
                         <span
                             style="
                                 color:#dc3545;
@@ -1578,9 +1825,11 @@ function renderProducts(products) {
                         >
                             0
                         </span>
+
                     `
 
                     : `
+
                         <span
                             style="
                                 color:#198754;
@@ -1589,15 +1838,19 @@ function renderProducts(products) {
                         >
                             ${escapeHtml(stock)}
                         </span>
+
                     `;
+
 
             const numericId =
                 Number(product.id);
+
 
             const actionHtml =
                 active
 
                     ? `
+
                         <button
                             type="button"
                             onclick="editProduct(${numericId})"
@@ -1611,9 +1864,11 @@ function renderProducts(products) {
                         >
                             Delete
                         </button>
+
                     `
 
                     : `
+
                         <button
                             type="button"
                             onclick="editProduct(${numericId})"
@@ -1627,7 +1882,9 @@ function renderProducts(products) {
                         >
                             Restore
                         </button>
+
                     `;
+
 
             html += `
 
@@ -1643,7 +1900,9 @@ function renderProducts(products) {
 
                     <td>
                         <strong>
-                            ${escapeHtml(product.name || "")}
+                            ${escapeHtml(
+                product.name || ""
+            )}
                         </strong>
                     </td>
 
@@ -1656,7 +1915,9 @@ function renderProducts(products) {
                     </td>
 
                     <td>
-                        ${escapeHtml(relationshipName)}
+                        ${escapeHtml(
+                relationshipName
+            )}
                     </td>
 
                     <td>
@@ -1683,6 +1944,7 @@ function renderProducts(products) {
         }
     );
 
+
     html += `
 
                 </tbody>
@@ -1692,6 +1954,7 @@ function renderProducts(products) {
         </div>
 
     `;
+
 
     container.innerHTML =
         html;
@@ -1707,33 +1970,65 @@ function openProductForm() {
     editingProductId =
         null;
 
+
     const formContainer =
         $("productFormContainer");
+
 
     const form =
         $("productForm");
 
+
     const title =
         $("productFormTitle");
+
 
     const productId =
         $("productId");
 
+
     const message =
         $("productFormMessage");
 
+
+    const imageInput =
+        $("productImageFile");
+
+
+    const imagePreview =
+        $("productImagePreview");
+
+
     if (formContainer) {
 
-        formContainer.classList.remove("hidden");
+        formContainer.classList.remove(
+            "hidden"
+        );
 
         formContainer.style.display =
             "block";
     }
 
+
     if (form) {
 
         form.reset();
     }
+
+
+    if (imageInput) {
+
+        imageInput.value =
+            "";
+    }
+
+
+    if (imagePreview) {
+
+        imagePreview.innerHTML =
+            "";
+    }
+
 
     if (title) {
 
@@ -1741,17 +2036,20 @@ function openProductForm() {
             "Add Product";
     }
 
+
     if (productId) {
 
         productId.value =
             "";
     }
 
+
     if (message) {
 
         message.textContent =
             "";
     }
+
 
     console.log(
         "Add Product form opened"
@@ -1768,33 +2066,65 @@ function closeProductForm() {
     const formContainer =
         $("productFormContainer");
 
+
     const form =
         $("productForm");
+
 
     const title =
         $("productFormTitle");
 
+
     const productId =
         $("productId");
+
 
     const message =
         $("productFormMessage");
 
+
+    const imageInput =
+        $("productImageFile");
+
+
+    const imagePreview =
+        $("productImagePreview");
+
+
     if (formContainer) {
 
-        formContainer.classList.add("hidden");
+        formContainer.classList.add(
+            "hidden"
+        );
 
         formContainer.style.display =
             "none";
     }
+
 
     if (form) {
 
         form.reset();
     }
 
+
+    if (imageInput) {
+
+        imageInput.value =
+            "";
+    }
+
+
+    if (imagePreview) {
+
+        imagePreview.innerHTML =
+            "";
+    }
+
+
     editingProductId =
         null;
+
 
     if (title) {
 
@@ -1802,17 +2132,20 @@ function closeProductForm() {
             "Add Product";
     }
 
+
     if (productId) {
 
         productId.value =
             "";
     }
 
+
     if (message) {
 
         message.textContent =
             "";
     }
+
 
     console.log(
         "Product form closed"
@@ -1835,6 +2168,7 @@ async function editProduct(productId) {
         return;
     }
 
+
     if (
         productId === null ||
         productId === undefined ||
@@ -1849,6 +2183,7 @@ async function editProduct(productId) {
         return;
     }
 
+
     try {
 
         const response =
@@ -1860,8 +2195,10 @@ async function editProduct(productId) {
                 }
             );
 
+
         const text =
             await response.text();
+
 
         if (!response.ok) {
 
@@ -1869,10 +2206,12 @@ async function editProduct(productId) {
                 text ||
                 `Failed to load product: ${response.status}`;
 
+
             try {
 
                 const errorData =
                     JSON.parse(text);
+
 
                 message =
                     errorData.message ||
@@ -1881,10 +2220,15 @@ async function editProduct(productId) {
 
             } catch (error) {}
 
-            throw new Error(message);
+
+            throw new Error(
+                message
+            );
         }
 
+
         let product;
+
 
         try {
 
@@ -1898,6 +2242,7 @@ async function editProduct(productId) {
             );
         }
 
+
         if (
             !product ||
             product.id === null ||
@@ -1909,22 +2254,29 @@ async function editProduct(productId) {
             );
         }
 
+
         editingProductId =
             product.id;
+
 
         const formContainer =
             $("productFormContainer");
 
+
         if (formContainer) {
 
-            formContainer.classList.remove("hidden");
+            formContainer.classList.remove(
+                "hidden"
+            );
 
             formContainer.style.display =
                 "block";
         }
 
+
         const productIdInput =
             $("productId");
+
 
         if (productIdInput) {
 
@@ -1932,8 +2284,10 @@ async function editProduct(productId) {
                 product.id;
         }
 
+
         const productName =
             $("productName");
+
 
         if (productName) {
 
@@ -1941,8 +2295,10 @@ async function editProduct(productId) {
                 product.name || "";
         }
 
+
         const productDescription =
             $("productDescription");
+
 
         if (productDescription) {
 
@@ -1950,8 +2306,10 @@ async function editProduct(productId) {
                 product.description || "";
         }
 
+
         const productPrice =
             $("productPrice");
+
 
         if (productPrice) {
 
@@ -1959,8 +2317,10 @@ async function editProduct(productId) {
                 product.price ?? "";
         }
 
+
         const productOriginalPrice =
             $("productOriginalPrice");
+
 
         if (productOriginalPrice) {
 
@@ -1968,8 +2328,10 @@ async function editProduct(productId) {
                 product.originalPrice ?? "";
         }
 
+
         const productStock =
             $("productStock");
+
 
         if (productStock) {
 
@@ -1977,17 +2339,100 @@ async function editProduct(productId) {
                 product.stock ?? 0;
         }
 
-        const productImage =
-            $("productImage");
 
-        if (productImage) {
+        /* File input must remain empty */
 
-            productImage.value =
-                product.image || "";
+        const productImageFile =
+            $("productImageFile");
+
+
+        if (productImageFile) {
+
+            productImageFile.value =
+                "";
         }
+
+
+        /* Show current image */
+
+        const imagePreview =
+            $("productImagePreview");
+
+
+        if (imagePreview) {
+
+            if (product.image) {
+
+                const imageUrl =
+                    getAdminProductImage(
+                        product.image
+                    );
+
+
+                imagePreview.innerHTML = `
+
+                    <div
+                        style="
+                            margin-top:15px;
+                        "
+                    >
+
+                        <p
+                            style="
+                                margin-bottom:8px;
+                                font-weight:600;
+                            "
+                        >
+                            Current Image
+                        </p>
+
+                        <img
+                            src="${escapeHtml(imageUrl)}"
+                            alt="Current Product Image"
+
+                            style="
+                                width:120px;
+                                height:120px;
+                                object-fit:cover;
+                                border-radius:10px;
+                                border:1px solid #ddd;
+                                padding:3px;
+                            "
+
+                            onerror="
+                                this.onerror=null;
+                                this.src='../images/logo.jpeg';
+                            "
+                        >
+
+                        <p
+                            style="
+                                margin-top:8px;
+                                font-size:13px;
+                                color:#666;
+                            "
+                        >
+                            New image select karne par
+                            current image replace ho jayegi.
+                        </p>
+
+                    </div>
+
+                `;
+
+            }
+
+            else {
+
+                imagePreview.innerHTML =
+                    "";
+            }
+        }
+
 
         const productCategoryId =
             $("productCategoryId");
+
 
         if (productCategoryId) {
 
@@ -1995,8 +2440,10 @@ async function editProduct(productId) {
                 product.category?.id || "";
         }
 
+
         const productFestivalId =
             $("productFestivalId");
+
 
         if (productFestivalId) {
 
@@ -2004,8 +2451,10 @@ async function editProduct(productId) {
                 product.festival?.id || "";
         }
 
+
         const productRelationshipId =
             $("productRelationshipId");
+
 
         if (productRelationshipId) {
 
@@ -2013,8 +2462,10 @@ async function editProduct(productId) {
                 product.relationship?.id || "";
         }
 
+
         const title =
             $("productFormTitle");
+
 
         if (title) {
 
@@ -2022,8 +2473,10 @@ async function editProduct(productId) {
                 "Edit Product";
         }
 
+
         const message =
             $("productFormMessage");
+
 
         if (message) {
 
@@ -2031,15 +2484,18 @@ async function editProduct(productId) {
                 "";
         }
 
+
         window.scrollTo({
             top: 0,
             behavior: "smooth"
         });
 
+
         console.log(
             "Editing product:",
             product
         );
+
 
     } catch (error) {
 
@@ -2047,6 +2503,7 @@ async function editProduct(productId) {
             "Edit product error:",
             error
         );
+
 
         alert(
             "Unable to edit product.\n\n" +
@@ -2059,241 +2516,637 @@ async function editProduct(productId) {
 /* =========================================================
    ADD / UPDATE PRODUCT
 ========================================================= */
+/* =========================================================
+   HANDLE PRODUCT SUBMIT
+========================================================= */
 
 async function handleProductSubmit(event) {
 
     event.preventDefault();
 
-    if (!isAdmin()) {
-
-        alert(
-            "Admin access required."
-        );
-
-        return;
-    }
-
-    const name =
-        $("productName")
-            ?.value
-            .trim() || "";
-
-    const description =
-        $("productDescription")
-            ?.value
-            .trim() || "";
-
-    const price =
-        Number(
-            $("productPrice")
-                ?.value || 0
-        );
-
-    const originalPrice =
-        Number(
-            $("productOriginalPrice")
-                ?.value || 0
-        );
-
-    const image =
-        $("productImage")
-            ?.value
-            .trim() || "";
-
-    const stock =
-        Number(
-            $("productStock")
-                ?.value || 0
-        );
-
-    const categoryId =
-        $("productCategoryId")
-            ?.value
-            .trim() || "";
-
-    const festivalId =
-        $("productFestivalId")
-            ?.value
-            .trim() || "";
-
-    const relationshipId =
-        $("productRelationshipId")
-            ?.value
-            .trim() || "";
-
-    if (!name) {
-
-        alert(
-            "Product name is required."
-        );
-
-        return;
-    }
-
-    if (price < 0) {
-
-        alert(
-            "Product price cannot be negative."
-        );
-
-        return;
-    }
-
-    if (originalPrice < 0) {
-
-        alert(
-            "Original price cannot be negative."
-        );
-
-        return;
-    }
-
-    if (
-        !Number.isInteger(stock) ||
-        stock < 0
-    ) {
-
-        alert(
-            "Stock must be a whole number and cannot be negative."
-        );
-
-        return;
-    }
-
-    const productData = {
-
-        name,
-        description,
-        price,
-        originalPrice,
-        image,
-        stock,
-
-        categoryId:
-            categoryId || null,
-
-        festivalId:
-            festivalId || null,
-
-        relationshipId:
-            relationshipId || null
-    };
-
-    console.log(
-        "Product data being sent:",
-        productData
-    );
 
     try {
 
-        const isEditing =
-            Boolean(editingProductId);
+        /* =====================================================
+           GET FORM VALUES
+        ===================================================== */
+
+        const name =
+            $("productName").value.trim();
+
+
+        const description =
+            $("productDescription").value.trim();
+
+
+        const price =
+            $("productPrice").value;
+
+
+        const originalPrice =
+            $("productOriginalPrice").value;
+
+
+        const stock =
+            $("productStock").value;
+
+
+        const categoryId =
+            $("productCategoryId").value.trim();
+
+
+        const festivalId =
+            $("productFestivalId").value.trim();
+
+
+        const relationshipId =
+            $("productRelationshipId").value.trim();
+
+
+        /* =====================================================
+           IMAGE INPUT
+        ===================================================== */
+
+        const imageInput =
+            $("productImageFile");
+
+
+        const imageFile =
+            imageInput &&
+            imageInput.files &&
+            imageInput.files.length > 0
+
+                ? imageInput.files[0]
+
+                : null;
+
+
+        /* =====================================================
+           VALIDATION
+        ===================================================== */
+
+        if (!name) {
+
+            alert(
+                "Product name is required."
+            );
+
+            return;
+        }
+
+
+        if (
+            price === "" ||
+            Number(price) < 0
+        ) {
+
+            alert(
+                "Please enter a valid price."
+            );
+
+            return;
+        }
+
+
+        if (
+            originalPrice !== "" &&
+            Number(originalPrice) < 0
+        ) {
+
+            alert(
+                "Please enter a valid original price."
+            );
+
+            return;
+        }
+
+
+        if (
+            stock === "" ||
+            Number(stock) < 0
+        ) {
+
+            alert(
+                "Please enter a valid stock."
+            );
+
+            return;
+        }
+
+
+        /* =====================================================
+           NEW PRODUCT MUST HAVE IMAGE
+        ===================================================== */
+
+        if (
+            !editingProductId &&
+            !imageFile
+        ) {
+
+            alert(
+                "Please select a product image."
+            );
+
+            return;
+        }
+
+
+        /* =====================================================
+           IMAGE VALIDATION
+        ===================================================== */
+
+        if (imageFile) {
+
+            const allowedTypes = [
+
+                "image/jpeg",
+                "image/png",
+                "image/webp"
+
+            ];
+
+
+            if (
+                !allowedTypes.includes(
+                    imageFile.type
+                )
+            ) {
+
+                alert(
+                    "Only JPG, PNG and WEBP images are allowed."
+                );
+
+                return;
+            }
+
+
+            if (
+                imageFile.size >
+                5 * 1024 * 1024
+            ) {
+
+                alert(
+                    "Image size must be less than 5 MB."
+                );
+
+                return;
+            }
+        }
+
+
+        /* =====================================================
+           CREATE FORM DATA
+        ===================================================== */
+
+        const formData =
+            new FormData();
+
+
+        formData.append(
+            "name",
+            name
+        );
+
+
+        formData.append(
+            "description",
+            description
+        );
+
+
+        formData.append(
+            "price",
+            price
+        );
+
+
+        formData.append(
+            "originalPrice",
+            originalPrice
+        );
+
+
+        formData.append(
+            "stock",
+            stock
+        );
+
+
+        formData.append(
+            "categoryId",
+            categoryId
+        );
+
+
+        formData.append(
+            "festivalId",
+            festivalId
+        );
+
+
+        formData.append(
+            "relationshipId",
+            relationshipId
+        );
+
+
+        /* =====================================================
+           ADD IMAGE
+        ===================================================== */
+
+        if (imageFile) {
+
+            formData.append(
+                "image",
+                imageFile
+            );
+        }
+
+
+        /* =====================================================
+           URL
+        ===================================================== */
 
         const url =
-            isEditing
+            editingProductId
+
                 ? `${API_BASE_URL}/api/products/${editingProductId}`
+
                 : `${API_BASE_URL}/api/products`;
 
+
+        /* =====================================================
+           HTTP METHOD
+        ===================================================== */
+
         const method =
-            isEditing
+            editingProductId
+
                 ? "PUT"
+
                 : "POST";
 
+
+        /* =====================================================
+           AUTH HEADERS
+        ===================================================== */
+
+        const headers =
+            getAuthHeaders();
+
+
+        /*
+         * IMPORTANT:
+         *
+         * FormData ke saath manually
+         * Content-Type set nahi karna hai.
+         *
+         * Browser automatically:
+         *
+         * multipart/form-data;
+         * boundary=...
+         */
+
+        delete headers["Content-Type"];
+
+        delete headers["content-type"];
+
+
+        /* =====================================================
+           REQUEST DEBUG
+        ===================================================== */
+
         console.log(
-            "Product request:",
-            method,
+            "===================================="
+        );
+
+        console.log(
+            "PRODUCT REQUEST"
+        );
+
+        console.log(
+            "URL:",
             url
         );
+
+        console.log(
+            "METHOD:",
+            method
+        );
+
+        console.log(
+            "EDITING PRODUCT ID:",
+            editingProductId
+        );
+
+        console.log(
+            "IMAGE:",
+            imageFile
+                ? imageFile.name
+                : "No new image"
+        );
+
+        console.log(
+            "IMAGE TYPE:",
+            imageFile
+                ? imageFile.type
+                : "N/A"
+        );
+
+        console.log(
+            "IMAGE SIZE:",
+            imageFile
+                ? imageFile.size
+                : 0
+        );
+
+        console.log(
+            "===================================="
+        );
+
+
+        /* =====================================================
+           FORM DATA DEBUG
+        ===================================================== */
+
+        console.log(
+            "========== FORM DATA =========="
+        );
+
+
+        for (
+            const [key, value]
+            of formData.entries()
+            ) {
+
+            if (
+                value instanceof File
+            ) {
+
+                console.log(
+                    key,
+                    "FILE:",
+                    value.name,
+                    value.type,
+                    value.size
+                );
+
+            } else {
+
+                console.log(
+                    key,
+                    value
+                );
+            }
+        }
+
+
+        console.log(
+            "================================"
+        );
+
+
+        /* =====================================================
+           SEND REQUEST
+        ===================================================== */
 
         const response =
             await fetch(
                 url,
                 {
+                    method:
                     method,
+
                     headers:
-                        getAuthHeaders(),
+                    headers,
 
                     body:
-                        JSON.stringify(
-                            productData
-                        )
+                    formData
                 }
             );
 
-        const text =
+
+        /* =====================================================
+           GET RESPONSE TEXT
+        ===================================================== */
+
+        const responseText =
             await response.text();
 
+
         console.log(
-            "Product save status:",
+            "PRODUCT RESPONSE STATUS:",
             response.status
         );
 
+
         console.log(
-            "Product save response:",
-            text
+            "PRODUCT RESPONSE:",
+            responseText
         );
+
+
+        /* =====================================================
+           PARSE RESPONSE
+        ===================================================== */
+
+        let result = {};
+
+
+        try {
+
+            result =
+                responseText
+                    ? JSON.parse(
+                        responseText
+                    )
+                    : {};
+
+        } catch (error) {
+
+            result = {
+
+                message:
+                responseText
+
+            };
+        }
+
+
+        /* =====================================================
+           HANDLE ERROR
+        ===================================================== */
 
         if (!response.ok) {
 
-            let errorMessage =
-                text ||
-                `Request failed: ${response.status}`;
+            console.error(
+                "PRODUCT REQUEST FAILED"
+            );
 
-            try {
+            console.error(
+                "STATUS:",
+                response.status
+            );
 
-                const errorData =
-                    JSON.parse(text);
+            console.error(
+                "RESPONSE:",
+                responseText
+            );
 
-                errorMessage =
-                    errorData.message ||
-                    errorData.error ||
-                    errorMessage;
-
-            } catch (error) {}
 
             throw new Error(
-                errorMessage
+
+                result.message ||
+
+                result.error ||
+
+                responseText ||
+
+                `HTTP ${response.status}`
+
             );
         }
 
-        alert(
-            isEditing
-                ? "Product updated successfully."
-                : "Product added successfully."
+
+        /* =====================================================
+           SUCCESS
+        ===================================================== */
+
+        console.log(
+            "===================================="
         );
+
+        console.log(
+            "PRODUCT SAVED SUCCESSFULLY"
+        );
+
+        console.log(
+            result
+        );
+
+        console.log(
+            "===================================="
+        );
+
+
+        alert(
+
+            editingProductId
+
+                ? "Product updated successfully."
+
+                : "Product added successfully."
+
+        );
+
+
+        /* =====================================================
+           CLOSE PRODUCT FORM
+        ===================================================== */
 
         closeProductForm();
 
+
+        /* =====================================================
+           RELOAD PRODUCTS
+        ===================================================== */
+
         await loadProducts();
 
-        await loadDashboardStats();
+
+        /* =====================================================
+           RELOAD PRODUCT COUNT
+        ===================================================== */
+
+        await loadProductCount();
+
+
+        /* =====================================================
+           RELOAD DASHBOARD STATS
+        ===================================================== */
+
+        if (
+            typeof loadDashboardStats ===
+            "function"
+        ) {
+
+            await loadDashboardStats();
+        }
+
 
     } catch (error) {
 
         console.error(
-            "Product save error:",
+            "===================================="
+        );
+
+        console.error(
+            "PRODUCT SAVE ERROR"
+        );
+
+        console.error(
             error
         );
 
-        const message =
-            $("productFormMessage");
+        console.error(
+            "===================================="
+        );
 
-        if (message) {
-
-            message.textContent =
-                error.message;
-        }
 
         alert(
-            "Product save failed.\n\n" +
-            error.message
+
+            error.message ||
+
+            "Failed to save product."
+
         );
     }
 }
+/* =========================================================
+   PRODUCT FORM SUBMIT + IMAGE PREVIEW
+========================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const productForm =
+            $("productForm");
+
+
+        if (productForm) {
+
+            productForm.addEventListener(
+                "submit",
+                handleProductSubmit
+            );
+        }
+
+
+        const productImageFile =
+            $("productImageFile");
+
+
+        if (productImageFile) {
+
+            productImageFile.addEventListener(
+                "change",
+                function () {
+
+                    previewProductImage(
+                        this
+                    );
+
+                }
+            );
+        }
+
+    }
+);
 
 
 /* =========================================================
-   SOFT DELETE PRODUCT
+   DELETE PRODUCT
 ========================================================= */
 
 async function deleteProduct(productId) {
@@ -2303,6 +3156,7 @@ async function deleteProduct(productId) {
         productId
     );
 
+
     if (!isAdmin()) {
 
         alert(
@@ -2311,6 +3165,7 @@ async function deleteProduct(productId) {
 
         return;
     }
+
 
     if (
         productId === null ||
@@ -2326,14 +3181,17 @@ async function deleteProduct(productId) {
         return;
     }
 
+
     const confirmed =
         confirm(
             "Are you sure you want to deactivate this product?"
         );
 
+
     if (!confirmed) {
         return;
     }
+
 
     try {
 
@@ -2346,18 +3204,10 @@ async function deleteProduct(productId) {
                 }
             );
 
+
         const text =
             await response.text();
 
-        console.log(
-            "Delete status:",
-            response.status
-        );
-
-        console.log(
-            "Delete response:",
-            text
-        );
 
         if (!response.ok) {
 
@@ -2365,10 +3215,12 @@ async function deleteProduct(productId) {
                 text ||
                 `Delete failed with status: ${response.status}`;
 
+
             try {
 
                 const errorData =
                     JSON.parse(text);
+
 
                 errorMessage =
                     errorData.message ||
@@ -2377,18 +3229,32 @@ async function deleteProduct(productId) {
 
             } catch (error) {}
 
+
             throw new Error(
                 errorMessage
             );
         }
 
+
         alert(
             "Product deactivated successfully."
         );
 
+
         await loadProducts();
 
-        await loadDashboardStats();
+
+        await loadProductCount();
+
+
+        if (
+            typeof loadDashboardStats ===
+            "function"
+        ) {
+
+            await loadDashboardStats();
+        }
+
 
     } catch (error) {
 
@@ -2396,6 +3262,7 @@ async function deleteProduct(productId) {
             "Delete product error:",
             error
         );
+
 
         alert(
             "Product deactivation failed.\n\n" +
@@ -2420,6 +3287,7 @@ async function restoreProduct(productId) {
         return;
     }
 
+
     if (
         productId === null ||
         productId === undefined ||
@@ -2434,21 +3302,19 @@ async function restoreProduct(productId) {
         return;
     }
 
+
     const confirmed =
         confirm(
             "Are you sure you want to restore this product?"
         );
 
+
     if (!confirmed) {
         return;
     }
 
-    try {
 
-        console.log(
-            "Restoring product:",
-            productId
-        );
+    try {
 
         const response =
             await fetch(
@@ -2459,18 +3325,10 @@ async function restoreProduct(productId) {
                 }
             );
 
+
         const responseText =
             await response.text();
 
-        console.log(
-            "Restore status:",
-            response.status
-        );
-
-        console.log(
-            "Restore response:",
-            responseText
-        );
 
         if (!response.ok) {
 
@@ -2478,10 +3336,12 @@ async function restoreProduct(productId) {
                 responseText ||
                 `Restore failed with status ${response.status}`;
 
+
             try {
 
                 const errorData =
                     JSON.parse(responseText);
+
 
                 errorMessage =
                     errorData.message ||
@@ -2490,18 +3350,32 @@ async function restoreProduct(productId) {
 
             } catch (error) {}
 
+
             throw new Error(
                 errorMessage
             );
         }
 
+
         alert(
             "Product restored successfully."
         );
 
+
         await loadProducts();
 
-        await loadDashboardStats();
+
+        await loadProductCount();
+
+
+        if (
+            typeof loadDashboardStats ===
+            "function"
+        ) {
+
+            await loadDashboardStats();
+        }
+
 
     } catch (error) {
 
@@ -2510,14 +3384,13 @@ async function restoreProduct(productId) {
             error
         );
 
+
         alert(
             "Product restore failed.\n\n" +
             error.message
         );
     }
 }
-
-
 /* =========================================================
    ORDER STATUS OPTIONS
 ========================================================= */
@@ -6095,9 +6968,13 @@ document.addEventListener(
     }
 );
 
-
 /* =========================================================
    BLOGS
+========================================================= */
+
+
+/* =========================================================
+   CLOSE BLOG FORM
 ========================================================= */
 function closeBlogForm() {
 
@@ -6107,272 +6984,42 @@ function closeBlogForm() {
     const form =
         document.getElementById("blogForm");
 
+    const existingImage =
+        document.getElementById("blogExistingImage");
+
+    const imagePreview =
+        document.getElementById("blogImagePreview");
+
     if (form) {
         form.reset();
     }
 
-    const blogId =
-        document.getElementById("blogId");
+    document.getElementById("blogId").value = "";
 
-    if (blogId) {
-        blogId.value = "";
+    document.getElementById("blogAuthor").value =
+        "RishtaBox";
+
+    document.getElementById("blogPublished").checked =
+        true;
+
+    if (existingImage) {
+        existingImage.value = "";
     }
 
-    const author =
-        document.getElementById("blogAuthor");
-
-    if (author) {
-        author.value = "RishtaBox";
+    if (imagePreview) {
+        imagePreview.innerHTML = "";
     }
 
-    const published =
-        document.getElementById("blogPublished");
-
-    if (published) {
-        published.checked = true;
-    }
-
-    const formTitle =
-        document.getElementById("blogFormTitle");
-
-    if (formTitle) {
-        formTitle.textContent = "Add Blog";
-    }
+    document.getElementById("blogFormTitle").textContent =
+        "Add Blog";
 
     if (formContainer) {
         formContainer.classList.add("hidden");
     }
 }
 /* =========================================================
-   RENDER BLOGS
+   OPEN BLOG FORM
 ========================================================= */
-
-function renderBlogs(blogs) {
-
-    const container = document.getElementById("blogsContent");
-
-    if (!container) {
-        console.error("blogsContent not found");
-        return;
-    }
-
-    if (!Array.isArray(blogs) || blogs.length === 0) {
-
-        container.innerHTML = `
-            <div class="empty-state">
-                <h3>No Blogs Found</h3>
-                <p>Create your first blog to display it here.</p>
-            </div>
-        `;
-
-        return;
-    }
-
-
-    container.innerHTML = blogs.map(blog => {
-
-        const blogId = Number(blog.id);
-
-        return `
-            <article class="admin-blog-card">
-
-                <div class="admin-blog-image">
-
-                    <img
-                        src="${getAdminBlogImage(blog.image)}"
-                        alt="${escapeHTML(blog.title || "Blog")}"
-                        onerror="
-                            this.onerror=null;
-                            this.src='../Frontend/images/logo.jpeg';
-                        "
-                    >
-
-                </div>
-
-
-                <div class="admin-blog-content">
-
-                    <div class="admin-blog-header">
-
-                        <div>
-
-                            <h3>
-                                ${escapeHTML(blog.title || "Untitled Blog")}
-                            </h3>
-
-                            <p class="admin-blog-author">
-                                By ${escapeHTML(blog.author || "RishtaBox")}
-                            </p>
-
-                        </div>
-
-                        <span class="blog-status-badge ${
-            blog.published ? "published" : "unpublished"
-        }">
-                            ${blog.published ? "Published" : "Unpublished"}
-                        </span>
-
-                    </div>
-
-
-                    <p class="admin-blog-description">
-                        ${escapeHTML(blog.description || "")}
-                    </p>
-
-
-                    <div class="admin-blog-meta">
-
-                        <span>
-                            ${formatAdminBlogDate(blog.createdAt)}
-                        </span>
-
-                        <span>
-                            Blog ID: ${blogId}
-                        </span>
-
-                    </div>
-
-
-                    <div class="admin-blog-actions">
-
-                        <button
-                            type="button"
-                            class="outline-btn"
-                            onclick="editBlog(${blogId})"
-                        >
-                            Edit
-                        </button>
-
-
-                        <button
-                            type="button"
-                            class="danger-btn"
-                            onclick="deleteBlog(${blogId})"
-                        >
-                            Delete
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </article>
-        `;
-
-    }).join("");
-}
-function getAdminBlogImage(image) {
-
-    if (!image) {
-        return "../Frontend/images/logo.jpeg";
-    }
-
-    const value = String(image).trim();
-
-    // Full URL
-    if (
-        value.startsWith("http://") ||
-        value.startsWith("https://")
-    ) {
-        return value;
-    }
-
-    // Absolute path
-    if (value.startsWith("/")) {
-        return value;
-    }
-
-    // Already contains images/
-    if (value.startsWith("images/")) {
-        return `../Frontend/${value}`;
-    }
-
-    // Only filename, for example: wedding.jpg
-    return `../Frontend/images/${value}`;
-}
-function escapeHTML(value) {
-
-    if (value === null || value === undefined) {
-        return "";
-    }
-
-    return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
-function formatAdminBlogDate(date) {
-
-    if (!date) {
-        return "";
-    }
-
-    const parsedDate = new Date(date);
-
-    if (Number.isNaN(parsedDate.getTime())) {
-        return "";
-    }
-
-    return parsedDate.toLocaleDateString("en-IN", {
-        day: "2-digit",
-        month: "long",
-        year: "numeric"
-    });
-}
-
-async function editBlog(blogId) {
-
-    console.log("EDIT BLOG ID:", blogId);
-
-    if (!blogId) {
-        alert("Invalid blog ID.");
-        return;
-    }
-
-    try {
-
-        const token =
-            getToken();
-
-        if (!token) {
-            alert("Admin session expired. Please login again.");
-            return;
-        }
-
-        const response = await fetch(
-            `${API_BASE_URL}/api/blogs/${blogId}`,
-            {
-                method: "GET",
-                headers: {
-                    "Authorization": `Bearer ${token}`,
-                    "Content-Type": "application/json"
-                }
-            }
-        );
-
-        const blog = await response.json();
-
-        if (!response.ok) {
-            throw new Error(
-                blog.message ||
-                `Failed to load blog (${response.status})`
-            );
-        }
-
-        openBlogForm(blog);
-
-    } catch (error) {
-
-        console.error("EDIT BLOG ERROR:", error);
-
-        alert(
-            error.message ||
-            "Unable to load blog for editing."
-        );
-    }
-}
 function openBlogForm(blog = null) {
 
     const formContainer =
@@ -6396,16 +7043,17 @@ function openBlogForm(blog = null) {
     const image =
         document.getElementById("blogImage");
 
+    const existingImage =
+        document.getElementById("blogExistingImage");
+
+    const imagePreview =
+        document.getElementById("blogImagePreview");
+
     const author =
         document.getElementById("blogAuthor");
 
     const published =
         document.getElementById("blogPublished");
-
-    if (!formContainer) {
-        console.error("blogFormContainer not found.");
-        return;
-    }
 
 
     formContainer.classList.remove("hidden");
@@ -6413,13 +7061,14 @@ function openBlogForm(blog = null) {
 
     if (blog) {
 
-        // EDIT MODE
+        formTitle.textContent =
+            "Edit Blog";
 
-        formTitle.textContent = "Edit Blog";
+        blogId.value =
+            blog.id || "";
 
-        blogId.value = blog.id || "";
-
-        title.value = blog.title || "";
+        title.value =
+            blog.title || "";
 
         description.value =
             blog.description || "";
@@ -6427,20 +7076,51 @@ function openBlogForm(blog = null) {
         content.value =
             blog.content || "";
 
-        image.value =
-            blog.image || "";
-
         author.value =
             blog.author || "RishtaBox";
 
         published.checked =
             blog.published !== false;
 
+
+        // Existing image
+        existingImage.value =
+            blog.image || "";
+
+
+        // File input must stay empty
+        image.value = "";
+
+
+        // Preview existing image
+        if (
+            imagePreview &&
+            blog.image
+        ) {
+
+            imagePreview.innerHTML = `
+                <img
+                    src="${getAdminBlogImage(blog.image)}"
+                    alt="Blog Image"
+                    style="
+                        width:180px;
+                        height:120px;
+                        object-fit:cover;
+                        border-radius:10px;
+                        margin-top:10px;
+                    "
+                >
+            `;
+
+        } else if (imagePreview) {
+
+            imagePreview.innerHTML = "";
+        }
+
     } else {
 
-        // ADD MODE
-
-        formTitle.textContent = "Add Blog";
+        formTitle.textContent =
+            "Add Blog";
 
         blogId.value = "";
 
@@ -6452,25 +7132,573 @@ function openBlogForm(blog = null) {
 
         image.value = "";
 
-        author.value = "RishtaBox";
+        existingImage.value = "";
 
-        published.checked = true;
+        author.value =
+            "RishtaBox";
+
+        published.checked =
+            true;
+
+        if (imagePreview) {
+            imagePreview.innerHTML = "";
+        }
+    }
+}
+/* =========================================================
+   IMAGE PREVIEW
+========================================================= */
+
+function setupBlogImagePreview() {
+
+    const imageInput =
+        document.getElementById("blogImage");
+
+    const imagePreview =
+        document.getElementById("blogImagePreview");
+
+
+    if (!imageInput || !imagePreview) {
+
+        console.warn(
+            "Blog image input or preview not found."
+        );
+
+        return;
     }
 
 
-    formContainer.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-    });
-}
-async function deleteBlog(blogId) {
+    imageInput.addEventListener(
+        "change",
+        function () {
 
-    console.log("DELETE BLOG ID:", blogId);
+            const file =
+                this.files &&
+                this.files[0];
+
+
+            if (!file) {
+
+                imagePreview.innerHTML = "";
+
+                return;
+            }
+
+
+            /* =============================================
+               CHECK FILE TYPE
+            ============================================= */
+
+            if (!file.type.startsWith("image/")) {
+
+                alert(
+                    "Please select a valid image file."
+                );
+
+                this.value = "";
+
+                imagePreview.innerHTML = "";
+
+                return;
+            }
+
+
+            /* =============================================
+               CHECK FILE SIZE
+               Maximum: 5 MB
+            ============================================= */
+
+            const maxSize =
+                5 * 1024 * 1024;
+
+
+            if (file.size > maxSize) {
+
+                alert(
+                    "Image size must be less than 5 MB."
+                );
+
+                this.value = "";
+
+                imagePreview.innerHTML = "";
+
+                return;
+            }
+
+
+            /* =============================================
+               CREATE PREVIEW
+            ============================================= */
+
+            const imageURL =
+                URL.createObjectURL(file);
+
+
+            imagePreview.innerHTML = `
+
+<div
+style="
+margin-top:10px;
+"
+>
+
+<p
+class="muted"
+style="
+margin-bottom:6px;
+"
+>
+Selected Image
+</p>
+
+<img
+    src="${imageURL}"
+    alt="Selected Blog Image"
+    style="
+                            width:180px;
+                            height:120px;
+                            object-fit:cover;
+                            border-radius:10px;
+                            display:block;
+                        "
+>
+
+    <p
+        class="muted"
+        style="
+                            margin-top:6px;
+                            font-size:13px;
+                        "
+    >
+        ${escapeHTML(file.name)}
+    </p>
+
+</div>
+
+    `;
+        }
+    );
+}
+
+
+/* =========================================================
+   RENDER BLOGS
+========================================================= */
+
+function renderBlogs(blogs) {
+
+    const container =
+        document.getElementById("blogsContent");
+
+
+    if (!container) {
+
+        console.error(
+            "blogsContent not found"
+        );
+
+        return;
+    }
+
+
+    if (
+        !Array.isArray(blogs) ||
+        blogs.length === 0
+    ) {
+
+        container.innerHTML = `
+
+<div class="empty-state">
+
+    <h3>
+    No Blogs Found
+</h3>
+
+<p>
+    Create your first blog
+    to display it here.
+</p>
+
+</div>
+
+`;
+
+        return;
+    }
+
+
+    container.innerHTML =
+        blogs.map(blog => {
+
+            const blogId =
+                Number(blog.id);
+
+
+            return `
+
+<article
+class="admin-blog-card"
+    >
+
+    <div
+class="admin-blog-image"
+    >
+
+    <img
+src="${getAdminBlogImage(blog.image)}"
+alt="${escapeHTML(
+blog.title ||
+"Blog"
+)}"
+onerror="
+this.onerror=null;
+this.src='../Frontend/images/logo.jpeg';
+"
+>
+
+</div>
+
+
+<div
+    class="admin-blog-content"
+>
+
+    <div
+        class="admin-blog-header"
+    >
+
+        <div>
+
+            <h3>
+                ${escapeHTML(
+                blog.title ||
+                "Untitled Blog"
+            )}
+            </h3>
+
+            <p
+                class="admin-blog-author"
+            >
+                By
+                ${escapeHTML(
+                blog.author ||
+                "RishtaBox"
+            )}
+            </p>
+
+        </div>
+
+
+        <span
+            class="blog-status-badge ${
+                                    blog.published
+                                        ? "published"
+                                        : "unpublished"
+                                }"
+        >
+
+                                ${
+            blog.published
+                ? "Published"
+                : "Unpublished"
+        }
+
+                            </span>
+
+    </div>
+
+
+    <p
+        class="admin-blog-description"
+    >
+        ${escapeHTML(
+        blog.description ||
+        ""
+    )}
+    </p>
+
+
+    <div
+        class="admin-blog-meta"
+    >
+
+                            <span>
+                                ${formatAdminBlogDate(
+                                blog.createdAt
+                            )}
+                            </span>
+
+        <span>
+                                Blog ID:
+                                ${blogId}
+                            </span>
+
+    </div>
+
+
+    <div
+        class="admin-blog-actions"
+    >
+
+        <button
+            type="button"
+            class="outline-btn"
+            onclick="editBlog(${blogId})"
+        >
+            Edit
+        </button>
+
+
+        <button
+            type="button"
+            class="danger-btn"
+            onclick="deleteBlog(${blogId})"
+        >
+            Delete
+        </button>
+
+    </div>
+
+</div>
+
+</article>
+
+`;
+
+        }).join("");
+}
+
+
+/* =========================================================
+   BLOG IMAGE PATH
+========================================================= */
+
+function getAdminBlogImage(image) {
+
+    if (!image) {
+        return "../Frontend/images/logo.jpeg";
+    }
+
+    const value = String(image).trim();
+
+    /* Full URL */
+    if (
+        value.startsWith("http://") ||
+        value.startsWith("https://")
+    ) {
+        return value;
+    }
+
+    /* Backend uploaded image */
+    if (value.startsWith("/uploads/")) {
+        return `${API_BASE_URL}${value}`;
+    }
+
+    /* Backend uploaded image without leading slash */
+    if (value.startsWith("uploads/")) {
+        return `${API_BASE_URL}/${value}`;
+    }
+
+    /* Frontend images */
+    if (value.startsWith("images/")) {
+        return `../Frontend/${value}`;
+    }
+
+    /* Filename only */
+    return `../Frontend/images/${value}`;
+}
+
+/* =========================================================
+   ESCAPE HTML
+========================================================= */
+
+function escapeHTML(value) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
+        return "";
+    }
+
+
+    return String(value)
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+}
+
+
+/* =========================================================
+   BLOG DATE
+========================================================= */
+
+function formatAdminBlogDate(date) {
+
+    if (!date) {
+        return "";
+    }
+
+
+    const parsedDate =
+        new Date(date);
+
+
+    if (
+        Number.isNaN(
+            parsedDate.getTime()
+        )
+    ) {
+
+        return "";
+    }
+
+
+    return parsedDate.toLocaleDateString(
+        "en-IN",
+        {
+            day: "2-digit",
+            month: "long",
+            year: "numeric"
+        }
+    );
+}
+
+
+/* =========================================================
+   EDIT BLOG
+========================================================= */
+
+async function editBlog(blogId) {
+
+    console.log(
+        "EDIT BLOG ID:",
+        blogId
+    );
 
 
     if (!blogId) {
 
-        alert("Invalid blog ID.");
+        alert(
+            "Invalid blog ID."
+        );
+
+        return;
+    }
+
+
+    try {
+
+        const token =
+            getToken();
+
+
+        if (!token) {
+
+            alert(
+                "Admin session expired. Please login again."
+            );
+
+            return;
+        }
+
+
+        const response =
+            await fetch(
+
+                `${API_BASE_URL}/api/blogs/${blogId}`,
+
+                {
+                    method: "GET",
+
+                    headers: {
+
+                        "Authorization":
+                            `Bearer ${token}`,
+
+                        "Content-Type":
+                            "application/json"
+                    }
+                }
+            );
+
+
+        const blog =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+
+                blog.message ||
+
+                `Failed to load blog (${response.status})`
+            );
+        }
+
+
+        openBlogForm(blog);
+
+    }
+
+
+    catch (error) {
+
+        console.error(
+            "EDIT BLOG ERROR:",
+            error
+        );
+
+
+        alert(
+            error.message ||
+            "Unable to load blog for editing."
+        );
+    }
+}
+
+
+/* =========================================================
+   DELETE BLOG
+========================================================= */
+
+async function deleteBlog(blogId) {
+
+    console.log(
+        "DELETE BLOG ID:",
+        blogId
+    );
+
+
+    if (!blogId) {
+
+        alert(
+            "Invalid blog ID."
+        );
 
         return;
     }
@@ -6482,6 +7710,7 @@ async function deleteBlog(blogId) {
             "This action cannot be undone."
         )
     ) {
+
         return;
     }
 
@@ -6503,19 +7732,21 @@ async function deleteBlog(blogId) {
         }
 
 
-        const response = await fetch(
+        const response =
+            await fetch(
 
-            `${API_BASE_URL}/api/blogs/${blogId}`,
+                `${API_BASE_URL}/api/blogs/${blogId}`,
 
-            {
-                method: "DELETE",
+                {
+                    method: "DELETE",
 
-                headers: {
-                    "Authorization":
-                        `Bearer ${token}`
+                    headers: {
+
+                        "Authorization":
+                            `Bearer ${token}`
+                    }
                 }
-            }
-        );
+            );
 
 
         const text =
@@ -6524,10 +7755,18 @@ async function deleteBlog(blogId) {
 
         let data = {};
 
+
         try {
+
             data =
-                text ? JSON.parse(text) : {};
-        } catch {
+                text
+                    ? JSON.parse(text)
+                    : {};
+
+        }
+
+        catch {
+
             data = {};
         }
 
@@ -6535,8 +7774,11 @@ async function deleteBlog(blogId) {
         if (!response.ok) {
 
             throw new Error(
+
                 data.message ||
+
                 text ||
+
                 `Delete failed (${response.status})`
             );
         }
@@ -6549,13 +7791,16 @@ async function deleteBlog(blogId) {
 
         await loadBlogs();
 
+    }
 
-    } catch (error) {
+
+    catch (error) {
 
         console.error(
             "DELETE BLOG ERROR:",
             error
         );
+
 
         alert(
             error.message ||
@@ -6563,34 +7808,26 @@ async function deleteBlog(blogId) {
         );
     }
 }
+
+
 /* =========================================================
-   DATE
+   LOAD BLOGS
 ========================================================= */
-
-function formatDate(value) {
-
-    if (!value) {
-        return "-";
-    }
-
-    try {
-
-        return new Date(value)
-            .toLocaleString("en-IN");
-
-    } catch (error) {
-
-        return String(value);
-    }
-}
 
 async function loadBlogs() {
 
     const container =
-        document.getElementById("blogsContent");
+        document.getElementById(
+            "blogsContent"
+        );
+
 
     if (!container) {
-        console.error("blogsContent not found.");
+
+        console.error(
+            "blogsContent not found."
+        );
+
         return;
     }
 
@@ -6598,9 +7835,11 @@ async function loadBlogs() {
     try {
 
         container.innerHTML = `
+
             <div class="empty-state">
                 Loading blogs...
             </div>
+
         `;
 
 
@@ -6609,26 +7848,44 @@ async function loadBlogs() {
             localStorage.getItem("token");
 
 
-        const response = await fetch(
-            `${API_BASE_URL}/api/blogs/all`,
-            {
-                method: "GET",
+        if (!token) {
 
-                headers: {
-                    "Authorization": `Bearer ${token}`,
-                    "Content-Type": "application/json"
+            throw new Error(
+                "Admin session expired. Please login again."
+            );
+        }
+
+
+        const response =
+            await fetch(
+
+                `${API_BASE_URL}/api/blogs/all`,
+
+                {
+                    method: "GET",
+
+                    headers: {
+
+                        "Authorization":
+                            `Bearer ${token}`,
+
+                        "Content-Type":
+                            "application/json"
+                    }
                 }
-            }
-        );
+            );
 
 
-        const blogs = await response.json();
+        const blogs =
+            await response.json();
 
 
         if (!response.ok) {
 
             throw new Error(
+
                 blogs.message ||
+
                 `Failed to load blogs (${response.status})`
             );
         }
@@ -6636,24 +7893,52 @@ async function loadBlogs() {
 
         renderBlogs(blogs);
 
+    }
 
-    } catch (error) {
 
-        console.error("LOAD BLOGS ERROR:", error);
+    catch (error) {
+
+        console.error(
+            "LOAD BLOGS ERROR:",
+            error
+        );
 
 
         container.innerHTML = `
+
             <div class="empty-state">
-                <h3>Blogs unavailable</h3>
-                <p>${escapeHTML(error.message)}</p>
+
+                <h3>
+                    Blogs unavailable
+                </h3>
+
+                <p>
+                    ${escapeHTML(
+            error.message
+        )}
+                </p>
+
             </div>
+
         `;
     }
 }
+
+
+/* =========================================================
+   SAVE BLOG
+========================================================= */
 async function saveBlog(event) {
 
     event.preventDefault();
 
+    const token =
+        localStorage.getItem("token");
+
+    if (!token) {
+        alert("Please login again.");
+        return;
+    }
 
     const blogId =
         document.getElementById("blogId").value.trim();
@@ -6667,85 +7952,157 @@ async function saveBlog(event) {
     const content =
         document.getElementById("blogContent").value.trim();
 
-    const image =
-        document.getElementById("blogImage").value.trim();
-
     const author =
         document.getElementById("blogAuthor").value.trim();
 
     const published =
         document.getElementById("blogPublished").checked;
 
+    const imageInput =
+        document.getElementById("blogImage");
 
-    if (!title || !description || !content || !image || !author) {
+    const imageFile =
+        imageInput &&
+        imageInput.files &&
+        imageInput.files.length > 0
+            ? imageInput.files[0]
+            : null;
 
-        alert("Please fill all required fields.");
+    const existingImage =
+        document.getElementById("blogExistingImage")
+            ? document.getElementById("blogExistingImage").value.trim()
+            : "";
+
+
+    // =====================================================
+    // VALIDATION
+    // =====================================================
+
+    if (
+        !title ||
+        !description ||
+        !content ||
+        !author
+    ) {
+
+        alert(
+            "Please fill all required fields."
+        );
 
         return;
     }
 
 
-    const token =
-        currentUser?.token ||
-        localStorage.getItem("token");
+    // =====================================================
+    // CREATE BLOG
+    // IMAGE REQUIRED
+    // =====================================================
 
+    if (!blogId && !imageFile) {
 
-    if (!token) {
-
-        alert("Admin session expired. Please login again.");
+        alert(
+            "Please select a blog image."
+        );
 
         return;
     }
-
-
-    const blogData = {
-
-        title: title,
-
-        description: description,
-
-        content: content,
-
-        image: image,
-
-        author: author,
-
-        published: published
-    };
-
-
-    const isEdit =
-        Boolean(blogId);
 
 
     try {
 
-        const response = await fetch(
+        // =================================================
+        // FORM DATA
+        // =================================================
 
-            isEdit
-                ? `${API_BASE_URL}/api/blogs/${blogId}`
-                : `${API_BASE_URL}/api/blogs`,
+        const formData =
+            new FormData();
 
-            {
-
-                method: isEdit
-                    ? "PUT"
-                    : "POST",
-
-                headers: {
-
-                    "Authorization":
-                        `Bearer ${token}`,
-
-                    "Content-Type":
-                        "application/json"
-                },
-
-                body:
-                    JSON.stringify(blogData)
-            }
+        formData.append(
+            "title",
+            title
         );
 
+        formData.append(
+            "description",
+            description
+        );
+
+        formData.append(
+            "content",
+            content
+        );
+
+        formData.append(
+            "author",
+            author
+        );
+
+        formData.append(
+            "published",
+            published
+        );
+
+
+        // =================================================
+        // IMAGE
+        // =================================================
+
+        if (imageFile) {
+
+            formData.append(
+                "image",
+                imageFile
+            );
+
+        } else if (blogId && existingImage) {
+
+            /*
+             * During edit:
+             * No new image selected.
+             * Backend keeps old image.
+             */
+
+        }
+
+
+        // =================================================
+        // API URL
+        // =================================================
+
+        const url =
+            blogId
+                ? `${API_BASE_URL}/api/blogs/${blogId}`
+                : `${API_BASE_URL}/api/blogs`;
+
+        const method =
+            blogId
+                ? "PUT"
+                : "POST";
+
+
+        // =================================================
+        // SAVE BLOG
+        // =================================================
+
+        const response =
+            await fetch(
+                url,
+                {
+                    method: method,
+
+                    headers: {
+                        "Authorization":
+                            `Bearer ${token}`
+                    },
+
+                    body: formData
+                }
+            );
+
+
+        // =================================================
+        // RESPONSE
+        // =================================================
 
         const data =
             await response.json();
@@ -6755,80 +8112,122 @@ async function saveBlog(event) {
 
             throw new Error(
                 data.message ||
-                `Failed to ${isEdit ? "update" : "create"} blog`
+                "Failed to save blog."
             );
         }
 
 
+        // =================================================
+        // SUCCESS
+        // =================================================
+
         alert(
-            isEdit
+            blogId
                 ? "Blog updated successfully."
                 : "Blog created successfully."
         );
 
 
+        // =================================================
+        // CLOSE FORM
+        // =================================================
+
         closeBlogForm();
 
 
-        await loadBlogs();
+        // =================================================
+        // RELOAD BLOGS
+        // =================================================
 
+        await loadBlogs();
 
     } catch (error) {
 
         console.error(
-            "SAVE BLOG ERROR:",
+            "Save blog error:",
             error
         );
 
         alert(
             error.message ||
-            "Unable to save blog."
+            "Something went wrong while saving the blog."
         );
     }
 }
-document.addEventListener("DOMContentLoaded", function () {
-
-    const blogForm =
-        document.getElementById("blogForm");
-
-    if (blogForm) {
-
-        blogForm.addEventListener(
-            "submit",
-            saveBlog
-        );
-    }
-
-});
 /* =========================================================
-   LOAD REVIEWS WHEN SECTION OPENS
+   BLOG FORM EVENTS
 ========================================================= */
 
 document.addEventListener(
     "DOMContentLoaded",
     function () {
 
-        const reviewNavButtons =
-            document.querySelectorAll(
-                '[data-section="reviews"]'
+
+        /* =============================================
+           BLOG FORM
+        ============================================= */
+
+        const blogForm =
+            document.getElementById(
+                "blogForm"
             );
 
-        reviewNavButtons.forEach(button => {
 
-            button.addEventListener(
-                "click",
-                function () {
+        if (blogForm) {
 
-                    setTimeout(
-                        () => loadReviews(),
-                        100
-                    );
-                }
+            blogForm.addEventListener(
+                "submit",
+                saveBlog
             );
-        });
+        }
+
+
+        /* =============================================
+           BLOG IMAGE PREVIEW
+        ============================================= */
+
+        setupBlogImagePreview();
 
     }
 );
+
+
+/* =========================================================
+   LOAD BLOGS WHEN BLOG SECTION OPENS
+========================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const blogNavButtons =
+            document.querySelectorAll(
+                '[data-section="blogs"]'
+            );
+
+
+        blogNavButtons.forEach(
+            button => {
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        setTimeout(
+                            () => loadBlogs(),
+                            100
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+    }
+);
+
+
 /* =========================================================
    REVIEWS MANAGEMENT
 ========================================================= */
@@ -7626,14 +9025,26 @@ async function deleteReview(reviewId) {
    TESTIMONIALS MANAGEMENT
 ========================================================= */
 
-const TESTIMONIAL_API_BASE_URL = "http://localhost:8080";
+const TESTIMONIAL_API_BASE_URL =
+    "http://localhost:8080";
+
 
 let allAdminTestimonials = [];
+
 let currentAdminTestimonials = [];
 
 
+/*
+ * IMPORTANT
+ *
+ * null  = CREATE mode
+ * value = EDIT mode
+ */
+let editingTestimonialId = null;
+
+
 /* =========================================================
-   GET TESTIMONIAL TOKEN
+   GET TOKEN
 ========================================================= */
 
 function getTestimonialToken() {
@@ -7641,23 +9052,34 @@ function getTestimonialToken() {
     return getToken();
 }
 
+
 /* =========================================================
    TESTIMONIAL HEADERS
 ========================================================= */
 
+/*
+ * IMPORTANT:
+ * Do NOT set Content-Type here.
+ *
+ * FormData automatically creates:
+ *
+ * multipart/form-data; boundary=...
+ */
+
 function getTestimonialHeaders() {
 
-    const headers = {
-        "Content-Type": "application/json"
-    };
+    const headers = {};
 
-    const token = getTestimonialToken();
+    const token =
+        getTestimonialToken();
+
 
     if (token) {
 
         headers["Authorization"] =
             "Bearer " + token;
     }
+
 
     return headers;
 }
@@ -7673,8 +9095,10 @@ function escapeTestimonialHTML(value) {
         value === null ||
         value === undefined
     ) {
+
         return "";
     }
+
 
     return String(value)
         .replace(/&/g, "&amp;")
@@ -7682,6 +9106,324 @@ function escapeTestimonialHTML(value) {
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
+}
+
+
+/* =========================================================
+   IMAGE URL
+========================================================= */
+
+function getTestimonialImageUrl(image) {
+
+    if (!image) {
+
+        return "";
+    }
+
+
+    let imageUrl =
+        String(image).trim();
+
+
+    if (
+        imageUrl.startsWith("http://") ||
+        imageUrl.startsWith("https://")
+    ) {
+
+        return imageUrl;
+    }
+
+
+    if (
+        imageUrl.startsWith("/")
+    ) {
+
+        return (
+            TESTIMONIAL_API_BASE_URL +
+            imageUrl
+        );
+    }
+
+
+    return (
+        TESTIMONIAL_API_BASE_URL +
+        "/" +
+        imageUrl
+    );
+}
+
+
+/* =========================================================
+   IMAGE UPLOAD / PREVIEW
+========================================================= */
+
+function setupTestimonialImageUpload() {
+
+    const fileInput =
+        document.getElementById(
+            "testimonialCustomerImageFile"
+        );
+
+
+    const preview =
+        document.getElementById(
+            "testimonialImagePreview"
+        );
+
+
+    const previewImg =
+        document.getElementById(
+            "testimonialImagePreviewImg"
+        );
+
+
+    if (
+        !fileInput ||
+        !preview ||
+        !previewImg
+    ) {
+
+        console.warn(
+            "Testimonial image upload elements not found."
+        );
+
+        return;
+    }
+
+
+    /*
+     * Prevent duplicate event listener
+     */
+
+    if (
+        fileInput.dataset.testimonialBound ===
+        "true"
+    ) {
+
+        return;
+    }
+
+
+    fileInput.dataset.testimonialBound =
+        "true";
+
+
+    fileInput.addEventListener(
+        "change",
+        function () {
+
+            const file =
+                this.files &&
+                this.files.length
+                    ? this.files[0]
+                    : null;
+
+
+            if (!file) {
+
+                return;
+            }
+
+
+            /* =============================================
+               IMAGE TYPE
+            ============================================= */
+
+            if (
+                !file.type ||
+                !file.type.startsWith(
+                    "image/"
+                )
+            ) {
+
+                alert(
+                    "Please choose a valid image file."
+                );
+
+                this.value = "";
+
+                preview.style.display =
+                    "none";
+
+                previewImg.src =
+                    "";
+
+                return;
+            }
+
+
+            /* =============================================
+               IMAGE SIZE
+            ============================================= */
+
+            if (
+                file.size >
+                5 * 1024 * 1024
+            ) {
+
+                alert(
+                    "Image size must be less than 5 MB."
+                );
+
+                this.value = "";
+
+                preview.style.display =
+                    "none";
+
+                previewImg.src =
+                    "";
+
+                return;
+            }
+
+
+            /* =============================================
+               PREVIEW
+            ============================================= */
+
+            const imageURL =
+                URL.createObjectURL(file);
+
+
+            previewImg.src =
+                imageURL;
+
+
+            preview.style.display =
+                "block";
+
+
+            console.log(
+                "TESTIMONIAL IMAGE SELECTED:",
+                file.name
+            );
+        }
+    );
+}
+
+
+/* =========================================================
+   SHOW EXISTING IMAGE
+========================================================= */
+
+function showExistingTestimonialImage(
+    image
+) {
+
+    const preview =
+        document.getElementById(
+            "testimonialImagePreview"
+        );
+
+
+    const previewImg =
+        document.getElementById(
+            "testimonialImagePreviewImg"
+        );
+
+
+    if (
+        !preview ||
+        !previewImg
+    ) {
+
+        return;
+    }
+
+
+    if (!image) {
+
+        preview.style.display =
+            "none";
+
+        previewImg.src =
+            "";
+
+        return;
+    }
+
+
+    const imageUrl =
+        getTestimonialImageUrl(
+            image
+        );
+
+
+    console.log(
+        "TESTIMONIAL IMAGE URL:",
+        imageUrl
+    );
+
+
+    previewImg.onerror =
+        function () {
+
+            console.error(
+                "Unable to load testimonial image:",
+                imageUrl
+            );
+
+            preview.style.display =
+                "none";
+        };
+
+
+    previewImg.onload =
+        function () {
+
+            preview.style.display =
+                "block";
+        };
+
+
+    previewImg.src =
+        imageUrl;
+}
+
+
+/* =========================================================
+   CLEAR IMAGE
+========================================================= */
+
+function clearTestimonialImage() {
+
+    const fileInput =
+        document.getElementById(
+            "testimonialCustomerImageFile"
+        );
+
+
+    const preview =
+        document.getElementById(
+            "testimonialImagePreview"
+        );
+
+
+    const previewImg =
+        document.getElementById(
+            "testimonialImagePreviewImg"
+        );
+
+
+    if (fileInput) {
+
+        fileInput.value =
+            "";
+    }
+
+
+    if (previewImg) {
+
+        previewImg.src =
+            "";
+    }
+
+
+    if (preview) {
+
+        preview.style.display =
+            "none";
+    }
 }
 
 
@@ -7696,6 +9438,7 @@ async function loadTestimonials() {
             "testimonialsContent"
         );
 
+
     if (!container) {
 
         console.error(
@@ -7705,25 +9448,29 @@ async function loadTestimonials() {
         return;
     }
 
+
     const token =
         getTestimonialToken();
+
 
     if (!token) {
 
         container.innerHTML = `
-<div class="empty-state">
-    Admin session expired. Please login again.
-</div>
-`;
+            <div class="empty-state">
+                Admin session expired. Please login again.
+            </div>
+        `;
 
         return;
     }
 
+
     container.innerHTML = `
-<div class="empty-state">
-    Loading testimonials...
-</div>
-`;
+        <div class="empty-state">
+            Loading testimonials...
+        </div>
+    `;
+
 
     try {
 
@@ -7732,59 +9479,58 @@ async function loadTestimonials() {
                 `${TESTIMONIAL_API_BASE_URL}/api/testimonials/admin/all`,
                 {
                     method: "GET",
-                    headers: getTestimonialHeaders()
+
+                    headers:
+                        getTestimonialHeaders()
                 }
             );
 
+
         const responseText =
             await response.text();
+
 
         console.log(
             "Testimonials status:",
             response.status
         );
 
-        console.log(
-            "Testimonials response:",
-            responseText
-        );
 
         if (!response.ok) {
 
-            let message =
+            throw new Error(
                 responseText ||
-                `HTTP ${response.status}`;
-
-            try {
-
-                const errorData =
-                    JSON.parse(responseText);
-
-                message =
-                    errorData.message ||
-                    errorData.error ||
-                    message;
-
-            } catch (error) {}
-
-            throw new Error(message);
+                `HTTP ${response.status}`
+            );
         }
 
+
         let data = [];
+
 
         try {
 
             data =
                 responseText
-                    ? JSON.parse(responseText)
+                    ? JSON.parse(
+                        responseText
+                    )
                     : [];
 
         } catch (error) {
 
-            throw new Error(
-                "Backend returned invalid JSON."
+            console.error(
+                "Unable to parse testimonials JSON:",
+                error
             );
+
+            data = [];
         }
+
+
+        /* =============================================
+           RESPONSE FORMAT
+        ============================================= */
 
         if (Array.isArray(data)) {
 
@@ -7792,14 +9538,18 @@ async function loadTestimonials() {
                 data;
 
         } else if (
-            Array.isArray(data.testimonials)
+            Array.isArray(
+                data.testimonials
+            )
         ) {
 
             currentAdminTestimonials =
                 data.testimonials;
 
         } else if (
-            Array.isArray(data.data)
+            Array.isArray(
+                data.data
+            )
         ) {
 
             currentAdminTestimonials =
@@ -7807,15 +9557,27 @@ async function loadTestimonials() {
 
         } else {
 
-            currentAdminTestimonials = [];
+            currentAdminTestimonials =
+                [];
         }
 
+
         allAdminTestimonials =
-            [...currentAdminTestimonials];
+            [
+                ...currentAdminTestimonials
+            ];
+
+
+        console.log(
+            "LOADED TESTIMONIALS:",
+            currentAdminTestimonials
+        );
+
 
         updateTestimonialStats();
 
         renderTestimonials();
+
 
     } catch (error) {
 
@@ -7824,27 +9586,28 @@ async function loadTestimonials() {
             error
         );
 
+
         container.innerHTML = `
-<div class="empty-state">
+            <div class="empty-state">
 
-    <h3>
-    Testimonials unavailable
-</h3>
+                <h3>
+                    Testimonials unavailable
+                </h3>
 
-<p>
-    ${escapeTestimonialHTML(
-    error.message
-)}
-</p>
+                <p>
+                    ${escapeTestimonialHTML(
+            error.message
+        )}
+                </p>
 
-</div>
-`;
+            </div>
+        `;
     }
 }
 
 
 /* =========================================================
-   TESTIMONIAL STATISTICS
+   TESTIMONIAL STATS
 ========================================================= */
 
 function updateTestimonialStats() {
@@ -7856,8 +9619,10 @@ function updateTestimonialStats() {
             ? currentAdminTestimonials
             : [];
 
+
     const total =
         testimonials.length;
+
 
     const published =
         testimonials.filter(
@@ -7869,6 +9634,7 @@ function updateTestimonialStats() {
                         ""
                     ).toUpperCase();
 
+
                 return (
                     status === "PUBLISHED" ||
                     testimonial.published === true
@@ -7876,8 +9642,10 @@ function updateTestimonialStats() {
             }
         ).length;
 
+
     const hidden =
         total - published;
+
 
     const ratings =
         testimonials
@@ -7889,17 +9657,23 @@ function updateTestimonialStats() {
             )
             .filter(
                 rating =>
-                    Number.isFinite(rating) &&
+                    Number.isFinite(
+                        rating
+                    ) &&
                     rating > 0
             );
 
+
     const average =
-        ratings.length > 0
+        ratings.length
             ? ratings.reduce(
-                (sum, rating) =>
-                    sum + rating,
-                0
-            ) / ratings.length
+            (
+                sum,
+                rating
+            ) =>
+                sum + rating,
+            0
+        ) / ratings.length
             : 0;
 
 
@@ -7908,15 +9682,18 @@ function updateTestimonialStats() {
             "totalTestimonialsCount"
         );
 
+
     const publishedElement =
         document.getElementById(
             "publishedTestimonialsCount"
         );
 
+
     const hiddenElement =
         document.getElementById(
             "hiddenTestimonialsCount"
         );
+
 
     const averageElement =
         document.getElementById(
@@ -7930,17 +9707,20 @@ function updateTestimonialStats() {
             total;
     }
 
+
     if (publishedElement) {
 
         publishedElement.textContent =
             published;
     }
 
+
     if (hiddenElement) {
 
         hiddenElement.textContent =
             hidden;
     }
+
 
     if (averageElement) {
 
@@ -7957,224 +9737,317 @@ function updateTestimonialStats() {
 function renderTestimonials() {
 
     const container =
-        document.getElementById("testimonialsContent");
+        document.getElementById(
+            "testimonialsContent"
+        );
 
-    console.log(
-        "TESTIMONIAL CONTAINER:",
-        container
-    );
-
-    console.log(
-        "TESTIMONIAL DATA:",
-        currentAdminTestimonials
-    );
 
     if (!container) {
 
         console.error(
-            "ERROR: #testimonialsContent does not exist in HTML."
+            "testimonialsContent not found."
         );
 
         return;
     }
 
+
     const testimonials =
-        Array.isArray(currentAdminTestimonials)
+        Array.isArray(
+            currentAdminTestimonials
+        )
             ? currentAdminTestimonials
             : [];
 
-    console.log(
-        "TESTIMONIAL COUNT:",
-        testimonials.length
-    );
 
-    if (testimonials.length === 0) {
+    if (!testimonials.length) {
 
         container.innerHTML = `
-<div class="empty-state">
-    <h3>No testimonials found</h3>
-<p>Add your first customer testimonial.</p>
-</div>
-`;
+            <div class="empty-state">
+
+                <h3>
+                    No testimonials found
+                </h3>
+
+                <p>
+                    Add your first customer testimonial.
+                </p>
+
+            </div>
+        `;
 
         return;
     }
 
+
     let html = `
-<div class="reviews-table-wrapper">
-    <table class="reviews-table">
 
-    <thead>
-    <tr>
-    <th>Customer</th>
-<th>Rating</th>
-<th>Testimonial</th>
-<th>Status</th>
-<th>Date</th>
-<th>Actions</th>
-</tr>
-</thead>
+        <div class="reviews-table-wrapper">
 
-<tbody>
-`;
+            <table class="reviews-table">
 
-testimonials.forEach(testimonial => {
+                <thead>
 
-    const id =
-    testimonial.id;
+                    <tr>
 
-    const name =
-    testimonial.customerName ||
-    "Unknown Customer";
+                        <th>Customer</th>
 
-    const image =
-    testimonial.customerImage ||
-    "";
+                        <th>Rating</th>
 
-    const rating =
-    Number(testimonial.rating || 0);
+                        <th>Testimonial</th>
 
-    const message =
-    testimonial.message ||
-    "";
+                        <th>Status</th>
 
-    const status =
-    String(
-    testimonial.status || "HIDDEN"
-    ).toUpperCase();
+                        <th>Date</th>
 
-    const isPublished =
-    status === "PUBLISHED";
+                        <th>Actions</th>
 
-    const date =
-    testimonial.createdAt
-    ? formatDate(testimonial.createdAt)
-    : "-";
+                    </tr>
 
-    const safeRating =
-    Math.min(
-    5,
-    Math.max(
-    0,
-    rating
-    )
+                </thead>
+
+                <tbody>
+    `;
+
+
+    testimonials.forEach(
+        testimonial => {
+
+            const id =
+                testimonial.id;
+
+
+            const name =
+                testimonial.customerName ||
+                testimonial.name ||
+                "Unknown Customer";
+
+
+            const image =
+                testimonial.customerImage ||
+                testimonial.image ||
+                "";
+
+
+            const rating =
+                Number(
+                    testimonial.rating || 0
+                );
+
+
+            const message =
+                testimonial.message ||
+                testimonial.text ||
+                testimonial.testimonial ||
+                "";
+
+
+            const status =
+                String(
+                    testimonial.status ||
+                    "HIDDEN"
+                ).toUpperCase();
+
+
+            const isPublished =
+                status === "PUBLISHED";
+
+
+            const date =
+                testimonial.createdAt
+                    ? formatDate(
+                        testimonial.createdAt
+                    )
+                    : "-";
+
+
+            const safeRating =
+                Math.min(
+                    5,
+                    Math.max(
+                        0,
+                        Math.round(rating)
+                    )
+                );
+
+
+            const stars =
+                "★".repeat(
+                    safeRating
+                ) +
+                "☆".repeat(
+                    5 - safeRating
+                );
+
+
+            const imageUrl =
+                getTestimonialImageUrl(
+                    image
+                );
+
+
+            html += `
+
+                <tr>
+
+                    <!-- CUSTOMER -->
+
+                    <td>
+
+                        <div style="
+                            display:flex;
+                            align-items:center;
+                            gap:10px;
+                        ">
+
+                            ${
+                image
+                    ? `
+                                        <img
+                                            src="${escapeTestimonialHTML(imageUrl)}"
+                                            alt="${escapeTestimonialHTML(name)}"
+                                            style="
+                                                width:45px;
+                                                height:45px;
+                                                border-radius:50%;
+                                                object-fit:cover;
+                                            "
+                                            onerror="this.style.display='none'"
+                                        >
+                                    `
+                    : ""
+            }
+
+                            <strong>
+                                ${escapeTestimonialHTML(name)}
+                            </strong>
+
+                        </div>
+
+                    </td>
+
+
+                    <!-- RATING -->
+
+                    <td>
+
+                        <span class="review-rating">
+                            ${stars}
+                        </span>
+
+                    </td>
+
+
+                    <!-- TESTIMONIAL -->
+
+                    <td>
+
+                        <div class="review-text">
+                            ${escapeTestimonialHTML(message)}
+                        </div>
+
+                    </td>
+
+
+                    <!-- STATUS -->
+
+                    <td>
+
+                        <span class="
+                            review-status
+                            ${
+                isPublished
+                    ? "approved"
+                    : "pending"
+            }
+                        ">
+
+                            ${
+                isPublished
+                    ? "Published"
+                    : "Hidden"
+            }
+
+                        </span>
+
+                    </td>
+
+
+                    <!-- DATE -->
+
+                    <td>
+                        ${date}
+                    </td>
+
+
+                    <!-- ACTIONS -->
+
+                    <td>
+
+                        <div class="review-actions">
+
+                            <button
+                                type="button"
+                                class="outline-btn"
+                                onclick="editTestimonial('${String(id)}')"
+                            >
+                                Edit
+                            </button>
+
+
+                            <button
+                                type="button"
+                                class="primary-btn"
+                                onclick="updateTestimonialStatus(
+                                    '${String(id)}',
+                                    ${!isPublished}
+                                )"
+                            >
+                                ${
+                isPublished
+                    ? "Hide"
+                    : "Publish"
+            }
+                            </button>
+
+
+                            <button
+                                type="button"
+                                class="danger-btn"
+                                onclick="deleteTestimonial('${String(id)}')"
+                            >
+                                Delete
+                            </button>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+            `;
+        }
     );
 
-    const stars =
-    "★".repeat(safeRating) +
-    "☆".repeat(5 - safeRating);
 
     html += `
-            <tr>
 
-                <td>
-                    <div style="
-                        display:flex;
-                        align-items:center;
-                        gap:10px;
-                    ">
+                </tbody>
 
-                        ${
-    image
-    ? `
-                                    <img
-                                        src="${escapeTestimonialHTML(image)}"
-                                        alt="${escapeTestimonialHTML(name)}"
-                                        style="
-                                            width:45px;
-                                            height:45px;
-                                            border-radius:50%;
-                                            object-fit:cover;
-                                        "
-                                        onerror="this.style.display='none'"
-                                    >
-                                  `
-    : ""
+            </table>
+
+        </div>
+
+    `;
+
+
+    container.innerHTML =
+        html;
 }
-
-                        <strong>
-                            ${escapeTestimonialHTML(name)}
-                        </strong>
-
-                    </div>
-                </td>
-
-                <td>
-                    <span class="review-rating">
-                        ${stars}
-                    </span>
-                </td>
-
-                <td>
-                    <div class="review-text">
-                        ${escapeTestimonialHTML(message)}
-                    </div>
-                </td>
-
-                <td>
-                    <span class="
-                        review-status
-                        ${isPublished ? "approved" : "pending"}
-                    ">
-                        ${isPublished ? "Published" : "Hidden"}
-                    </span>
-                </td>
-
-                <td>
-                    ${date}
-                </td>
-
-                <td>
-                    <div class="review-actions">
-
-                        <button
-                            type="button"
-                            class="outline-btn"
-                            onclick="editTestimonial(${Number(id)})"
-                        >
-                            Edit
-                        </button>
-
-                        <button
-                            type="button"
-                            class="primary-btn"
-                            onclick="updateTestimonialStatus(${Number(id)}, ${!isPublished})"
-                        >
-                            ${isPublished ? "Hide" : "Publish"}
-                        </button>
-
-                        <button
-                            type="button"
-                            class="danger-btn"
-                            onclick="deleteTestimonial(${Number(id)})"
-                        >
-                            Delete
-                        </button>
-
-                    </div>
-                </td>
-
-            </tr>
-        `;
-});
-
-html += `
-</tbody>
-</table>
-</div>
-`;
-
-    container.innerHTML = html;
-
-    console.log(
-        "Testimonials rendered successfully."
-    );
-}
-
 
 
 /* =========================================================
-   OPEN TESTIMONIAL FORM
+   OPEN FORM - ADD
 ========================================================= */
 
 function openTestimonialForm() {
@@ -8184,10 +10057,12 @@ function openTestimonialForm() {
             "testimonialFormContainer"
         );
 
+
     const form =
         document.getElementById(
             "testimonialForm"
         );
+
 
     if (!container || !form) {
 
@@ -8199,28 +10074,86 @@ function openTestimonialForm() {
     }
 
 
+    /*
+     * IMPORTANT:
+     *
+     * Add button always starts CREATE mode.
+     */
+
+    editingTestimonialId =
+        null;
+
+
     form.reset();
 
 
-    document.getElementById(
-        "testimonialId"
-    ).value = "";
+    /* =====================================================
+       CLEAR ID
+    ===================================================== */
+
+    const idInput =
+        document.getElementById(
+            "testimonialId"
+        );
 
 
-    document.getElementById(
-        "testimonialRating"
-    ).value = "5";
+    if (idInput) {
+
+        idInput.value =
+            "";
+    }
 
 
-    document.getElementById(
-        "testimonialStatus"
-    ).value = "PUBLISHED";
+    /* =====================================================
+       CLEAR IMAGE
+    ===================================================== */
 
+    clearTestimonialImage();
+
+
+    /* =====================================================
+       DEFAULT RATING
+    ===================================================== */
+
+    const rating =
+        document.getElementById(
+            "testimonialRating"
+        );
+
+
+    if (rating) {
+
+        rating.value =
+            "5";
+    }
+
+
+    /* =====================================================
+       DEFAULT STATUS
+    ===================================================== */
+
+    const status =
+        document.getElementById(
+            "testimonialStatus"
+        );
+
+
+    if (status) {
+
+        status.value =
+            "PUBLISHED";
+    }
+
+
+    /* =====================================================
+       TITLE
+    ===================================================== */
 
     const title =
         document.getElementById(
             "testimonialFormTitle"
         );
+
 
     if (title) {
 
@@ -8229,31 +10162,69 @@ function openTestimonialForm() {
     }
 
 
-    const message =
+    /* =====================================================
+       MESSAGE
+    ===================================================== */
+
+    const formMessage =
         document.getElementById(
             "testimonialFormMessage"
         );
 
-    if (message) {
 
-        message.textContent =
+    if (formMessage) {
+
+        formMessage.textContent =
             "";
+
+        formMessage.className =
+            "form-message";
     }
 
+
+    /* =====================================================
+       OPEN
+    ===================================================== */
 
     container.classList.remove(
         "hidden"
     );
 
+
+    container.style.setProperty(
+        "display",
+        "block",
+        "important"
+    );
+
+
     container.scrollIntoView({
         behavior: "smooth",
         block: "start"
     });
+
+
+    console.log(
+        "=========================================="
+    );
+
+    console.log(
+        "TESTIMONIAL MODE: CREATE"
+    );
+
+    console.log(
+        "editingTestimonialId:",
+        editingTestimonialId
+    );
+
+    console.log(
+        "=========================================="
+    );
 }
 
 
 /* =========================================================
-   CLOSE TESTIMONIAL FORM
+   CLOSE FORM
 ========================================================= */
 
 function closeTestimonialForm() {
@@ -8263,22 +10234,67 @@ function closeTestimonialForm() {
             "testimonialFormContainer"
         );
 
+
     const form =
         document.getElementById(
             "testimonialForm"
         );
+
 
     if (form) {
 
         form.reset();
     }
 
+
+    clearTestimonialImage();
+
+
+    /* =====================================================
+       CLEAR ID
+    ===================================================== */
+
+    const idInput =
+        document.getElementById(
+            "testimonialId"
+        );
+
+
+    if (idInput) {
+
+        idInput.value =
+            "";
+    }
+
+
+    /*
+     * IMPORTANT:
+     * Closing form means edit mode ends.
+     */
+
+    editingTestimonialId =
+        null;
+
+
+    /* =====================================================
+       CLOSE
+    ===================================================== */
+
     if (container) {
 
         container.classList.add(
             "hidden"
         );
+
+        container.style.removeProperty(
+            "display"
+        );
     }
+
+
+    console.log(
+        "TESTIMONIAL FORM CLOSED"
+    );
 }
 
 
@@ -8288,6 +10304,24 @@ function closeTestimonialForm() {
 
 function editTestimonial(testimonialId) {
 
+    console.log(
+        "=========================================="
+    );
+
+    console.log(
+        "EDIT TESTIMONIAL CLICKED"
+    );
+
+    console.log(
+        "ID RECEIVED:",
+        testimonialId
+    );
+
+
+    /* =====================================================
+       FIND TESTIMONIAL
+    ===================================================== */
+
     const testimonial =
         currentAdminTestimonials.find(
             item =>
@@ -8295,7 +10329,18 @@ function editTestimonial(testimonialId) {
                 String(testimonialId)
         );
 
+
     if (!testimonial) {
+
+        console.error(
+            "TESTIMONIAL NOT FOUND:",
+            testimonialId
+        );
+
+        console.log(
+            "AVAILABLE TESTIMONIALS:",
+            currentAdminTestimonials
+        );
 
         alert(
             "Testimonial not found."
@@ -8305,58 +10350,210 @@ function editTestimonial(testimonialId) {
     }
 
 
-    document.getElementById(
-        "testimonialId"
-    ).value =
-        testimonial.id;
+    console.log(
+        "TESTIMONIAL FOUND:",
+        testimonial
+    );
 
 
-    document.getElementById(
-        "testimonialCustomerName"
-    ).value =
-        testimonial.customerName ||
-        testimonial.name ||
-        "";
+    /* =====================================================
+       SET EDIT MODE
+    ===================================================== */
+
+    editingTestimonialId =
+        String(testimonial.id);
 
 
-    document.getElementById(
-        "testimonialCustomerImage"
-    ).value =
+    console.log(
+        "EDITING TESTIMONIAL ID:",
+        editingTestimonialId
+    );
+
+
+    /* =====================================================
+       FORM CONTAINER
+    ===================================================== */
+
+    const container =
+        document.getElementById(
+            "testimonialFormContainer"
+        );
+
+
+    if (!container) {
+
+        console.error(
+            "testimonialFormContainer NOT FOUND"
+        );
+
+        return;
+    }
+
+
+    /* =====================================================
+       GET INPUTS
+    ===================================================== */
+
+    const idInput =
+        document.getElementById(
+            "testimonialId"
+        );
+
+
+    const nameInput =
+        document.getElementById(
+            "testimonialCustomerName"
+        );
+
+
+    const ratingInput =
+        document.getElementById(
+            "testimonialRating"
+        );
+
+
+    const messageInput =
+        document.getElementById(
+            "testimonialMessage"
+        );
+
+
+    const statusInput =
+        document.getElementById(
+            "testimonialStatus"
+        );
+
+
+    const imageInput =
+        document.getElementById(
+            "testimonialCustomerImageFile"
+        );
+
+
+    /* =====================================================
+       SET ID
+    ===================================================== */
+
+    if (idInput) {
+
+        idInput.value =
+            editingTestimonialId;
+
+
+        console.log(
+            "HIDDEN ID SET:",
+            idInput.value
+        );
+
+    } else {
+
+        console.error(
+            "testimonialId INPUT NOT FOUND"
+        );
+    }
+
+
+    /* =====================================================
+       CUSTOMER NAME
+    ===================================================== */
+
+    if (nameInput) {
+
+        nameInput.value =
+            testimonial.customerName ||
+            testimonial.name ||
+            "";
+    }
+
+
+    /* =====================================================
+       RATING
+    ===================================================== */
+
+    if (ratingInput) {
+
+        ratingInput.value =
+            String(
+                testimonial.rating || 5
+            );
+    }
+
+
+    /* =====================================================
+       MESSAGE
+    ===================================================== */
+
+    if (messageInput) {
+
+        messageInput.value =
+            testimonial.message ||
+            testimonial.text ||
+            testimonial.testimonial ||
+            "";
+    }
+
+
+    /* =====================================================
+       STATUS
+    ===================================================== */
+
+    if (statusInput) {
+
+        statusInput.value =
+            String(
+                testimonial.status ||
+                "PUBLISHED"
+            ).toUpperCase();
+    }
+
+
+    /* =====================================================
+       EXISTING IMAGE
+    ===================================================== */
+
+    const image =
         testimonial.customerImage ||
         testimonial.image ||
         "";
 
 
-    document.getElementById(
-        "testimonialRating"
-    ).value =
-        testimonial.rating || 5;
+    console.log(
+        "EXISTING IMAGE:",
+        image
+    );
 
 
-    document.getElementById(
-        "testimonialMessage"
-    ).value =
-        testimonial.message ||
-        testimonial.text ||
-        testimonial.testimonial ||
-        "";
+    if (
+        typeof showExistingTestimonialImage ===
+        "function"
+    ) {
 
-
-    document.getElementById(
-        "testimonialStatus"
-    ).value =
-        testimonial.status ||
-        (
-            testimonial.published
-                ? "PUBLISHED"
-                : "HIDDEN"
+        showExistingTestimonialImage(
+            image
         );
+    }
 
+
+    /* =====================================================
+       CLEAR NEW FILE
+    ===================================================== */
+
+    if (imageInput) {
+
+        imageInput.value =
+            "";
+    }
+
+
+    /* =====================================================
+       TITLE
+    ===================================================== */
 
     const title =
         document.getElementById(
             "testimonialFormTitle"
         );
+
 
     if (title) {
 
@@ -8365,27 +10562,86 @@ function editTestimonial(testimonialId) {
     }
 
 
-    const container =
+    /* =====================================================
+       CLEAR MESSAGE
+    ===================================================== */
+
+    const formMessage =
         document.getElementById(
-            "testimonialFormContainer"
+            "testimonialFormMessage"
         );
 
-    if (container) {
 
-        container.classList.remove(
-            "hidden"
-        );
+    if (formMessage) {
+
+        formMessage.textContent =
+            "";
+
+        formMessage.className =
+            "form-message";
+    }
+
+
+    /* =====================================================
+       OPEN FORM
+    ===================================================== */
+
+    container.classList.remove(
+        "hidden"
+    );
+
+
+    container.style.setProperty(
+        "display",
+        "block",
+        "important"
+    );
+
+
+    /* =====================================================
+       FINAL ID CHECK
+    ===================================================== */
+
+    console.log(
+        "FINAL HIDDEN ID:",
+        document.getElementById(
+            "testimonialId"
+        )?.value
+    );
+
+
+    console.log(
+        "FINAL EDIT ID:",
+        editingTestimonialId
+    );
+
+
+    /* =====================================================
+       SCROLL
+    ===================================================== */
+
+    setTimeout(() => {
 
         container.scrollIntoView({
             behavior: "smooth",
             block: "start"
         });
-    }
+
+    }, 50);
+
+
+    console.log(
+        "EDIT FORM OPENED"
+    );
+
+    console.log(
+        "=========================================="
+    );
 }
 
 
 /* =========================================================
-   SAVE TESTIMONIAL
+   SAVE / UPDATE TESTIMONIAL
 ========================================================= */
 
 async function saveTestimonial(event) {
@@ -8393,43 +10649,104 @@ async function saveTestimonial(event) {
     event.preventDefault();
 
 
-    const testimonialId =
+    console.log(
+        "=========================================="
+    );
+
+    console.log(
+        "SAVE TESTIMONIAL BUTTON CLICKED"
+    );
+
+
+    /* =====================================================
+       READ HIDDEN ID
+    ===================================================== */
+
+    const hiddenId =
         document.getElementById(
             "testimonialId"
-        ).value.trim();
+        )?.value.trim();
 
+
+    /*
+     * IMPORTANT:
+     *
+     * editingTestimonialId is primary.
+     * hiddenId is fallback.
+     */
+
+    const testimonialId =
+        editingTestimonialId ||
+        hiddenId ||
+        "";
+
+
+    console.log(
+        "EDITING ID VARIABLE:",
+        editingTestimonialId
+    );
+
+
+    console.log(
+        "HIDDEN ID:",
+        hiddenId
+    );
+
+
+    console.log(
+        "FINAL TESTIMONIAL ID:",
+        testimonialId
+    );
+
+
+    /* =====================================================
+       VALUES
+    ===================================================== */
 
     const customerName =
         document.getElementById(
             "testimonialCustomerName"
-        ).value.trim();
-
-
-    const customerImage =
-        document.getElementById(
-            "testimonialCustomerImage"
-        ).value.trim();
+        )?.value.trim();
 
 
     const rating =
         Number(
             document.getElementById(
                 "testimonialRating"
-            ).value
+            )?.value
         );
 
 
     const message =
         document.getElementById(
             "testimonialMessage"
-        ).value.trim();
+        )?.value.trim();
 
 
     const status =
         document.getElementById(
             "testimonialStatus"
-        ).value;
+        )?.value ||
+        "PUBLISHED";
 
+
+    const imageInput =
+        document.getElementById(
+            "testimonialCustomerImageFile"
+        );
+
+
+    const selectedImage =
+        imageInput &&
+        imageInput.files &&
+        imageInput.files.length > 0
+            ? imageInput.files[0]
+            : null;
+
+
+    /* =====================================================
+       VALIDATION
+    ===================================================== */
 
     if (!customerName) {
 
@@ -8452,6 +10769,7 @@ async function saveTestimonial(event) {
 
 
     if (
+        !Number.isFinite(rating) ||
         rating < 1 ||
         rating > 5
     ) {
@@ -8464,6 +10782,45 @@ async function saveTestimonial(event) {
     }
 
 
+    /* =====================================================
+       IMAGE VALIDATION
+    ===================================================== */
+
+    if (selectedImage) {
+
+        if (
+            !selectedImage.type ||
+            !selectedImage.type.startsWith(
+                "image/"
+            )
+        ) {
+
+            alert(
+                "Please choose a valid image."
+            );
+
+            return;
+        }
+
+
+        if (
+            selectedImage.size >
+            5 * 1024 * 1024
+        ) {
+
+            alert(
+                "Image size must be less than 5 MB."
+            );
+
+            return;
+        }
+    }
+
+
+    /* =====================================================
+       TOKEN
+    ===================================================== */
+
     const token =
         getTestimonialToken();
 
@@ -8478,57 +10835,142 @@ async function saveTestimonial(event) {
     }
 
 
-    const testimonialData = {
-
-        customerName:
-            customerName,
-
-        customerImage:
-            customerImage,
-
-        rating:
-            rating,
-
-        message:
-            message,
-
-        status:
-            status,
-
-        published:
-            status === "PUBLISHED"
-    };
-
+    /* =====================================================
+       CREATE OR UPDATE
+    ===================================================== */
 
     const isEdit =
-        Boolean(testimonialId);
+        testimonialId !== "";
 
+
+    const method =
+        isEdit
+            ? "PUT"
+            : "POST";
+
+
+    const url =
+        isEdit
+            ? `${TESTIMONIAL_API_BASE_URL}/api/testimonials/${encodeURIComponent(testimonialId)}`
+            : `${TESTIMONIAL_API_BASE_URL}/api/testimonials`;
+
+
+    console.log(
+        "=========================================="
+    );
+
+
+    console.log(
+        "SAVE MODE:",
+        isEdit
+            ? "UPDATE EXISTING"
+            : "CREATE NEW"
+    );
+
+
+    console.log(
+        "METHOD:",
+        method
+    );
+
+
+    console.log(
+        "URL:",
+        url
+    );
+
+
+    console.log(
+        "ID:",
+        testimonialId
+    );
+
+
+    console.log(
+        "=========================================="
+    );
+
+
+    /* =====================================================
+       FORM DATA
+    ===================================================== */
+
+    const formData =
+        new FormData();
+
+
+    formData.append(
+        "customerName",
+        customerName
+    );
+
+
+    formData.append(
+        "rating",
+        String(rating)
+    );
+
+
+    formData.append(
+        "message",
+        message
+    );
+
+
+    formData.append(
+        "status",
+        status
+    );
+
+
+    /* =====================================================
+       IMAGE
+    ===================================================== */
+
+    if (selectedImage) {
+
+        formData.append(
+            "image",
+            selectedImage
+        );
+
+
+        console.log(
+            "NEW IMAGE SELECTED:",
+            selectedImage.name
+        );
+
+    } else {
+
+        console.log(
+            "NO NEW IMAGE SELECTED"
+        );
+    }
+
+
+    /* =====================================================
+       SEND REQUEST
+    ===================================================== */
 
     try {
 
+        console.log(
+            "SENDING REQUEST..."
+        );
+
+
         const response =
             await fetch(
-
-                isEdit
-
-                    ? `${TESTIMONIAL_API_BASE_URL}/api/testimonials/${testimonialId}`
-
-                    : `${TESTIMONIAL_API_BASE_URL}/api/testimonials`,
-
+                url,
                 {
+                    method: method,
 
-                    method:
-                        isEdit
-                            ? "PUT"
-                            : "POST",
+                    headers: {
+                        "Authorization":
+                            "Bearer " + token
+                    },
 
-                    headers:
-                        getTestimonialHeaders(),
-
-                    body:
-                        JSON.stringify(
-                            testimonialData
-                        )
+                    body: formData
                 }
             );
 
@@ -8538,40 +10980,64 @@ async function saveTestimonial(event) {
 
 
         console.log(
-            "Save testimonial status:",
+            "SAVE STATUS:",
             response.status
         );
 
+
         console.log(
-            "Save testimonial response:",
+            "SAVE RESPONSE:",
             responseText
         );
 
 
+        /* =================================================
+           ERROR
+        ================================================= */
+
         if (!response.ok) {
 
-            let message =
+            let errorMessage =
                 responseText ||
                 `HTTP ${response.status}`;
 
+
             try {
 
-                const data =
+                const errorData =
                     JSON.parse(
                         responseText
                     );
 
-                message =
-                    data.message ||
-                    data.error ||
-                    message;
 
-            } catch (error) {}
+                errorMessage =
+                    errorData.message ||
+                    errorData.error ||
+                    errorMessage;
+
+            } catch (error) {
+
+                console.log(
+                    "Response was not JSON."
+                );
+            }
+
 
             throw new Error(
-                message
+                errorMessage
             );
         }
+
+
+        /* =================================================
+           SUCCESS
+        ================================================= */
+
+        console.log(
+            isEdit
+                ? "TESTIMONIAL UPDATED SUCCESSFULLY"
+                : "TESTIMONIAL CREATED SUCCESSFULLY"
+        );
 
 
         alert(
@@ -8581,8 +11047,24 @@ async function saveTestimonial(event) {
         );
 
 
+        /* =================================================
+           CLEAR EDIT MODE
+        ================================================= */
+
+        editingTestimonialId =
+            null;
+
+
+        /* =================================================
+           CLOSE FORM
+        ================================================= */
+
         closeTestimonialForm();
 
+
+        /* =================================================
+           RELOAD
+        ================================================= */
 
         await loadTestimonials();
 
@@ -8594,16 +11076,22 @@ async function saveTestimonial(event) {
             error
         );
 
+
         alert(
             "Unable to save testimonial.\n\n" +
             error.message
         );
     }
+
+
+    console.log(
+        "=========================================="
+    );
 }
 
 
 /* =========================================================
-   PUBLISH / HIDE TESTIMONIAL
+   PUBLISH / HIDE
 ========================================================= */
 
 async function updateTestimonialStatus(
@@ -8611,100 +11099,79 @@ async function updateTestimonialStatus(
     published
 ) {
 
-    if (!testimonialId) {
+    const token =
+        getTestimonialToken();
+
+
+    if (!token) {
 
         alert(
-            "Testimonial ID is missing."
+            "Admin session expired."
         );
 
         return;
     }
+
 
     const status =
         published
             ? "PUBLISHED"
             : "HIDDEN";
 
-    const token =
-        getTestimonialToken();
-
-    if (!token) {
-
-        alert(
-            "Admin session expired. Please login again."
-        );
-
-        return;
-    }
 
     try {
 
         const response =
             await fetch(
-                `${TESTIMONIAL_API_BASE_URL}/api/testimonials/admin/${testimonialId}/status?status=${encodeURIComponent(status)}`,
-{
-    method: "PUT",
-        headers: getTestimonialHeaders()
+                `${TESTIMONIAL_API_BASE_URL}/api/testimonials/admin/${encodeURIComponent(testimonialId)}/status?status=${encodeURIComponent(status)}`,
+                {
+                    method: "PUT",
+
+                    headers: {
+                        "Authorization":
+                            "Bearer " + token
+                    }
+                }
+            );
+
+
+        const responseText =
+            await response.text();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                responseText ||
+                `HTTP ${response.status}`
+            );
+        }
+
+
+        alert(
+            published
+                ? "Testimonial published successfully."
+                : "Testimonial hidden successfully."
+        );
+
+
+        await loadTestimonials();
+
+
+    } catch (error) {
+
+        console.error(
+            "UPDATE TESTIMONIAL STATUS ERROR:",
+            error
+        );
+
+
+        alert(
+            "Unable to update testimonial.\n\n" +
+            error.message
+        );
+    }
 }
-);
-
-const responseText =
-    await response.text();
-
-console.log(
-    "Update testimonial status:",
-    response.status
-);
-
-console.log(
-    "Update testimonial response:",
-    responseText
-);
-
-if (!response.ok) {
-
-    let message =
-        responseText ||
-        `HTTP ${response.status}`;
-
-    try {
-
-        const errorData =
-            JSON.parse(responseText);
-
-        message =
-            errorData.message ||
-            errorData.error ||
-            message;
-
-    } catch (error) {}
-
-    throw new Error(message);
-}
-
-alert(
-    published
-        ? "Testimonial published successfully."
-        : "Testimonial hidden successfully."
-);
-
-await loadTestimonials();
-
-} catch (error) {
-
-    console.error(
-        "UPDATE TESTIMONIAL STATUS ERROR:",
-        error
-    );
-
-    alert(
-        "Unable to update testimonial.\n\n" +
-        error.message
-    );
-}
-}
-
-
 
 
 /* =========================================================
@@ -8725,14 +11192,25 @@ async function deleteTestimonial(
     }
 
 
-    const confirmed =
-        confirm(
-            "Are you sure you want to permanently delete this testimonial?\n\n" +
-            "This action cannot be undone."
+    if (
+        !confirm(
+            "Are you sure you want to permanently delete this testimonial?"
+        )
+    ) {
+
+        return;
+    }
+
+
+    const token =
+        getTestimonialToken();
+
+
+    if (!token) {
+
+        alert(
+            "Admin session expired."
         );
-
-
-    if (!confirmed) {
 
         return;
     }
@@ -8742,15 +11220,14 @@ async function deleteTestimonial(
 
         const response =
             await fetch(
-
-                `${TESTIMONIAL_API_BASE_URL}/api/testimonials/admin/${testimonialId}`,
-
+                `${TESTIMONIAL_API_BASE_URL}/api/testimonials/admin/${encodeURIComponent(testimonialId)}`,
                 {
-
                     method: "DELETE",
 
-                    headers:
-                        getTestimonialHeaders()
+                    headers: {
+                        "Authorization":
+                            "Bearer " + token
+                    }
                 }
             );
 
@@ -8783,6 +11260,7 @@ async function deleteTestimonial(
             error
         );
 
+
         alert(
             "Unable to delete testimonial.\n\n" +
             error.message
@@ -8792,42 +11270,62 @@ async function deleteTestimonial(
 
 
 /* =========================================================
-   TESTIMONIAL FORM SUBMIT
+   DOM READY
 ========================================================= */
 
 document.addEventListener(
     "DOMContentLoaded",
     function () {
+
+        /* =============================================
+           FORM
+        ============================================= */
 
         const form =
             document.getElementById(
                 "testimonialForm"
             );
 
+
         if (form) {
 
-            form.addEventListener(
-                "submit",
-                saveTestimonial
-            );
+            /*
+             * Prevent duplicate submit listener
+             */
+
+            if (
+                form.dataset.testimonialSubmitBound !==
+                "true"
+            ) {
+
+                form.dataset.testimonialSubmitBound =
+                    "true";
+
+
+                form.addEventListener(
+                    "submit",
+                    saveTestimonial
+                );
+            }
         }
 
-    }
-);
+
+        /* =============================================
+           IMAGE UPLOAD
+        ============================================= */
+
+        setupTestimonialImageUpload();
 
 
-/* =========================================================
-   LOAD WHEN TESTIMONIAL SECTION OPENS
-========================================================= */
-
-document.addEventListener(
-    "DOMContentLoaded",
-    function () {
+        /* =============================================
+           TESTIMONIAL SECTION BUTTONS
+        ============================================= */
 
         const buttons =
             document.querySelectorAll(
                 '[data-section="testimonials"]'
             );
+
 
         buttons.forEach(
             button => {
@@ -8837,88 +11335,59 @@ document.addEventListener(
                     function () {
 
                         setTimeout(
-                            () => {
-                                loadTestimonials();
-                            },
+                            loadTestimonials,
                             100
                         );
                     }
                 );
-
             }
         );
-
     }
 );
 
 
 /* =========================================================
-   MAKE FUNCTIONS AVAILABLE TO HTML
+   WINDOW FUNCTIONS
 ========================================================= */
 
 window.loadTestimonials =
     loadTestimonials;
 
+
 window.openTestimonialForm =
     openTestimonialForm;
+
 
 window.closeTestimonialForm =
     closeTestimonialForm;
 
+
 window.editTestimonial =
     editTestimonial;
+
 
 window.saveTestimonial =
     saveTestimonial;
 
+
 window.updateTestimonialStatus =
     updateTestimonialStatus;
+
 
 window.deleteTestimonial =
     deleteTestimonial;
 
 
-/* =========================================================
-   UPDATE SHOW SECTION
-========================================================= */
+window.setupTestimonialImageUpload =
+    setupTestimonialImageUpload;
 
-/*
- * IMPORTANT:
- * Apne existing showSection() ke sections array mein
- * "testimonials" add karein.
- *
- * Existing:
- *
- * const sections = [
- *     "overview",
- *     "products",
- *     "orders",
- *     "users",
- *     "blogs",
- *     "reviews"
- * ];
- *
- * Isko:
- */
 
-const TESTIMONIAL_SECTION_NAME =
-    "testimonials";
+window.showExistingTestimonialImage =
+    showExistingTestimonialImage;
 
-/* =========================================================
-   MAKE FUNCTIONS AVAILABLE TO HTML
-========================================================= */
 
-window.loadReviews =
-    loadReviews;
-
-window.updateReviewStatus =
-    updateReviewStatus;
-
-window.deleteReview =
-    deleteReview;
-
-window.renderReviewStars =
-    renderReviewStars;
+window.clearTestimonialImage =
+    clearTestimonialImage;
 /* =========================================================
    CHANGE USER ROLE
 ========================================================= */

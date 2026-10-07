@@ -799,6 +799,12 @@ async function initializeApp() {
     // =====================================================
 
     loadHomepageSliders();
+
+    // =====================================================
+// LOAD BLOGS
+// =====================================================
+
+    loadBlogs();
     // =====================================================
     // RENDER NAVIGATION DROPDOWNS
     // =====================================================
@@ -7980,9 +7986,24 @@ async function loadBlogs() {
 
     try {
 
-        const response = await fetch(
-            `${API_BASE_URL}/api/blogs`
-        );
+        if (blogsContainer) {
+
+            blogsContainer.innerHTML = `
+                <div class="blog-loading">
+                    Loading blogs...
+                </div>
+            `;
+        }
+
+
+        const response =
+            await fetch(
+                `${API_BASE_URL}/api/blogs`,
+                {
+                    method: "GET",
+                    cache: "no-store"
+                }
+            );
 
 
         if (!response.ok) {
@@ -7994,7 +8015,8 @@ async function loadBlogs() {
         }
 
 
-        const blogs = await response.json();
+        const blogs =
+            await response.json();
 
 
         publishedBlogs =
@@ -8029,7 +8051,10 @@ async function loadBlogs() {
                 </h3>
 
                 <p>
-                    Please try again later.
+                    ${escapeBlogHTML(
+            error.message ||
+            "Please try again later."
+        )}
                 </p>
 
             </div>
@@ -8121,18 +8146,34 @@ function renderBlogs() {
 
     /* =====================================================
        HOME BLOGS
-       ONLY FIRST 3
     ===================================================== */
+
     if (container) {
 
-        container.innerHTML = publishedBlogs
-            .map(function (blog) {
-                return createBlogCard(blog);
-            })
-            .join("");
+        container.innerHTML =
+            publishedBlogs
+                .map(function (blog) {
 
-        startBlogAutoScroll();
+                    return createBlogCard(blog);
+
+                })
+                .join("");
+
+
+        /*
+         * Start auto scroll only
+         * after cards are rendered.
+         */
+
+        setTimeout(function () {
+
+            startBlogAutoScroll();
+
+        }, 100);
+
     }
+
+
     /* =====================================================
        ALL BLOGS
     ===================================================== */
@@ -8169,25 +8210,30 @@ function createBlogCard(blog) {
 
     const title =
         escapeBlogHTML(
-            blog.title || "RishtaBox Blog"
+            blog.title ||
+            "RishtaBox Blog"
         );
 
 
     const description =
         escapeBlogHTML(
-            blog.description || ""
+            blog.description ||
+            ""
         );
 
 
     const author =
         escapeBlogHTML(
-            blog.author || "RishtaBox"
+            blog.author ||
+            "RishtaBox"
         );
 
 
     const date =
         escapeBlogHTML(
-            formatBlogDate(blog.createdAt)
+            formatBlogDate(
+                blog.createdAt
+            )
         );
 
 
@@ -8207,6 +8253,7 @@ function createBlogCard(blog) {
                     alt="${title}"
                     class="blog-image"
                     loading="lazy"
+                    decoding="async"
                     onerror="
                         this.onerror=null;
                         this.src='images/logo.jpeg';
@@ -8224,23 +8271,32 @@ function createBlogCard(blog) {
                 <div class="blog-meta">
 
                     <span class="blog-date">
+
                         ${date}
+
                     </span>
 
+
                     <span class="blog-author">
+
                         By ${author}
+
                     </span>
 
                 </div>
 
 
                 <h3>
+
                     ${title}
+
                 </h3>
 
 
                 <p>
+
                     ${description}
+
                 </p>
 
 
@@ -8261,242 +8317,338 @@ function createBlogCard(blog) {
     `;
 
 }
+
+
 /* =========================================================
    INFINITE BLOG AUTO SCROLL
-   1 → 2 → 3 → 4 → 5 → ... → 1
 ========================================================= */
 
 let blogAutoScrollInterval = null;
+
 let blogScrollPaused = false;
+
 
 function startBlogAutoScroll() {
 
     const container =
-        document.getElementById("blogsContainer");
+        document.getElementById(
+            "blogsContainer"
+        );
 
-    if (!container) return;
 
-    if (blogAutoScrollInterval) {
-        clearInterval(blogAutoScrollInterval);
+    if (!container) {
+
+        return;
+
     }
 
-    blogAutoScrollInterval = setInterval(function () {
 
-        if (blogScrollPaused) return;
+    if (blogAutoScrollInterval) {
 
-        const cards =
-            container.querySelectorAll(".blog-card");
+        clearInterval(
+            blogAutoScrollInterval
+        );
 
-        if (cards.length <= 3) {
-            return;
-        }
+    }
 
-        const firstCard = cards[0];
 
-        const gap =
-            parseFloat(
-                window.getComputedStyle(container).gap
-            ) || 0;
+    blogAutoScrollInterval =
+        setInterval(function () {
 
-        const cardWidth =
-            firstCard.getBoundingClientRect().width + gap;
+            if (blogScrollPaused) {
 
-        const maxScroll =
-            container.scrollWidth -
-            container.clientWidth;
+                return;
 
-        /*
-         * Move one blog at a time
-         */
-        if (container.scrollLeft < maxScroll - 5) {
+            }
 
-            container.scrollBy({
-                left: cardWidth,
-                behavior: "smooth"
-            });
 
-        } else {
+            const cards =
+                container.querySelectorAll(
+                    ".blog-card"
+                );
 
-            /*
-             * All blogs completed
-             * Start again from Blog 1
-             */
-            container.scrollTo({
-                left: 0,
-                behavior: "smooth"
-            });
-        }
 
-    }, 3000);
+            if (cards.length <= 3) {
+
+                return;
+
+            }
+
+
+            const firstCard =
+                cards[0];
+
+
+            if (!firstCard) {
+
+                return;
+
+            }
+
+
+            const gap =
+                parseFloat(
+                    window
+                        .getComputedStyle(
+                            container
+                        )
+                        .gap
+                ) || 0;
+
+
+            const cardWidth =
+                firstCard
+                    .getBoundingClientRect()
+                    .width +
+                gap;
+
+
+            const maxScroll =
+                container.scrollWidth -
+                container.clientWidth;
+
+
+            if (
+                container.scrollLeft <
+                maxScroll - 5
+            ) {
+
+                container.scrollBy({
+
+                    left: cardWidth,
+
+                    behavior: "smooth"
+
+                });
+
+            } else {
+
+                container.scrollTo({
+
+                    left: 0,
+
+                    behavior: "smooth"
+
+                });
+
+            }
+
+        }, 3000);
+
 }
+
+
+/* =========================================================
+   STOP AUTO SCROLL
+========================================================= */
+
 function stopBlogAutoScroll() {
 
     if (blogAutoScrollInterval) {
 
-        clearInterval(blogAutoScrollInterval);
+        clearInterval(
+            blogAutoScrollInterval
+        );
 
         blogAutoScrollInterval = null;
+
     }
+
 }
+
+
 /* =========================================================
-   PAUSE ON USER INTERACTION
+   PAUSE AUTO SCROLL
 ========================================================= */
 
 function pauseBlogAutoScroll() {
 
     blogScrollPaused = true;
+
 }
 
+
+/* =========================================================
+   RESUME AUTO SCROLL
+========================================================= */
 
 function resumeBlogAutoScroll() {
 
     blogScrollPaused = false;
+
 }
 
 
 /* =========================================================
    BLOG SCROLL EVENTS
+   ONLY ONE DOM CONTENT LISTENER
 ========================================================= */
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
 
-    const container =
-        document.getElementById("blogsContainer");
+        const container =
+            document.getElementById(
+                "blogsContainer"
+            );
 
-    if (!container) return;
 
-    container.addEventListener(
-        "mouseenter",
-        pauseBlogAutoScroll
-    );
+        if (!container) {
 
-    container.addEventListener(
-        "mouseleave",
-        resumeBlogAutoScroll
-    );
+            return;
 
-    container.addEventListener(
-        "touchstart",
-        pauseBlogAutoScroll,
-        { passive: true }
-    );
+        }
 
-    container.addEventListener(
-        "touchend",
-        function () {
 
-            setTimeout(function () {
-                resumeBlogAutoScroll();
-            }, 1500);
+        /* Mouse */
 
-        },
-        { passive: true }
-    );
+        container.addEventListener(
+            "mouseenter",
+            pauseBlogAutoScroll
+        );
 
-    startBlogAutoScroll();
-});
 
-/* Mouse interaction */
-document.addEventListener("DOMContentLoaded", function () {
+        container.addEventListener(
+            "mouseleave",
+            resumeBlogAutoScroll
+        );
 
-    const container =
-        document.getElementById("blogsContainer");
 
-    if (!container) return;
+        /* Mobile touch */
 
-    container.addEventListener(
-        "mouseenter",
-        pauseBlogAutoScroll
-    );
+        container.addEventListener(
+            "touchstart",
+            pauseBlogAutoScroll,
+            {
+                passive: true
+            }
+        );
 
-    container.addEventListener(
-        "mouseleave",
-        resumeBlogAutoScroll
-    );
 
-    /* Mobile touch */
-    container.addEventListener(
-        "touchstart",
-        pauseBlogAutoScroll,
-        { passive: true }
-    );
+        container.addEventListener(
+            "touchend",
+            function () {
 
-    container.addEventListener(
-        "touchend",
-        function () {
+                setTimeout(
+                    function () {
 
-            setTimeout(function () {
-                resumeBlogAutoScroll();
-            }, 5000);
+                        resumeBlogAutoScroll();
 
-        },
-        { passive: true }
-    );
+                    },
+                    1500
+                );
 
-    startBlogAutoScroll();
-});
+            },
+            {
+                passive: true
+            }
+        );
+
+    }
+);
+
 
 /* =========================================================
    OPEN BLOG
 ========================================================= */
+
 async function openBlog(blogId) {
 
-    console.log("OPEN BLOG ID:", blogId);
+    console.log(
+        "OPEN BLOG ID:",
+        blogId
+    );
+
+
+    currentBlogId =
+        Number(blogId);
+
 
     const detailsSection =
-        document.getElementById("blogDetailsSection");
+        document.getElementById(
+            "blogDetailsSection"
+        );
+
 
     const detailsContent =
-        document.getElementById("blogDetailsContent");
+        document.getElementById(
+            "blogDetailsContent"
+        );
+
 
     if (!detailsSection) {
-        console.error("blogDetailsSection NOT FOUND");
+
+        console.error(
+            "blogDetailsSection NOT FOUND"
+        );
+
         return;
+
     }
+
 
     if (!detailsContent) {
-        console.error("blogDetailsContent NOT FOUND");
+
+        console.error(
+            "blogDetailsContent NOT FOUND"
+        );
+
         return;
+
     }
 
 
     /* =====================================================
-       SHOW BLOG DETAILS
+       SHOW DETAILS
     ===================================================== */
 
-    detailsSection.style.display = "block";
+    detailsSection.style.display =
+        "block";
 
 
     /* =====================================================
-       TEMPORARY LOADING
+       LOADING
     ===================================================== */
 
     detailsContent.innerHTML = `
+
         <div class="blog-loading">
+
             Loading blog...
+
         </div>
+
     `;
 
 
     /* =====================================================
-       SCROLL DIRECTLY TO BLOG DETAILS
+       SCROLL TO DETAILS
     ===================================================== */
 
     detailsSection.scrollIntoView({
+
         behavior: "smooth",
+
         block: "start"
+
     });
 
 
     /* =====================================================
-       LOAD BLOG FROM BACKEND
+       LOAD BLOG
     ===================================================== */
 
     try {
 
-        const response = await fetch(
-            `${API_BASE_URL}/api/blogs/${blogId}`
-        );
+        const response =
+            await fetch(
+                `${API_BASE_URL}/api/blogs/${blogId}`,
+                {
+                    method: "GET",
+                    cache: "no-store"
+                }
+            );
 
 
         console.log(
@@ -8505,7 +8657,8 @@ async function openBlog(blogId) {
         );
 
 
-        const data = await response.json();
+        const data =
+            await response.json();
 
 
         console.log(
@@ -8517,32 +8670,34 @@ async function openBlog(blogId) {
         if (!response.ok) {
 
             throw new Error(
+
                 data.message ||
                 `Blog not found (${response.status})`
+
             );
 
         }
 
 
-        /* =================================================
-           RENDER BLOG
-        ================================================= */
-
-        renderBlogDetails(data);
+        renderBlogDetails(
+            data
+        );
 
 
-        /* =================================================
-           SCROLL TO TOP OF BLOG DETAILS AGAIN
-        ================================================= */
+        setTimeout(
+            function () {
 
-        setTimeout(function () {
+                detailsSection.scrollIntoView({
 
-            detailsSection.scrollIntoView({
-                behavior: "smooth",
-                block: "start"
-            });
+                    behavior: "smooth",
 
-        }, 100);
+                    block: "start"
+
+                });
+
+            },
+            100
+        );
 
 
     } catch (error) {
@@ -8562,8 +8717,11 @@ async function openBlog(blogId) {
                 </h2>
 
                 <p>
-                    ${escapeBlogHTML(error.message)}
+                    ${escapeBlogHTML(
+            error.message
+        )}
                 </p>
+
 
                 <button
                     type="button"
@@ -8577,11 +8735,16 @@ async function openBlog(blogId) {
             </div>
 
         `;
+
     }
+
 }
+
+
 /* =========================================================
    RENDER BLOG DETAILS
 ========================================================= */
+
 function renderBlogDetails(blog) {
 
     console.log(
@@ -8603,16 +8766,20 @@ function renderBlogDetails(blog) {
         );
 
         return;
+
     }
 
 
     const imageUrl =
-        getBlogImageUrl(blog.image);
+        getBlogImageUrl(
+            blog.image
+        );
 
 
     container.innerHTML = `
 
-        <article class="blog-details">
+        <article
+            class="blog-details">
 
 
             <button
@@ -8628,9 +8795,12 @@ function renderBlogDetails(blog) {
             <img
                 src="${escapeBlogHTML(imageUrl)}"
                 alt="${escapeBlogHTML(
-        blog.title || "Blog"
+        blog.title ||
+        "Blog"
     )}"
                 class="blog-details-image"
+                loading="lazy"
+                decoding="async"
                 onerror="
                     this.onerror=null;
                     this.src='images/logo.jpeg';
@@ -8638,47 +8808,59 @@ function renderBlogDetails(blog) {
             >
 
 
-            <span class="blog-details-date">
+            <span
+                class="blog-details-date">
 
                 ${escapeBlogHTML(
-        formatBlogDate(blog.createdAt)
+        formatBlogDate(
+            blog.createdAt
+        )
     )}
 
             </span>
 
 
-            <h1 class="blog-details-title">
+            <h1
+                class="blog-details-title">
 
                 ${escapeBlogHTML(
-        blog.title || ""
+        blog.title ||
+        ""
     )}
 
             </h1>
 
 
-            <div class="blog-details-meta">
+            <div
+                class="blog-details-meta">
 
                 By
+
                 ${escapeBlogHTML(
-        blog.author || "RishtaBox"
+        blog.author ||
+        "RishtaBox"
     )}
 
             </div>
 
 
-            <div class="blog-details-description">
+            <div
+                class="blog-details-description">
 
                 ${escapeBlogHTML(
-        blog.description || ""
+        blog.description ||
+        ""
     )}
 
             </div>
 
 
-            <div class="blog-details-text">
+            <div
+                class="blog-details-text">
 
                 ${escapeBlogHTML(
-        blog.content || ""
+        blog.content ||
+        ""
     )}
 
             </div>
@@ -8694,6 +8876,8 @@ function renderBlogDetails(blog) {
     );
 
 }
+
+
 /* =========================================================
    BLOG IMAGE PATH
 ========================================================= */
@@ -8711,7 +8895,9 @@ function getBlogImageUrl(image) {
         String(image).trim();
 
 
-    /* Full URL */
+    /* =====================================================
+       FULL URL
+    ===================================================== */
 
     if (
         value.startsWith("http://") ||
@@ -8723,16 +8909,37 @@ function getBlogImageUrl(image) {
     }
 
 
-    /* Absolute path */
+    /* =====================================================
+       BACKEND UPLOAD
+       Example:
+       /uploads/blogs/image.jpg
+    ===================================================== */
 
-    if (value.startsWith("/")) {
+    if (
+        value.startsWith("/uploads/")
+    ) {
 
-        return value;
+        return `${API_BASE_URL}${value}`;
 
     }
 
 
-    /* Already contains images/ */
+    /* =====================================================
+       BACKEND UPLOAD WITHOUT /
+    ===================================================== */
+
+    if (
+        value.startsWith("uploads/")
+    ) {
+
+        return `${API_BASE_URL}/${value}`;
+
+    }
+
+
+    /* =====================================================
+       FRONTEND IMAGE
+    ===================================================== */
 
     if (
         value.startsWith("images/")
@@ -8743,36 +8950,56 @@ function getBlogImageUrl(image) {
     }
 
 
-    /* Filename stored in database */
+    /* =====================================================
+       ONLY FILE NAME
+    ===================================================== */
 
     return `images/${value}`;
 
 }
+
+
+/* =========================================================
+   CLOSE BLOG DETAILS
+========================================================= */
+
 function closeBlogDetails() {
 
     const detailsSection =
-        document.getElementById("blogDetailsSection");
+        document.getElementById(
+            "blogDetailsSection"
+        );
+
 
     if (detailsSection) {
-        detailsSection.style.display = "none";
+
+        detailsSection.style.display =
+            "none";
+
     }
 
 
-    /* Scroll back to Blog section */
-
     const blogSection =
-        document.getElementById("blogs");
+        document.getElementById(
+            "blogs"
+        );
+
 
     if (blogSection) {
 
         blogSection.scrollIntoView({
+
             behavior: "smooth",
+
             block: "start"
+
         });
 
     }
 
 }
+
+
 /* =========================================================
    ESCAPE HTML
 ========================================================= */
@@ -8826,7 +9053,9 @@ function escapeBlogHTML(value) {
 function formatBlogDate(date) {
 
     if (!date) {
+
         return "";
+
     }
 
 
@@ -8846,24 +9075,28 @@ function formatBlogDate(date) {
 
 
     return parsedDate.toLocaleDateString(
+
         "en-IN",
+
         {
             day: "2-digit",
             month: "long",
             year: "numeric"
         }
+
     );
 
 }
 
 
 /* =========================================================
-   LOAD SECTIONS
+   LOAD BLOGS ON PAGE LOAD
 ========================================================= */
 
 document.addEventListener(
     "DOMContentLoaded",
     function () {
+
 
         /* Existing testimonial system */
 
@@ -8877,7 +9110,7 @@ document.addEventListener(
         }
 
 
-        /* Backend blogs */
+        /* Load customer blogs */
 
         loadBlogs();
 
@@ -8892,15 +9125,37 @@ document.addEventListener(
 window.loadBlogs =
     loadBlogs;
 
+
 window.renderBlogs =
     renderBlogs;
+
+
+window.createBlogCard =
+    createBlogCard;
+
 
 window.openBlog =
     openBlog;
 
+
 window.renderBlogDetails =
     renderBlogDetails;
 
+
+window.closeBlogDetails =
+    closeBlogDetails;
+
+
+window.getBlogImageUrl =
+    getBlogImageUrl;
+
+
+window.startBlogAutoScroll =
+    startBlogAutoScroll;
+
+
+window.stopBlogAutoScroll =
+    stopBlogAutoScroll;
 // ===============================
 // LOAD RELATIONSHIPS FROM BACKEND
 // ===============================

@@ -6,7 +6,9 @@ import com.rishtabox.backend.service.BlogService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -17,13 +19,17 @@ public class BlogController {
 
     private final BlogService blogService;
 
-    public BlogController(BlogService blogService) {
+    public BlogController(
+            BlogService blogService
+    ) {
         this.blogService = blogService;
     }
 
-    // =========================================================
+
+    // =====================================================
     // GET PUBLISHED BLOGS
-    // =========================================================
+    // FRONTEND
+    // =====================================================
 
     @GetMapping
     public ResponseEntity<List<Blog>> getPublishedBlogs() {
@@ -33,9 +39,11 @@ public class BlogController {
         );
     }
 
-    // =========================================================
+
+    // =====================================================
     // GET ALL BLOGS
-    // =========================================================
+    // ADMIN
+    // =====================================================
 
     @GetMapping("/all")
     public ResponseEntity<List<Blog>> getAllBlogs() {
@@ -45,13 +53,15 @@ public class BlogController {
         );
     }
 
-    // =========================================================
+
+    // =====================================================
     // GET BLOG BY ID
-    // =========================================================
+    // =====================================================
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getBlogById(
-            @PathVariable Long id) {
+            @PathVariable Long id
+    ) {
 
         try {
 
@@ -63,24 +73,60 @@ public class BlogController {
 
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
-                    .body(Map.of(
-                            "message",
-                            exception.getMessage()
-                    ));
+                    .body(
+                            Map.of(
+                                    "message",
+                                    exception.getMessage()
+                            )
+                    );
         }
     }
 
-    // =========================================================
-    // CREATE BLOG
-    // =========================================================
 
-    @PostMapping
+    // =====================================================
+    // CREATE BLOG
+    // IMAGE REQUIRED
+    // =====================================================
+
+    @PostMapping(
+            consumes = "multipart/form-data"
+    )
     public ResponseEntity<?> createBlog(
-            @RequestBody Blog blog) {
+
+            @RequestParam("title")
+            String title,
+
+            @RequestParam("description")
+            String description,
+
+            @RequestParam("content")
+            String content,
+
+            @RequestParam("image")
+            MultipartFile image,
+
+            @RequestParam("author")
+            String author,
+
+            @RequestParam(
+                    value = "published",
+                    required = false
+            )
+            Boolean published
+
+    ) throws IOException {
 
         try {
 
-            Blog savedBlog = blogService.createBlog(blog);
+            Blog savedBlog =
+                    blogService.createBlog(
+                            title,
+                            description,
+                            content,
+                            image,
+                            author,
+                            published
+                    );
 
             return ResponseEntity
                     .status(HttpStatus.CREATED)
@@ -90,47 +136,94 @@ public class BlogController {
 
             return ResponseEntity
                     .badRequest()
-                    .body(Map.of(
-                            "message",
-                            exception.getMessage()
-                    ));
+                    .body(
+                            Map.of(
+                                    "message",
+                                    exception.getMessage()
+                            )
+                    );
         }
     }
 
-    // =========================================================
-    // UPDATE BLOG
-    // =========================================================
 
-    @PutMapping("/{id}")
+    // =====================================================
+    // UPDATE BLOG
+    // IMAGE OPTIONAL
+    // =====================================================
+
+    @PutMapping(
+            value = "/{id}",
+            consumes = "multipart/form-data"
+    )
     public ResponseEntity<?> updateBlog(
+
             @PathVariable Long id,
-            @RequestBody Blog blog) {
+
+            @RequestParam("title")
+            String title,
+
+            @RequestParam("description")
+            String description,
+
+            @RequestParam("content")
+            String content,
+
+            @RequestParam(
+                    value = "image",
+                    required = false
+            )
+            MultipartFile image,
+
+            @RequestParam("author")
+            String author,
+
+            @RequestParam(
+                    value = "published",
+                    required = false
+            )
+            Boolean published
+
+    ) throws IOException {
 
         try {
 
             Blog updatedBlog =
-                    blogService.updateBlog(id, blog);
+                    blogService.updateBlog(
+                            id,
+                            title,
+                            description,
+                            content,
+                            image,
+                            author,
+                            published
+                    );
 
-            return ResponseEntity.ok(updatedBlog);
+            return ResponseEntity.ok(
+                    updatedBlog
+            );
 
         } catch (RuntimeException exception) {
 
             return ResponseEntity
                     .badRequest()
-                    .body(Map.of(
-                            "message",
-                            exception.getMessage()
-                    ));
+                    .body(
+                            Map.of(
+                                    "message",
+                                    exception.getMessage()
+                            )
+                    );
         }
     }
 
-    // =========================================================
+
+    // =====================================================
     // DELETE BLOG
-    // =========================================================
+    // =====================================================
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteBlog(
-            @PathVariable Long id) {
+            @PathVariable Long id
+    ) {
 
         try {
 
@@ -147,10 +240,12 @@ public class BlogController {
 
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
-                    .body(Map.of(
-                            "message",
-                            exception.getMessage()
-                    ));
+                    .body(
+                            Map.of(
+                                    "message",
+                                    exception.getMessage()
+                            )
+                    );
         }
     }
 }

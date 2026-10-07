@@ -480,14 +480,25 @@
 
                                 <div class="form-group">
 
-                                    <label for="productImage">
-                                        Image URL
+                                    <label for="productImageFile">
+                                        Product Image
                                     </label>
 
-                                    <input type="text" id="productImage" placeholder="images/product.jpg" required>
+                                    <input
+                                            type="file"
+                                            id="productImageFile"
+                                            accept="image/*"
+                                    >
+
+                                    <small class="muted">
+                                        JPG, PNG, WEBP image upload karein.
+                                    </small>
+
+                                    <div id="productImagePreview" style="margin-top:10px;"></div>
 
                                 </div>
 
+                                <input type="hidden" id="productImage">
 
                                 <div class="form-group">
 
@@ -1148,12 +1159,23 @@
                                 <div class="form-group">
 
                                     <label for="blogImage">
-                                        Image
+                                        Blog Image
                                     </label>
 
-                                    <input type="text" id="blogImage" placeholder="images/blog.jpg" required>
+                                    <input
+                                            type="file"
+                                            id="blogImage"
+                                            accept="image/*"
+                                    >
+
+                                    <div id="blogImagePreview" class="image-preview"></div>
+
+                                    <p class="muted">
+                                        Choose a JPG, PNG or WebP image from your computer.
+                                    </p>
 
                                 </div>
+
 
 
                                 <div class="form-group">
@@ -1773,45 +1795,74 @@
 
                             <form id="testimonialForm">
 
-                                <input type="hidden" id="testimonialId">
-
-
                                 <!-- CUSTOMER NAME -->
-
                                 <div class="form-group">
 
                                     <label for="testimonialCustomerName">
                                         Customer Name
                                     </label>
 
-                                    <input type="text" id="testimonialCustomerName" placeholder="Enter customer name"
-                                        required>
+                                    <input
+                                            type="text"
+                                            id="testimonialCustomerName"
+                                            placeholder="Enter customer name"
+                                            required
+                                    >
 
                                 </div>
 
 
-                                <!-- CUSTOMER IMAGE -->
-
+                                <!-- CUSTOMER PHOTO -->
                                 <div class="form-group">
 
-                                    <label for="testimonialCustomerImage">
+                                    <label for="testimonialCustomerImageFile">
                                         Customer Photo
                                     </label>
 
-                                    <input type="text" id="testimonialCustomerImage" placeholder="images/customer.jpg">
+                                    <input
+                                            type="file"
+                                            id="testimonialCustomerImageFile"
+                                            accept="image/*"
+                                    >
+
+                                    <!-- IMAGE PREVIEW -->
+                                    <div
+                                            id="testimonialImagePreview"
+                                            style="
+                margin-top:12px;
+                display:none;
+            "
+                                    >
+
+                                        <img
+                                                id="testimonialImagePreviewImg"
+                                                src=""
+                                                alt="Customer Photo Preview"
+                                                style="
+                    width:100px;
+                    height:100px;
+                    object-fit:cover;
+                    border-radius:12px;
+                    border:1px solid #ddd;
+                "
+                                        >
+
+                                    </div>
 
                                 </div>
 
 
                                 <!-- RATING -->
-
                                 <div class="form-group">
 
                                     <label for="testimonialRating">
                                         Rating
                                     </label>
 
-                                    <select id="testimonialRating" required>
+                                    <select
+                                            id="testimonialRating"
+                                            required
+                                    >
 
                                         <option value="5">
                                             ⭐⭐⭐⭐⭐ — 5 Stars
@@ -1838,22 +1889,24 @@
                                 </div>
 
 
-                                <!-- MESSAGE -->
-
+                                <!-- TESTIMONIAL -->
                                 <div class="form-group">
 
                                     <label for="testimonialMessage">
                                         Testimonial
                                     </label>
 
-                                    <textarea id="testimonialMessage" rows="6"
-                                        placeholder="Write customer testimonial..." required></textarea>
+                                    <textarea
+                                            id="testimonialMessage"
+                                            placeholder="Enter customer testimonial"
+                                            rows="5"
+                                            required
+                                    ></textarea>
 
                                 </div>
 
 
                                 <!-- STATUS -->
-
                                 <div class="form-group">
 
                                     <label for="testimonialStatus">
@@ -1875,26 +1928,34 @@
                                 </div>
 
 
-                                <div id="testimonialFormMessage" class="form-message"></div>
+                                <!-- FORM MESSAGE -->
+                                <div
+                                        id="testimonialFormMessage"
+                                        class="form-message"
+                                ></div>
 
 
                                 <!-- ACTIONS -->
-
                                 <div class="form-actions">
 
-                                    <button type="submit" class="primary-btn">
+                                    <button
+                                            type="submit"
+                                            class="primary-btn"
+                                    >
                                         Save Testimonial
                                     </button>
 
-
-                                    <button type="button" class="outline-btn" onclick="closeTestimonialForm()">
+                                    <button
+                                            type="button"
+                                            class="secondary-btn"
+                                            onclick="closeTestimonialForm()"
+                                    >
                                         Cancel
                                     </button>
 
                                 </div>
 
                             </form>
-
                         </div>
 
 

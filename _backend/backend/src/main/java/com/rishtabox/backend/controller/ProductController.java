@@ -1,18 +1,20 @@
 package com.rishtabox.backend.controller;
 
-import com.rishtabox.backend.dto.ProductRequest;
 import com.rishtabox.backend.entity.Product;
 import com.rishtabox.backend.service.ProductService;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/products")
+@CrossOrigin
 public class ProductController {
 
     private final ProductService productService;
@@ -24,25 +26,53 @@ public class ProductController {
 
     // =========================================================
     // CREATE PRODUCT
-    // POST /api/products
-    // ADMIN + SUPER_ADMIN
     // =========================================================
 
     @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
-    @PostMapping
+    @PostMapping(consumes = "multipart/form-data")
     public ResponseEntity<Product> createProduct(
-            @RequestBody ProductRequest request) {
+
+            @RequestParam("name")
+            String name,
+
+            @RequestParam(value = "description", required = false)
+            String description,
+
+            @RequestParam("price")
+            Double price,
+
+            @RequestParam(value = "originalPrice", required = false)
+            Double originalPrice,
+
+            @RequestParam("image")
+            MultipartFile image,
+
+            @RequestParam("stock")
+            Integer stock,
+
+            @RequestParam(value = "categoryId", required = false)
+            String categoryId,
+
+            @RequestParam(value = "festivalId", required = false)
+            String festivalId,
+
+            @RequestParam(value = "relationshipId", required = false)
+            String relationshipId
+
+    ) throws IOException {
 
         Product product = productService.createProduct(
-                request.getName(),
-                request.getDescription(),
-                request.getPrice(),
-                request.getOriginalPrice(),
-                request.getImage(),
-                request.getStock(),
-                request.getCategoryId(),
-                request.getFestivalId(),
-                request.getRelationshipId()
+
+                name,
+                description,
+                price,
+                originalPrice,
+                image,
+                stock,
+                categoryId,
+                festivalId,
+                relationshipId
+
         );
 
         return ResponseEntity.ok(product);
@@ -51,8 +81,6 @@ public class ProductController {
 
     // =========================================================
     // GET ALL ACTIVE PRODUCTS
-    // GET /api/products
-    // PUBLIC
     // =========================================================
 
     @GetMapping
@@ -66,9 +94,6 @@ public class ProductController {
 
     // =========================================================
     // GET ALL PRODUCTS FOR ADMIN
-    // GET /api/products/admin/all
-    // ACTIVE + INACTIVE
-    // ADMIN + SUPER_ADMIN
     // =========================================================
 
     @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
@@ -83,15 +108,17 @@ public class ProductController {
 
     // =========================================================
     // GET PRODUCT BY ID
-    // GET /api/products/{id}
-    // PUBLIC
     // =========================================================
 
     @GetMapping("/{id}")
     public ResponseEntity<Product> getProductById(
-            @PathVariable Long id) {
 
-        Product product = productService.getProductById(id);
+            @PathVariable Long id
+
+    ) {
+
+        Product product =
+                productService.getProductById(id);
 
         return ResponseEntity.ok(product);
     }
@@ -99,46 +126,77 @@ public class ProductController {
 
     // =========================================================
     // UPDATE PRODUCT
-    // PUT /api/products/{id}
-    // ADMIN + SUPER_ADMIN
-    //
-    // Category / Festival / Relationship
-    // are handled independently
     // =========================================================
 
     @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
-    @PutMapping("/{id}")
+    @PutMapping(
+            value = "/{id}",
+            consumes = "multipart/form-data"
+    )
     public ResponseEntity<Product> updateProduct(
-            @PathVariable Long id,
-            @RequestBody ProductRequest request) {
 
-        Product product = productService.updateProduct(
-                id,
-                request.getName(),
-                request.getDescription(),
-                request.getPrice(),
-                request.getOriginalPrice(),
-                request.getImage(),
-                request.getStock(),
-                request.getCategoryId(),
-                request.getFestivalId(),
-                request.getRelationshipId()
-        );
+            @PathVariable Long id,
+
+            @RequestParam("name")
+            String name,
+
+            @RequestParam(value = "description", required = false)
+            String description,
+
+            @RequestParam("price")
+            Double price,
+
+            @RequestParam(value = "originalPrice", required = false)
+            Double originalPrice,
+
+            @RequestParam(value = "image", required = false)
+            MultipartFile image,
+
+            @RequestParam("stock")
+            Integer stock,
+
+            @RequestParam(value = "categoryId", required = false)
+            String categoryId,
+
+            @RequestParam(value = "festivalId", required = false)
+            String festivalId,
+
+            @RequestParam(value = "relationshipId", required = false)
+            String relationshipId
+
+    ) throws IOException {
+
+        Product product =
+                productService.updateProduct(
+
+                        id,
+                        name,
+                        description,
+                        price,
+                        originalPrice,
+                        image,
+                        stock,
+                        categoryId,
+                        festivalId,
+                        relationshipId
+
+                );
 
         return ResponseEntity.ok(product);
     }
 
 
     // =========================================================
-    // SOFT DELETE PRODUCT
-    // DELETE /api/products/{id}
-    // ADMIN + SUPER_ADMIN
+    // DELETE PRODUCT
     // =========================================================
 
     @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteProduct(
-            @PathVariable Long id) {
+
+            @PathVariable Long id
+
+    ) {
 
         productService.deleteProduct(id);
 
@@ -153,31 +211,33 @@ public class ProductController {
 
     // =========================================================
     // RESTORE PRODUCT
-    // PUT /api/products/{id}/restore
-    // ADMIN + SUPER_ADMIN
     // =========================================================
 
     @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     @PutMapping("/{id}/restore")
     public ResponseEntity<Product> restoreProduct(
-            @PathVariable Long id) {
 
-        Product product = productService.restoreProduct(id);
+            @PathVariable Long id
+
+    ) {
+
+        Product product =
+                productService.restoreProduct(id);
 
         return ResponseEntity.ok(product);
     }
 
 
     // =========================================================
-    // GET PRODUCTS BY CATEGORY
-    // GET /api/products/category/{categoryId}
-    // PUBLIC
-    // ONLY ACTIVE PRODUCTS
+    // PRODUCTS BY CATEGORY
     // =========================================================
 
     @GetMapping("/category/{categoryId}")
     public ResponseEntity<List<Product>> getProductsByCategory(
-            @PathVariable String categoryId) {
+
+            @PathVariable String categoryId
+
+    ) {
 
         return ResponseEntity.ok(
                 productService.getProductsByCategory(categoryId)
