@@ -160,17 +160,20 @@ public class OtpService {
         } else {
             subject = "RishtaBox - Login OTP";
         }
-
         String messageText =
-                "Your RishtaBox OTP is: "
-                        + otp
-                        + "\n\n"
-                        + "This OTP is valid for 5 minutes."
-                        + "\n"
-                        + "Do not share this OTP with anyone."
-                        + "\n\n"
-                        + "Regards,\n"
-                        + "RishtaBox";
+                "Welcome to RishtaBox!\n\n"
+                        + "To keep your account secure, please verify your email address using the One-Time Password (OTP) below.\n\n"
+                        + "Your OTP: " + otp + "\n\n"
+                        + "This OTP is valid for 5 minutes.\n\n"
+                        + "For your security, please do not share this code with anyone. "
+                        + "RishtaBox will never ask you for your OTP.\n\n"
+                        + "If you did not request this verification, you can safely ignore this email.\n\n"
+                        + "Thank you for choosing RishtaBox.\n\n"
+                        + "Warm Regards,\n"
+                        + "Team RishtaBox\n"
+                        + "Thoughtful Gifts. Meaningful Moments.";
+
+
 
         SimpleMailMessage message =
                 new SimpleMailMessage();

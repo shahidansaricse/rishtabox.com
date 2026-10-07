@@ -129,20 +129,30 @@ public class SubscriberService {
         message.setText(
                 "Hello,\n\n"
 
-                        + "Thank you for subscribing to RishtaBox!\n\n"
+                        + "✨ Welcome to RishtaBox!\n\n"
 
-                        + "We are happy to have you with us.\n\n"
+                        + "Thank you for becoming a part of the RishtaBox family. "
+                        + "We're delighted to have you with us.\n\n"
 
-                        + "You will receive updates about our "
-                        + "latest gifts, collections, offers, "
-                        + "and special occasions.\n\n"
+                        + "🎁 From thoughtful surprises to beautifully curated gifts, "
+                        + "we'll keep you updated with our latest collections, "
+                        + "exclusive offers, and special selections for every occasion.\n\n"
 
-                        + "Visit RishtaBox:\n"
+                        + "💝 Whether you're celebrating a birthday, anniversary, festival, "
+                        + "or simply expressing your love and appreciation, "
+                        + "we're here to help you make every moment memorable.\n\n"
+
+                        + "Discover something special:\n"
                         + "https://rishtabox.com\n\n"
 
-                        + "Regards,\n"
-                        + "RishtaBox Team"
+                        + "Thank you for choosing RishtaBox.\n\n"
+
+                        + "Warm Regards,\n"
+                        + "RishtaBox Team\n"
+                        + "Thoughtful Gifts. Meaningful Moments. ✨"
         );
+
+
 
 
         mailSender.send(message);
