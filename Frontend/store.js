@@ -7,7 +7,7 @@ let categories = [];
 let products = [];
 let festivalProducts = [];
 let relationshipProducts = [];
-let festivals=[];
+let festivals = [];
 let backendProducts = [];
 
 let currentUser = {
@@ -27,7 +27,7 @@ let currentOrderSteps = 1;
  ========================================================= */
 function saveUserData() {
     try {
-        localStorage.setItem("userData",JSON.stringify(currentUser));
+        localStorage.setItem("userData", JSON.stringify(currentUser));
     } catch (error) {
         console.error("Could not save user data:", error);
     }
@@ -373,15 +373,15 @@ function loadOrdersData() {
 
 function saveRecentlyViewed() {
     try {
-        localStorage.setItem("recentlyViewed",JSON.stringify(recentlyViewed));
+        localStorage.setItem("recentlyViewed", JSON.stringify(recentlyViewed));
     } catch (error) {
-        console.error("Could not save recently viewed:",error);
+        console.error("Could not save recently viewed:", error);
     }
 }
 
 function loadRecentlyViewed() {
     try {
-        const saved =localStorage.getItem("recentlyViewed");
+        const saved = localStorage.getItem("recentlyViewed");
         if (saved) {
             recentlyViewed = JSON.parse(saved);
         }
@@ -389,7 +389,7 @@ function loadRecentlyViewed() {
             recentlyViewed = [];
         }
     } catch (error) {
-        console.error("Could not load recently viewed:",error);
+        console.error("Could not load recently viewed:", error);
         recentlyViewed = [];
     }
 }
@@ -535,7 +535,7 @@ async function loadData() {
             // =================================================
 
             id:
-            product.id,
+                product.id,
 
             name:
                 product.name || "",
@@ -801,8 +801,8 @@ async function initializeApp() {
     loadHomepageSliders();
 
     // =====================================================
-// LOAD BLOGS
-// =====================================================
+    // LOAD BLOGS
+    // =====================================================
 
     loadBlogs();
     // =====================================================
@@ -881,33 +881,33 @@ async function initializeApp() {
 /* =========================================================
    DOM READY
 ========================================================= */
-document.addEventListener("DOMContentLoaded",() => {
-        loadData();
-        const sortBy =
-            document.getElementById("sortBy");
-        const priceRange =
-            document.getElementById("priceRange");
-        const brandFilter =
-            document.getElementById("brandFilter");
-        if (sortBy) {
-            sortBy.addEventListener(
-                "change",
-                applyFilters
-            );
-        }
-        if (priceRange) {
-            priceRange.addEventListener(
-                "input",
-                applyFilters
-            );
-        }
-        if (brandFilter) {
-            brandFilter.addEventListener(
-                "change",
-                applyFilters
-            );
-        }
+document.addEventListener("DOMContentLoaded", () => {
+    loadData();
+    const sortBy =
+        document.getElementById("sortBy");
+    const priceRange =
+        document.getElementById("priceRange");
+    const brandFilter =
+        document.getElementById("brandFilter");
+    if (sortBy) {
+        sortBy.addEventListener(
+            "change",
+            applyFilters
+        );
     }
+    if (priceRange) {
+        priceRange.addEventListener(
+            "input",
+            applyFilters
+        );
+    }
+    if (brandFilter) {
+        brandFilter.addEventListener(
+            "change",
+            applyFilters
+        );
+    }
+}
 );
 
 /* =========================================================
@@ -1460,11 +1460,10 @@ function renderHomepageSliders() {
                         <div
                             class="
                                 hero-slide
-                                ${
-                        index === 0
+                                ${index === 0
                             ? "active"
                             : ""
-                    }
+                        }
                             ">
 
 
@@ -1474,21 +1473,20 @@ function renderHomepageSliders() {
 
                             <img
                                 src="${escapeHtml(
-                        image
-                    )}"
+                            image
+                        )}"
 
                                 alt="${escapeHtml(
-                        title ||
-                        "RishtaBox Gifts"
-                    )}"
+                            title ||
+                            "RishtaBox Gifts"
+                        )}"
 
                                 class="hero-image"
 
-                                ${
-                        index === 0
+                                ${index === 0
                             ? 'loading="eager"'
                             : 'loading="lazy"'
-                    }
+                        }
                             >
 
 
@@ -1505,46 +1503,43 @@ function renderHomepageSliders() {
                                  TITLE / SUBTITLE
                             ========================== -->
 
-                            ${
-                        title ||
-                        subtitle
+                            ${title ||
+                            subtitle
                             ? `
 
                                         <div
                                             class="hero-content">
 
 
-                                            ${
-                                title
-                                    ? `
+                                            ${title
+                                ? `
 
                                                         <h1>
 
                                                             ${escapeHtml(
-                                        title
-                                    )}
+                                    title
+                                )}
 
                                                         </h1>
 
                                                     `
-                                    : ""
+                                : ""
                             }
 
 
-                                            ${
-                                subtitle
-                                    ? `
+                                            ${subtitle
+                                ? `
 
                                                         <p>
 
                                                             ${escapeHtml(
-                                        subtitle
-                                    )}
+                                    subtitle
+                                )}
 
                                                         </p>
 
                                                     `
-                                    : ""
+                                : ""
                             }
 
 
@@ -1552,7 +1547,7 @@ function renderHomepageSliders() {
 
                                     `
                             : ""
-                    }
+                        }
 
 
                             <!-- =========================
@@ -1564,8 +1559,8 @@ function renderHomepageSliders() {
 
                                 <a
                                     href="${escapeHtml(
-                        link
-                    )}"
+                            link
+                        )}"
 
                                     class="hero-btn">
 
@@ -1604,11 +1599,10 @@ function renderHomepageSliders() {
 
                             class="
                                 slider-dot
-                                ${
-                        index === 0
+                                ${index === 0
                             ? "active"
                             : ""
-                    }
+                        }
                             "
 
                             onclick="
@@ -1616,9 +1610,8 @@ function renderHomepageSliders() {
                             "
 
                             aria-label="
-                                Go to slide ${
-                        index + 1
-                    }
+                                Go to slide ${index + 1
+                        }
                             ">
                         </button>
 
@@ -2328,15 +2321,14 @@ function renderProducts(
                     alt="${product.name || "Product"}"
                 >
 
-                ${
-            !isAvailable
+                ${!isAvailable
                 ? `
                             <span class="out-of-stock-badge">
                                 Out of Stock
                             </span>
                           `
                 : ""
-        }
+            }
 
             </div>
 
@@ -2382,25 +2374,23 @@ function renderProducts(
                         ₹${Number(product.price) || 0}
                     </span>
 
-                    ${
-            product.originalPrice
+                    ${product.originalPrice
                 ? `
                                 <span class="original-price">
                                     ₹${product.originalPrice}
                                 </span>
                               `
                 : ""
-        }
+            }
 
-                    ${
-            product.discount
+                    ${product.discount
                 ? `
                                 <span class="discount">
                                     ${product.discount}% OFF
                                 </span>
                               `
                 : ""
-        }
+            }
 
                 </div>
 
@@ -2409,8 +2399,7 @@ function renderProducts(
 
                 <div class="product-stock-status">
 
-                    ${
-            isAvailable
+                    ${isAvailable
                 ? `
                                 <span class="in-stock">
                                     In Stock: ${stock}
@@ -2421,7 +2410,7 @@ function renderProducts(
                                     Out of Stock
                                 </span>
                               `
-        }
+            }
 
                 </div>
 
@@ -3465,25 +3454,23 @@ function showProduct(productId) {
                     ₹${Number(product.price) || 0}
                 </span>
 
-                ${
-        product.originalPrice
+                ${product.originalPrice
             ? `
                             <span class="original-price">
                                 ₹${product.originalPrice}
                             </span>
                           `
             : ""
-    }
+        }
 
-                ${
-        product.discount
+                ${product.discount
             ? `
                             <span class="discount">
                                 ${product.discount}% OFF
                             </span>
                           `
             : ""
-    }
+        }
 
             </div>
 
@@ -3494,8 +3481,7 @@ function showProduct(productId) {
 
             <div class="stock-status">
 
-                ${
-        isAvailable
+                ${isAvailable
             ? `
                             <span class="in-stock">
                                 In Stock: ${stock}
@@ -3506,7 +3492,7 @@ function showProduct(productId) {
                                 Out of Stock
                             </span>
                           `
-    }
+        }
 
             </div>
 
@@ -3528,8 +3514,7 @@ function showProduct(productId) {
 
             <div class="product-option">
 
-                ${
-        colors.length > 0
+                ${colors.length > 0
             ? `
                             <div class="option-group">
 
@@ -3556,11 +3541,10 @@ function showProduct(productId) {
                             </div>
                           `
             : ""
-    }
+        }
 
 
-                ${
-        sizes.length > 0
+                ${sizes.length > 0
             ? `
                             <div class="option-group">
 
@@ -3587,7 +3571,7 @@ function showProduct(productId) {
                             </div>
                           `
             : ""
-    }
+        }
 
             </div>
 
@@ -3602,8 +3586,7 @@ function showProduct(productId) {
                     Delivery Address
                 </h3>
 
-                ${
-        currentUser && currentUser.address
+                ${currentUser && currentUser.address
             ? `
                             <p>
                                 ${currentUser.address}
@@ -3628,7 +3611,7 @@ function showProduct(productId) {
                                 Add Address
                             </button>
                           `
-    }
+        }
 
             </div>
 
@@ -3665,8 +3648,7 @@ function showProduct(productId) {
 
             <div class="product-actions">
 
-                ${
-        isAvailable
+                ${isAvailable
             ? `
                             <button
                                 class="btn-primary"
@@ -3705,7 +3687,7 @@ function showProduct(productId) {
                                 Unavailable
                             </button>
                           `
-    }
+        }
 
             </div>
 
@@ -4100,7 +4082,7 @@ async function addToCart(productId, showSuccessAlert = true) {
             cart.push({
 
                 id:
-                product.id,
+                    product.id,
 
                 name:
                     product.name || "",
@@ -4123,10 +4105,10 @@ async function addToCart(productId, showSuccessAlert = true) {
                     product.image || "",
 
                 color:
-                selectedColor,
+                    selectedColor,
 
                 size:
-                selectedSize,
+                    selectedSize,
 
                 quantity: 1
             });
@@ -4286,8 +4268,7 @@ function renderCart() {
                     <div class="product-brand">
                         ${item.brand || ""}
                     </div>
-                    ${
-                item.color
+                    ${item.color
                     ? `
                                 <p>
                                     Color:
@@ -4295,9 +4276,8 @@ function renderCart() {
                                 </p>
                             `
                     : ""
-            }
-                    ${
-                item.size
+                }
+                    ${item.size
                     ? `
                                 <p>
                                     Size:
@@ -4305,29 +4285,27 @@ function renderCart() {
                                 </p>
                             `
                     : ""
-            }
+                }
                     <div class="product-price">
                         <span class="current-price">
                             ₹${price}
                         </span>
-                        ${
-                originalPrice > price
+                        ${originalPrice > price
                     ? `
                                     <span class="original-price">
                                         ₹${originalPrice}
                                     </span>
                                 `
                     : ""
-            }
-                        ${
-                item.discount
+                }
+                        ${item.discount
                     ? `
                                     <span class="discount">
                                         ${item.discount}% OFF
                                     </span>
                                 `
                     : ""
-            }
+                }
                     </div>
                     <div class="quantity-controls">
                         <button
@@ -4412,10 +4390,9 @@ function renderCart() {
                 Discount:
             </span>
             <span>
-                ₹${
-        totalOriginal -
+                ₹${totalOriginal -
         totalDiscounted
-    }
+        }
             </span>
         </div>
         <div class="summary-row">
@@ -4423,12 +4400,11 @@ function renderCart() {
                 Delivery Charges:
             </span>
             <span>
-                ${
-        deliveryCharges === 0
+                ${deliveryCharges === 0
             ? "FREE"
             : "₹" +
             deliveryCharges
-    }
+        }
             </span>
         </div>
         <div class="summary-divider"></div>
@@ -4824,22 +4800,22 @@ async function placeOrder() {
                 body: JSON.stringify({
 
                     userId:
-                    currentUser.id,
+                        currentUser.id,
 
                     paymentMethod:
-                    backendPaymentMethod,
+                        backendPaymentMethod,
 
                     shippingAddress:
-                    currentUser.address,
+                        currentUser.address,
 
                     shippingCity:
-                    currentUser.city,
+                        currentUser.city,
 
                     shippingState:
-                    currentUser.state,
+                        currentUser.state,
 
                     shippingPincode:
-                    currentUser.pincode
+                        currentUser.pincode
                 })
             }
         );
@@ -4989,10 +4965,10 @@ async function placeOrder() {
         const order = {
 
             id:
-            orderId,
+                orderId,
 
             backendOrderId:
-            backendOrderId,
+                backendOrderId,
 
             items:
                 cart.map(item => ({
@@ -5000,16 +4976,16 @@ async function placeOrder() {
                 })),
 
             total:
-            cartTotal,
+                cartTotal,
 
             deliveryCharges:
-            deliveryCharges,
+                deliveryCharges,
 
             finalTotal:
-            finalTotal,
+                finalTotal,
 
             paymentMethod:
-            frontendPaymentMethod,
+                frontendPaymentMethod,
 
             paymentStatus:
                 "PENDING",
@@ -5024,25 +5000,25 @@ async function placeOrder() {
                 "confirmed",
 
             name:
-            currentUser.name,
+                currentUser.name,
 
             email:
-            currentUser.email,
+                currentUser.email,
 
             phone:
-            currentUser.phone,
+                currentUser.phone,
 
             address:
-            currentUser.address,
+                currentUser.address,
 
             city:
-            currentUser.city,
+                currentUser.city,
 
             state:
-            currentUser.state,
+                currentUser.state,
 
             pincode:
-            currentUser.pincode
+                currentUser.pincode
         };
 
 
@@ -5551,10 +5527,10 @@ function renderOrders() {
                                 "",
 
                             quantity:
-                            itemQuantity,
+                                itemQuantity,
 
                             price:
-                            itemPrice
+                                itemPrice
                         };
                     }
                 );
@@ -5662,8 +5638,7 @@ function renderOrders() {
 
                         <div class="cart-item">
 
-                            ${
-                        image
+                            ${image
                             ? `
                                     <img
                                         src="${image}"
@@ -5672,7 +5647,7 @@ function renderOrders() {
                                     >
                                     `
                             : ""
-                    }
+                        }
 
                             <div class="cart-item-details">
 
@@ -5684,8 +5659,7 @@ function renderOrders() {
                                     ${item.brand || ""}
                                 </div>
 
-                                ${
-                        item.color
+                                ${item.color
                             ? `
                                         <p>
                                             Color:
@@ -5693,10 +5667,9 @@ function renderOrders() {
                                         </p>
                                         `
                             : ""
-                    }
+                        }
 
-                                ${
-                        item.size
+                                ${item.size
                             ? `
                                         <p>
                                             Size:
@@ -5704,7 +5677,7 @@ function renderOrders() {
                                         </p>
                                         `
                             : ""
-                    }
+                        }
 
                                 <p>
                                     Quantity:
@@ -5714,9 +5687,9 @@ function renderOrders() {
                                 <p>
                                     Price:
                                     ₹${(
-                        item.price *
-                        item.quantity
-                    ).toFixed(2)}
+                            item.price *
+                            item.quantity
+                        ).toFixed(2)}
                                 </p>
 
                             </div>
@@ -5762,11 +5735,10 @@ function renderOrders() {
                                 Order Date:
                             </strong>
 
-                            ${
-                formatDate(
-                    rawOrderDate
-                )
-            }
+                            ${formatDate(
+                rawOrderDate
+            )
+                }
 
                         </p>
 
@@ -5790,11 +5762,10 @@ function renderOrders() {
 
                             ${orderItems.length}
 
-                            ${
-                orderItems.length !== 1
+                            ${orderItems.length !== 1
                     ? " items"
                     : " item"
-            }
+                }
 
                         </p>
 
@@ -5827,13 +5798,12 @@ function renderOrders() {
                                 Delivery Date:
                             </strong>
 
-                            ${
-                deliveryDate
+                            ${deliveryDate
                     ? formatDate(
                         deliveryDate
                     )
                     : "Not available"
-            }
+                }
 
                         </p>
 
@@ -5856,30 +5826,27 @@ function renderOrders() {
                             </h4>
 
 
-                            ${
-                customerName
+                            ${customerName
                     ? `
                                     <p>
                                         ${customerName}
                                     </p>
                                     `
                     : ""
-            }
+                }
 
 
-                            ${
-                customerPhone
+                            ${customerPhone
                     ? `
                                     <p>
                                         ${customerPhone}
                                     </p>
                                     `
                     : ""
-            }
+                }
 
 
-                            ${
-                fullAddress
+                            ${fullAddress
                     ? `
                                     <p>
                                         ${fullAddress}
@@ -5890,7 +5857,7 @@ function renderOrders() {
                                         Address not available
                                     </p>
                                     `
-            }
+                }
 
                         </div>
 
@@ -5900,14 +5867,13 @@ function renderOrders() {
                         </h4>
 
 
-                        ${
-                orderItemsHtml ||
+                        ${orderItemsHtml ||
                 `
                             <p>
                                 No item information available.
                             </p>
                             `
-            }
+                }
 
 
                         <div class="cart-summary">
@@ -5934,12 +5900,11 @@ function renderOrders() {
 
                                 <span>
 
-                                    ${
-                deliveryCharges === 0
+                                    ${deliveryCharges === 0
                     ? "FREE"
                     : "₹" +
                     deliveryCharges.toFixed(2)
-            }
+                }
 
                                 </span>
 
@@ -5964,9 +5929,8 @@ function renderOrders() {
 
                             <div class="order-actions">
 
-                                ${
-                !isDelivered &&
-                !isCancelled
+                                ${!isDelivered &&
+                    !isCancelled
                     ? `
                                         <button
                                             type="button"
@@ -5980,11 +5944,10 @@ function renderOrders() {
                                         </button>
                                         `
                     : ""
-            }
+                }
 
 
-                                ${
-                !isCancelled
+                                ${!isCancelled
                     ? `
                                         <button
                                             type="button"
@@ -5998,7 +5961,7 @@ function renderOrders() {
                                         </button>
                                         `
                     : ""
-            }
+                }
 
                             </div>
 
@@ -6702,121 +6665,121 @@ async function cancelOrder(orderId) {
         const apiUrl =
             rbApiUrl(
                 `/api/orders/${backendOrderId}/cancel`
-);
+            );
 
-console.log(
-    "CANCEL API URL:",
-    apiUrl
-);
+        console.log(
+            "CANCEL API URL:",
+            apiUrl
+        );
 
-const response =
-    await fetch(
-        apiUrl,
-        {
-            method: "PUT",
+        const response =
+            await fetch(
+                apiUrl,
+                {
+                    method: "PUT",
 
-            headers: {
-                "Authorization":
-                    `Bearer ${token}`,
+                    headers: {
+                        "Authorization":
+                            `Bearer ${token}`,
 
-                "Content-Type":
-                    "application/json"
-            }
-        }
-    );
+                        "Content-Type":
+                            "application/json"
+                    }
+                }
+            );
 
-const responseText =
-    await response.text();
+        const responseText =
+            await response.text();
 
-console.log(
-    "CANCEL STATUS:",
-    response.status
-);
+        console.log(
+            "CANCEL STATUS:",
+            response.status
+        );
 
-console.log(
-    "CANCEL RESPONSE:",
-    responseText
-);
+        console.log(
+            "CANCEL RESPONSE:",
+            responseText
+        );
 
-let responseData = {};
+        let responseData = {};
 
-try {
+        try {
 
-    responseData =
-        responseText
-            ? JSON.parse(
+            responseData =
                 responseText
-            )
-            : {};
+                    ? JSON.parse(
+                        responseText
+                    )
+                    : {};
 
-} catch (error) {
+        } catch (error) {
 
-    console.warn(
-        "Response is not JSON."
-    );
-}
+            console.warn(
+                "Response is not JSON."
+            );
+        }
 
-// ==========================================
-// BACKEND ERROR
-// ==========================================
+        // ==========================================
+        // BACKEND ERROR
+        // ==========================================
 
-if (!response.ok) {
+        if (!response.ok) {
 
-    console.error(
-        "CANCEL ORDER FAILED:",
-        response.status,
-        responseData,
-        responseText
-    );
+            console.error(
+                "CANCEL ORDER FAILED:",
+                response.status,
+                responseData,
+                responseText
+            );
 
-    alert(
-        responseData.message ||
-        responseData.error ||
-        responseText ||
-        `Order cancellation failed. HTTP ${response.status}`
-    );
+            alert(
+                responseData.message ||
+                responseData.error ||
+                responseText ||
+                `Order cancellation failed. HTTP ${response.status}`
+            );
 
-    return;
-}
+            return;
+        }
 
-// ==========================================
-// SUCCESS
-// ==========================================
+        // ==========================================
+        // SUCCESS
+        // ==========================================
 
-console.log(
-    "ORDER CANCELLED SUCCESSFULLY:",
-    responseData
-);
+        console.log(
+            "ORDER CANCELLED SUCCESSFULLY:",
+            responseData
+        );
 
-orders[orderIndex].status =
-    "Cancelled";
+        orders[orderIndex].status =
+            "Cancelled";
 
-orders[orderIndex].orderStatus =
-    "CANCELLED";
+        orders[orderIndex].orderStatus =
+            "CANCELLED";
 
-orders[orderIndex].cancelledDate =
-    new Date().toISOString();
+        orders[orderIndex].cancelledDate =
+            new Date().toISOString();
 
-saveOrdersData();
+        saveOrdersData();
 
-renderOrders();
+        renderOrders();
 
-alert(
-    "Order cancelled successfully."
-);
+        alert(
+            "Order cancelled successfully."
+        );
 
-} catch (error) {
+    } catch (error) {
 
-    console.error(
-        "CANCEL ORDER NETWORK ERROR:",
-        error
-    );
+        console.error(
+            "CANCEL ORDER NETWORK ERROR:",
+            error
+        );
 
-    alert(
-        "Unable to cancel order.\n\n" +
-        error.message
-    );
-}
+        alert(
+            "Unable to cancel order.\n\n" +
+            error.message
+        );
+    }
 }
 
 // ======================================================
@@ -7211,10 +7174,9 @@ function renderOrderSteps() {
                                 </div>
 
                                 <strong>
-                                    ₹${
-            Number(item.price || 0) *
+                                    ₹${Number(item.price || 0) *
             Number(item.quantity || 0)
-        }
+            }
                                 </strong>
 
                             </div>
@@ -7246,11 +7208,10 @@ function renderOrderSteps() {
                             </span>
 
                             <span>
-                                ${
-            deliveryCharges === 0
+                                ${deliveryCharges === 0
                 ? "FREE"
                 : "₹" + deliveryCharges
-        }
+            }
                             </span>
 
                         </div>
@@ -7400,11 +7361,10 @@ function renderOrderSteps() {
                             </span>
 
                             <span>
-                                ${
-            deliveryCharges === 0
+                                ${deliveryCharges === 0
                 ? "FREE"
                 : "₹" + deliveryCharges
-        }
+            }
                             </span>
 
                         </div>
@@ -7859,7 +7819,7 @@ async function loadFestivals() {
     } catch (error) {
         console.error("Festival loading error:", error);
     }
-}function showFestivalProducts(festivalId) {
+} function showFestivalProducts(festivalId) {
 
     console.log("=================================");
     console.log("FESTIVAL CLICK");
@@ -7883,8 +7843,8 @@ async function loadFestivals() {
         festivals.find(function (f) {
 
             return String(f.id || "")
-                    .trim()
-                    .toLowerCase() ===
+                .trim()
+                .toLowerCase() ===
                 window.currentFestivalId;
 
         });
@@ -9251,8 +9211,8 @@ function showRelationshipProducts(relationshipId) {
         relationships.find(function (r) {
 
             return String(r.id || "")
-                    .trim()
-                    .toLowerCase() ===
+                .trim()
+                .toLowerCase() ===
                 window.currentRelationshipId;
 
         });
@@ -9313,7 +9273,7 @@ window.RISHTABOX_API_BASE_URL =
     window.RISHTABOX_API_BASE_URL ||
     (
         window.location.hostname === "localhost" ||
-        window.location.hostname === "127.0.0.1"
+            window.location.hostname === "127.0.0.1"
             ? "http://localhost:8080"
             : ""
     );
@@ -9562,7 +9522,7 @@ async function sendEmailOtp() {
                     body: JSON.stringify({
 
                         email:
-                        signupData.email
+                            signupData.email
                     })
                 }
             );
@@ -9804,10 +9764,10 @@ async function verifyEmailOtp() {
                     body: JSON.stringify({
 
                         email:
-                        signupData.email,
+                            signupData.email,
 
                         otp:
-                        otp
+                            otp
                     })
                 }
             );
@@ -10070,16 +10030,16 @@ async function createAccount() {
     signupData = {
 
         name:
-        name,
+            name,
 
         mobile:
-        mobile,
+            mobile,
 
         email:
-        email,
+            email,
 
         password:
-        password,
+            password,
 
         emailVerified:
             true
@@ -10153,7 +10113,7 @@ async function createVerifiedAccount() {
                     body: JSON.stringify({
 
                         name:
-                        signupData.name,
+                            signupData.name,
 
                         /*
                          * Mobile number is stored
@@ -10162,13 +10122,13 @@ async function createVerifiedAccount() {
                          * NO mobile OTP.
                          */
                         phone:
-                        signupData.mobile,
+                            signupData.mobile,
 
                         email:
-                        signupData.email,
+                            signupData.email,
 
                         password:
-                        signupData.password
+                            signupData.password
                     })
                 }
             );
@@ -10488,7 +10448,7 @@ async function sendLoginOtp() {
                     body: JSON.stringify({
 
                         email:
-                        window.loginOtpEmail
+                            window.loginOtpEmail
                     })
                 }
             );
@@ -10741,10 +10701,10 @@ async function verifyLoginOtp() {
                     body: JSON.stringify({
 
                         email:
-                        email,
+                            email,
 
                         otp:
-                        otp
+                            otp
                     })
                 }
             );
@@ -11237,9 +11197,9 @@ async function loginWithPassword() {
             currentUser.id
         );
 
-// =====================================================
-// LOAD CART
-// =====================================================
+        // =====================================================
+        // LOAD CART
+        // =====================================================
 
         await loadCartFromBackend();
 
@@ -11248,9 +11208,9 @@ async function loginWithPassword() {
             cart
         );
 
-// =====================================================
-// LOAD ORDERS
-// =====================================================
+        // =====================================================
+        // LOAD ORDERS
+        // =====================================================
 
         await loadOrdersFromBackend();
 
@@ -11573,7 +11533,7 @@ function logout() {
 
     const loggedOutUserId =
         currentUser &&
-        currentUser.id
+            currentUser.id
             ? Number(currentUser.id)
             : null;
 
@@ -11812,8 +11772,8 @@ document.addEventListener(
 
         }
 
-            // =========================================
-            // LOGGED-OUT USER
+        // =========================================
+        // LOGGED-OUT USER
         // =========================================
 
         else {
@@ -12109,7 +12069,7 @@ async function payWithRazorpay(backendOrderId, orderData) {
                 "RishtaBox Order",
 
             order_id:
-            razorpayOrderId,
+                razorpayOrderId,
 
 
             // =================================================
@@ -12186,13 +12146,13 @@ async function payWithRazorpay(backendOrderId, orderData) {
                                         Number(backendOrderId),
 
                                     razorpayOrderId:
-                                    response.razorpay_order_id,
+                                        response.razorpay_order_id,
 
                                     razorpayPaymentId:
-                                    response.razorpay_payment_id,
+                                        response.razorpay_payment_id,
 
                                     razorpaySignature:
-                                    response.razorpay_signature
+                                        response.razorpay_signature
                                 })
                             }
                         );
@@ -12393,10 +12353,10 @@ async function payWithRazorpay(backendOrderId, orderData) {
                     const frontendOrder = {
 
                         id:
-                        frontendOrderId,
+                            frontendOrderId,
 
                         backendOrderId:
-                        backendOrderId,
+                            backendOrderId,
 
                         items:
                             paidCart.map(item => ({
@@ -12404,13 +12364,13 @@ async function payWithRazorpay(backendOrderId, orderData) {
                             })),
 
                         total:
-                        cartTotal,
+                            cartTotal,
 
                         deliveryCharges:
-                        deliveryCharges,
+                            deliveryCharges,
 
                         finalTotal:
-                        finalTotal,
+                            finalTotal,
 
                         paymentMethod:
                             "Online Payment",
@@ -12419,13 +12379,13 @@ async function payWithRazorpay(backendOrderId, orderData) {
                             "PAID",
 
                         razorpayOrderId:
-                        response.razorpay_order_id,
+                            response.razorpay_order_id,
 
                         razorpayPaymentId:
-                        response.razorpay_payment_id,
+                            response.razorpay_payment_id,
 
                         razorpaySignature:
-                        response.razorpay_signature,
+                            response.razorpay_signature,
 
                         orderDate:
                             orderDate.toISOString(),
@@ -12437,16 +12397,16 @@ async function payWithRazorpay(backendOrderId, orderData) {
                             "confirmed",
 
                         name:
-                        customerName,
+                            customerName,
 
                         email:
-                        customerEmail,
+                            customerEmail,
 
                         phone:
-                        customerPhone,
+                            customerPhone,
 
                         address:
-                        customerAddress
+                            customerAddress
                     };
 
 
@@ -12718,9 +12678,9 @@ async function payWithRazorpay(backendOrderId, orderData) {
                 }
 
 
-                    // =================================================
-                    // ERROR AFTER PAYMENT VERIFICATION
-                    // =================================================
+                // =================================================
+                // ERROR AFTER PAYMENT VERIFICATION
+                // =================================================
 
                 catch (errorAfterPayment) {
 
@@ -12885,7 +12845,7 @@ async function payWithRazorpay(backendOrderId, orderData) {
             "Please make sure Spring Boot is running."
         );
     }
-}function showOrderSuccess(
+} function showOrderSuccess(
     orderId,
     paymentMethod,
     finalTotal,
@@ -13008,7 +12968,7 @@ async function payWithRazorpay(backendOrderId, orderData) {
 
     document
         .querySelectorAll(".page")
-        .forEach(function(page) {
+        .forEach(function (page) {
 
             page.classList.add("hidden");
         });
@@ -13332,8 +13292,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
 
                 // -----------------------------
-// VALIDATE AND SAVE JWT
-// -----------------------------
+                // VALIDATE AND SAVE JWT
+                // -----------------------------
 
                 const token =
                     data.token ||
@@ -13370,9 +13330,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     return;
                 }
 
-// -----------------------------
-// CREATE USER DATA
-// -----------------------------
+                // -----------------------------
+                // CREATE USER DATA
+                // -----------------------------
 
                 const user = {
 
@@ -13389,25 +13349,25 @@ document.addEventListener("DOMContentLoaded", function () {
                     token: cleanToken
                 };
 
-// -----------------------------
-// SAVE JWT
-// -----------------------------
+                // -----------------------------
+                // SAVE JWT
+                // -----------------------------
 
                 localStorage.setItem(
                     "token",
                     cleanToken
                 );
 
-// -----------------------------
-// SAVE USER DATA
-// -----------------------------
+                // -----------------------------
+                // SAVE USER DATA
+                // -----------------------------
 
                 localStorage.setItem(
                     "userData",
                     JSON.stringify(user)
                 );
 
-// IMPORTANT
+                // IMPORTANT
                 localStorage.setItem(
                     "rishtaBoxCurrentUser",
                     JSON.stringify(user)
@@ -13418,9 +13378,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     "true"
                 );
 
-// -----------------------------
-// UPDATE CURRENT USER
-// -----------------------------
+                // -----------------------------
+                // UPDATE CURRENT USER
+                // -----------------------------
 
                 currentUser = user;
 
@@ -13453,9 +13413,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     currentUser.id
                 );
 
-// -----------------------------
-// LOGIN SUCCESS
-// -----------------------------
+                // -----------------------------
+                // LOGIN SUCCESS
+                // -----------------------------
 
                 message.textContent =
                     "Login successful.";
@@ -14386,15 +14346,14 @@ function createShopCard(item, type) {
                 ${name}
             </h3>
 
-            ${
-        description
+            ${description
             ? `
                         <p>
                             ${description}
                         </p>
                     `
             : ""
-    }
+        }
 
         </div>
 
@@ -14695,15 +14654,14 @@ function renderProductReviews(reviews) {
                     ${comment}
                 </p>
 
-                ${
-            review.verifiedPurchaser
+                ${review.verifiedPurchaser
                 ? `
                             <span class="verified-review">
                                 ✓ Verified Purchaser
                             </span>
                           `
                 : ""
-        }
+            }
 
             </div>
         `;
@@ -14989,7 +14947,7 @@ async function submitReview(event, productId) {
             } else {
                 const errorMessage =
                     typeof result === "object" &&
-                    result?.message
+                        result?.message
                         ? result.message
                         : `Review failed (${response.status}).`;
 
@@ -15414,11 +15372,10 @@ function updateTestimonialDots(
         html += `
             <button
                 type="button"
-                class="testimonial-dot ${
-            i === currentIndex
+                class="testimonial-dot ${i === currentIndex
                 ? "active"
                 : ""
-        }"
+            }"
                 onclick="goToTestimonialSlide(${i})"
             ></button>
         `;

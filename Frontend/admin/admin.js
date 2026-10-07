@@ -1506,7 +1506,7 @@ async function loadProducts() {
                     errorData.error ||
                     message;
 
-            } catch (error) {}
+            } catch (error) { }
 
 
             throw new Error(
@@ -2218,7 +2218,7 @@ async function editProduct(productId) {
                     errorData.error ||
                     message;
 
-            } catch (error) {}
+            } catch (error) { }
 
 
             throw new Error(
@@ -2573,8 +2573,8 @@ async function handleProductSubmit(event) {
 
         const imageFile =
             imageInput &&
-            imageInput.files &&
-            imageInput.files.length > 0
+                imageInput.files &&
+                imageInput.files.length > 0
 
                 ? imageInput.files[0]
 
@@ -2877,7 +2877,7 @@ async function handleProductSubmit(event) {
         for (
             const [key, value]
             of formData.entries()
-            ) {
+        ) {
 
             if (
                 value instanceof File
@@ -2915,13 +2915,13 @@ async function handleProductSubmit(event) {
                 url,
                 {
                     method:
-                    method,
+                        method,
 
                     headers:
-                    headers,
+                        headers,
 
                     body:
-                    formData
+                        formData
                 }
             );
 
@@ -2967,7 +2967,7 @@ async function handleProductSubmit(event) {
             result = {
 
                 message:
-                responseText
+                    responseText
 
             };
         }
@@ -3227,7 +3227,7 @@ async function deleteProduct(productId) {
                     errorData.error ||
                     errorMessage;
 
-            } catch (error) {}
+            } catch (error) { }
 
 
             throw new Error(
@@ -3348,7 +3348,7 @@ async function restoreProduct(productId) {
                     errorData.error ||
                     errorMessage;
 
-            } catch (error) {}
+            } catch (error) { }
 
 
             throw new Error(
@@ -3462,10 +3462,10 @@ function formatOrderStatus(status) {
 
     return (
         labels[
-            String(
-                status || ""
-            ).toUpperCase()
-            ] ||
+        String(
+            status || ""
+        ).toUpperCase()
+        ] ||
         status ||
         "-"
     );
@@ -3496,10 +3496,10 @@ function formatShippingMode(mode) {
 
     return (
         labels[
-            String(
-                mode || ""
-            ).toUpperCase()
-            ] ||
+        String(
+            mode || ""
+        ).toUpperCase()
+        ] ||
         mode ||
         "-"
     );
@@ -3770,21 +3770,20 @@ function renderOrders(orders) {
                         >
 
                             ${ORDER_STATUS_OPTIONS
-                .map(
-                    status => `
+                    .map(
+                        status => `
                                         <option
                                             value="${status}"
-                                            ${
-                        status === orderStatus
-                            ? "selected"
-                            : ""
-                    }
+                                            ${status === orderStatus
+                                ? "selected"
+                                : ""
+                            }
                                         >
                                             ${formatOrderStatus(status)}
                                         </option>
                                     `
-                )
-                .join("")}
+                    )
+                    .join("")}
 
                         </select>
 
@@ -3802,21 +3801,20 @@ function renderOrders(orders) {
                             </option>
 
                             ${SHIPPING_MODE_OPTIONS
-                .map(
-                    mode => `
+                    .map(
+                        mode => `
                                         <option
                                             value="${mode}"
-                                            ${
-                        mode === shippingMode
-                            ? "selected"
-                            : ""
-                    }
+                                            ${mode === shippingMode
+                                ? "selected"
+                                : ""
+                            }
                                         >
                                             ${formatShippingMode(mode)}
                                         </option>
                                     `
-                )
-                .join("")}
+                    )
+                    .join("")}
 
                         </select>
 
@@ -3844,8 +3842,7 @@ function renderOrders(orders) {
         "
     >
 
-        ${
-                !shiprocketOrderId
+        ${!shiprocketOrderId
                     ? `
                     <button
                         type="button"
@@ -3868,11 +3865,10 @@ function renderOrders(orders) {
                         ${escapeHtml(shiprocketShipmentId)}
                     </div>
                 `
-            }
+                }
 
 
-        ${
-                shiprocketShipmentId && !awbCode
+        ${shiprocketShipmentId && !awbCode
                     ? `
                     <button
                         type="button"
@@ -3888,11 +3884,10 @@ function renderOrders(orders) {
                     </button>
                 `
                     : ""
-            }
+                }
 
 
-        ${
-                awbCode
+        ${awbCode
                     ? `
                     <div style="font-size:12px;">
                         <strong>AWB:</strong>
@@ -3905,11 +3900,10 @@ function renderOrders(orders) {
                     </div>
                 `
                     : ""
-            }
+                }
 
 
-        ${
-                awbCode
+        ${awbCode
                     ? `
                     <button
                         type="button"
@@ -3922,11 +3916,10 @@ function renderOrders(orders) {
                     </button>
                 `
                     : ""
-            }
+                }
 
 
-        ${
-                shipmentStatus
+        ${shipmentStatus
                     ? `
                     <div style="font-size:12px;">
                         <strong>Status:</strong>
@@ -3934,11 +3927,10 @@ function renderOrders(orders) {
                     </div>
                 `
                     : ""
-            }
+                }
 
 
-        ${
-                trackingUrl
+        ${trackingUrl
                     ? `
                     <a
                         href="${escapeHtml(trackingUrl)}"
@@ -3953,7 +3945,7 @@ function renderOrders(orders) {
                     </a>
                 `
                     : ""
-            }
+                }
 
     </div>
 
@@ -4059,7 +4051,7 @@ async function createShiprocketShipment(orderId) {
                     data.error ||
                     message;
 
-            } catch (error) {}
+            } catch (error) { }
 
             throw new Error(message);
         }
@@ -4162,7 +4154,7 @@ async function assignShiprocketCourier(
                     data.error ||
                     message;
 
-            } catch (error) {}
+            } catch (error) { }
 
             throw new Error(message);
         }
@@ -4246,7 +4238,7 @@ async function trackShiprocketShipment(orderId) {
                     data.error ||
                     message;
 
-            } catch (error) {}
+            } catch (error) { }
 
             throw new Error(message);
         }
@@ -4402,7 +4394,7 @@ async function updateAdminOrder(orderId) {
                     errorData.error ||
                     message;
 
-            } catch (error) {}
+            } catch (error) { }
 
             throw new Error(message);
         }
@@ -5127,11 +5119,10 @@ function renderUsers(users) {
                             <span
                                 class="
                                     status-badge
-                                    ${
-                    isActive
+                                    ${isActive
                         ? "active"
                         : "blocked"
-                }
+                    }
                                 "
                             >
 
@@ -5322,8 +5313,7 @@ function openUserActionsMenu(button) {
         </button>
 
 
-        ${
-        canManage
+        ${canManage
             ? `
                     <button
                         type="button"
@@ -5337,11 +5327,10 @@ function openUserActionsMenu(button) {
                     </button>
                 `
             : ""
-    }
+        }
 
 
-        ${
-        canChangeRole
+        ${canChangeRole
             ? `
                     <button
                         type="button"
@@ -5355,11 +5344,10 @@ function openUserActionsMenu(button) {
                     </button>
                 `
             : ""
-    }
+        }
 
 
-        ${
-        canManage
+        ${canManage
             ? `
                     <button
                         type="button"
@@ -5372,19 +5360,17 @@ function openUserActionsMenu(button) {
                             ${active ? "🚫" : "✓"}
                         </span>
 
-                        ${
-                active
-                    ? "Block User"
-                    : "Unblock User"
+                        ${active
+                ? "Block User"
+                : "Unblock User"
             }
                     </button>
                 `
             : ""
-    }
+        }
 
 
-        ${
-        canManage
+        ${canManage
             ? `
                     <button
                         type="button"
@@ -5398,11 +5384,10 @@ function openUserActionsMenu(button) {
                     </button>
                 `
             : ""
-    }
+        }
 
 
-        ${
-        canDelete
+        ${canDelete
             ? `
                     <div
                         class="user-action-menu-divider"
@@ -5423,7 +5408,7 @@ function openUserActionsMenu(button) {
                     </button>
                 `
             : ""
-    }
+        }
 
     `;
 
@@ -6449,7 +6434,7 @@ async function handleEditUserSubmit(event) {
                     errorData.error ||
                     errorMessage;
 
-            } catch (_) {}
+            } catch (_) { }
 
             throw new Error(errorMessage);
         }
@@ -6500,7 +6485,7 @@ async function handleEditUserSubmit(event) {
                         errorData.error ||
                         errorMessage;
 
-                } catch (_) {}
+                } catch (_) { }
 
                 throw new Error(errorMessage);
             }
@@ -6545,7 +6530,7 @@ async function handleEditUserSubmit(event) {
                         errorData.error ||
                         errorMessage;
 
-                } catch (_) {}
+                } catch (_) { }
 
                 throw new Error(errorMessage);
             }
@@ -7347,9 +7332,9 @@ class="admin-blog-image"
     <img
 src="${getAdminBlogImage(blog.image)}"
 alt="${escapeHTML(
-blog.title ||
-"Blog"
-)}"
+                blog.title ||
+                "Blog"
+            )}"
 onerror="
 this.onerror=null;
 this.src='../Frontend/images/logo.jpeg';
@@ -7390,18 +7375,16 @@ this.src='../Frontend/images/logo.jpeg';
 
 
         <span
-            class="blog-status-badge ${
-                                    blog.published
-                                        ? "published"
-                                        : "unpublished"
-                                }"
+            class="blog-status-badge ${blog.published
+                    ? "published"
+                    : "unpublished"
+                }"
         >
 
-                                ${
-            blog.published
-                ? "Published"
-                : "Unpublished"
-        }
+                                ${blog.published
+                    ? "Published"
+                    : "Unpublished"
+                }
 
                             </span>
 
@@ -7412,9 +7395,9 @@ this.src='../Frontend/images/logo.jpeg';
         class="admin-blog-description"
     >
         ${escapeHTML(
-        blog.description ||
-        ""
-    )}
+                    blog.description ||
+                    ""
+                )}
     </p>
 
 
@@ -7424,8 +7407,8 @@ this.src='../Frontend/images/logo.jpeg';
 
                             <span>
                                 ${formatAdminBlogDate(
-                                blog.createdAt
-                            )}
+                    blog.createdAt
+                )}
                             </span>
 
         <span>
@@ -7963,8 +7946,8 @@ async function saveBlog(event) {
 
     const imageFile =
         imageInput &&
-        imageInput.files &&
-        imageInput.files.length > 0
+            imageInput.files &&
+            imageInput.files.length > 0
             ? imageInput.files[0]
             : null;
 
@@ -8583,8 +8566,8 @@ function updateReviewStats() {
 
     const averageRating = ratings.length > 0
         ? ratings.reduce(function (sum, rating) {
-        return sum + rating;
-    }, 0) / ratings.length
+            return sum + rating;
+        }, 0) / ratings.length
         : 0;
 
 
@@ -8784,8 +8767,7 @@ function renderReviews() {
                         ${escapeReviewHTML(customer)}
                     </strong>
 
-                    ${
-            email
+                    ${email
                 ? `
                                 <br>
                                 <small>
@@ -8793,7 +8775,7 @@ function renderReviews() {
                                 </small>
                               `
                 : ""
-        }
+            }
 
                 </td>
 
@@ -8821,17 +8803,15 @@ function renderReviews() {
 
                 <td>
 
-                    <span class="review-status ${
-            approved
+                    <span class="review-status ${approved
                 ? "approved"
                 : "pending"
-        }">
+            }">
 
-                        ${
-            approved
+                        ${approved
                 ? "Approved"
                 : "Pending"
-        }
+            }
 
                     </span>
 
@@ -8847,8 +8827,7 @@ function renderReviews() {
 
                     <div class="review-actions">
 
-                        ${
-            approved
+                        ${approved
                 ? `
                                     <button
                                         type="button"
@@ -8867,7 +8846,7 @@ function renderReviews() {
                                         Approve
                                     </button>
                                   `
-        }
+            }
 
 
                         <button
@@ -9214,7 +9193,7 @@ function setupTestimonialImageUpload() {
 
             const file =
                 this.files &&
-                this.files.length
+                    this.files.length
                     ? this.files[0]
                     : null;
 
@@ -9667,13 +9646,13 @@ function updateTestimonialStats() {
     const average =
         ratings.length
             ? ratings.reduce(
-            (
-                sum,
-                rating
-            ) =>
-                sum + rating,
-            0
-        ) / ratings.length
+                (
+                    sum,
+                    rating
+                ) =>
+                    sum + rating,
+                0
+            ) / ratings.length
             : 0;
 
 
@@ -9900,8 +9879,7 @@ function renderTestimonials() {
                             gap:10px;
                         ">
 
-                            ${
-                image
+                            ${image
                     ? `
                                         <img
                                             src="${escapeTestimonialHTML(imageUrl)}"
@@ -9916,7 +9894,7 @@ function renderTestimonials() {
                                         >
                                     `
                     : ""
-            }
+                }
 
                             <strong>
                                 ${escapeTestimonialHTML(name)}
@@ -9955,18 +9933,16 @@ function renderTestimonials() {
 
                         <span class="
                             review-status
-                            ${
-                isPublished
+                            ${isPublished
                     ? "approved"
                     : "pending"
-            }
+                }
                         ">
 
-                            ${
-                isPublished
+                            ${isPublished
                     ? "Published"
                     : "Hidden"
-            }
+                }
 
                         </span>
 
@@ -10003,11 +9979,10 @@ function renderTestimonials() {
                                     ${!isPublished}
                                 )"
                             >
-                                ${
-                isPublished
+                                ${isPublished
                     ? "Hide"
                     : "Publish"
-            }
+                }
                             </button>
 
 
@@ -10738,8 +10713,8 @@ async function saveTestimonial(event) {
 
     const selectedImage =
         imageInput &&
-        imageInput.files &&
-        imageInput.files.length > 0
+            imageInput.files &&
+            imageInput.files.length > 0
             ? imageInput.files[0]
             : null;
 
@@ -11477,7 +11452,7 @@ async function changeUserRole(userId) {
                     data.error ||
                     message;
 
-            } catch (_) {}
+            } catch (_) { }
 
             throw new Error(message);
         }
@@ -11587,7 +11562,7 @@ async function toggleUserStatus(userId) {
                     data.error ||
                     message;
 
-            } catch (_) {}
+            } catch (_) { }
 
             throw new Error(message);
         }
@@ -11689,7 +11664,7 @@ async function forceLogoutUser(userId) {
                     data.error ||
                     message;
 
-            } catch (_) {}
+            } catch (_) { }
 
             throw new Error(message);
         }
@@ -12912,8 +12887,8 @@ async function saveFestival(event) {
 
     const imageFile =
         festivalImage &&
-        festivalImage.files &&
-        festivalImage.files[0]
+            festivalImage.files &&
+            festivalImage.files[0]
             ? festivalImage.files[0]
             : null;
 
@@ -13058,8 +13033,8 @@ async function saveFestival(event) {
         }
 
 
-            // =================================================
-            // UPDATE
+        // =================================================
+        // UPDATE
         // =================================================
 
         else {
@@ -13247,8 +13222,7 @@ function createAdminFestivalCard(
 
                 <div>
 
-                    ${
-        imageUrl
+                    ${imageUrl
             ? `
                                 <img
                                     src="${escapeAdminHtml(imageUrl)}"
@@ -13267,26 +13241,25 @@ function createAdminFestivalCard(
                                 >
                             `
             : ""
-    }
+        }
 
 
                     <h3>
                         ${escapeAdminHtml(
-        festival.name
-    )}
+            festival.name
+        )}
                     </h3>
 
 
                     <p class="muted">
                         ID:
                         ${escapeAdminHtml(
-        festival.id
-    )}
+            festival.id
+        )}
                     </p>
 
 
-                    ${
-        festival.description
+                    ${festival.description
             ? `
                                 <p>
                                     ${escapeAdminHtml(
@@ -13295,11 +13268,10 @@ function createAdminFestivalCard(
                                 </p>
                             `
             : ""
-    }
+        }
 
 
-                    ${
-        festival.image
+                    ${festival.image
             ? `
                                 <p class="muted">
                                     Image:
@@ -13309,7 +13281,7 @@ function createAdminFestivalCard(
                                 </p>
                             `
             : ""
-    }
+        }
 
                 </div>
 
@@ -13322,8 +13294,8 @@ function createAdminFestivalCard(
                         onclick="
                             editFestival(
                                 '${escapeJs(
-        festival.id
-    )}'
+            festival.id
+        )}'
                             )
                         "
                     >
@@ -13337,8 +13309,8 @@ function createAdminFestivalCard(
                         onclick="
                             deleteFestival(
                                 '${escapeJs(
-        festival.id
-    )}'
+            festival.id
+        )}'
                             )
                         "
                     >
@@ -13348,25 +13320,23 @@ function createAdminFestivalCard(
 
                     <button
                         type="button"
-                        class="${
-        festival.pinned
+                        class="${festival.pinned
             ? "outline-btn"
             : "primary-btn"
-    }"
+        }"
                         onclick="
                             toggleFestivalPin(
                                 '${escapeJs(
-        festival.id
-    )}',
+            festival.id
+        )}',
                                 ${!festival.pinned}
                             )
                         "
                     >
-                        ${
-        festival.pinned
+                        ${festival.pinned
             ? "📌 Unpin"
             : "📍 Pin"
-    }
+        }
                     </button>
 
                 </div>
@@ -14053,8 +14023,8 @@ async function saveCategory(event) {
 
     const imageFile =
         categoryImage &&
-        categoryImage.files &&
-        categoryImage.files[0]
+            categoryImage.files &&
+            categoryImage.files[0]
             ? categoryImage.files[0]
             : null;
 
@@ -14193,8 +14163,8 @@ async function saveCategory(event) {
         }
 
 
-            // =================================================
-            // UPDATE
+        // =================================================
+        // UPDATE
         // =================================================
 
         else {
@@ -14379,8 +14349,7 @@ function createAdminCategoryCard(
 
                 <div>
 
-                    ${
-        imageUrl
+                    ${imageUrl
             ? `
                                 <img
                                     src="${escapeAdminHtml(imageUrl)}"
@@ -14396,23 +14365,22 @@ function createAdminCategoryCard(
                                 >
                             `
             : ""
-    }
+        }
 
                     <h3>
                         ${escapeAdminHtml(
-        category.name
-    )}
+            category.name
+        )}
                     </h3>
 
                     <p class="muted">
                         ID:
                         ${escapeAdminHtml(
-        category.id
-    )}
+            category.id
+        )}
                     </p>
 
-                    ${
-        category.description
+                    ${category.description
             ? `
                                 <p>
                                     ${escapeAdminHtml(
@@ -14421,10 +14389,9 @@ function createAdminCategoryCard(
                                 </p>
                             `
             : ""
-    }
+        }
 
-                    ${
-        category.image
+                    ${category.image
             ? `
                                 <p class="muted">
                                     Image:
@@ -14434,7 +14401,7 @@ function createAdminCategoryCard(
                                 </p>
                             `
             : ""
-    }
+        }
 
                 </div>
 
@@ -14461,11 +14428,10 @@ function createAdminCategoryCard(
 
                     <button
                         type="button"
-                        class="${
-        category.pinned
+                        class="${category.pinned
             ? "outline-btn"
             : "primary-btn"
-    }"
+        }"
                         onclick="
                             toggleCategoryPin(
                                 '${escapeJs(category.id)}',
@@ -14473,11 +14439,10 @@ function createAdminCategoryCard(
                             )
                         "
                     >
-                        ${
-        category.pinned
+                        ${category.pinned
             ? "📌 Unpin"
             : "📍 Pin"
-    }
+        }
                     </button>
 
                 </div>
@@ -15228,8 +15193,8 @@ async function saveRelationship(event) {
 
     const imageFile =
         relationshipImage &&
-        relationshipImage.files &&
-        relationshipImage.files[0]
+            relationshipImage.files &&
+            relationshipImage.files[0]
             ? relationshipImage.files[0]
             : null;
 
@@ -15377,8 +15342,8 @@ async function saveRelationship(event) {
         }
 
 
-            // =================================================
-            // UPDATE
+        // =================================================
+        // UPDATE
         // =================================================
 
         else {
@@ -15573,8 +15538,7 @@ function createAdminRelationshipCard(
 
                 <div>
 
-                    ${
-        imageUrl
+                    ${imageUrl
             ? `
                                 <img
                                     src="${escapeAdminHtml(
@@ -15595,26 +15559,25 @@ function createAdminRelationshipCard(
                                 >
                             `
             : ""
-    }
+        }
 
 
                     <h3>
                         ${escapeAdminHtml(
-        relationship.name
-    )}
+            relationship.name
+        )}
                     </h3>
 
 
                     <p class="muted">
                         ID:
                         ${escapeAdminHtml(
-        relationship.id
-    )}
+            relationship.id
+        )}
                     </p>
 
 
-                    ${
-        relationship.description
+                    ${relationship.description
             ? `
                                 <p>
                                     ${escapeAdminHtml(
@@ -15623,11 +15586,10 @@ function createAdminRelationshipCard(
                                 </p>
                             `
             : ""
-    }
+        }
 
 
-                    ${
-        relationship.image
+                    ${relationship.image
             ? `
                                 <p class="muted">
                                     Image:
@@ -15637,7 +15599,7 @@ function createAdminRelationshipCard(
                                 </p>
                             `
             : ""
-    }
+        }
 
                 </div>
 
@@ -15650,8 +15612,8 @@ function createAdminRelationshipCard(
                         onclick="
                             editRelationship(
                                 '${escapeJs(
-        relationship.id
-    )}'
+            relationship.id
+        )}'
                             )
                         "
                     >
@@ -15665,8 +15627,8 @@ function createAdminRelationshipCard(
                         onclick="
                             deleteRelationship(
                                 '${escapeJs(
-        relationship.id
-    )}'
+            relationship.id
+        )}'
                             )
                         "
                     >
@@ -15676,25 +15638,23 @@ function createAdminRelationshipCard(
 
                     <button
                         type="button"
-                        class="${
-        relationship.pinned
+                        class="${relationship.pinned
             ? "outline-btn"
             : "primary-btn"
-    }"
+        }"
                         onclick="
                             toggleRelationshipPin(
                                 '${escapeJs(
-        relationship.id
-    )}',
+            relationship.id
+        )}',
                                 ${!relationship.pinned}
                             )
                         "
                     >
-                        ${
-        relationship.pinned
+                        ${relationship.pinned
             ? "📌 Unpin"
             : "📍 Pin"
-    }
+        }
                     </button>
 
                 </div>
@@ -17064,7 +17024,7 @@ if (sliderForm) {
 
             const imageFile =
                 sliderImage &&
-                sliderImage.files.length > 0
+                    sliderImage.files.length > 0
                     ? sliderImage.files[0]
                     : null;
 
@@ -17245,7 +17205,7 @@ if (sliderForm) {
                                 getAdminHeaders(),
 
                             body:
-                            formData
+                                formData
                         }
                     );
 
@@ -17650,8 +17610,7 @@ function createAdminSliderCard(
             <div
                 class="slider-admin-image">
 
-                ${
-        imageUrl
+                ${imageUrl
 
             ? `
 
@@ -17675,7 +17634,7 @@ function createAdminSliderCard(
                             </div>
 
                           `
-    }
+        }
 
             </div>
 
@@ -17693,9 +17652,9 @@ function createAdminSliderCard(
                     <h3>
 
                         ${escapeHtml(
-        slider.title ||
-        "Untitled Slider"
-    )}
+            slider.title ||
+            "Untitled Slider"
+        )}
 
                     </h3>
 
@@ -17711,8 +17670,7 @@ function createAdminSliderCard(
                 </div>
 
 
-                ${
-        slider.subtitle
+                ${slider.subtitle
 
             ? `
 
@@ -17727,7 +17685,7 @@ function createAdminSliderCard(
                           `
 
             : ""
-    }
+        }
 
 
                 <div
@@ -17747,8 +17705,7 @@ function createAdminSliderCard(
                     </span>
 
 
-                    ${
-        slider.link
+                    ${slider.link
 
             ? `
 
@@ -17765,7 +17722,7 @@ function createAdminSliderCard(
                               `
 
             : ""
-    }
+        }
 
 
                 </div>
@@ -17795,11 +17752,10 @@ function createAdminSliderCard(
                             ${isActive}
                         )">
 
-                        ${
-        isActive
+                        ${isActive
             ? "Deactivate"
             : "Activate"
-    }
+        }
 
                     </button>
 
@@ -18040,7 +17996,7 @@ async function toggleSliderStatus(
                         getAdminHeaders(),
 
                     body:
-                    body
+                        body
                 }
             );
 

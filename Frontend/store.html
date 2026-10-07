@@ -13,1083 +13,799 @@
 </head>
 
 <body>
-<!-- ================= HEADER ================= -->
-<header class="header">
-    <div class="nav-container">
-        <div class="logo-section">
-            <a href="#" class="home-btn"
-               onclick="showPage('home'); return false;">
+    <!-- ================= HEADER ================= -->
+    <header class="header">
+        <div class="nav-container">
+            <div class="logo-section">
+                <a href="#" class="home-btn" onclick="showPage('home'); return false;">
 
-                <div class="logo-text">
-                    <span>RishtaBox</span>
+                    <div class="logo-text">
+                        <span>RishtaBox</span>
 
-                </div>
+                    </div>
 
-            </a>
-            <a href="#" class="logo"
-               onclick="showPage('home'); return false;">
+                </a>
+                <a href="#" class="logo" onclick="showPage('home'); return false;">
 
-                <img src="images/logo1.png" alt="RishtaBox Logo">
+                    <img src="images/logo1.png" alt="RishtaBox Logo">
 
-            </a>
+                </a>
 
 
-        </div>   <!-- Search -->
-        <div class="search-bar">
+            </div> <!-- Search -->
+            <div class="search-bar">
 
-            <input type="search" id="searchInput" name="search" placeholder="Search Product.." autocomplete="off">
+                <input type="search" id="searchInput" name="search" placeholder="Search Product.." autocomplete="off">
 
-            <button type="button" onclick="searchProducts()">
-                Search
+                <button type="button" onclick="searchProducts()">
+                    Search
+                </button>
+
+            </div>
+
+
+
+            <!-- Mobile Menu -->
+            <button type="button" class="mobile-menu-btn" onclick="toggleSidebar()" aria-label="Open menu">
+                ☰
             </button>
 
         </div>
+        <div class="shop-nav-wrapper">
 
-
-
-        <!-- Mobile Menu -->
-        <button type="button" class="mobile-menu-btn" onclick="toggleSidebar()" aria-label="Open menu">
-            ☰
-        </button>
-
-    </div>
-    <div class="shop-nav-wrapper">
-
-        <!-- BACK BUTTON -->
-        <button
-                type="button"
-                class="nav-scroll-btn nav-back-btn"
-                onclick="scrollNavBack()"
+            <!-- BACK BUTTON -->
+            <button type="button" class="nav-scroll-btn nav-back-btn" onclick="scrollNavBack()"
                 aria-label="Scroll navigation back">
-            ← Back
-        </button>
+                ← Back
+            </button>
 
 
-        <!-- SCROLLABLE NAVIGATION -->
-        <div class="shop-nav-scroll">
+            <!-- SCROLLABLE NAVIGATION -->
+            <div class="shop-nav-scroll">
 
-            <div class="panel">
+                <div class="panel">
 
-                <div class="panel-all">
-                    <a href="#" onclick="openAllGifts(); return false;">
-                        ☰ All Gifts
-                    </a>
-                </div>
-
-                <!-- Gifts by Price -->
-                <div class="nav-dropdown">
-
-                    <button type="button" class="dropdown-btn">
-                        Gifts by Price
-                        <span>▼</span>
-                    </button>
-
-                    <div class="dropdown-menu price-menu">
-
-                        <a href="#" onclick="showPriceProducts(99); return false;">
-                            Under ₹99
+                    <div class="panel-all">
+                        <a href="#" onclick="openAllGifts(); return false;">
+                            ☰ All Gifts
                         </a>
+                    </div>
 
-                        <a href="#" onclick="showPriceProducts(199); return false;">
-                            Under ₹199
-                        </a>
+                    <!-- Gifts by Price -->
+                    <div class="nav-dropdown">
 
-                        <a href="#" onclick="showPriceProducts(499); return false;">
-                            Under ₹499
-                        </a>
+                        <button type="button" class="dropdown-btn">
+                            Gifts by Price
+                            <span>▼</span>
+                        </button>
 
-                        <a href="#" onclick="showPriceProducts(999); return false;">
-                            Under ₹999
-                        </a>
+                        <div class="dropdown-menu price-menu">
 
-                        <a href="#" onclick="showPriceProducts(1499); return false;">
-                            Under ₹1,499
-                        </a>
+                            <a href="#" onclick="showPriceProducts(99); return false;">
+                                Under ₹99
+                            </a>
 
-                        <a href="#" onclick="showPriceProducts(1999); return false;">
-                            Under ₹1,999
-                        </a>
+                            <a href="#" onclick="showPriceProducts(199); return false;">
+                                Under ₹199
+                            </a>
 
-                        <a href="#" onclick="showPriceProducts(2999); return false;">
-                            Under ₹2,999
-                        </a>
+                            <a href="#" onclick="showPriceProducts(499); return false;">
+                                Under ₹499
+                            </a>
 
-                        <a href="#" onclick="showPriceProducts(4999); return false;">
-                            Under ₹4,999
-                        </a>
+                            <a href="#" onclick="showPriceProducts(999); return false;">
+                                Under ₹999
+                            </a>
+
+                            <a href="#" onclick="showPriceProducts(1499); return false;">
+                                Under ₹1,499
+                            </a>
+
+                            <a href="#" onclick="showPriceProducts(1999); return false;">
+                                Under ₹1,999
+                            </a>
+
+                            <a href="#" onclick="showPriceProducts(2999); return false;">
+                                Under ₹2,999
+                            </a>
+
+                            <a href="#" onclick="showPriceProducts(4999); return false;">
+                                Under ₹4,999
+                            </a>
+
+                        </div>
 
                     </div>
 
-                </div>
 
+                    <div class="nav-dropdown">
 
-                <div class="nav-dropdown">
+                        <button type="button" class="dropdown-btn">
+                            Gifts by Relationship
+                            <span>▼</span>
+                        </button>
 
-                    <button type="button" class="dropdown-btn">
-                        Gifts by Relationship
-                        <span>▼</span>
-                    </button>
+                        <div class="dropdown-menu" id="relationshipMenu">
+                        </div>
 
-                    <div
-                            class="dropdown-menu"
-                            id="relationshipMenu">
                     </div>
 
-                </div>
 
+                    <div class="nav-dropdown">
 
-                <div class="nav-dropdown">
+                        <button type="button" class="dropdown-btn">
+                            Gifts by Festival
+                            <span>▼</span>
+                        </button>
 
-                    <button type="button" class="dropdown-btn">
-                        Gifts by Festival
-                        <span>▼</span>
-                    </button>
+                        <div class="dropdown-menu" id="festivalMenu">
+                        </div>
 
-                    <div
-                            class="dropdown-menu"
-                            id="festivalMenu">
                     </div>
 
-                </div>
 
+                    <div class="nav-dropdown">
 
-                <div class="nav-dropdown">
+                        <button type="button" class="dropdown-btn">
+                            Gifts by Category
+                            <span>▼</span>
+                        </button>
 
-                    <button type="button" class="dropdown-btn">
-                        Gifts by Category
-                        <span>▼</span>
-                    </button>
+                        <div class="dropdown-menu" id="categoryMenu">
+                        </div>
 
-                    <div
-                            class="dropdown-menu"
-                            id="categoryMenu">
                     </div>
 
-                </div>
 
+                    <div class="panel-deals">
 
-                <div class="panel-deals">
+                        <a href="#" onclick="showSpecialOffers(); return false;">
+                            🎁 Special Offers
+                        </a>
 
-                    <a href="#"
-                       onclick="showSpecialOffers(); return false;">
-                        🎁 Special Offers
-                    </a>
+                    </div>
 
                 </div>
 
             </div>
 
-        </div>
 
-
-        <!-- MORE BUTTON -->
-        <button
-                type="button"
-                class="nav-scroll-btn nav-more-btn"
-                onclick="scrollNavMore()"
+            <!-- MORE BUTTON -->
+            <button type="button" class="nav-scroll-btn nav-more-btn" onclick="scrollNavMore()"
                 aria-label="Show more navigation">
-            More →
-        </button>
+                More →
+            </button>
 
-    </div>
-</header>
-<!-- ================= MAIN CONTENT ================= -->
-<main class="main-content">
+        </div>
+    </header>
+    <!-- ================= MAIN CONTENT ================= -->
+    <main class="main-content">
 
 
-    <!-- ================= HOME PAGE ================= -->
-    <section id="homePage" class="page">
+        <!-- ================= HOME PAGE ================= -->
+        <section id="homePage" class="page">
 
-        <!-- =========================================================
+            <!-- =========================================================
          HERO SLIDER
     ========================================================= -->
 
-        <section class="hero">
+            <section class="hero">
 
-            <div class="hero-slider" id="heroSlider">
+                <div class="hero-slider" id="heroSlider">
 
-                <!-- Sliders will be loaded from Admin -->
-                <div class="hero-loading">
-                    Loading...
-                </div>
-
-                <!-- Previous Button -->
-                <button
-                        type="button"
-                        class="slider-btn slider-prev"
-                        onclick="changeSlide(-1)"
-                        aria-label="Previous slide">
-                    ❮
-                </button>
-
-                <!-- Next Button -->
-                <button
-                        type="button"
-                        class="slider-btn slider-next"
-                        onclick="changeSlide(1)"
-                        aria-label="Next slide">
-                    ❯
-                </button>
-
-                <!-- Slider Dots -->
-                <div
-                        class="slider-dots"
-                        id="sliderDots">
-                </div>
-
-            </div>
-
-        </section>
-        <!-- ================================================= -->
-        <!-- ============== 1. SHOP BY RELATIONSHIP ========== -->
-        <!-- ================================================= -->
-
-        <section class="categories relationship-section"
-                 id="relationships">
-
-            <div class="container">
-
-                <h2>
-                    Gifts by Relationship
-                </h2>
-
-            </div>
-
-            <div class="category-grid"
-                 id="relationshipGrid">
-
-                <!-- Relationship cards populated by JavaScript -->
-
-            </div>
-
-        </section>
-
-
-        <!-- ================================================= -->
-        <!-- ================ 2. SHOP BY FESTIVAL ============ -->
-        <!-- ================================================= -->
-
-        <section class="categories festivals"
-                 id="festivals">
-
-            <div class="container">
-
-                <h2>
-                    Gifts by Festival
-                </h2>
-
-            </div>
-
-            <div class="category-grid"
-                 id="festivalGrid">
-
-                <!-- Festivals populated by JavaScript -->
-
-            </div>
-
-        </section>
-
-
-        <!-- ================================================= -->
-        <!-- ================ 3. SHOP BY CATEGORY ============ -->
-        <!-- ================================================= -->
-
-        <section class="categories"
-                 id="categories">
-
-            <div class="container">
-
-                <h2>
-                    Gifts by Category
-                </h2>
-
-            </div>
-
-            <div class="category-grid"
-                 id="categoryGrid">
-
-                <!-- Categories populated by JavaScript -->
-
-            </div>
-
-        </section>
-
-    </section>
-    <!-- ================= END HOME PAGE ================= -->
-
-
-
-
-    <!-- ================= CATEGORY PAGE ================= -->
-    <div id="categoryPage" class="page hidden">
-
-        <div class="container">
-
-            <h1 id="categoryTitle">
-                Products
-            </h1>
-
-
-            <!-- Filter Section -->
-            <div class="filter-section">
-
-                <div class="filter-row">
-
-
-                    <!-- Sort -->
-                    <div class="filter-group">
-
-                        <label for="sortBy">
-                            Sort By:
-                        </label>
-
-                        <select id="sortBy" onchange="applyFilters()">
-
-                            <option value="relevance">
-                                Relevance
-                            </option>
-
-                            <option value="price-low">
-                                Price: Low to High
-                            </option>
-
-                            <option value="price-high">
-                                Price: High to Low
-                            </option>
-
-                            <option value="rating">
-                                Rating
-                            </option>
-
-                        </select>
-
+                    <!-- Sliders will be loaded from Admin -->
+                    <div class="hero-loading">
+                        Loading...
                     </div>
 
+                    <!-- Previous Button -->
+                    <button type="button" class="slider-btn slider-prev" onclick="changeSlide(-1)"
+                        aria-label="Previous slide">
+                        ❮
+                    </button>
 
-                    <!-- Price -->
-                    <div class="filter-group">
+                    <!-- Next Button -->
+                    <button type="button" class="slider-btn slider-next" onclick="changeSlide(1)"
+                        aria-label="Next slide">
+                        ❯
+                    </button>
 
-                        <label for="priceRange">
-                            Max Price:
-                        </label>
+                    <!-- Slider Dots -->
+                    <div class="slider-dots" id="sliderDots">
+                    </div>
 
-                        <input type="range" id="priceRange" min="0" max="10000" value="10000"
-                               oninput="applyFilters()">
+                </div>
 
-                        <span id="priceValue">
+            </section>
+            <!-- ================================================= -->
+            <!-- ============== 1. SHOP BY RELATIONSHIP ========== -->
+            <!-- ================================================= -->
+
+            <section class="categories relationship-section" id="relationships">
+
+                <div class="container">
+
+                    <h2>
+                        Gifts by Relationship
+                    </h2>
+
+                </div>
+
+                <div class="category-grid" id="relationshipGrid">
+
+                    <!-- Relationship cards populated by JavaScript -->
+
+                </div>
+
+            </section>
+
+
+            <!-- ================================================= -->
+            <!-- ================ 2. SHOP BY FESTIVAL ============ -->
+            <!-- ================================================= -->
+
+            <section class="categories festivals" id="festivals">
+
+                <div class="container">
+
+                    <h2>
+                        Gifts by Festival
+                    </h2>
+
+                </div>
+
+                <div class="category-grid" id="festivalGrid">
+
+                    <!-- Festivals populated by JavaScript -->
+
+                </div>
+
+            </section>
+
+
+            <!-- ================================================= -->
+            <!-- ================ 3. SHOP BY CATEGORY ============ -->
+            <!-- ================================================= -->
+
+            <section class="categories" id="categories">
+
+                <div class="container">
+
+                    <h2>
+                        Gifts by Category
+                    </h2>
+
+                </div>
+
+                <div class="category-grid" id="categoryGrid">
+
+                    <!-- Categories populated by JavaScript -->
+
+                </div>
+
+            </section>
+
+        </section>
+        <!-- ================= END HOME PAGE ================= -->
+
+
+
+
+        <!-- ================= CATEGORY PAGE ================= -->
+        <div id="categoryPage" class="page hidden">
+
+            <div class="container">
+
+                <h1 id="categoryTitle">
+                    Products
+                </h1>
+
+
+                <!-- Filter Section -->
+                <div class="filter-section">
+
+                    <div class="filter-row">
+
+
+                        <!-- Sort -->
+                        <div class="filter-group">
+
+                            <label for="sortBy">
+                                Sort By:
+                            </label>
+
+                            <select id="sortBy" onchange="applyFilters()">
+
+                                <option value="relevance">
+                                    Relevance
+                                </option>
+
+                                <option value="price-low">
+                                    Price: Low to High
+                                </option>
+
+                                <option value="price-high">
+                                    Price: High to Low
+                                </option>
+
+                                <option value="rating">
+                                    Rating
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- Price -->
+                        <div class="filter-group">
+
+                            <label for="priceRange">
+                                Max Price:
+                            </label>
+
+                            <input type="range" id="priceRange" min="0" max="10000" value="10000"
+                                oninput="applyFilters()">
+
+                            <span id="priceValue">
                                 ₹10000
                             </span>
 
+                        </div>
+
+
+                        <!-- Brand -->
+                        <div class="filter-group">
+
+                            <label for="brandFilter">
+                                Brand:
+                            </label>
+
+                            <select id="brandFilter" onchange="applyFilters()">
+
+                                <option value="">
+                                    All Brands
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Products -->
+                <div class="product-grid" id="productGrid">
+
+                    <!-- Products populated by JavaScript -->
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ================= SEARCH RESULTS PAGE ================= -->
+        <div id="searchPage" class="page hidden">
+
+            <div class="container">
+
+                <div class="search-results-header">
+
+                    <h1 id="searchResultsTitle">
+                        Search Results
+                    </h1>
+
+                    <button type="button" class="btn-secondary" onclick="showPage('home')">
+
+                        ← Continue Shopping
+
+                    </button>
+
+                </div>
+
+                <div class="product-grid" id="searchProductGrid">
+
+                    <!-- Search products populated by JavaScript -->
+
+                </div>
+
+                <div id="searchNoResults" style="display: none; text-align: center; padding: 40px;">
+
+                    <h2>No products found</h2>
+
+                    <p>Try searching with a different keyword.</p>
+
+                </div>
+
+            </div>
+
+        </div>
+        <!-- ================= END SEARCH RESULTS PAGE ================= -->
+
+        <!-- ================= PRODUCT DETAILS PAGE ================= -->
+        <div id="productPage" class="page hidden">
+
+            <div class="container">
+
+                <!-- Back Button -->
+                <button type="button" class="btn-secondary" onclick="showPage('category')">
+
+                    ← Back to Products
+
+                </button>
+
+
+                <!-- Product Details -->
+                <div class="product-detail" id="productDetails">
+
+                    <!-- Product details populated by JavaScript -->
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ================= CART PAGE ================= -->
+        <div id="cartPage" class="page hidden">
+
+            <div class="container">
+
+                <h1>
+                    My Cart
+                </h1>
+
+
+
+                <!-- Cart Items -->
+                <div id="cartItems">
+
+                    <!-- Cart items populated by JavaScript -->
+
+                </div>
+
+
+                <!-- Cart Summary -->
+                <div class="cart-summary" id="cartSummary">
+
+                    <!-- Cart summary populated by JavaScript -->
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= PLACE ORDER PAGE ================= -->
+        <div id="orderPage" class="page hidden">
+
+            <div class="container">
+
+                <h1>
+                    Place Order
+                </h1>
+
+                <div id="orderSteps">
+                    <!-- Order steps populated by JavaScript -->
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= MY ORDERS PAGE ================= -->
+        <div id="ordersPage" class="page hidden">
+
+            <div class="container">
+
+                <h1>
+                    My Orders
+                </h1>
+
+
+                <div id="ordersList">
+
+                    <!-- Orders populated by JavaScript -->
+
+                </div>
+
+                <!-- ================= TRACKING UI PREVIEW ================= -->
+                <div class="tracking-preview">
+
+                    <div class="tracking-header">
+                        <div>
+                            <h2>Track Your Order</h2>
+                            <p>Order #RB1001</p>
+                        </div>
+
+                        <span class="tracking-status shipped">
+                            Shipped
+                        </span>
                     </div>
 
 
-                    <!-- Brand -->
-                    <div class="filter-group">
+                    <!-- Courier Selection -->
+                    <div class="tracking-courier-section">
 
-                        <label for="brandFilter">
-                            Brand:
+                        <label for="trackingCourier">
+                            Delivery Partner
                         </label>
 
-                        <select id="brandFilter" onchange="applyFilters()">
+                        <select id="trackingCourier">
 
-                            <option value="">
-                                All Brands
+                            <option value="shiprocket">
+                                Shiprocket
+                            </option>
+
+                            <option value="goswift">
+                                GoSwift
                             </option>
 
                         </select>
 
                     </div>
 
-                </div>
 
-            </div>
+                    <!-- Tracking Information -->
+                    <div class="tracking-info-grid">
 
+                        <div class="tracking-info-box">
 
-            <!-- Products -->
-            <div class="product-grid" id="productGrid">
+                            <span class="tracking-label">
+                                Courier
+                            </span>
 
-                <!-- Products populated by JavaScript -->
+                            <strong id="courierName">
+                                Shiprocket
+                            </strong>
 
-            </div>
-
-        </div>
-
-    </div>
-
-    <!-- ================= SEARCH RESULTS PAGE ================= -->
-    <div id="searchPage" class="page hidden">
-
-        <div class="container">
-
-            <div class="search-results-header">
-
-                <h1 id="searchResultsTitle">
-                    Search Results
-                </h1>
-
-                <button
-                        type="button"
-                        class="btn-secondary"
-                        onclick="showPage('home')">
-
-                    ← Continue Shopping
-
-                </button>
-
-            </div>
-
-            <div
-                    class="product-grid"
-                    id="searchProductGrid">
-
-                <!-- Search products populated by JavaScript -->
-
-            </div>
-
-            <div
-                    id="searchNoResults"
-                    style="display: none; text-align: center; padding: 40px;">
-
-                <h2>No products found</h2>
-
-                <p>Try searching with a different keyword.</p>
-
-            </div>
-
-        </div>
-
-    </div>
-    <!-- ================= END SEARCH RESULTS PAGE ================= -->
-
-    <!-- ================= PRODUCT DETAILS PAGE ================= -->
-    <div id="productPage" class="page hidden">
-
-        <div class="container">
-
-            <!-- Back Button -->
-            <button type="button" class="btn-secondary" onclick="showPage('category')">
-
-                ← Back to Products
-
-            </button>
-
-
-            <!-- Product Details -->
-            <div class="product-detail" id="productDetails">
-
-                <!-- Product details populated by JavaScript -->
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-
-    <!-- ================= CART PAGE ================= -->
-    <div id="cartPage" class="page hidden">
-
-        <div class="container">
-
-            <h1>
-                My Cart
-            </h1>
-
-
-
-            <!-- Cart Items -->
-            <div id="cartItems">
-
-                <!-- Cart items populated by JavaScript -->
-
-            </div>
-
-
-            <!-- Cart Summary -->
-            <div class="cart-summary" id="cartSummary">
-
-                <!-- Cart summary populated by JavaScript -->
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- ================= PLACE ORDER PAGE ================= -->
-    <div id="orderPage" class="page hidden">
-
-        <div class="container">
-
-            <h1>
-                Place Order
-            </h1>
-
-            <div id="orderSteps">
-                <!-- Order steps populated by JavaScript -->
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- ================= MY ORDERS PAGE ================= -->
-    <div id="ordersPage" class="page hidden">
-
-        <div class="container">
-
-            <h1>
-                My Orders
-            </h1>
-
-
-            <div id="ordersList">
-
-                <!-- Orders populated by JavaScript -->
-
-            </div>
-
-            <!-- ================= TRACKING UI PREVIEW ================= -->
-            <div class="tracking-preview">
-
-                <div class="tracking-header">
-                    <div>
-                        <h2>Track Your Order</h2>
-                        <p>Order #RB1001</p>
-                    </div>
-
-                    <span class="tracking-status shipped">
-                    Shipped
-                </span>
-                </div>
-
-
-                <!-- Courier Selection -->
-                <div class="tracking-courier-section">
-
-                    <label for="trackingCourier">
-                        Delivery Partner
-                    </label>
-
-                    <select id="trackingCourier">
-
-                        <option value="shiprocket">
-                            Shiprocket
-                        </option>
-
-                        <option value="goswift">
-                            GoSwift
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-                <!-- Tracking Information -->
-                <div class="tracking-info-grid">
-
-                    <div class="tracking-info-box">
-
-                    <span class="tracking-label">
-                        Courier
-                    </span>
-
-                        <strong id="courierName">
-                            Shiprocket
-                        </strong>
-
-                    </div>
-
-
-                    <div class="tracking-info-box">
-
-                    <span class="tracking-label">
-                        Tracking ID
-                    </span>
-
-                        <strong>
-                            SR123456789
-                        </strong>
-
-                    </div>
-
-
-                    <div class="tracking-info-box">
-
-                    <span class="tracking-label">
-                        Current Status
-                    </span>
-
-                        <strong>
-                            Shipped
-                        </strong>
-
-                    </div>
-
-                </div>
-
-
-                <!-- Tracking Timeline -->
-                <div class="tracking-timeline">
-
-                    <div class="tracking-step completed">
-
-                        <div class="tracking-icon">
-                            ✓
                         </div>
 
-                        <div class="tracking-step-content">
 
-                            <strong>Order Placed</strong>
+                        <div class="tracking-info-box">
 
-                            <span>
-                            Your order has been confirmed
-                        </span>
+                            <span class="tracking-label">
+                                Tracking ID
+                            </span>
+
+                            <strong>
+                                SR123456789
+                            </strong>
+
+                        </div>
+
+
+                        <div class="tracking-info-box">
+
+                            <span class="tracking-label">
+                                Current Status
+                            </span>
+
+                            <strong>
+                                Shipped
+                            </strong>
 
                         </div>
 
                     </div>
 
 
-                    <div class="tracking-step completed">
+                    <!-- Tracking Timeline -->
+                    <div class="tracking-timeline">
 
-                        <div class="tracking-icon">
-                            ✓
-                        </div>
+                        <div class="tracking-step completed">
 
-                        <div class="tracking-step-content">
+                            <div class="tracking-icon">
+                                ✓
+                            </div>
 
-                            <strong>Shipped</strong>
+                            <div class="tracking-step-content">
 
-                            <span>
-                            Your order has been shipped
-                        </span>
+                                <strong>Order Placed</strong>
 
-                        </div>
-
-                    </div>
-
-
-                    <div class="tracking-step current">
-
-                        <div class="tracking-icon">
-                            🚚
-                        </div>
-
-                        <div class="tracking-step-content">
-
-                            <strong>Out for Delivery</strong>
-
-                            <span>
-                            Your order is on the way
-                        </span>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="tracking-step">
-
-                        <div class="tracking-icon">
-                            ✓
-                        </div>
-
-                        <div class="tracking-step-content">
-
-                            <strong>Delivered</strong>
-
-                            <span>
-                            Waiting for delivery
-                        </span>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <!-- Track Button -->
-                <button
-                        type="button"
-                        class="track-shipment-btn"
-                        onclick="trackShipment()">
-
-                    🚚 Track Shipment
-
-                </button>
-
-            </div>
-
-        </div>
-
-    </div>
-    <!-- ================= ORDER SUCCESS PAGE ================= -->
-    <section id="orderSuccessPage" class="page hidden">
-
-        <div class="container">
-
-            <div class="order-success-container">
-
-                <div class="success-icon">✓</div>
-
-                <h1>Congratulations! 🎉</h1>
-
-                <h2>Your order has been placed successfully</h2>
-
-                <p class="success-message">
-                    Thank you for shopping with RishtaBox.
-                    Your payment was successful and your order is confirmed.
-                </p>
-
-                <div class="success-order-details">
-
-                    <div class="success-detail-row">
-                        <span>Order ID</span>
-                        <strong id="successOrderId">-</strong>
-                    </div>
-
-                    <div class="success-detail-row">
-                        <span>Payment Method</span>
-                        <strong id="successPaymentMethod">-</strong>
-                    </div>
-
-                    <div class="success-detail-row">
-                        <span>Total Amount</span>
-                        <strong>₹<span id="successOrderTotal">0</span></strong>
-                    </div>
-
-                    <div class="success-detail-row">
-                        <span>Expected Delivery</span>
-                        <strong id="successDeliveryDate">-</strong>
-                    </div>
-
-                    <div class="success-detail-row">
-                        <span>Payment Status</span>
-                        <strong id="successPaymentStatus">-</strong>
-                    </div>
-
-                </div>
-
-                <div class="success-buttons">
-
-                    <button type="button"
-                            class="btn-primary"
-                            onclick="showPage('orders'); return false;">
-                        📦 View My Orders
-                    </button>
-
-                    <button type="button"
-                            class="btn-secondary"
-                            onclick="showPage('home'); return false;">
-                        🛍️ Continue Shopping
-                    </button>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </section>
-    <!-- ================= END ORDER SUCCESS PAGE ================= -->
-
-
-    <!-- =========================================================
-         LOGIN / SIGNUP PAGE
-    ========================================================= -->
-
-    <section id="loginPage" class="page hidden">
-
-        <div class="auth-container">
-
-
-            <!-- =====================================================
-                 LEFT SIDE
-            ====================================================== -->
-
-            <div class="auth-welcome">
-
-                <div class="auth-gift-icon">
-
-                    <img
-                            src="images/logo.jpeg"
-                            alt="RishtaBox Logo"
-                    >
-
-                </div>
-
-                <h2>Make Every Moment Special</h2>
-
-                <p>
-                    Discover thoughtful gifts for every special
-                    relationship and occasion.
-                </p>
-
-                <div class="auth-features">
-
-                    <div>
-                        <span>💝</span>
-                        Gifts for Every Relationship
-                    </div>
-
-                    <div>
-                        <span>✨</span>
-                        Beautiful Personalized Gifts
-                    </div>
-
-                    <div>
-                        <span>🚚</span>
-                        Fast & Reliable Delivery
-                    </div>
-
-                    <div>
-                        <span>🔒</span>
-                        Safe & Secure Shopping
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- =====================================================
-                 RIGHT SIDE
-            ====================================================== -->
-
-            <div class="auth-box">
-
-
-                <!-- =================================================
-                     LOGIN SECTION
-                ================================================== -->
-
-                <div id="loginSection">
-
-                    <div class="auth-heading">
-
-                        <h1>Welcome Back!</h1>
-
-                        <p>
-                            Sign in to continue shopping
-                        </p>
-
-                    </div>
-
-                    <!-- =================================================
-                         EMAIL ONLY
-                    ================================================== -->
-
-                    <div class="auth-input-group">
-
-                        <label for="loginEmail">
-                            Email Address
-                        </label>
-
-                        <div class="auth-input">
-
-                            <span>✉️</span>
-
-                            <input
-                                    type="email"
-                                    id="loginEmail"
-                                    placeholder="Enter your registered email"
-                                    autocomplete="email"
-                            >
-
-                        </div>
-
-                    </div>
-
-                    <!-- =================================================
-                         SEND LOGIN OTP
-                    ================================================== -->
-
-                    <button
-                            type="button"
-                            id="sendLoginOtpBtn"
-                            class="auth-main-btn"
-                            onclick="sendLoginOtp()"
-                    >
-                        Send OTP
-                    </button>
-
-
-                    <div
-                            id="loginSendOtpMessage"
-                            class="auth-message"
-                    ></div>
-
-
-                    <!-- =================================================
-                         LOGIN OTP
-                    ================================================== -->
-
-                    <div id="loginOtpSection">
-
-                        <div class="auth-input-group">
-
-                            <label for="loginOtp">
-                                Enter OTP
-                            </label>
-
-                            <div class="auth-input">
-
-                                <span>🔐</span>
-
-                                <input
-                                        type="text"
-                                        id="loginOtp"
-                                        placeholder="Enter 6-digit OTP"
-                                        maxlength="6"
-                                        inputmode="numeric"
-                                        autocomplete="one-time-code"
-                                >
+                                <span>
+                                    Your order has been confirmed
+                                </span>
 
                             </div>
 
                         </div>
 
 
-                        <button
-                                type="button"
-                                id="verifyLoginOtpBtn"
-                                class="auth-main-btn"
-                                onclick="verifyLoginOtp()"
-                        >
-                            Verify OTP
-                        </button>
+                        <div class="tracking-step completed">
 
+                            <div class="tracking-icon">
+                                ✓
+                            </div>
 
-                        <button
-                                type="button"
-                                id="resendLoginOtpBtn"
-                                class="auth-outline-btn"
-                                onclick="sendLoginOtp()"
-                        >
-                            Resend OTP
-                        </button>
+                            <div class="tracking-step-content">
 
+                                <strong>Shipped</strong>
 
-                        <div
-                                id="loginOtpMessage"
-                                class="auth-message"
-                        ></div>
+                                <span>
+                                    Your order has been shipped
+                                </span>
 
-                    </div>
-
-
-                    <!-- =================================================
-                         LOGIN PASSWORD
-                    ================================================== -->
-
-                    <div class="auth-input-group">
-
-                        <div class="auth-label-row">
-
-                            <label for="loginPassword">
-                                Password
-                            </label>
-
-                            <a
-                                    href="#"
-                                    onclick="forgotPassword(event)"
-                            >
-                                Forgot password?
-                            </a>
+                            </div>
 
                         </div>
 
 
-                        <div class="auth-input">
+                        <div class="tracking-step current">
 
-                            <span>🔒</span>
+                            <div class="tracking-icon">
+                                🚚
+                            </div>
 
-                            <input
-                                    type="password"
-                                    id="loginPassword"
-                                    placeholder="Enter your password"
-                                    autocomplete="current-password"
-                            >
+                            <div class="tracking-step-content">
 
-                            <button
-                                    type="button"
-                                    class="password-toggle"
-                                    onclick="togglePassword(
-                                    'loginPassword',
-                                    this
-                                )"
-                            >
-                                Show
-                            </button>
+                                <strong>Out for Delivery</strong>
+
+                                <span>
+                                    Your order is on the way
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="tracking-step">
+
+                            <div class="tracking-icon">
+                                ✓
+                            </div>
+
+                            <div class="tracking-step-content">
+
+                                <strong>Delivered</strong>
+
+                                <span>
+                                    Waiting for delivery
+                                </span>
+
+                            </div>
 
                         </div>
 
                     </div>
 
 
-                    <!-- =================================================
-                         REMEMBER ME
-                    ================================================== -->
+                    <!-- Track Button -->
+                    <button type="button" class="track-shipment-btn" onclick="trackShipment()">
 
-                    <label class="remember-me">
+                        🚚 Track Shipment
 
-                        <input
-                                type="checkbox"
-                                id="rememberMe"
-                        >
-
-                        Remember me
-
-                    </label>
-
-
-                    <!-- =================================================
-                         SIGN IN
-                    ================================================== -->
-
-                    <button
-                            type="button"
-                            id="loginBtn"
-                            class="auth-main-btn"
-                            onclick="loginWithPassword()"
-                    >
-                        Sign In
                     </button>
 
+                </div>
 
-                    <div
-                            id="loginMessage"
-                            class="auth-message"
-                    ></div>
+            </div>
 
+        </div>
+        <!-- ================= ORDER SUCCESS PAGE ================= -->
+        <section id="orderSuccessPage" class="page hidden">
 
-                    <!-- =================================================
-                         CREATE ACCOUNT
-                    ================================================== -->
+            <div class="container">
 
-                    <div class="auth-switch">
+                <div class="order-success-container">
 
-                        <div class="auth-divider">
+                    <div class="success-icon">✓</div>
 
-                        <span>
-                            New to RishtaBox?
-                        </span>
+                    <h1>Congratulations! 🎉</h1>
 
+                    <h2>Your order has been placed successfully</h2>
+
+                    <p class="success-message">
+                        Thank you for shopping with RishtaBox.
+                        Your payment was successful and your order is confirmed.
+                    </p>
+
+                    <div class="success-order-details">
+
+                        <div class="success-detail-row">
+                            <span>Order ID</span>
+                            <strong id="successOrderId">-</strong>
                         </div>
 
-                        <button
-                                type="button"
-                                class="auth-outline-btn"
-                                onclick="showSignup()"
-                        >
-                            Create your RishtaBox account
+                        <div class="success-detail-row">
+                            <span>Payment Method</span>
+                            <strong id="successPaymentMethod">-</strong>
+                        </div>
+
+                        <div class="success-detail-row">
+                            <span>Total Amount</span>
+                            <strong>₹<span id="successOrderTotal">0</span></strong>
+                        </div>
+
+                        <div class="success-detail-row">
+                            <span>Expected Delivery</span>
+                            <strong id="successDeliveryDate">-</strong>
+                        </div>
+
+                        <div class="success-detail-row">
+                            <span>Payment Status</span>
+                            <strong id="successPaymentStatus">-</strong>
+                        </div>
+
+                    </div>
+
+                    <div class="success-buttons">
+
+                        <button type="button" class="btn-primary" onclick="showPage('orders'); return false;">
+                            📦 View My Orders
                         </button>
+
+                        <button type="button" class="btn-secondary" onclick="showPage('home'); return false;">
+                            🛍️ Continue Shopping
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+        <!-- ================= END ORDER SUCCESS PAGE ================= -->
+
+
+        <!-- =========================================================
+         LOGIN / SIGNUP PAGE
+    ========================================================= -->
+
+        <section id="loginPage" class="page hidden">
+
+            <div class="auth-container">
+
+
+                <!-- =====================================================
+                 LEFT SIDE
+            ====================================================== -->
+
+                <div class="auth-welcome">
+
+                    <div class="auth-gift-icon">
+
+                        <img src="images/logo.jpeg" alt="RishtaBox Logo">
+
+                    </div>
+
+                    <h2>Make Every Moment Special</h2>
+
+                    <p>
+                        Discover thoughtful gifts for every special
+                        relationship and occasion.
+                    </p>
+
+                    <div class="auth-features">
+
+                        <div>
+                            <span>💝</span>
+                            Gifts for Every Relationship
+                        </div>
+
+                        <div>
+                            <span>✨</span>
+                            Beautiful Personalized Gifts
+                        </div>
+
+                        <div>
+                            <span>🚚</span>
+                            Fast & Reliable Delivery
+                        </div>
+
+                        <div>
+                            <span>🔒</span>
+                            Safe & Secure Shopping
+                        </div>
 
                     </div>
 
@@ -1097,313 +813,610 @@
 
 
                 <!-- =====================================================
-                     SIGNUP SECTION
-                ====================================================== -->
+                 RIGHT SIDE
+            ====================================================== -->
 
-                <div
-                        id="signupSection"
-                        class="hidden"
-                >
-
-                    <div class="auth-heading">
-
-                        <h1>Create Account</h1>
-
-                        <p>
-                            Join RishtaBox and start gifting
-                        </p>
-
-                    </div>
+                <div class="auth-box">
 
 
                     <!-- =================================================
-                         NAME
-                    ================================================== -->
+                     LOGIN SECTION
+                ================================================== -->
 
-                    <div class="auth-input-group">
+                    <div id="loginSection">
 
-                        <label for="signupName">
-                            Your Name
-                        </label>
+                        <div class="auth-heading">
 
-                        <div class="auth-input">
+                            <h1>Welcome Back!</h1>
 
-                            <span>👤</span>
-
-                            <input
-                                    type="text"
-                                    id="signupName"
-                                    placeholder="Enter your full name"
-                                    autocomplete="name"
-                            >
+                            <p>
+                                Sign in to continue shopping
+                            </p>
 
                         </div>
 
-                    </div>
-
-
-                    <!-- =================================================
-                         MOBILE NUMBER
-                         MOBILE OTP REMOVED
+                        <!-- =================================================
+                         EMAIL ONLY
                     ================================================== -->
-
-                    <div class="auth-input-group">
-
-                        <label for="signupMobile">
-                            Mobile Number
-                        </label>
-
-                        <div class="auth-input">
-
-                            <span>📱</span>
-
-                            <input
-                                    type="tel"
-                                    id="signupMobile"
-                                    placeholder="Enter 10-digit mobile number"
-                                    maxlength="10"
-                                    inputmode="numeric"
-                                    autocomplete="tel"
-                            >
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- =================================================
-                         EMAIL
-                    ================================================== -->
-
-                    <div class="auth-input-group">
-
-                        <label for="signupEmail">
-                            Email Address
-                        </label>
-
-                        <div class="auth-input">
-
-                            <span>✉️</span>
-
-                            <input
-                                    type="email"
-                                    id="signupEmail"
-                                    placeholder="Enter your email"
-                                    autocomplete="email"
-                            >
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- =================================================
-                         SEND EMAIL OTP
-                    ================================================== -->
-
-                    <button
-                            type="button"
-                            id="sendEmailOtpBtn"
-                            class="auth-main-btn"
-                            onclick="sendEmailOtp()"
-                    >
-                        Send OTP
-                    </button>
-
-
-                    <div
-                            id="emailSendOtpMessage"
-                            class="auth-message"
-                    ></div>
-
-
-                    <!-- =================================================
-                         EMAIL OTP
-                    ================================================== -->
-
-                    <div id="emailOtpSection">
 
                         <div class="auth-input-group">
 
-                            <label for="emailOtp">
-                                Email OTP
+                            <label for="loginEmail">
+                                Email Address
                             </label>
 
                             <div class="auth-input">
 
                                 <span>✉️</span>
 
-                                <input
-                                        type="text"
-                                        id="emailOtp"
-                                        placeholder="Enter 6-digit OTP"
-                                        maxlength="6"
-                                        inputmode="numeric"
-                                        autocomplete="one-time-code"
-                                >
+                                <input type="email" id="loginEmail" placeholder="Enter your registered email"
+                                    autocomplete="email">
+
+                            </div>
+
+                        </div>
+
+                        <!-- =================================================
+                         SEND LOGIN OTP
+                    ================================================== -->
+
+                        <button type="button" id="sendLoginOtpBtn" class="auth-main-btn" onclick="sendLoginOtp()">
+                            Send OTP
+                        </button>
+
+
+                        <div id="loginSendOtpMessage" class="auth-message"></div>
+
+
+                        <!-- =================================================
+                         LOGIN OTP
+                    ================================================== -->
+
+                        <div id="loginOtpSection">
+
+                            <div class="auth-input-group">
+
+                                <label for="loginOtp">
+                                    Enter OTP
+                                </label>
+
+                                <div class="auth-input">
+
+                                    <span>🔐</span>
+
+                                    <input type="text" id="loginOtp" placeholder="Enter 6-digit OTP" maxlength="6"
+                                        inputmode="numeric" autocomplete="one-time-code">
+
+                                </div>
+
+                            </div>
+
+
+                            <button type="button" id="verifyLoginOtpBtn" class="auth-main-btn"
+                                onclick="verifyLoginOtp()">
+                                Verify OTP
+                            </button>
+
+
+                            <button type="button" id="resendLoginOtpBtn" class="auth-outline-btn"
+                                onclick="sendLoginOtp()">
+                                Resend OTP
+                            </button>
+
+
+                            <div id="loginOtpMessage" class="auth-message"></div>
+
+                        </div>
+
+
+                        <!-- =================================================
+                         LOGIN PASSWORD
+                    ================================================== -->
+
+                        <div class="auth-input-group">
+
+                            <div class="auth-label-row">
+
+                                <label for="loginPassword">
+                                    Password
+                                </label>
+
+                                <a href="#" onclick="forgotPassword(event)">
+                                    Forgot password?
+                                </a>
+
+                            </div>
+
+
+                            <div class="auth-input">
+
+                                <span>🔒</span>
+
+                                <input type="password" id="loginPassword" placeholder="Enter your password"
+                                    autocomplete="current-password">
+
+                                <button type="button" class="password-toggle" onclick="togglePassword(
+                                    'loginPassword',
+                                    this
+                                )">
+                                    Show
+                                </button>
 
                             </div>
 
                         </div>
 
 
-                        <button
-                                type="button"
-                                id="verifyEmailOtpBtn"
-                                class="auth-main-btn"
-                                onclick="verifyEmailOtp()"
-                        >
-                            Verify OTP
-                        </button>
-
-
-                        <button
-                                type="button"
-                                id="resendEmailOtpBtn"
-                                class="auth-outline-btn"
-                                onclick="sendEmailOtp()"
-                        >
-                            Resend OTP
-                        </button>
-
-
-                        <div
-                                id="emailOtpMessage"
-                                class="auth-message"
-                        ></div>
-
-                    </div>
-
-
-                    <!-- =================================================
-                         PASSWORD
+                        <!-- =================================================
+                         REMEMBER ME
                     ================================================== -->
 
-                    <div class="auth-input-group">
+                        <label class="remember-me">
 
-                        <label for="signupPassword">
-                            Password
+                            <input type="checkbox" id="rememberMe">
+
+                            Remember me
+
                         </label>
 
-                        <div class="auth-input">
 
-                            <span>🔒</span>
-
-                            <input
-                                    type="password"
-                                    id="signupPassword"
-                                    placeholder="At least 6 characters"
-                                    autocomplete="new-password"
-                            >
-
-                            <button
-                                    type="button"
-                                    class="password-toggle"
-                                    onclick="togglePassword(
-                                    'signupPassword',
-                                    this
-                                )"
-                            >
-                                Show
-                            </button>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- =================================================
-                         CONFIRM PASSWORD
-                    ================================================== -->
-
-                    <div class="auth-input-group">
-
-                        <label for="confirmPassword">
-                            Confirm Password
-                        </label>
-
-                        <div class="auth-input">
-
-                            <span>🔒</span>
-
-                            <input
-                                    type="password"
-                                    id="confirmPassword"
-                                    placeholder="Re-enter your password"
-                                    autocomplete="new-password"
-                            >
-
-                            <button
-                                    type="button"
-                                    class="password-toggle"
-                                    onclick="togglePassword(
-                                    'confirmPassword',
-                                    this
-                                )"
-                            >
-                                Show
-                            </button>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- =================================================
-                         PASSWORD HINT
-                    ================================================== -->
-
-                    <p class="password-hint">
-
-                        🔐 Password must contain at least 6 characters.
-
-                    </p>
-
-
-                    <!-- =================================================
-                         CREATE ACCOUNT
-                    ================================================== -->
-
-                    <button
-                            type="button"
-                            id="createAccountBtn"
-                            class="auth-main-btn"
-                            onclick="createAccount()"
-                    >
-                        Create Account
-                    </button>
-
-
-                    <div
-                            id="signupMessage"
-                            class="auth-message"
-                    ></div>
-
-
-                    <!-- =================================================
+                        <!-- =================================================
                          SIGN IN
                     ================================================== -->
 
-                    <div class="auth-switch">
-
-                        <div class="auth-divider">
-
-                        <span>
-                            Already have an account?
-                        </span>
-
-                        </div>
-
-                        <button
-                                type="button"
-                                class="auth-outline-btn"
-                                onclick="showLogin()"
-                        >
+                        <button type="button" id="loginBtn" class="auth-main-btn" onclick="loginWithPassword()">
                             Sign In
                         </button>
 
+
+                        <div id="loginMessage" class="auth-message"></div>
+
+
+                        <!-- =================================================
+                         CREATE ACCOUNT
+                    ================================================== -->
+
+                        <div class="auth-switch">
+
+                            <div class="auth-divider">
+
+                                <span>
+                                    New to RishtaBox?
+                                </span>
+
+                            </div>
+
+                            <button type="button" class="auth-outline-btn" onclick="showSignup()">
+                                Create your RishtaBox account
+                            </button>
+
+                        </div>
+
                     </div>
 
+
+                    <!-- =====================================================
+                     SIGNUP SECTION
+                ====================================================== -->
+
+                    <div id="signupSection" class="hidden">
+
+                        <div class="auth-heading">
+
+                            <h1>Create Account</h1>
+
+                            <p>
+                                Join RishtaBox and start gifting
+                            </p>
+
+                        </div>
+
+
+                        <!-- =================================================
+                         NAME
+                    ================================================== -->
+
+                        <div class="auth-input-group">
+
+                            <label for="signupName">
+                                Your Name
+                            </label>
+
+                            <div class="auth-input">
+
+                                <span>👤</span>
+
+                                <input type="text" id="signupName" placeholder="Enter your full name"
+                                    autocomplete="name">
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- =================================================
+                         MOBILE NUMBER
+                         MOBILE OTP REMOVED
+                    ================================================== -->
+
+                        <div class="auth-input-group">
+
+                            <label for="signupMobile">
+                                Mobile Number
+                            </label>
+
+                            <div class="auth-input">
+
+                                <span>📱</span>
+
+                                <input type="tel" id="signupMobile" placeholder="Enter 10-digit mobile number"
+                                    maxlength="10" inputmode="numeric" autocomplete="tel">
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- =================================================
+                         EMAIL
+                    ================================================== -->
+
+                        <div class="auth-input-group">
+
+                            <label for="signupEmail">
+                                Email Address
+                            </label>
+
+                            <div class="auth-input">
+
+                                <span>✉️</span>
+
+                                <input type="email" id="signupEmail" placeholder="Enter your email"
+                                    autocomplete="email">
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- =================================================
+                         SEND EMAIL OTP
+                    ================================================== -->
+
+                        <button type="button" id="sendEmailOtpBtn" class="auth-main-btn" onclick="sendEmailOtp()">
+                            Send OTP
+                        </button>
+
+
+                        <div id="emailSendOtpMessage" class="auth-message"></div>
+
+
+                        <!-- =================================================
+                         EMAIL OTP
+                    ================================================== -->
+
+                        <div id="emailOtpSection">
+
+                            <div class="auth-input-group">
+
+                                <label for="emailOtp">
+                                    Email OTP
+                                </label>
+
+                                <div class="auth-input">
+
+                                    <span>✉️</span>
+
+                                    <input type="text" id="emailOtp" placeholder="Enter 6-digit OTP" maxlength="6"
+                                        inputmode="numeric" autocomplete="one-time-code">
+
+                                </div>
+
+                            </div>
+
+
+                            <button type="button" id="verifyEmailOtpBtn" class="auth-main-btn"
+                                onclick="verifyEmailOtp()">
+                                Verify OTP
+                            </button>
+
+
+                            <button type="button" id="resendEmailOtpBtn" class="auth-outline-btn"
+                                onclick="sendEmailOtp()">
+                                Resend OTP
+                            </button>
+
+
+                            <div id="emailOtpMessage" class="auth-message"></div>
+
+                        </div>
+
+
+                        <!-- =================================================
+                         PASSWORD
+                    ================================================== -->
+
+                        <div class="auth-input-group">
+
+                            <label for="signupPassword">
+                                Password
+                            </label>
+
+                            <div class="auth-input">
+
+                                <span>🔒</span>
+
+                                <input type="password" id="signupPassword" placeholder="At least 6 characters"
+                                    autocomplete="new-password">
+
+                                <button type="button" class="password-toggle" onclick="togglePassword(
+                                    'signupPassword',
+                                    this
+                                )">
+                                    Show
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- =================================================
+                         CONFIRM PASSWORD
+                    ================================================== -->
+
+                        <div class="auth-input-group">
+
+                            <label for="confirmPassword">
+                                Confirm Password
+                            </label>
+
+                            <div class="auth-input">
+
+                                <span>🔒</span>
+
+                                <input type="password" id="confirmPassword" placeholder="Re-enter your password"
+                                    autocomplete="new-password">
+
+                                <button type="button" class="password-toggle" onclick="togglePassword(
+                                    'confirmPassword',
+                                    this
+                                )">
+                                    Show
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- =================================================
+                         PASSWORD HINT
+                    ================================================== -->
+
+                        <p class="password-hint">
+
+                            🔐 Password must contain at least 6 characters.
+
+                        </p>
+
+
+                        <!-- =================================================
+                         CREATE ACCOUNT
+                    ================================================== -->
+
+                        <button type="button" id="createAccountBtn" class="auth-main-btn" onclick="createAccount()">
+                            Create Account
+                        </button>
+
+
+                        <div id="signupMessage" class="auth-message"></div>
+
+
+                        <!-- =================================================
+                         SIGN IN
+                    ================================================== -->
+
+                        <div class="auth-switch">
+
+                            <div class="auth-divider">
+
+                                <span>
+                                    Already have an account?
+                                </span>
+
+                            </div>
+
+                            <button type="button" class="auth-outline-btn" onclick="showLogin()">
+                                Sign In
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= END LOGIN / SIGNUP ================= -->
+        <!-- ================= ACCOUNT PAGE ================= -->
+        <div id="accountPage" class="page hidden">
+
+            <div class="container">
+
+                <h1>My Account</h1>
+
+                <div class="account-form">
+
+                    <h2>Personal Information</h2>
+
+                    <!-- Name -->
+                    <div class="form-group">
+                        <label for="userName">Name:</label>
+
+                        <input type="text" id="userName" name="userName" placeholder="Enter your name"
+                            autocomplete="name">
+                    </div>
+
+                    <!-- Email -->
+                    <div class="form-group">
+                        <label for="userEmail">Email:</label>
+
+                        <input type="email" id="userEmail" name="userEmail" placeholder="Enter your email"
+                            autocomplete="email">
+                    </div>
+
+                    <!-- Phone -->
+                    <div class="form-group">
+                        <label for="userPhone">Phone:</label>
+
+                        <input type="tel" id="userPhone" name="userPhone" placeholder="Enter your phone"
+                            autocomplete="tel">
+                    </div>
+
+                    <!-- Address -->
+                    <div class="form-group">
+                        <label for="userAddress">Address:</label>
+
+                        <textarea id="userAddress" name="userAddress" placeholder="Enter your delivery address"
+                            autocomplete="street-address" rows="4"></textarea>
+                    </div>
+
+                    <!-- Save Button -->
+                    <button type="button" class="btn-primary" onclick="saveUserInfo()">
+                        Save Information
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+    <!-- ==================== TESTIMONIALS SECTION ==================== -->
+
+    <section class="testimonials-section" id="customerTestimonials">
+
+        <div class="section-heading">
+
+            <h2>What Our Customers Say</h2>
+
+            <p>
+                Loved by our customers ❤️
+            </p>
+
+        </div>
+
+        <div class="testimonials-container" id="testimonialsContainer">
+
+            <div class="testimonial-loading">
+                Loading customer testimonials...
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- ==================== END TESTIMONIALS ==================== -->
+    <!-- ==================== BLOG SECTION ==================== -->
+
+    <section id="blogs" class="blog-section">
+
+        <div class="section-heading">
+
+            <span class="section-tag">
+                OUR BLOG
+            </span>
+
+            <h2>From Our Blog</h2>
+
+            <p>
+                Ideas, Tips & Inspiration ✨
+            </p>
+
+        </div>
+
+
+        <div id="blogsContainer" class="blogs-container">
+
+            <div class="blog-loading">
+                Loading blogs...
+            </div>
+
+        </div>
+
+
+        <div class="blog-view-all">
+
+            <button type="button" class="view-all-blogs-btn" onclick="showPage('blogsPage')">
+
+                View All Blogs
+
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================================
+     ALL BLOGS PAGE
+========================================================= -->
+
+    <section id="blogsPage" class="blog-page" style="display: none;">
+
+        <div class="blog-page-header">
+
+            <button type="button" class="blog-back-btn" onclick="showPage('home')">
+
+                ← Back to Home
+
+            </button>
+
+            <span class="section-tag">
+                RISHTABOX BLOG
+            </span>
+
+            <h1>
+                Stories, Ideas & Inspiration
+            </h1>
+
+            <p>
+                Discover gifting ideas, relationship stories,
+                festival inspiration and helpful tips.
+            </p>
+
+        </div>
+
+
+        <div id="allBlogsContainer" class="blogs-container">
+
+            <div class="blog-loading">
+                Loading blogs...
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================================
+     BLOG DETAILS PAGE
+========================================================= -->
+
+    <section id="blogDetailsSection" class="blog-details-section" style="display: none;">
+
+        <div class="blog-details-container">
+
+            <div id="blogDetailsContent">
+
+                <div class="blog-loading">
+                    Loading blog...
                 </div>
 
             </div>
@@ -1412,674 +1425,390 @@
 
     </section>
 
-
-    <!-- ================= END LOGIN / SIGNUP ================= -->
-    <!-- ================= ACCOUNT PAGE ================= -->
-    <div id="accountPage" class="page hidden">
+    <footer class="footer">
 
         <div class="container">
 
-            <h1>My Account</h1>
+            <!-- FOOTER CONTENT -->
+            <div class="footer-content">
 
-            <div class="account-form">
+                <!-- BRAND -->
+                <div class="footer-section footer-brand">
+                    <h2>
+                        <img src="images/logo.jpeg" alt="RishtaBox Logo" class="footer-logo">
+                        RishtaBox
+                    </h2>
 
-                <h2>Personal Information</h2>
+                    <p>
+                        Thoughtful gifts for every special relationship.
+                        Make every occasion memorable with RishtaBox.
+                    </p>
 
-                <!-- Name -->
-                <div class="form-group">
-                    <label for="userName">Name:</label>
-
-                    <input
-                            type="text"
-                            id="userName"
-                            name="userName"
-                            placeholder="Enter your name"
-                            autocomplete="name"
-                    >
+                    <div class="footer-features">
+                        <span>🎁 Unique Gifts</span>
+                        <span>🚚 Fast Delivery</span>
+                        <span>💝 Made With Love</span>
+                    </div>
                 </div>
 
-                <!-- Email -->
-                <div class="form-group">
-                    <label for="userEmail">Email:</label>
 
-                    <input
-                            type="email"
-                            id="userEmail"
-                            name="userEmail"
-                            placeholder="Enter your email"
-                            autocomplete="email"
-                    >
+                <!-- QUICK LINKS -->
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+
+                    <ul>
+                        <li>
+                            <a href="#" onclick="footerHome(event)">
+                                Home
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="#" onclick="footerShop(event)">
+                                Shop Gifts
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="#" onclick="footerCart(event)">
+                                My Cart
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="#" onclick="footerOrders(event)">
+                                My Orders
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="#" onclick="footerAccount(event)">
+                                My Account
+                            </a>
+                        </li>
+                    </ul>
                 </div>
 
-                <!-- Phone -->
-                <div class="form-group">
-                    <label for="userPhone">Phone:</label>
 
-                    <input
-                            type="tel"
-                            id="userPhone"
-                            name="userPhone"
-                            placeholder="Enter your phone"
-                            autocomplete="tel"
-                    >
+                <!-- CUSTOMER CARE -->
+                <div class="footer-section">
+                    <h3>Customer Care</h3>
+
+                    <ul>
+                        <li>
+                            <a href="#" onclick="footerContact(event)">
+                                Contact Us
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="#" onclick="footerFAQs(event)">
+                                FAQs
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="#" onclick="footerShipping(event)">
+                                Shipping Information
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="#" onclick="footerReturns(event)">
+                                Return &amp; Refund
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="#" onclick="footerPrivacy(event)">
+                                Privacy Policy
+                            </a>
+                        </li>
+                    </ul>
                 </div>
 
-                <!-- Address -->
-                <div class="form-group">
-                    <label for="userAddress">Address:</label>
 
-                    <textarea
-                            id="userAddress"
-                            name="userAddress"
-                            placeholder="Enter your delivery address"
-                            autocomplete="street-address"
-                            rows="4"
-                    ></textarea>
+                <!-- GIFT GUIDE -->
+                <div class="footer-section">
+                    <h3>Gift Ideas</h3>
+
+                    <ul>
+                        <li>
+                            <a href="#" onclick="footerRelationships(event)">
+                                Gifts by Relationship
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="#" onclick="footerFestivals(event)">
+                                Gifts by Festival
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="#" onclick="footerCategories(event)">
+                                Gifts by Category
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="#" onclick="footerCouples(event)">
+                                Gifts for Couples
+                            </a>
+                        </li>
+                    </ul>
                 </div>
 
-                <!-- Save Button -->
-                <button
-                        type="button"
-                        class="btn-primary"
-                        onclick="saveUserInfo()"
-                >
-                    Save Information
-                </button>
+
+                <!-- FOLLOW US -->
+                <div class="footer-section">
+                    <h3>Follow Us</h3>
+
+                    <p class="footer-follow-text">
+                        Follow RishtaBox for gift inspiration,
+                        offers and new arrivals.
+                    </p>
+
+                    <div class="social-links">
+                        <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer"
+                            aria-label="Facebook">
+                            <i class="fa-brands fa-facebook-f"></i>
+                        </a>
+
+                        <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer"
+                            aria-label="Instagram">
+                            <i class="fa-brands fa-instagram"></i>
+                        </a>
+
+                        <a href="https://x.com/" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
+                            <i class="fa-brands fa-x-twitter"></i>
+                        </a>
+
+                        <a href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer"
+                            aria-label="YouTube">
+                            <i class="fa-brands fa-youtube"></i>
+                        </a>
+                    </div>
+
+                    <p class="footer-payment">
+                        💳 Secure Payments
+                    </p>
+                </div>
 
             </div>
 
-        </div>
 
-    </div>
+            <!-- NEWSLETTER -->
+            <div class="footer-newsletter">
+                <div>
+                    <h3>🎁 Get Gift Inspiration</h3>
 
-</main>
-<!-- ==================== TESTIMONIALS SECTION ==================== -->
+                    <p>
+                        Discover special gifts and exclusive offers.
+                    </p>
+                </div>
 
-<section class="testimonials-section" id="customerTestimonials">
+                <div class="newsletter-form">
+                    <input type="email" id="footerNewsletterEmail" placeholder="Enter your email"
+                        aria-label="Email address">
 
-    <div class="section-heading">
-
-        <h2>What Our Customers Say</h2>
-
-        <p>
-            Loved by our customers ❤️
-        </p>
-
-    </div>
-
-    <div
-            class="testimonials-container"
-            id="testimonialsContainer"
-    >
-
-        <div class="testimonial-loading">
-            Loading customer testimonials...
-        </div>
-
-    </div>
-
-</section>
-
-<!-- ==================== END TESTIMONIALS ==================== -->
-<!-- ==================== BLOG SECTION ==================== -->
-
-<section id="blogs" class="blog-section">
-
-    <div class="section-heading">
-
-        <span class="section-tag">
-            OUR BLOG
-        </span>
-
-        <h2>From Our Blog</h2>
-
-        <p>
-            Ideas, Tips & Inspiration ✨
-        </p>
-
-    </div>
-
-
-    <div
-            id="blogsContainer"
-            class="blogs-container">
-
-        <div class="blog-loading">
-            Loading blogs...
-        </div>
-
-    </div>
-
-
-    <div class="blog-view-all">
-
-        <button
-                type="button"
-                class="view-all-blogs-btn"
-                onclick="showPage('blogsPage')">
-
-            View All Blogs
-
-        </button>
-
-    </div>
-
-</section>
-
-
-<!-- =========================================================
-     ALL BLOGS PAGE
-========================================================= -->
-
-<section
-        id="blogsPage"
-        class="blog-page"
-        style="display: none;">
-
-    <div class="blog-page-header">
-
-        <button
-                type="button"
-                class="blog-back-btn"
-                onclick="showPage('home')">
-
-            ← Back to Home
-
-        </button>
-
-        <span class="section-tag">
-            RISHTABOX BLOG
-        </span>
-
-        <h1>
-            Stories, Ideas & Inspiration
-        </h1>
-
-        <p>
-            Discover gifting ideas, relationship stories,
-            festival inspiration and helpful tips.
-        </p>
-
-    </div>
-
-
-    <div
-            id="allBlogsContainer"
-            class="blogs-container">
-
-        <div class="blog-loading">
-            Loading blogs...
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =========================================================
-     BLOG DETAILS PAGE
-========================================================= -->
-
-<section
-        id="blogDetailsSection"
-        class="blog-details-section"
-        style="display: none;">
-
-    <div class="blog-details-container">
-
-        <div id="blogDetailsContent">
-
-            <div class="blog-loading">
-                Loading blog...
+                    <button type="button" onclick="footerSubscribe(event)">
+                        Subscribe
+                    </button>
+                </div>
             </div>
 
-        </div>
 
-    </div>
-
-</section>
-
-<footer class="footer">
-
-    <div class="container">
-
-        <!-- FOOTER CONTENT -->
-        <div class="footer-content">
-
-            <!-- BRAND -->
-            <div class="footer-section footer-brand">
-                <h2>
-                    <img
-                            src="images/logo.jpeg"
-                            alt="RishtaBox Logo"
-                            class="footer-logo"
-                    >
-                    RishtaBox
-                </h2>
-
+            <!-- BOTTOM -->
+            <div class="footer-bottom">
                 <p>
-                    Thoughtful gifts for every special relationship.
-                    Make every occasion memorable with RishtaBox.
+                    © 2026 <strong>RishtaBox</strong>.
+                    Site made by PUCHO Limelight.
                 </p>
 
-                <div class="footer-features">
-                    <span>🎁 Unique Gifts</span>
-                    <span>🚚 Fast Delivery</span>
-                    <span>💝 Made With Love</span>
-                </div>
-            </div>
-
-
-            <!-- QUICK LINKS -->
-            <div class="footer-section">
-                <h3>Quick Links</h3>
-
-                <ul>
-                    <li>
-                        <a href="#" onclick="footerHome(event)">
-                            Home
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="#" onclick="footerShop(event)">
-                            Shop Gifts
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="#" onclick="footerCart(event)">
-                            My Cart
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="#" onclick="footerOrders(event)">
-                            My Orders
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="#" onclick="footerAccount(event)">
-                            My Account
-                        </a>
-                    </li>
-                </ul>
-            </div>
-
-
-            <!-- CUSTOMER CARE -->
-            <div class="footer-section">
-                <h3>Customer Care</h3>
-
-                <ul>
-                    <li>
-                        <a href="#" onclick="footerContact(event)">
-                            Contact Us
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="#" onclick="footerFAQs(event)">
-                            FAQs
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="#" onclick="footerShipping(event)">
-                            Shipping Information
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="#" onclick="footerReturns(event)">
-                            Return &amp; Refund
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="#" onclick="footerPrivacy(event)">
-                            Privacy Policy
-                        </a>
-                    </li>
-                </ul>
-            </div>
-
-
-            <!-- GIFT GUIDE -->
-            <div class="footer-section">
-                <h3>Gift Ideas</h3>
-
-                <ul>
-                    <li>
-                        <a href="#" onclick="footerRelationships(event)">
-                            Gifts by Relationship
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="#" onclick="footerFestivals(event)">
-                            Gifts by Festival
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="#" onclick="footerCategories(event)">
-                            Gifts by Category
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="#" onclick="footerCouples(event)">
-                            Gifts for Couples
-                        </a>
-                    </li>
-                </ul>
-            </div>
-
-
-            <!-- FOLLOW US -->
-            <div class="footer-section">
-                <h3>Follow Us</h3>
-
-                <p class="footer-follow-text">
-                    Follow RishtaBox for gift inspiration,
-                    offers and new arrivals.
-                </p>
-
-                <div class="social-links">
-                    <a
-                            href="https://www.facebook.com/"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label="Facebook"
-                    >
-                        <i class="fa-brands fa-facebook-f"></i>
+                <div class="footer-bottom-links">
+                    <a href="#" onclick="footerTerms(event)">
+                        Terms &amp; Conditions
                     </a>
 
-                    <a
-                            href="https://www.instagram.com/"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label="Instagram"
-                    >
-                        <i class="fa-brands fa-instagram"></i>
+                    <a href="#" onclick="footerPrivacy(event)">
+                        Privacy Policy
                     </a>
 
-                    <a
-                            href="https://x.com/"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label="Twitter"
-                    >
-                        <i class="fa-brands fa-x-twitter"></i>
-                    </a>
-
-                    <a
-                            href="https://www.youtube.com/"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label="YouTube"
-                    >
-                        <i class="fa-brands fa-youtube"></i>
+                    <a href="#" onclick="footerReturns(event)">
+                        Refund Policy
                     </a>
                 </div>
-
-                <p class="footer-payment">
-                    💳 Secure Payments
-                </p>
             </div>
 
         </div>
 
+    </footer>
 
-        <!-- NEWSLETTER -->
-        <div class="footer-newsletter">
-            <div>
-                <h3>🎁 Get Gift Inspiration</h3>
+    <!-- ================= MOBILE BOTTOM NAVIGATION ================= -->
 
-                <p>
-                    Discover special gifts and exclusive offers.
-                </p>
-            </div>
+    <nav class="mobile-bottom-nav" aria-label="Mobile Navigation">
 
-            <div class="newsletter-form">
-                <input
-                        type="email"
-                        id="footerNewsletterEmail"
-                        placeholder="Enter your email"
-                        aria-label="Email address"
-                >
+        <!-- Home -->
+        <a href="#" class="bottom-nav-item" onclick="showPage('home'); return false;">
 
-                <button
-                        type="button"
-                        onclick="footerSubscribe(event)"
-                >
-                    Subscribe
-                </button>
-            </div>
-        </div>
+            <span class="bottom-nav-icon">🏠</span>
+            <span>Home</span>
 
+        </a>
 
-        <!-- BOTTOM -->
-        <div class="footer-bottom">
-            <p>
-                © 2026 <strong>RishtaBox</strong>.
-                Site made by PUCHO Limelight.
-            </p>
+        <!-- Category -->
+        <!--    <a href="#"-->
+        <!--       class="bottom-nav-item"-->
+        <!--       onclick="showPage('category'); return false;">-->
 
-            <div class="footer-bottom-links">
-                <a href="#" onclick="footerTerms(event)">
-                    Terms &amp; Conditions
-                </a>
+        <!--        <span class="bottom-nav-icon">🛍️</span>-->
+        <!--        <span>Category</span>-->
 
-                <a href="#" onclick="footerPrivacy(event)">
-                    Privacy Policy
-                </a>
-
-                <a href="#" onclick="footerReturns(event)">
-                    Refund Policy
-                </a>
-            </div>
-        </div>
-
-    </div>
-
-</footer>
-
-<!-- ================= MOBILE BOTTOM NAVIGATION ================= -->
-
-<nav class="mobile-bottom-nav" aria-label="Mobile Navigation">
-
-    <!-- Home -->
-    <a href="#"
-       class="bottom-nav-item"
-       onclick="showPage('home'); return false;">
-
-        <span class="bottom-nav-icon">🏠</span>
-        <span>Home</span>
-
-    </a>
-
-    <!-- Category -->
-<!--    <a href="#"-->
-<!--       class="bottom-nav-item"-->
-<!--       onclick="showPage('category'); return false;">-->
-
-<!--        <span class="bottom-nav-icon">🛍️</span>-->
-<!--        <span>Category</span>-->
-
-<!--    </a>-->
-    <a href="#" class="bottom-nav-item"
-       onclick="showPage('home'); setTimeout(() => {
+        <!--    </a>-->
+        <a href="#" class="bottom-nav-item" onclick="showPage('home'); setTimeout(() => {
        document.getElementById('categories')?.scrollIntoView({
            behavior: 'smooth'
        });
    }, 100); return false;">
-        <span class="bottom-nav-icon">🛍️</span>
-        <span>Category</span>
-    </a>
+            <span class="bottom-nav-icon">🛍️</span>
+            <span>Category</span>
+        </a>
 
-    <!-- Search -->
-    <a href="#"
-       class="bottom-nav-item"
-       onclick="openMobileSearch(); return false;">
+        <!-- Search -->
+        <a href="#" class="bottom-nav-item" onclick="openMobileSearch(); return false;">
 
-        <span class="bottom-nav-icon">🔍</span>
-        <span>Search</span>
+            <span class="bottom-nav-icon">🔍</span>
+            <span>Search</span>
 
-    </a>
+        </a>
 
-    <!-- Account -->
-    <a href="#"
-       class="bottom-nav-item"
-       onclick="openAccount(); return false;">
+        <!-- Account -->
+        <a href="#" class="bottom-nav-item" onclick="openAccount(); return false;">
 
-        <span class="bottom-nav-icon">👤</span>
-        <span>Account</span>
+            <span class="bottom-nav-icon">👤</span>
+            <span>Account</span>
 
-    </a>
+        </a>
 
-    <!-- Cart -->
-    <a href="#"
-       class="bottom-nav-item"
-       onclick="showPage('cart'); return false;">
+        <!-- Cart -->
+        <a href="#" class="bottom-nav-item" onclick="showPage('cart'); return false;">
 
-        <span class="bottom-nav-icon">🛒</span>
-        <span>Cart</span>
-        <span class="bottom-cart-count" id="bottomCartCount">0</span>
+            <span class="bottom-nav-icon">🛒</span>
+            <span>Cart</span>
+            <span class="bottom-cart-count" id="bottomCartCount">0</span>
 
-    </a>
-    <!-- Orders -->
-    <a href="#"
-       class="bottom-nav-item"
-       onclick="showPage('orders'); return false;">
+        </a>
+        <!-- Orders -->
+        <a href="#" class="bottom-nav-item" onclick="showPage('orders'); return false;">
 
-        <span class="bottom-nav-icon">📦</span>
-        <span>Orders</span>
+            <span class="bottom-nav-icon">📦</span>
+            <span>Orders</span>
 
-    </a>
+        </a>
 
-</nav>
+    </nav>
 
-<!-- =========================================================
+    <!-- =========================================================
      ACCOUNT PANEL
 ========================================================= -->
 
-<div
-        id="accountPanel"
-        class="account-panel"
-        aria-hidden="true">
+    <div id="accountPanel" class="account-panel" aria-hidden="true">
 
-    <div class="account-panel-header">
+        <div class="account-panel-header">
 
-        <div class="account-user-info">
+            <div class="account-user-info">
 
-            <span class="account-user-icon">
-                👤
-            </span>
+                <span class="account-user-icon">
+                    👤
+                </span>
 
-            <div>
-                <div class="account-welcome">
-                    Hello,
-                    <strong id="accountUserName">
-                        User
-                    </strong>
+                <div>
+                    <div class="account-welcome">
+                        Hello,
+                        <strong id="accountUserName">
+                            User
+                        </strong>
+                    </div>
+
+                    <div class="account-user-email" id="accountUserEmail">
+                        Welcome to RishtaBox
+                    </div>
                 </div>
 
-                <div
-                        class="account-user-email"
-                        id="accountUserEmail">
-                    Welcome to RishtaBox
-                </div>
             </div>
+
+
+            <!-- Close -->
+            <button type="button" class="account-close" onclick="closeAccount()" aria-label="Close Account">
+
+                ×
+
+            </button>
 
         </div>
 
 
-        <!-- Close -->
-        <button
-                type="button"
-                class="account-close"
-                onclick="closeAccount()"
-                aria-label="Close Account">
-
-            ×
-
-        </button>
-
-    </div>
-
-
-    <!-- =====================================================
+        <!-- =====================================================
          ACCOUNT OPTIONS
     ====================================================== -->
 
-    <div class="account-panel-body">
+        <div class="account-panel-body">
 
-        <!-- My Account -->
-        <a
-                href="#"
-                class="account-option"
-                onclick="showPage('account'); closeAccount(); return false;">
+            <!-- My Account -->
+            <a href="#" class="account-option" onclick="showPage('account'); closeAccount(); return false;">
 
-            <span class="account-option-icon">
-                👤
-            </span>
+                <span class="account-option-icon">
+                    👤
+                </span>
 
-            <span>
-                My Account
-            </span>
+                <span>
+                    My Account
+                </span>
 
-        </a>
+            </a>
 
 
-        <!-- My Orders -->
-        <a
-                href="#"
-                class="account-option"
-                onclick="showPage('orders'); closeAccount(); return false;">
+            <!-- My Orders -->
+            <a href="#" class="account-option" onclick="showPage('orders'); closeAccount(); return false;">
 
-            <span class="account-option-icon">
-                📦
-            </span>
+                <span class="account-option-icon">
+                    📦
+                </span>
 
-            <span>
-                My Orders
-            </span>
+                <span>
+                    My Orders
+                </span>
 
-        </a>
+            </a>
 
 
 
 
 
-        <!-- Divider -->
-        <div class="account-divider"></div>
+            <!-- Divider -->
+            <div class="account-divider"></div>
 
 
-        <!-- Sign Out -->
-        <button
-                type="button"
-                class="account-option logout-btn"
-                onclick="logoutUser()">
+            <!-- Sign Out -->
+            <button type="button" class="account-option logout-btn" onclick="logoutUser()">
 
-            <span class="account-option-icon">
-                🚪
-            </span>
+                <span class="account-option-icon">
+                    🚪
+                </span>
 
-            <span>
-                Sign Out
-            </span>
+                <span>
+                    Sign Out
+                </span>
 
-        </button>
+            </button>
 
+        </div>
     </div>
-</div>
 
-<!-- ================= END MOBILE BOTTOM NAVIGATION ================= -->
-<!-- ================= JAVASCRIPT ================= -->
-<script src="store.js"></script>
+    <!-- ================= END MOBILE BOTTOM NAVIGATION ================= -->
+    <!-- ================= JAVASCRIPT ================= -->
+    <script src="store.js"></script>
 
 </body>
 

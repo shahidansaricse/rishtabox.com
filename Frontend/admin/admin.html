@@ -2,7 +2,6 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,21 +14,15 @@
 
 </head>
 
-
 <body>
-
-
     <!-- =====================================================
      ADMIN AUTH PAGE
 ===================================================== -->
 
     <div id="adminAuthPage" class="admin-auth-page hidden">
-
-
         <!-- =================================================
          ADMIN LOGIN
     ================================================= -->
-
         <section id="adminLoginSection" class="auth-card">
 
             <div class="auth-header">
@@ -88,16 +81,11 @@
         </section>
 
     </div>
-
-
-
     <!-- =====================================================
      ADMIN DASHBOARD
 ===================================================== -->
 
     <div id="adminDashboard" class="hidden">
-
-
         <!-- =================================================
          TOPBAR
     ================================================= -->
@@ -130,16 +118,11 @@
             </div>
 
         </header>
-
-
-
         <!-- =================================================
          MAIN ADMIN LAYOUT
     ================================================= -->
 
         <main class="admin-layout">
-
-
             <!-- =================================================
              SIDEBAR
         ================================================= -->
@@ -194,22 +177,14 @@
                 <button type="button" class="nav-btn" data-section="testimonials">
                     Testimonials
                 </button>
-                <button
-                        type="button"
-                        class="nav-btn"
-                        data-section="relationships"
-                >
+                <button type="button" class="nav-btn" data-section="relationships">
                     Relationships
                 </button>
 
                 <button type="button" class="nav-btn" data-section="festivals">
                     Festivals
                 </button>
-                <button
-                        type="button"
-                        class="nav-btn"
-                        data-section="categories"
-                >
+                <button type="button" class="nav-btn" data-section="categories">
                     Categories
                 </button>
                 <a class="back-link" href="../store.html">
@@ -484,11 +459,7 @@
                                         Product Image
                                     </label>
 
-                                    <input
-                                            type="file"
-                                            id="productImageFile"
-                                            accept="image/*"
-                                    >
+                                    <input type="file" id="productImageFile" accept="image/*">
 
                                     <small class="muted">
                                         JPG, PNG, WEBP image upload karein.
@@ -993,10 +964,7 @@
                             <p>Manage newsletter subscribers</p>
                         </div>
 
-                        <button
-                                type="button"
-                                class="admin-refresh-btn"
-                                onclick="loadSubscribers()">
+                        <button type="button" class="admin-refresh-btn" onclick="loadSubscribers()">
                             <i class="fas fa-sync-alt"></i>
                             Refresh
                         </button>
@@ -1024,11 +992,8 @@
                         <div class="subscriber-search">
                             <i class="fas fa-search"></i>
 
-                            <input
-                                    type="text"
-                                    id="subscriberSearch"
-                                    placeholder="Search subscriber email..."
-                                    oninput="filterSubscribers()">
+                            <input type="text" id="subscriberSearch" placeholder="Search subscriber email..."
+                                oninput="filterSubscribers()">
                         </div>
 
                     </div>
@@ -1039,21 +1004,21 @@
                         <table class="subscriber-table">
 
                             <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Email</th>
-                                <th>Subscribed At</th>
-                                <th>Action</th>
-                            </tr>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Email</th>
+                                    <th>Subscribed At</th>
+                                    <th>Action</th>
+                                </tr>
                             </thead>
 
                             <tbody id="subscribersTableBody">
 
-                            <tr>
-                                <td colspan="4" class="subscriber-loading">
-                                    Loading subscribers...
-                                </td>
-                            </tr>
+                                <tr>
+                                    <td colspan="4" class="subscriber-loading">
+                                        Loading subscribers...
+                                    </td>
+                                </tr>
 
                             </tbody>
 
@@ -1162,11 +1127,7 @@
                                         Blog Image
                                     </label>
 
-                                    <input
-                                            type="file"
-                                            id="blogImage"
-                                            accept="image/*"
-                                    >
+                                    <input type="file" id="blogImage" accept="image/*">
 
                                     <div id="blogImagePreview" class="image-preview"></div>
 
@@ -1265,19 +1226,13 @@
 
                             <div class="form-actions">
 
-                                <button
-                                        type="button"
-                                        class="primary-btn"
-                                        onclick="openSliderForm()">
+                                <button type="button" class="primary-btn" onclick="openSliderForm()">
 
                                     + Add Slider
 
                                 </button>
 
-                                <button
-                                        type="button"
-                                        class="outline-btn"
-                                        onclick="loadAdminSliders()">
+                                <button type="button" class="outline-btn" onclick="loadAdminSliders()">
 
                                     Refresh
 
@@ -1292,9 +1247,7 @@
                              SLIDER FORM
                         ================================================= -->
 
-                        <div
-                                id="sliderFormContainer"
-                                class="admin-form-container hidden">
+                        <div id="sliderFormContainer" class="admin-form-container hidden">
 
                             <!-- FORM HEADER -->
 
@@ -1317,15 +1270,11 @@
 
                             <!-- FORM -->
 
-                            <form
-                                    id="sliderForm"
-                                    enctype="multipart/form-data">
+                            <form id="sliderForm" enctype="multipart/form-data">
 
                                 <!-- SLIDER ID -->
 
-                                <input
-                                        type="hidden"
-                                        id="sliderId">
+                                <input type="hidden" id="sliderId">
 
 
                                 <!-- =================================================
@@ -1339,10 +1288,8 @@
                                         <span class="muted">(Optional)</span>
                                     </label>
 
-                                    <input
-                                            type="text"
-                                            id="sliderTitle"
-                                            placeholder="Example: Special Gifts for Every Relationship">
+                                    <input type="text" id="sliderTitle"
+                                        placeholder="Example: Special Gifts for Every Relationship">
 
                                 </div>
 
@@ -1358,10 +1305,8 @@
                                         <span class="muted">(Optional)</span>
                                     </label>
 
-                                    <input
-                                            type="text"
-                                            id="sliderSubtitle"
-                                            placeholder="Example: Make every moment memorable">
+                                    <input type="text" id="sliderSubtitle"
+                                        placeholder="Example: Make every moment memorable">
 
                                 </div>
 
@@ -1377,10 +1322,7 @@
                                         <span class="muted">(Required for new slider)</span>
                                     </label>
 
-                                    <input
-                                            type="file"
-                                            id="sliderImage"
-                                            accept="image/jpeg,image/png,image/webp">
+                                    <input type="file" id="sliderImage" accept="image/jpeg,image/png,image/webp">
 
                                     <small class="muted">
                                         Upload JPG, PNG or WEBP image.
@@ -1395,9 +1337,7 @@
                                      IMAGE PREVIEW
                                 ================================================= -->
 
-                                <div
-                                        id="sliderImagePreviewContainer"
-                                        class="form-group hidden">
+                                <div id="sliderImagePreviewContainer" class="form-group hidden">
 
                                     <label>
                                         Image Preview
@@ -1405,11 +1345,7 @@
 
                                     <div>
 
-                                        <img
-                                                id="sliderImagePreview"
-                                                src=""
-                                                alt="Slider Preview"
-                                                style="
+                                        <img id="sliderImagePreview" src="" alt="Slider Preview" style="
                                     width: 100%;
                                     max-width: 500px;
                                     height: 220px;
@@ -1436,10 +1372,7 @@
                                         <span class="muted">(Optional)</span>
                                     </label>
 
-                                    <input
-                                            type="text"
-                                            id="sliderLink"
-                                            placeholder="Example: category.html?id=1">
+                                    <input type="text" id="sliderLink" placeholder="Example: category.html?id=1">
 
                                     <small class="muted">
                                         Optional. Enter the page or product/category
@@ -1459,11 +1392,7 @@
                                         Display Order
                                     </label>
 
-                                    <input
-                                            type="number"
-                                            id="sliderOrder"
-                                            min="0"
-                                            value="0">
+                                    <input type="number" id="sliderOrder" min="0" value="0">
 
                                     <small class="muted">
                                         Smaller numbers appear first.
@@ -1480,10 +1409,7 @@
 
                                     <label>
 
-                                        <input
-                                                type="checkbox"
-                                                id="sliderActive"
-                                                checked>
+                                        <input type="checkbox" id="sliderActive" checked>
 
                                         Active
 
@@ -1496,9 +1422,7 @@
                                      FORM MESSAGE
                                 ================================================= -->
 
-                                <div
-                                        id="sliderFormMessage"
-                                        class="form-message">
+                                <div id="sliderFormMessage" class="form-message">
                                 </div>
 
 
@@ -1508,18 +1432,13 @@
 
                                 <div class="form-actions">
 
-                                    <button
-                                            type="submit"
-                                            class="primary-btn">
+                                    <button type="submit" class="primary-btn">
 
                                         Save Slider
 
                                     </button>
 
-                                    <button
-                                            type="button"
-                                            class="outline-btn"
-                                            onclick="closeSliderForm()">
+                                    <button type="button" class="outline-btn" onclick="closeSliderForm()">
 
                                         Cancel
 
@@ -1536,9 +1455,7 @@
                              SLIDER LIST
                         ================================================= -->
 
-                        <div
-                                id="slidersContent"
-                                class="empty-state">
+                        <div id="slidersContent" class="empty-state">
 
                             Loading sliders...
 
@@ -1802,12 +1719,8 @@
                                         Customer Name
                                     </label>
 
-                                    <input
-                                            type="text"
-                                            id="testimonialCustomerName"
-                                            placeholder="Enter customer name"
-                                            required
-                                    >
+                                    <input type="text" id="testimonialCustomerName" placeholder="Enter customer name"
+                                        required>
 
                                 </div>
 
@@ -1819,33 +1732,21 @@
                                         Customer Photo
                                     </label>
 
-                                    <input
-                                            type="file"
-                                            id="testimonialCustomerImageFile"
-                                            accept="image/*"
-                                    >
+                                    <input type="file" id="testimonialCustomerImageFile" accept="image/*">
 
                                     <!-- IMAGE PREVIEW -->
-                                    <div
-                                            id="testimonialImagePreview"
-                                            style="
+                                    <div id="testimonialImagePreview" style="
                 margin-top:12px;
                 display:none;
-            "
-                                    >
+            ">
 
-                                        <img
-                                                id="testimonialImagePreviewImg"
-                                                src=""
-                                                alt="Customer Photo Preview"
-                                                style="
+                                        <img id="testimonialImagePreviewImg" src="" alt="Customer Photo Preview" style="
                     width:100px;
                     height:100px;
                     object-fit:cover;
                     border-radius:12px;
                     border:1px solid #ddd;
-                "
-                                        >
+                ">
 
                                     </div>
 
@@ -1859,10 +1760,7 @@
                                         Rating
                                     </label>
 
-                                    <select
-                                            id="testimonialRating"
-                                            required
-                                    >
+                                    <select id="testimonialRating" required>
 
                                         <option value="5">
                                             ⭐⭐⭐⭐⭐ — 5 Stars
@@ -1896,12 +1794,8 @@
                                         Testimonial
                                     </label>
 
-                                    <textarea
-                                            id="testimonialMessage"
-                                            placeholder="Enter customer testimonial"
-                                            rows="5"
-                                            required
-                                    ></textarea>
+                                    <textarea id="testimonialMessage" placeholder="Enter customer testimonial" rows="5"
+                                        required></textarea>
 
                                 </div>
 
@@ -1929,27 +1823,17 @@
 
 
                                 <!-- FORM MESSAGE -->
-                                <div
-                                        id="testimonialFormMessage"
-                                        class="form-message"
-                                ></div>
+                                <div id="testimonialFormMessage" class="form-message"></div>
 
 
                                 <!-- ACTIONS -->
                                 <div class="form-actions">
 
-                                    <button
-                                            type="submit"
-                                            class="primary-btn"
-                                    >
+                                    <button type="submit" class="primary-btn">
                                         Save Testimonial
                                     </button>
 
-                                    <button
-                                            type="button"
-                                            class="secondary-btn"
-                                            onclick="closeTestimonialForm()"
-                                    >
+                                    <button type="button" class="secondary-btn" onclick="closeTestimonialForm()">
                                         Cancel
                                     </button>
 
@@ -1997,17 +1881,11 @@
 
                             <div class="form-actions">
 
-                                <button
-                                        type="button"
-                                        class="primary-btn"
-                                        onclick="openRelationshipForm()">
+                                <button type="button" class="primary-btn" onclick="openRelationshipForm()">
                                     + Add Relationship
                                 </button>
 
-                                <button
-                                        type="button"
-                                        class="outline-btn"
-                                        onclick="loadAdminRelationships()">
+                                <button type="button" class="outline-btn" onclick="loadAdminRelationships()">
                                     Refresh
                                 </button>
 
@@ -2018,9 +1896,7 @@
 
                         <!-- RELATIONSHIP FORM -->
 
-                        <div
-                                id="relationshipFormContainer"
-                                class="admin-form-container hidden">
+                        <div id="relationshipFormContainer" class="admin-form-container hidden">
 
                             <div class="form-header">
 
@@ -2039,9 +1915,7 @@
 
                             <form id="relationshipForm">
 
-                                <input
-                                        type="hidden"
-                                        id="relationshipId">
+                                <input type="hidden" id="relationshipId">
 
 
                                 <div class="form-group">
@@ -2050,11 +1924,7 @@
                                         Relationship Name
                                     </label>
 
-                                    <input
-                                            type="text"
-                                            id="relationshipName"
-                                            placeholder="Example: Brother"
-                                            required>
+                                    <input type="text" id="relationshipName" placeholder="Example: Brother" required>
 
                                 </div>
 
@@ -2065,11 +1935,8 @@
                                         Relationship Image
                                     </label>
 
-                                    <input
-                                            type="file"
-                                            id="relationshipImage"
-                                            name="image"
-                                            accept="image/jpeg,image/png,image/webp">
+                                    <input type="file" id="relationshipImage" name="image"
+                                        accept="image/jpeg,image/png,image/webp">
 
                                     <small class="muted">
                                         JPG, PNG or WEBP — Maximum 5 MB
@@ -2077,16 +1944,9 @@
 
                                 </div>
 
-                                <div
-                                        id="relationshipImagePreviewContainer"
-                                        class="hidden"
-                                        style="margin-top:15px;">
+                                <div id="relationshipImagePreviewContainer" class="hidden" style="margin-top:15px;">
 
-                                    <img
-                                            id="relationshipImagePreview"
-                                            src=""
-                                            alt="Relationship Preview"
-                                            style="
+                                    <img id="relationshipImagePreview" src="" alt="Relationship Preview" style="
             width:220px;
             height:160px;
             object-fit:cover;
@@ -2104,10 +1964,8 @@
                                         Description
                                     </label>
 
-                                    <textarea
-                                            id="relationshipDescription"
-                                            rows="4"
-                                            placeholder="Enter relationship description"></textarea>
+                                    <textarea id="relationshipDescription" rows="4"
+                                        placeholder="Enter relationship description"></textarea>
 
                                 </div>
 
@@ -2115,9 +1973,7 @@
                                 <div class="form-group">
 
                                     <label>
-                                        <input
-                                                type="checkbox"
-                                                id="relationshipPinned">
+                                        <input type="checkbox" id="relationshipPinned">
 
                                         Pinned
                                     </label>
@@ -2125,24 +1981,17 @@
                                 </div>
 
 
-                                <div
-                                        id="relationshipFormMessage"
-                                        class="form-message">
+                                <div id="relationshipFormMessage" class="form-message">
                                 </div>
 
 
                                 <div class="form-actions">
 
-                                    <button
-                                            type="submit"
-                                            class="primary-btn">
+                                    <button type="submit" class="primary-btn">
                                         Save Relationship
                                     </button>
 
-                                    <button
-                                            type="button"
-                                            class="outline-btn"
-                                            onclick="closeRelationshipForm()">
+                                    <button type="button" class="outline-btn" onclick="closeRelationshipForm()">
                                         Cancel
                                     </button>
 
@@ -2190,17 +2039,11 @@
 
                             <div class="form-actions">
 
-                                <button
-                                        type="button"
-                                        class="primary-btn"
-                                        onclick="openFestivalForm()">
+                                <button type="button" class="primary-btn" onclick="openFestivalForm()">
                                     + Add Festival
                                 </button>
 
-                                <button
-                                        type="button"
-                                        class="outline-btn"
-                                        onclick="loadAdminFestivals()">
+                                <button type="button" class="outline-btn" onclick="loadAdminFestivals()">
                                     Refresh
                                 </button>
 
@@ -2211,9 +2054,7 @@
 
                         <!-- FESTIVAL FORM -->
 
-                        <div
-                                id="festivalFormContainer"
-                                class="admin-form-container hidden">
+                        <div id="festivalFormContainer" class="admin-form-container hidden">
 
                             <div class="form-header">
 
@@ -2232,9 +2073,7 @@
 
                             <form id="festivalForm">
 
-                                <input
-                                        type="hidden"
-                                        id="festivalId">
+                                <input type="hidden" id="festivalId">
 
 
                                 <div class="form-group">
@@ -2243,11 +2082,7 @@
                                         Festival Name
                                     </label>
 
-                                    <input
-                                            type="text"
-                                            id="festivalName"
-                                            placeholder="Example: Diwali"
-                                            required>
+                                    <input type="text" id="festivalName" placeholder="Example: Diwali" required>
 
                                 </div>
 
@@ -2258,11 +2093,8 @@
                                         Festival Image
                                     </label>
 
-                                    <input
-                                            type="file"
-                                            id="festivalImage"
-                                            name="image"
-                                            accept="image/jpeg,image/png,image/webp">
+                                    <input type="file" id="festivalImage" name="image"
+                                        accept="image/jpeg,image/png,image/webp">
 
                                     <small class="muted">
                                         JPG, PNG or WEBP — Maximum 5 MB
@@ -2270,16 +2102,9 @@
 
                                 </div>
 
-                                <div
-                                        id="festivalImagePreviewContainer"
-                                        class="hidden"
-                                        style="margin-top:15px;">
+                                <div id="festivalImagePreviewContainer" class="hidden" style="margin-top:15px;">
 
-                                    <img
-                                            id="festivalImagePreview"
-                                            src=""
-                                            alt="Festival Preview"
-                                            style="
+                                    <img id="festivalImagePreview" src="" alt="Festival Preview" style="
             width:220px;
             height:160px;
             object-fit:cover;
@@ -2297,10 +2122,8 @@
                                         Description
                                     </label>
 
-                                    <textarea
-                                            id="festivalDescription"
-                                            rows="4"
-                                            placeholder="Enter festival description"></textarea>
+                                    <textarea id="festivalDescription" rows="4"
+                                        placeholder="Enter festival description"></textarea>
 
                                 </div>
 
@@ -2308,9 +2131,7 @@
                                 <div class="form-group">
 
                                     <label>
-                                        <input
-                                                type="checkbox"
-                                                id="festivalPinned">
+                                        <input type="checkbox" id="festivalPinned">
 
                                         Pinned
                                     </label>
@@ -2318,24 +2139,17 @@
                                 </div>
 
 
-                                <div
-                                        id="festivalFormMessage"
-                                        class="form-message">
+                                <div id="festivalFormMessage" class="form-message">
                                 </div>
 
 
                                 <div class="form-actions">
 
-                                    <button
-                                            type="submit"
-                                            class="primary-btn">
+                                    <button type="submit" class="primary-btn">
                                         Save Festival
                                     </button>
 
-                                    <button
-                                            type="button"
-                                            class="outline-btn"
-                                            onclick="closeFestivalForm()">
+                                    <button type="button" class="outline-btn" onclick="closeFestivalForm()">
                                         Cancel
                                     </button>
 
@@ -2383,17 +2197,11 @@
 
                             <div class="form-actions">
 
-                                <button
-                                        type="button"
-                                        class="primary-btn"
-                                        onclick="openCategoryForm()">
+                                <button type="button" class="primary-btn" onclick="openCategoryForm()">
                                     + Add Category
                                 </button>
 
-                                <button
-                                        type="button"
-                                        class="outline-btn"
-                                        onclick="loadAdminCategories()">
+                                <button type="button" class="outline-btn" onclick="loadAdminCategories()">
                                     Refresh
                                 </button>
 
@@ -2406,9 +2214,7 @@
                              CATEGORY FORM
                         ================================================= -->
 
-                        <div
-                                id="categoryFormContainer"
-                                class="admin-form-container hidden">
+                        <div id="categoryFormContainer" class="admin-form-container hidden">
 
                             <div class="form-header">
 
@@ -2425,13 +2231,9 @@
                             </div>
 
 
-                            <form
-                                    id="categoryForm"
-                                    enctype="multipart/form-data">
+                            <form id="categoryForm" enctype="multipart/form-data">
 
-                                <input
-                                        type="hidden"
-                                        id="categoryId">
+                                <input type="hidden" id="categoryId">
 
 
                                 <!-- =========================================
@@ -2444,11 +2246,7 @@
                                         Category Name
                                     </label>
 
-                                    <input
-                                            type="text"
-                                            id="categoryName"
-                                            placeholder="Example: Birthday Gifts"
-                                            required>
+                                    <input type="text" id="categoryName" placeholder="Example: Birthday Gifts" required>
 
                                 </div>
 
@@ -2463,11 +2261,8 @@
                                         Category Image
                                     </label>
 
-                                    <input
-                                            type="file"
-                                            id="categoryImage"
-                                            name="image"
-                                            accept="image/jpeg,image/png,image/webp">
+                                    <input type="file" id="categoryImage" name="image"
+                                        accept="image/jpeg,image/png,image/webp">
 
                                     <small class="muted">
                                         JPG, PNG or WEBP — Maximum 5 MB
@@ -2480,16 +2275,9 @@
                                      IMAGE PREVIEW
                                 ========================================== -->
 
-                                <div
-                                        id="categoryImagePreviewContainer"
-                                        class="hidden"
-                                        style="margin-top: 15px;">
+                                <div id="categoryImagePreviewContainer" class="hidden" style="margin-top: 15px;">
 
-                                    <img
-                                            id="categoryImagePreview"
-                                            src=""
-                                            alt="Category Preview"
-                                            style="
+                                    <img id="categoryImagePreview" src="" alt="Category Preview" style="
                         width: 220px;
                         height: 160px;
                         object-fit: cover;
@@ -2511,10 +2299,8 @@
                                         Description
                                     </label>
 
-                                    <textarea
-                                            id="categoryDescription"
-                                            rows="4"
-                                            placeholder="Enter category description"></textarea>
+                                    <textarea id="categoryDescription" rows="4"
+                                        placeholder="Enter category description"></textarea>
 
                                 </div>
 
@@ -2527,9 +2313,7 @@
 
                                     <label>
 
-                                        <input
-                                                type="checkbox"
-                                                id="categoryPinned">
+                                        <input type="checkbox" id="categoryPinned">
 
                                         Pinned
 
@@ -2542,9 +2326,7 @@
                                      MESSAGE
                                 ========================================== -->
 
-                                <div
-                                        id="categoryFormMessage"
-                                        class="form-message">
+                                <div id="categoryFormMessage" class="form-message">
                                 </div>
 
 
@@ -2554,16 +2336,11 @@
 
                                 <div class="form-actions">
 
-                                    <button
-                                            type="submit"
-                                            class="primary-btn">
+                                    <button type="submit" class="primary-btn">
                                         Save Category
                                     </button>
 
-                                    <button
-                                            type="button"
-                                            class="outline-btn"
-                                            onclick="closeCategoryForm()">
+                                    <button type="button" class="outline-btn" onclick="closeCategoryForm()">
                                         Cancel
                                     </button>
 
@@ -2592,330 +2369,330 @@
                  USER DETAILS MODAL
             ===================================================== -->
 
-    <div id="userDetailsModal" class="admin-modal hidden">
+                <div id="userDetailsModal" class="admin-modal hidden">
 
-        <div class="admin-modal-overlay" id="userDetailsOverlay"></div>
-
-
-        <div class="admin-modal-card">
+                    <div class="admin-modal-overlay" id="userDetailsOverlay"></div>
 
 
-            <div class="admin-modal-header">
+                    <div class="admin-modal-card">
 
-                <div>
 
-                    <p class="eyebrow">
-                        USER DETAILS
-                    </p>
+                        <div class="admin-modal-header">
 
-                    <h2>
-                        User Information
-                    </h2>
+                            <div>
+
+                                <p class="eyebrow">
+                                    USER DETAILS
+                                </p>
+
+                                <h2>
+                                    User Information
+                                </h2>
+
+                            </div>
+
+
+                            <button type="button" id="closeUserDetailsBtn" class="modal-close-btn" aria-label="Close">
+                                ×
+                            </button>
+
+                        </div>
+
+
+
+                        <div class="user-profile-header">
+
+
+                            <div id="userDetailsAvatar" class="user-avatar">
+                                U
+                            </div>
+
+
+                            <div>
+
+                                <h3 id="userDetailsName">
+                                    —
+                                </h3>
+
+                                <span id="userDetailsRole" class="role-badge">
+                                    USER
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <div class="user-details-grid">
+
+
+                            <div class="detail-item">
+
+                                <span>
+                                    User ID
+                                </span>
+
+                                <strong id="userDetailsId">
+                                    —
+                                </strong>
+
+                            </div>
+
+
+                            <div class="detail-item">
+
+                                <span>
+                                    Email
+                                </span>
+
+                                <strong id="userDetailsEmail">
+                                    —
+                                </strong>
+
+                            </div>
+
+
+                            <div class="detail-item">
+
+                                <span>
+                                    Mobile
+                                </span>
+
+                                <strong id="userDetailsMobile">
+                                    —
+                                </strong>
+
+                            </div>
+
+
+                            <div class="detail-item">
+
+                                <span>
+                                    Account Status
+                                </span>
+
+                                <strong id="userDetailsStatus">
+                                    —
+                                </strong>
+
+                            </div>
+
+
+                            <div class="detail-item">
+
+                                <span>
+                                    Joined
+                                </span>
+
+                                <strong id="userDetailsJoined">
+                                    —
+                                </strong>
+
+                            </div>
+
+
+                            <div class="detail-item">
+
+                                <span>
+                                    Orders
+                                </span>
+
+                                <strong id="userDetailsOrders">
+                                    0
+                                </strong>
+
+                            </div>
+
+
+                            <div class="detail-item">
+
+                                <span>
+                                    Total Spent
+                                </span>
+
+                                <strong id="userDetailsSpent">
+                                    ₹0
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <div class="form-actions user-modal-actions">
+
+
+                            <button type="button" id="editUserBtn" class="primary-btn">
+                                Edit User
+                            </button>
+
+
+                            <button type="button" id="changeUserRoleBtn" class="outline-btn">
+                                Change Role
+                            </button>
+
+
+                            <button type="button" id="toggleUserStatusBtn" class="outline-btn">
+                                Block User
+                            </button>
+
+
+                            <button type="button" id="deleteUserBtn" class="danger-btn">
+                                Delete User
+                            </button>
+
+                        </div>
+
+                    </div>
 
                 </div>
 
 
-                <button type="button" id="closeUserDetailsBtn" class="modal-close-btn" aria-label="Close">
-                    ×
-                </button>
 
-            </div>
-
-
-
-            <div class="user-profile-header">
-
-
-                <div id="userDetailsAvatar" class="user-avatar">
-                    U
-                </div>
-
-
-                <div>
-
-                    <h3 id="userDetailsName">
-                        —
-                    </h3>
-
-                    <span id="userDetailsRole" class="role-badge">
-                        USER
-                    </span>
-
-                </div>
-
-            </div>
-
-
-
-            <div class="user-details-grid">
-
-
-                <div class="detail-item">
-
-                    <span>
-                        User ID
-                    </span>
-
-                    <strong id="userDetailsId">
-                        —
-                    </strong>
-
-                </div>
-
-
-                <div class="detail-item">
-
-                    <span>
-                        Email
-                    </span>
-
-                    <strong id="userDetailsEmail">
-                        —
-                    </strong>
-
-                </div>
-
-
-                <div class="detail-item">
-
-                    <span>
-                        Mobile
-                    </span>
-
-                    <strong id="userDetailsMobile">
-                        —
-                    </strong>
-
-                </div>
-
-
-                <div class="detail-item">
-
-                    <span>
-                        Account Status
-                    </span>
-
-                    <strong id="userDetailsStatus">
-                        —
-                    </strong>
-
-                </div>
-
-
-                <div class="detail-item">
-
-                    <span>
-                        Joined
-                    </span>
-
-                    <strong id="userDetailsJoined">
-                        —
-                    </strong>
-
-                </div>
-
-
-                <div class="detail-item">
-
-                    <span>
-                        Orders
-                    </span>
-
-                    <strong id="userDetailsOrders">
-                        0
-                    </strong>
-
-                </div>
-
-
-                <div class="detail-item">
-
-                    <span>
-                        Total Spent
-                    </span>
-
-                    <strong id="userDetailsSpent">
-                        ₹0
-                    </strong>
-
-                </div>
-
-            </div>
-
-
-
-            <div class="form-actions user-modal-actions">
-
-
-                <button type="button" id="editUserBtn" class="primary-btn">
-                    Edit User
-                </button>
-
-
-                <button type="button" id="changeUserRoleBtn" class="outline-btn">
-                    Change Role
-                </button>
-
-
-                <button type="button" id="toggleUserStatusBtn" class="outline-btn">
-                    Block User
-                </button>
-
-
-                <button type="button" id="deleteUserBtn" class="danger-btn">
-                    Delete User
-                </button>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-
-    <!-- =====================================================
+                <!-- =====================================================
      EDIT USER MODAL
 ===================================================== -->
 
-    <div id="editUserModal" class="admin-modal hidden">
+                <div id="editUserModal" class="admin-modal hidden">
 
-        <div class="admin-modal-overlay" id="editUserOverlay"></div>
-
-
-        <div class="admin-modal-card">
+                    <div class="admin-modal-overlay" id="editUserOverlay"></div>
 
 
-            <div class="admin-modal-header">
+                    <div class="admin-modal-card">
 
-                <div>
 
-                    <p class="eyebrow">
-                        USER MANAGEMENT
-                    </p>
+                        <div class="admin-modal-header">
 
-                    <h2>
-                        Edit User
-                    </h2>
+                            <div>
+
+                                <p class="eyebrow">
+                                    USER MANAGEMENT
+                                </p>
+
+                                <h2>
+                                    Edit User
+                                </h2>
+
+                            </div>
+
+
+                            <button type="button" id="closeEditUserBtn" class="modal-close-btn" aria-label="Close">
+                                ×
+                            </button>
+
+                        </div>
+
+
+
+                        <form id="editUserForm">
+
+
+                            <input type="hidden" id="editUserId">
+
+
+                            <div class="form-group">
+
+                                <label for="editUserName">
+                                    Name
+                                </label>
+
+                                <input type="text" id="editUserName" placeholder="Enter user name" required>
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="editUserEmail">
+                                    Email
+                                </label>
+
+                                <input type="email" id="editUserEmail" placeholder="Enter email" required>
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="editUserMobile">
+                                    Mobile
+                                </label>
+
+                                <input type="tel" id="editUserMobile" placeholder="Enter mobile number" required>
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="editUserRole">
+                                    Role
+                                </label>
+
+                                <select id="editUserRole">
+
+                                    <option value="USER">
+                                        User
+                                    </option>
+
+                                    <option value="ADMIN">
+                                        Admin
+                                    </option>
+
+                                    <option value="SUPER_ADMIN">
+                                        Super Admin
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label for="editUserStatus">
+                                    Account Status
+                                </label>
+
+                                <select id="editUserStatus">
+
+                                    <option value="ACTIVE">
+                                        Active
+                                    </option>
+
+                                    <option value="BLOCKED">
+                                        Blocked
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <div id="editUserMessage" class="form-message"></div>
+
+
+                            <div class="form-actions">
+
+
+                                <button type="submit" class="primary-btn">
+                                    Save Changes
+                                </button>
+
+
+                                <button type="button" id="cancelEditUserBtn" class="outline-btn">
+                                    Cancel
+                                </button>
+
+                            </div>
+
+                        </form>
+
+                    </div>
 
                 </div>
-
-
-                <button type="button" id="closeEditUserBtn" class="modal-close-btn" aria-label="Close">
-                    ×
-                </button>
-
-            </div>
-
-
-
-            <form id="editUserForm">
-
-
-                <input type="hidden" id="editUserId">
-
-
-                <div class="form-group">
-
-                    <label for="editUserName">
-                        Name
-                    </label>
-
-                    <input type="text" id="editUserName" placeholder="Enter user name" required>
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label for="editUserEmail">
-                        Email
-                    </label>
-
-                    <input type="email" id="editUserEmail" placeholder="Enter email" required>
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label for="editUserMobile">
-                        Mobile
-                    </label>
-
-                    <input type="tel" id="editUserMobile" placeholder="Enter mobile number" required>
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label for="editUserRole">
-                        Role
-                    </label>
-
-                    <select id="editUserRole">
-
-                        <option value="USER">
-                            User
-                        </option>
-
-                        <option value="ADMIN">
-                            Admin
-                        </option>
-
-                        <option value="SUPER_ADMIN">
-                            Super Admin
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label for="editUserStatus">
-                        Account Status
-                    </label>
-
-                    <select id="editUserStatus">
-
-                        <option value="ACTIVE">
-                            Active
-                        </option>
-
-                        <option value="BLOCKED">
-                            Blocked
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-                <div id="editUserMessage" class="form-message"></div>
-
-
-                <div class="form-actions">
-
-
-                    <button type="submit" class="primary-btn">
-                        Save Changes
-                    </button>
-
-
-                    <button type="button" id="cancelEditUserBtn" class="outline-btn">
-                        Cancel
-                    </button>
-
-                </div>
-
-            </form>
-
-        </div>
-
-    </div>
 
 
 
