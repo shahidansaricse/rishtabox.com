@@ -4,7 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2cd1b3b3-a02f-4dc0-aef7-29095d46c4fd" name="Changes" comment="" />
+    <list default="true" id="2cd1b3b3-a02f-4dc0-aef7-29095d46c4fd" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/store.js" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/store.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/_backend/backend/src/main/java/com/rishtabox/backend/BackendApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/_backend/backend/src/main/java/com/rishtabox/backend/BackendApplication.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -17,6 +21,65 @@
     <commands />
     <urls />
   </component>
+  <component name="NextEditCompletionFeaturesState">
+    <decayedCancelled>
+      <entry key="MS100" value="1.0006735915576652" />
+      <entry key="MS500" value="1.4553415234578617" />
+      <entry key="S2" value="2.839499004695364" />
+      <entry key="S5" value="3.474183125000319" />
+      <entry key="S10" value="3.9279975222438375" />
+      <entry key="S30" value="5.400952645325955" />
+      <entry key="S60" value="6.398961831015471" />
+      <entry key="M2" value="7.10458377496576" />
+      <entry key="M5" value="7.615971383010654" />
+      <entry key="M10" value="7.803388768631582" />
+      <entry key="M15" value="7.8678819355970635" />
+      <entry key="M30" value="7.933413304636167" />
+      <entry key="H1" value="7.966573655271102" />
+      <entry key="H2" value="7.983253442246383" />
+      <entry key="H4" value="7.991618357698948" />
+      <entry key="D1" value="7.998601896577514" />
+      <entry key="W1" value="7.9998002424381" />
+    </decayedCancelled>
+    <decayedSelected>
+      <entry key="MS100" value="0.0" />
+      <entry key="MS500" value="0.0" />
+      <entry key="S2" value="0.0" />
+      <entry key="S5" value="0.0" />
+      <entry key="S10" value="0.0" />
+      <entry key="S30" value="0.0" />
+      <entry key="S60" value="0.0" />
+      <entry key="M2" value="0.0" />
+      <entry key="M5" value="0.0" />
+      <entry key="M10" value="0.0" />
+      <entry key="M15" value="0.0" />
+      <entry key="M30" value="0.0" />
+      <entry key="H1" value="0.0" />
+      <entry key="H2" value="0.0" />
+      <entry key="H4" value="0.0" />
+      <entry key="D1" value="0.0" />
+      <entry key="W1" value="0.0" />
+    </decayedSelected>
+    <decayedShown>
+      <entry key="MS100" value="0.005782082256952838" />
+      <entry key="MS500" value="0.7965329316746271" />
+      <entry key="S2" value="2.5995534118495" />
+      <entry key="S5" value="3.369281055461233" />
+      <entry key="S10" value="3.8712361296225595" />
+      <entry key="S30" value="5.375843220031168" />
+      <entry key="S60" value="6.384224690125753" />
+      <entry key="M2" value="7.0964390918650695" />
+      <entry key="M5" value="7.612488018701538" />
+      <entry key="M10" value="7.801605729315929" />
+      <entry key="M15" value="7.866683752380169" />
+      <entry key="M30" value="7.932809390837304" />
+      <entry key="H1" value="7.966270478185655" />
+      <entry key="H2" value="7.983101546809916" />
+      <entry key="H4" value="7.9915423330252775" />
+      <entry key="D1" value="7.998589215090571" />
+      <entry key="W1" value="7.999798430534616" />
+    </decayedShown>
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 3,
   &quot;fromUser&quot;: false
@@ -28,6 +91,7 @@
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
+    &quot;JavaScript Debug.admin.html.executor&quot;: &quot;Run&quot;,
     &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,

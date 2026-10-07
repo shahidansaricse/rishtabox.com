@@ -4460,6 +4460,13 @@ function updateQuantity(index, change, newValue = null) {
 // ======================================================
 function saveOrderDetails() {
 
+    console.log("=== SAVE ORDER DETAILS START ===");
+
+
+    // =====================================================
+    // GET FORM ELEMENTS
+    // =====================================================
+
     const nameElement =
         document.getElementById("orderName");
 
@@ -4482,33 +4489,41 @@ function saveOrderDetails() {
         document.getElementById("orderPincode");
 
 
+    // =====================================================
+    // CHECK FORM
+    // =====================================================
+
     if (
         !nameElement ||
+        !emailElement ||
         !phoneElement ||
         !addressElement ||
         !cityElement ||
         !stateElement ||
         !pincodeElement
     ) {
+
         console.error(
             "Checkout form fields not found."
         );
 
         alert(
-            "Unable to read checkout details."
+            "Unable to read checkout details. Please refresh the page."
         );
 
         return;
     }
 
 
+    // =====================================================
+    // GET VALUES
+    // =====================================================
+
     const name =
         nameElement.value.trim();
 
     const email =
-        emailElement
-            ? emailElement.value.trim()
-            : "";
+        emailElement.value.trim();
 
     const phone =
         phoneElement.value.trim();
@@ -4526,45 +4541,84 @@ function saveOrderDetails() {
         pincodeElement.value.trim();
 
 
-    if (
-        !name ||
-        !phone ||
-        !address ||
-        !city ||
-        !state ||
-        !pincode
-    ) {
+    console.log("Checkout details:", {
+        name,
+        email,
+        phone,
+        address,
+        city,
+        state,
+        pincode
+    });
 
-        alert(
-            "Please fill all required fields."
-        );
 
+    // =====================================================
+    // REQUIRED FIELD VALIDATION
+    // =====================================================
+
+    if (!name) {
+        alert("Please enter your full name.");
+        nameElement.focus();
+        return;
+    }
+
+    if (!email) {
+        alert("Please enter your email address.");
+        emailElement.focus();
+        return;
+    }
+
+    if (!phone) {
+        alert("Please enter your mobile number.");
+        phoneElement.focus();
+        return;
+    }
+
+    if (!address) {
+        alert("Please enter your delivery address.");
+        addressElement.focus();
+        return;
+    }
+
+    if (!city) {
+        alert("Please enter your city.");
+        cityElement.focus();
+        return;
+    }
+
+    if (!state) {
+        alert("Please enter your state.");
+        stateElement.focus();
+        return;
+    }
+
+    if (!pincode) {
+        alert("Please enter your pincode.");
+        pincodeElement.focus();
         return;
     }
 
 
-    if (!validateName(name)) {
+    // =====================================================
+    // VALIDATION
+    // =====================================================
+
+    if (
+        typeof validateName === "function" &&
+        !validateName(name)
+    ) {
 
         alert(
             "Please enter a valid name (2-50 characters, letters only)."
         );
 
-        return;
-    }
-
-
-    if (!validatePhone(phone)) {
-
-        alert(
-            "Please enter a valid 10-digit phone number."
-        );
-
+        nameElement.focus();
         return;
     }
 
 
     if (
-        email &&
+        typeof validateEmail === "function" &&
         !validateEmail(email)
     ) {
 
@@ -4572,6 +4626,21 @@ function saveOrderDetails() {
             "Please enter a valid email address."
         );
 
+        emailElement.focus();
+        return;
+    }
+
+
+    if (
+        typeof validatePhone === "function" &&
+        !validatePhone(phone)
+    ) {
+
+        alert(
+            "Please enter a valid 10-digit phone number."
+        );
+
+        phoneElement.focus();
         return;
     }
 
@@ -4582,11 +4651,39 @@ function saveOrderDetails() {
             "Please enter a valid 6-digit pincode."
         );
 
+        pincodeElement.focus();
         return;
     }
 
 
-    // Save customer details
+    // =====================================================
+    // MAKE SURE CURRENT USER EXISTS
+    // =====================================================
+
+    if (!currentUser) {
+
+        currentUser = {
+            id: null,
+            name: "",
+            email: "",
+            phone: "",
+            address: "",
+            city: "",
+            state: "",
+            pincode: "",
+            role: "USER"
+        };
+
+        console.warn(
+            "currentUser was null. Created temporary user object."
+        );
+    }
+
+
+    // =====================================================
+    // SAVE CUSTOMER DETAILS
+    // =====================================================
+
     currentUser.name = name;
     currentUser.email = email;
     currentUser.phone = phone;
@@ -4595,15 +4692,52 @@ function saveOrderDetails() {
     currentUser.state = state;
     currentUser.pincode = pincode;
 
+
+    // =====================================================
+    // SAVE LOCAL STORAGE
+    // =====================================================
+
     saveUserData();
 
 
-    // Go to summary
+    try {
+
+        localStorage.setItem(
+            "rishtaBoxCurrentUser",
+            JSON.stringify(currentUser)
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Could not save current user:",
+            error
+        );
+    }
+
+
+    // =====================================================
+    // GO TO ORDER SUMMARY
+    // =====================================================
+
     currentOrderSteps = 2;
 
-    renderOrderSteps();
-}
+    console.log(
+        "Moving to Order Summary..."
+    );
 
+    console.log(
+        "currentOrderSteps:",
+        currentOrderSteps
+    );
+
+    renderOrderSteps();
+
+
+    console.log(
+        "=== SAVE ORDER DETAILS COMPLETE ==="
+    );
+}
 // ======================================================
 // GO TO PAYMENT
 // ======================================================
@@ -6811,25 +6945,29 @@ function toggleOrderDetails(orderId) {
         }
     }
 }
+function validateName(name) {
+    name = String(name || "").trim();
+    return /^[A-Za-z\s]{2,50}$/.test(name);
+}
 
+function validateEmail(email) {
+    email = String(email || "").trim();
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function validatePhone(phone) {
+    phone = String(phone || "").trim();
+    return /^[6-9]\d{9}$/.test(phone);
+}
 function saveUserInfo() {
 
-    const name =
-        document.getElementById("userName").value.trim();
-
-    const email =
-        document.getElementById("userEmail").value.trim();
-
-    const phone =
-        document.getElementById("userPhone").value.trim();
-
-    const address =
-        document.getElementById("userAddress").value.trim();
+    const name = document.getElementById("userName").value.trim();
+    const email = document.getElementById("userEmail").value.trim();
+    const phone = document.getElementById("userPhone").value.trim();
+    const address = document.getElementById("userAddress").value.trim();
 
     if (name && !validateName(name)) {
-        alert(
-            "Please enter a valid name (2-50 characters, letters only)."
-        );
+        alert("Please enter a valid name.");
         return;
     }
 
@@ -6843,6 +6981,21 @@ function saveUserInfo() {
         return;
     }
 
+    // Create user object if not available
+    if (!currentUser) {
+        currentUser = {
+            id: null,
+            name: "",
+            email: "",
+            phone: "",
+            address: "",
+            city: "",
+            state: "",
+            pincode: "",
+            role: "USER"
+        };
+    }
+
     currentUser.name = name;
     currentUser.email = email;
     currentUser.phone = phone;
@@ -6850,8 +7003,18 @@ function saveUserInfo() {
 
     saveUserData();
 
+    try {
+        localStorage.setItem(
+            "rishtaBoxCurrentUser",
+            JSON.stringify(currentUser)
+        );
+    } catch (error) {
+        console.error("Could not save current user:", error);
+    }
+
     alert("Information saved successfully!");
 }
+
 /* =========================================================
    REMOVE FROM CART
 ========================================================= */
@@ -7873,7 +8036,11 @@ document.addEventListener("DOMContentLoaded", function () {
     loadFestivals();
 
 });
+let testimonials = [];
 
+function initFooter() {
+    console.log("Footer initialized");
+}
 function renderTestimonials() {
 
     const container = document.getElementById("testimonialsContainer");
@@ -11884,7 +12051,10 @@ async function payWithRazorpay(backendOrderId, orderData) {
         : [];
 
 
-    console.log("Paid Cart Snapshot:", paidCart);
+    console.log(
+        "Paid Cart Snapshot:",
+        paidCart
+    );
 
 
     if (paidCart.length === 0) {
@@ -11906,17 +12076,7 @@ async function payWithRazorpay(backendOrderId, orderData) {
             backendOrderId
         );
 
-        console.log("========== ORDER DEBUG ==========");
-        console.log("STATUS:", response.status);
-        console.log("RAW RESPONSE:", responseText);
-        console.log("PARSED DATA:", data);
-        console.log("IS ARRAY:", Array.isArray(data));
-        console.log(
-            "DATA KEYS:",
-            data && typeof data === "object"
-                ? Object.keys(data)
-                : []
-        );
+
         const paymentOrderResponse = await fetch(
             "http://localhost:8080/api/payments/create-order",
             {
@@ -11955,6 +12115,42 @@ async function payWithRazorpay(backendOrderId, orderData) {
         }
 
 
+        // =====================================================
+        // DEBUG PAYMENT ORDER RESPONSE
+        // =====================================================
+
+        console.log(
+            "========== PAYMENT ORDER DEBUG =========="
+        );
+
+
+        console.log(
+            "STATUS:",
+            paymentOrderResponse.status
+        );
+
+
+        console.log(
+            "RAW RESPONSE:",
+            paymentOrderText
+        );
+
+
+        console.log(
+            "PARSED DATA:",
+            paymentOrder
+        );
+
+
+        console.log(
+            "DATA KEYS:",
+            paymentOrder &&
+            typeof paymentOrder === "object"
+                ? Object.keys(paymentOrder)
+                : []
+        );
+
+
         console.log(
             "Create Payment Status:",
             paymentOrderResponse.status
@@ -11966,6 +12162,10 @@ async function payWithRazorpay(backendOrderId, orderData) {
             paymentOrder
         );
 
+
+        // =====================================================
+        // PAYMENT ORDER CREATION FAILED
+        // =====================================================
 
         if (!paymentOrderResponse.ok) {
 
@@ -12031,10 +12231,12 @@ async function payWithRazorpay(backendOrderId, orderData) {
                 "Invalid payment amount received from backend."
             );
 
+
             console.error(
                 "Invalid Razorpay amount:",
                 paymentOrder.amount
             );
+
 
             return;
         }
@@ -12052,24 +12254,32 @@ async function payWithRazorpay(backendOrderId, orderData) {
 
         const options = {
 
-            // Your TEST key
+            // =================================================
+            // RAZORPAY LIVE KEY
+            // =================================================
+
             key: "rzp_live_T993YlUbiXqvXZ",
 
-            // Razorpay expects paise
+
+            // Razorpay expects amount in paise
             amount:
                 Math.round(
                     razorpayAmount * 100
                 ),
 
+
             currency: "INR",
 
+
             name: "RishtaBox",
+
 
             description:
                 "RishtaBox Order",
 
+
             order_id:
-                razorpayOrderId,
+            razorpayOrderId,
 
 
             // =================================================
@@ -12090,7 +12300,7 @@ async function payWithRazorpay(backendOrderId, orderData) {
 
 
                 // =============================================
-                // CHECK RESPONSE
+                // CHECK RAZORPAY RESPONSE
                 // =============================================
 
                 if (
@@ -12146,13 +12356,13 @@ async function payWithRazorpay(backendOrderId, orderData) {
                                         Number(backendOrderId),
 
                                     razorpayOrderId:
-                                        response.razorpay_order_id,
+                                    response.razorpay_order_id,
 
                                     razorpayPaymentId:
-                                        response.razorpay_payment_id,
+                                    response.razorpay_payment_id,
 
                                     razorpaySignature:
-                                        response.razorpay_signature
+                                    response.razorpay_signature
                                 })
                             }
                         );
@@ -12287,13 +12497,21 @@ async function payWithRazorpay(backendOrderId, orderData) {
                             (total, item) => {
 
                                 const price =
-                                    Number(item.price || 0);
+                                    Number(
+                                        item.price || 0
+                                    );
 
                                 const quantity =
-                                    Number(item.quantity || 0);
+                                    Number(
+                                        item.quantity || 0
+                                    );
 
                                 return total +
-                                    (price * quantity);
+                                    (
+                                        price *
+                                        quantity
+                                    );
+
                             },
 
                             0
@@ -12336,11 +12554,14 @@ async function payWithRazorpay(backendOrderId, orderData) {
                     const customerName =
                         currentUser?.name || "";
 
+
                     const customerEmail =
                         currentUser?.email || "";
 
+
                     const customerPhone =
                         currentUser?.phone || "";
+
 
                     const customerAddress =
                         currentUser?.address || "";
@@ -12353,60 +12574,77 @@ async function payWithRazorpay(backendOrderId, orderData) {
                     const frontendOrder = {
 
                         id:
-                            frontendOrderId,
+                        frontendOrderId,
+
 
                         backendOrderId:
-                            backendOrderId,
+                        backendOrderId,
+
 
                         items:
                             paidCart.map(item => ({
                                 ...item
                             })),
 
+
                         total:
-                            cartTotal,
+                        cartTotal,
+
 
                         deliveryCharges:
-                            deliveryCharges,
+                        deliveryCharges,
+
 
                         finalTotal:
-                            finalTotal,
+                        finalTotal,
+
 
                         paymentMethod:
                             "Online Payment",
 
+
                         paymentStatus:
                             "PAID",
 
+
                         razorpayOrderId:
-                            response.razorpay_order_id,
+                        response.razorpay_order_id,
+
 
                         razorpayPaymentId:
-                            response.razorpay_payment_id,
+                        response.razorpay_payment_id,
+
 
                         razorpaySignature:
-                            response.razorpay_signature,
+                        response.razorpay_signature,
+
 
                         orderDate:
                             orderDate.toISOString(),
 
+
                         deliveryDate:
                             deliveryDate.toISOString(),
+
 
                         status:
                             "confirmed",
 
+
                         name:
-                            customerName,
+                        customerName,
+
 
                         email:
-                            customerEmail,
+                        customerEmail,
+
 
                         phone:
-                            customerPhone,
+                        customerPhone,
+
 
                         address:
-                            customerAddress
+                        customerAddress
                     };
 
 
@@ -12422,7 +12660,9 @@ async function payWithRazorpay(backendOrderId, orderData) {
 
                     try {
 
-                        if (!Array.isArray(orders)) {
+                        if (
+                            !Array.isArray(orders)
+                        ) {
 
                             orders = [];
                         }
@@ -12444,7 +12684,9 @@ async function payWithRazorpay(backendOrderId, orderData) {
 
                             localStorage.setItem(
                                 "orders",
-                                JSON.stringify(orders)
+                                JSON.stringify(
+                                    orders
+                                )
                             );
                         }
 
@@ -12454,7 +12696,9 @@ async function payWithRazorpay(backendOrderId, orderData) {
                         );
 
 
-                    } catch (orderSaveError) {
+                    } catch (
+                        orderSaveError
+                        ) {
 
                         console.error(
                             "Frontend order save error:",
@@ -12463,11 +12707,14 @@ async function payWithRazorpay(backendOrderId, orderData) {
 
 
                         // Direct localStorage backup
+
                         try {
 
                             localStorage.setItem(
                                 "orders",
-                                JSON.stringify(orders)
+                                JSON.stringify(
+                                    orders
+                                )
                             );
 
 
@@ -12475,7 +12722,10 @@ async function payWithRazorpay(backendOrderId, orderData) {
                                 "Order saved using localStorage backup."
                             );
 
-                        } catch (backupError) {
+
+                        } catch (
+                            backupError
+                            ) {
 
                             console.error(
                                 "localStorage order backup failed:",
@@ -12500,7 +12750,8 @@ async function payWithRazorpay(backendOrderId, orderData) {
                                 await fetch(
                                     `http://localhost:8080/api/cart/clear/${currentUser.id}`,
                                     {
-                                        method: "DELETE",
+                                        method:
+                                            "DELETE",
 
                                         headers: {
                                             "Authorization":
@@ -12516,7 +12767,9 @@ async function payWithRazorpay(backendOrderId, orderData) {
                             );
 
 
-                            if (!clearCartResponse.ok) {
+                            if (
+                                !clearCartResponse.ok
+                            ) {
 
                                 console.warn(
                                     "Backend cart could not be cleared."
@@ -12532,7 +12785,9 @@ async function payWithRazorpay(backendOrderId, orderData) {
                         }
 
 
-                    } catch (cartError) {
+                    } catch (
+                        cartError
+                        ) {
 
                         console.error(
                             "Backend Cart Clear Error:",
@@ -12540,8 +12795,7 @@ async function payWithRazorpay(backendOrderId, orderData) {
                         );
 
 
-                        // IMPORTANT:
-                        // Payment is already verified.
+                        // Payment already verified.
                         // Cart error must not cancel success.
                     }
 
@@ -12585,7 +12839,9 @@ async function payWithRazorpay(backendOrderId, orderData) {
                         );
 
 
-                    } catch (cartSaveError) {
+                    } catch (
+                        cartSaveError
+                        ) {
 
                         console.error(
                             "Frontend cart clear error:",
@@ -12594,6 +12850,7 @@ async function payWithRazorpay(backendOrderId, orderData) {
 
 
                         // Force localStorage clear
+
                         try {
 
                             localStorage.setItem(
@@ -12654,7 +12911,9 @@ async function payWithRazorpay(backendOrderId, orderData) {
                         }
 
 
-                    } catch (successError) {
+                    } catch (
+                        successError
+                        ) {
 
                         console.error(
                             "showOrderSuccess error:",
@@ -12678,11 +12937,13 @@ async function payWithRazorpay(backendOrderId, orderData) {
                 }
 
 
-                // =================================================
-                // ERROR AFTER PAYMENT VERIFICATION
-                // =================================================
+                    // =================================================
+                    // ERROR AFTER PAYMENT VERIFICATION
+                    // =================================================
 
-                catch (errorAfterPayment) {
+                catch (
+                    errorAfterPayment
+                    ) {
 
                     console.error(
                         "ERROR AFTER PAYMENT VERIFICATION:",
@@ -12710,21 +12971,14 @@ async function payWithRazorpay(backendOrderId, orderData) {
 
                     /*
                      * IMPORTANT:
-                     * At this point Razorpay payment was already
-                     * verified by backend.
-                     *
-                     * Therefore DON'T show:
-                     * "Payment verification failed"
-                     *
-                     * Show successful payment message instead.
+                     * If the backend verification request itself
+                     * threw an exception, we cannot safely claim
+                     * that payment was verified.
                      */
 
                     alert(
-                        "Payment successful!\n\n" +
-                        "Order ID: " +
-                        backendOrderId +
-                        "\n\n" +
-                        "Please check My Orders."
+                        "Payment processing could not be completed.\n\n" +
+                        "Please check My Orders or contact support."
                     );
                 }
             },
@@ -12845,7 +13099,8 @@ async function payWithRazorpay(backendOrderId, orderData) {
             "Please make sure Spring Boot is running."
         );
     }
-} function showOrderSuccess(
+}
+function showOrderSuccess(
     orderId,
     paymentMethod,
     finalTotal,
@@ -13043,7 +13298,6 @@ function trackShipment() {
     }
 
 }
-
 // =====================================================
 // SIGNUP
 // =====================================================
@@ -13052,398 +13306,385 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const signupForm = document.getElementById("signupForm");
 
-    if (signupForm) {
-
-        signupForm.addEventListener("submit", async function (event) {
-
-            event.preventDefault();
-
-            console.log("=================================");
-            console.log("SIGNUP FORM SUBMITTED");
-            console.log("=================================");
-
-            const name =
-                document.getElementById("signupName").value.trim();
-
-            const mobile =
-                document.getElementById("signupMobile").value.trim();
-
-            const email =
-                document.getElementById("signupEmail").value.trim();
-
-            const password =
-                document.getElementById("signupPassword").value;
-
-            const confirmPassword =
-                document.getElementById("confirmPassword").value;
-
-            const message =
-                document.getElementById("signupMessage");
-
-            // -----------------------------
-            // VALIDATION
-            // -----------------------------
-
-            if (!name || !mobile || !email || !password) {
-
-                message.textContent =
-                    "Please fill all fields.";
-
-                return;
-            }
-
-            if (password !== confirmPassword) {
-
-                message.textContent =
-                    "Passwords do not match.";
-
-                return;
-            }
-
-            // -----------------------------
-            // REQUEST DATA
-            // -----------------------------
-
-            const requestData = {
-                name: name,
-                email: email,
-                phone: mobile,
-                password: password
-            };
-
-            console.log(
-                "REGISTER REQUEST:",
-                requestData
-            );
-
-            try {
-
-                const response = await fetch(
-                    `${API_BASE_URL}/api/auth/register`,
-                    {
-                        method: "POST",
-
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-
-                        body: JSON.stringify(requestData)
-                    }
-                );
-
-                console.log(
-                    "REGISTER STATUS:",
-                    response.status
-                );
-
-                const responseText =
-                    await response.text();
-
-                console.log(
-                    "REGISTER RESPONSE:",
-                    responseText
-                );
-
-                let data = {};
-
-                try {
-                    data = JSON.parse(responseText);
-                } catch (e) {
-                    console.log(
-                        "Response is not JSON"
-                    );
-                }
-
-                // -----------------------------
-                // BACKEND ERROR
-                // -----------------------------
-
-                if (!response.ok) {
-
-                    message.textContent =
-                        data.message ||
-                        responseText ||
-                        "Registration failed.";
-
-                    return;
-                }
-
-                // -----------------------------
-                // SUCCESS
-                // -----------------------------
-
-                console.log(
-                    "USER REGISTERED SUCCESSFULLY"
-                );
-
-                message.textContent =
-                    "Account created successfully.";
-
-                // Clear signup form
-                signupForm.reset();
-
-                // Go to log in
-                setTimeout(() => {
-
-                    showLogin();
-
-                }, 1000);
-
-            } catch (error) {
-
-                console.error(
-                    "REGISTER ERROR:",
-                    error
-                );
-
-                message.textContent =
-                    "Unable to connect to backend.";
-
-            }
-
-        });
-
-    } else {
-
-        console.error(
-            "ERROR: signupForm not found"
-        );
-
+    // Signup form is not present on this page
+    if (!signupForm) {
+        return;
     }
 
+    signupForm.addEventListener("submit", async function (event) {
 
+        event.preventDefault();
+
+        console.log("=================================");
+        console.log("SIGNUP FORM SUBMITTED");
+        console.log("=================================");
+
+        const name =
+            document.getElementById("signupName").value.trim();
+
+        const mobile =
+            document.getElementById("signupMobile").value.trim();
+
+        const email =
+            document.getElementById("signupEmail").value.trim();
+
+        const password =
+            document.getElementById("signupPassword").value;
+
+        const confirmPassword =
+            document.getElementById("confirmPassword").value;
+
+        const message =
+            document.getElementById("signupMessage");
+
+        // -----------------------------
+        // VALIDATION
+        // -----------------------------
+
+        if (!name || !mobile || !email || !password) {
+
+            message.textContent =
+                "Please fill all fields.";
+
+            return;
+        }
+
+        if (password !== confirmPassword) {
+
+            message.textContent =
+                "Passwords do not match.";
+
+            return;
+        }
+
+        // -----------------------------
+        // REQUEST DATA
+        // -----------------------------
+
+        const requestData = {
+            name: name,
+            email: email,
+            phone: mobile,
+            password: password
+        };
+
+        console.log(
+            "REGISTER REQUEST:",
+            requestData
+        );
+
+        try {
+
+            const response = await fetch(
+                `${API_BASE_URL}/api/auth/register`,
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify(requestData)
+                }
+            );
+
+            console.log(
+                "REGISTER STATUS:",
+                response.status
+            );
+
+            const responseText =
+                await response.text();
+
+            console.log(
+                "REGISTER RESPONSE:",
+                responseText
+            );
+
+            let data = {};
+
+            try {
+                data = JSON.parse(responseText);
+            } catch (e) {
+                console.log("Response is not JSON");
+            }
+
+            // -----------------------------
+            // BACKEND ERROR
+            // -----------------------------
+
+            if (!response.ok) {
+
+                message.textContent =
+                    data.message ||
+                    responseText ||
+                    "Registration failed.";
+
+                return;
+            }
+
+            // -----------------------------
+            // SUCCESS
+            // -----------------------------
+
+            console.log(
+                "USER REGISTERED SUCCESSFULLY"
+            );
+
+            message.textContent =
+                "Account created successfully.";
+
+            signupForm.reset();
+
+            setTimeout(() => {
+
+                if (typeof showLogin === "function") {
+                    showLogin();
+                }
+
+            }, 1000);
+
+        } catch (error) {
+
+            console.error(
+                "REGISTER ERROR:",
+                error
+            );
+
+            message.textContent =
+                "Unable to connect to backend.";
+
+        }
+
+    });
+
+});
     // =====================================================
     // LOGIN
     // =====================================================
+// =====================================================
+// LOGIN
+// =====================================================
 
-    const loginForm =
-        document.getElementById("loginForm");
+const loginForm =
+    document.getElementById("loginForm");
 
-    if (loginForm) {
+if (loginForm) {
 
-        loginForm.addEventListener("submit", async function (event) {
+    loginForm.addEventListener("submit", async function (event) {
 
-            event.preventDefault();
+        event.preventDefault();
 
-            console.log("=================================");
-            console.log("LOGIN FORM SUBMITTED");
-            console.log("=================================");
+        console.log("=================================");
+        console.log("LOGIN FORM SUBMITTED");
+        console.log("=================================");
 
-            const email =
-                document.getElementById("loginEmail")
-                    .value.trim();
+        const email =
+            document.getElementById("loginEmail")
+                .value.trim();
 
-            const password =
-                document.getElementById("loginPassword")
-                    .value;
+        const password =
+            document.getElementById("loginPassword")
+                .value;
 
-            const message =
-                document.getElementById("loginMessage");
+        const message =
+            document.getElementById("loginMessage");
+
+        try {
+
+            const response = await fetch(
+                `${API_BASE_URL}/api/auth/login`,
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        email: email,
+                        password: password
+                    })
+                }
+            );
+
+            console.log(
+                "LOGIN STATUS:",
+                response.status
+            );
+
+            const responseText =
+                await response.text();
+
+            console.log(
+                "LOGIN RESPONSE:",
+                responseText
+            );
+
+            let data = {};
 
             try {
-
-                const response = await fetch(
-                    `${API_BASE_URL}/api/auth/login`,
-                    {
-                        method: "POST",
-
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-
-                        body: JSON.stringify({
-                            email: email,
-                            password: password
-                        })
-                    }
-                );
-
-                console.log(
-                    "LOGIN STATUS:",
-                    response.status
-                );
-
-                const responseText =
-                    await response.text();
-
-                console.log(
-                    "LOGIN RESPONSE:",
-                    responseText
-                );
-
-                let data = {};
-
-                try {
-                    data = JSON.parse(responseText);
-                } catch (e) {
-                    console.log(
-                        "Response is not JSON"
-                    );
-                }
-
-                if (!response.ok) {
-
-                    message.textContent =
-                        data.message ||
-                        responseText ||
-                        "Invalid login.";
-
-                    return;
-                }
-
-                // -----------------------------
-                // VALIDATE AND SAVE JWT
-                // -----------------------------
-
-                const token =
-                    data.token ||
-                    data.accessToken ||
-                    data.jwt ||
-                    data.jwtToken;
-
-                if (
-                    !token ||
-                    typeof token !== "string" ||
-                    token.trim() === ""
-                ) {
-                    console.error(
-                        "LOGIN ERROR: JWT token missing",
-                        data
-                    );
-
-                    message.textContent =
-                        "Login failed: Authentication token missing.";
-
-                    return;
-                }
-
-                const cleanToken = token.trim();
-
-                if (cleanToken.split(".").length !== 3) {
-                    console.error(
-                        "LOGIN ERROR: Invalid JWT format"
-                    );
-
-                    message.textContent =
-                        "Login failed: Invalid authentication token.";
-
-                    return;
-                }
-
-                // -----------------------------
-                // CREATE USER DATA
-                // -----------------------------
-
-                const user = {
-
-                    id: data.userId,
-
-                    name: data.name || "",
-
-                    email: data.email || "",
-
-                    phone: "",
-
-                    address: "",
-
-                    token: cleanToken
-                };
-
-                // -----------------------------
-                // SAVE JWT
-                // -----------------------------
-
-                localStorage.setItem(
-                    "token",
-                    cleanToken
-                );
-
-                // -----------------------------
-                // SAVE USER DATA
-                // -----------------------------
-
-                localStorage.setItem(
-                    "userData",
-                    JSON.stringify(user)
-                );
-
-                // IMPORTANT
-                localStorage.setItem(
-                    "rishtaBoxCurrentUser",
-                    JSON.stringify(user)
-                );
-
-                localStorage.setItem(
-                    "rishtaBoxLoggedIn",
-                    "true"
-                );
-
-                // -----------------------------
-                // UPDATE CURRENT USER
-                // -----------------------------
-
-                currentUser = user;
-
-                console.log(
-                    "LOGIN TOKEN SAVED SUCCESSFULLY"
-                );
-
-                console.log(
-                    "Token exists:",
-                    Boolean(cleanToken)
-                );
-
-                console.log(
-                    "Token length:",
-                    cleanToken.length
-                );
-
-                console.log(
-                    "Token parts:",
-                    cleanToken.split(".").length
-                );
-
-                console.log(
-                    "CURRENT USER:",
-                    currentUser
-                );
-
-                console.log(
-                    "CURRENT USER ID:",
-                    currentUser.id
-                );
-
-                // -----------------------------
-                // LOGIN SUCCESS
-                // -----------------------------
-
-                message.textContent =
-                    "Login successful.";
-
-                showPage("home");
-            } catch (error) {
-
-                console.error(
-                    "LOGIN ERROR:",
-                    error
-                );
-
-                message.textContent =
-                    "Login error: " +
-                    error.message;
+                data = JSON.parse(responseText);
+            } catch (e) {
+                console.log("Response is not JSON");
             }
 
-        });
+            if (!response.ok) {
 
-    } else {
+                message.textContent =
+                    data.message ||
+                    responseText ||
+                    "Invalid login.";
 
-        console.error(
-            "ERROR: loginForm not found"
-        );
+                return;
+            }
 
-    }
+            // -----------------------------
+            // VALIDATE AND SAVE JWT
+            // -----------------------------
 
-});/* =========================================================
+            const token =
+                data.token ||
+                data.accessToken ||
+                data.jwt ||
+                data.jwtToken;
+
+            if (
+                !token ||
+                typeof token !== "string" ||
+                token.trim() === ""
+            ) {
+                console.error(
+                    "LOGIN ERROR: JWT token missing",
+                    data
+                );
+
+                message.textContent =
+                    "Login failed: Authentication token missing.";
+
+                return;
+            }
+
+            const cleanToken = token.trim();
+
+            if (cleanToken.split(".").length !== 3) {
+
+                console.error(
+                    "LOGIN ERROR: Invalid JWT format"
+                );
+
+                message.textContent =
+                    "Login failed: Invalid authentication token.";
+
+                return;
+            }
+
+            // -----------------------------
+            // CREATE USER DATA
+            // -----------------------------
+
+            const user = {
+
+                id: data.userId,
+
+                name: data.name || "",
+
+                email: data.email || "",
+
+                phone: "",
+
+                address: "",
+
+                token: cleanToken
+            };
+
+            // -----------------------------
+            // SAVE JWT
+            // -----------------------------
+
+            localStorage.setItem(
+                "token",
+                cleanToken
+            );
+
+            // -----------------------------
+            // SAVE USER DATA
+            // -----------------------------
+
+            localStorage.setItem(
+                "userData",
+                JSON.stringify(user)
+            );
+
+            localStorage.setItem(
+                "rishtaBoxCurrentUser",
+                JSON.stringify(user)
+            );
+
+            localStorage.setItem(
+                "rishtaBoxLoggedIn",
+                "true"
+            );
+
+            // -----------------------------
+            // UPDATE CURRENT USER
+            // -----------------------------
+
+            currentUser = user;
+
+            console.log(
+                "LOGIN TOKEN SAVED SUCCESSFULLY"
+            );
+
+            console.log(
+                "Token exists:",
+                Boolean(cleanToken)
+            );
+
+            console.log(
+                "Token length:",
+                cleanToken.length
+            );
+
+            console.log(
+                "Token parts:",
+                cleanToken.split(".").length
+            );
+
+            console.log(
+                "CURRENT USER:",
+                currentUser
+            );
+
+            console.log(
+                "CURRENT USER ID:",
+                currentUser.id
+            );
+
+            // -----------------------------
+            // LOGIN SUCCESS
+            // -----------------------------
+
+            message.textContent =
+                "Login successful.";
+
+            showPage("home");
+
+        } catch (error) {
+
+            console.error(
+                "LOGIN ERROR:",
+                error
+            );
+
+            message.textContent =
+                "Login error: " +
+                error.message;
+        }
+
+    });
+}
+/* =========================================================
    RISHTABOX - COMPLETE NAV DROPDOWN SYSTEM
    Desktop  : Hover
    Mobile   : Click
