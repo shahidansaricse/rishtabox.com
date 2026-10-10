@@ -22,6 +22,7 @@ let cart = [];
 let orders = [];
 let currentOrderSteps = 1;
 
+
 /* =========================================================
     LOCAL STORAGE
  ========================================================= */
@@ -224,6 +225,15 @@ function saveOrdersData() {
         );
     }
 }
+function loadOrdersData() {
+
+    console.log(
+        "loadOrdersData skipped: orders are loaded from backend."
+    );
+
+    return;
+}
+
 function saveCartData() {
 
     if (
@@ -361,14 +371,6 @@ function loadCartData() {
     }
 }
 
-function loadOrdersData() {
-
-    console.log(
-        "loadOrdersData skipped: orders are loaded from backend."
-    );
-
-    return;
-}
 
 
 function saveRecentlyViewed() {
@@ -425,97 +427,33 @@ function updateCartCount() {
 
 async function loadData() {
     try {
+        const fetchJson = async function (url) {
+            const response = await fetch(url);
 
-        // =====================================================
-        // LOAD CATEGORIES FROM BACKEND
-        // =====================================================
+            if (!response.ok) {
+                throw new Error(
+                    url + " failed: " + response.status
+                );
+            }
 
-        const categoryResponse = await fetch(
-            "http://localhost:8080/api/categories"
-        );
+            return response.json();
+        };
 
-        if (!categoryResponse.ok) {
-            throw new Error(
-                "Category API Error: " +
-                categoryResponse.status
-            );
-        }
+        const [
+            categoryData,
+            festivalData,
+            relationshipData,
+            backendProducts
+        ] = await Promise.all([
+            fetchJson("http://localhost:8080/api/categories"),
+            fetchJson("http://localhost:8080/api/festivals"),
+            fetchJson("http://localhost:8080/api/relationships"),
+            fetchJson("http://localhost:8080/api/products")
+        ]);
 
-        categories = await categoryResponse.json();
-
-        console.log(
-            "BACKEND CATEGORIES:",
-            categories
-        );
-
-
-        // =====================================================
-        // LOAD FESTIVALS FROM BACKEND
-        // =====================================================
-
-        const festivalResponse = await fetch(
-            "http://localhost:8080/api/festivals"
-        );
-
-        if (!festivalResponse.ok) {
-            throw new Error(
-                "Festival API Error: " +
-                festivalResponse.status
-            );
-        }
-
-        festivals = await festivalResponse.json();
-
-        console.log(
-            "BACKEND FESTIVALS:",
-            festivals
-        );
-
-
-        // =====================================================
-        // LOAD RELATIONSHIPS FROM BACKEND
-        // =====================================================
-
-        const relationshipResponse = await fetch(
-            "http://localhost:8080/api/relationships"
-        );
-
-        if (!relationshipResponse.ok) {
-            throw new Error(
-                "Relationship API Error: " +
-                relationshipResponse.status
-            );
-        }
-
-        relationships = await relationshipResponse.json();
-
-        console.log(
-            "BACKEND RELATIONSHIPS:",
-            relationships
-        );
-
-        // =====================================================
-        // LOAD PRODUCTS FROM BACKEND
-        // =====================================================
-
-        const productResponse = await fetch(
-            "http://localhost:8080/api/products"
-        );
-
-        if (!productResponse.ok) {
-            throw new Error(
-                "Product API Error: " +
-                productResponse.status
-            );
-        }
-
-        const backendProducts =
-            await productResponse.json();
-
-
-        // =====================================================
-        // VALIDATE PRODUCTS
-        // =====================================================
+        categories = categoryData;
+        festivals = festivalData;
+        relationships = relationshipData;
 
         if (!Array.isArray(backendProducts)) {
             throw new Error(
@@ -523,407 +461,151 @@ async function loadData() {
             );
         }
 
+        products = backendProducts.map(product => {
+            const price = Number(product.price) || 0;
+            const originalPrice =
+                Number(product.originalPrice) || 0;
 
-        // =====================================================
-        // CONVERT BACKEND PRODUCTS
-        // =====================================================
+            return {
+                id: product.id,
+                name: product.name || "",
+                description: product.description || "",
+                price,
+                originalPrice,
+                image: product.image || "",
+                stock: Number(product.stock) || 0,
+                active: product.active === true,
 
-        products = backendProducts.map(product => ({
-
-            // =================================================
-            // BASIC PRODUCT DATA
-            // =================================================
-
-            id:
-                product.id,
-
-            name:
-                product.name || "",
-
-            description:
-                product.description || "",
-
-            price:
-                Number(product.price) || 0,
-
-            originalPrice:
-                Number(product.originalPrice) || 0,
-
-            image:
-                product.image || "",
-
-
-            // =================================================
-            // STOCK
-            // =================================================
-
-            stock:
-                Number(product.stock) || 0,
-
-
-            // =================================================
-            // ACTIVE / INACTIVE
-            // =================================================
-
-            active:
-                product.active === true,
-
-
-            // =================================================
-            // CATEGORY
-            // =================================================
-
-            category:
-                product.category
+                category: product.category
                     ? product.category.id
                     : null,
-
-            categoryName:
-                product.category
+                categoryName: product.category
                     ? product.category.name
                     : null,
 
-
-            // =================================================
-            // FESTIVAL
-            // =================================================
-
-            festival:
-                product.festival
+                festival: product.festival
                     ? product.festival.id
                     : null,
-
-            festivalName:
-                product.festival
+                festivalName: product.festival
                     ? product.festival.name
                     : null,
 
-
-            // =================================================
-            // RELATIONSHIP
-            // =================================================
-
-            relationship:
-                product.relationship
+                relationship: product.relationship
                     ? product.relationship.id
                     : null,
-
-            relationshipName:
-                product.relationship
+                relationshipName: product.relationship
                     ? product.relationship.name
                     : null,
 
-
-            // =================================================
-            // OTHER
-            // =================================================
-
-            brand:
-                product.brand || "",
-
-            rating:
-                Number(product.rating) || 0,
-
-
-            // =================================================
-            // AUTOMATIC DISCOUNT
-            // =================================================
-
-            discount:
-                calculateDiscount(
-                    Number(product.originalPrice) || 0,
-                    Number(product.price) || 0
+                brand: product.brand || "",
+                rating: Number(product.rating) || 0,
+                discount: calculateDiscount(
+                    originalPrice,
+                    price
                 )
-
-        }));
-
-
-        // =====================================================
-        // OLD DATA.JSON PRODUCTS
-        // =====================================================
-
-        // Products now come from backend only
-        festivalProducts = [];
-
-        relationshipProducts = [];
-
-
-        // =====================================================
-        // DEBUG
-        // =====================================================
-
-        console.log(
-            "================================="
-        );
-
-        console.log(
-            "CATEGORIES:",
-            categories
-        );
-
-        console.log(
-            "FESTIVALS:",
-            festivals
-        );
-
-        console.log(
-            "RELATIONSHIPS:",
-            relationships
-        );
-
-        console.log(
-            "PRODUCTS:",
-            products
-        );
-
-        console.log(
-            "PRODUCT COUNT:",
-            products.length
-        );
-
-
-        // =====================================================
-        // CHECK STOCK / ACTIVE
-        // =====================================================
-
-        products.forEach(product => {
-
-            console.log(
-                "Product:",
-                product.id,
-                "|",
-                product.name,
-                "| Stock:",
-                product.stock,
-                "| Active:",
-                product.active
-            );
-
+            };
         });
 
+        festivalProducts = [];
+        relationshipProducts = [];
 
-        console.log(
-            "================================="
-        );
+        console.log("Products loaded:", products.length);
 
-
-        // =====================================================
-        // INITIALIZE APPLICATION
-        // =====================================================
-
-        initializeApp();
-
+        await initializeApp();
 
     } catch (error) {
-
-        console.error(
-            "DATA LOAD ERROR:",
-            error
-        );
+        console.error("DATA LOAD ERROR:", error);
 
         document.body.innerHTML = `
-            <div style="
-                text-align:center;
-                padding:50px;
-                font-family:Arial;
-            ">
-
+            <div style="text-align:center;padding:50px;font-family:Arial;">
                 <h2>Data Loading Error</h2>
-
-                <p>
-                    ${error.message}
-                </p>
-
-                <p>
-                    Make sure your Spring Boot backend
-                    is running on port 8080.
-                </p>
-
+                <p>Unable to load store data. Please try again.</p>
+                <p>${escapeHtml(error.message)}</p>
+                <p>Check that the backend is running and the API URLs are correct.</p>
             </div>
         `;
     }
 }
 
-/* =========================================================
-   INITIALIZE APP
-====/* =====================================================
-   INITIALIZE APPLICATION
-===================================================== */
-
 async function initializeApp() {
-
-    // =====================================================
-    // LOAD USER
-    // =====================================================
-
     loadUserData();
-
-
-    // =====================================================
-    // LOAD CART
-    // =====================================================
-
     loadCartData();
-
-
-    // =====================================================
-    // LOAD ORDERS FROM BACKEND
-    // =====================================================
-
-    console.log(
-        "🚀🚀🚀 CALLING BACKEND ORDERS 🚀🚀🚀"
-    );
-
-    await loadOrdersFromBackend();
-
-
-    // =====================================================
-    // LOAD RECENTLY VIEWED
-    // =====================================================
-
     loadRecentlyViewed();
 
-
-    // =====================================================
-    // RENDER HOME DATA
-    // =====================================================
-
     renderCategories();
-
     renderFestivals();
-
     renderRelationships();
-
-    // =====================================================
-    // LOAD HOMEPAGE SLIDERS
-    // =====================================================
-
-    loadHomepageSliders();
-
-    // =====================================================
-    // LOAD BLOGS
-    // =====================================================
-
-    loadBlogs();
-    // =====================================================
-    // RENDER NAVIGATION DROPDOWNS
-    // =====================================================
-
     renderShopMenus();
 
-
-    // =====================================================
-    // FILTERED PRODUCTS
-    // =====================================================
-
     filteredProducts = [...products];
-
-    console.log(
-        "ALL PRODUCTS:",
-        products
-    );
-
-
-    renderProducts(
-        filteredProducts
-    );
-
-
-    // =====================================================
-    // CART
-    // =====================================================
+    renderProducts(filteredProducts);
 
     updateCartCount();
-
-
-    // =====================================================
-    // SHOW HOME PAGE
-    // =====================================================
-
     showPage("home");
 
+    // Non-blocking homepage slider
+    Promise.resolve()
+        .then(() => loadHomepageSliders())
+        .catch(error => {
+            console.error("Homepage slider error:", error);
+        });
 
-    // =====================================================
-    // FINAL DEBUG
-    // =====================================================
+    // Load blogs after the main content
+    const runLater = window.requestIdleCallback
+        ? window.requestIdleCallback.bind(window)
+        : callback => setTimeout(callback, 200);
 
-    console.log(
-        "================================="
-    );
+    runLater(() => {
+        if (typeof loadBlogs === "function") {
+            loadBlogs();
+        }
+    });
 
-    console.log(
-        "✅ APPLICATION INITIALIZED"
-    );
+    // Load orders in the background
+    if (typeof loadOrdersFromBackend === "function") {
+        Promise.resolve()
+            .then(() => loadOrdersFromBackend())
+            .catch(error => {
+                console.error("Orders loading error:", error);
+            });
+    }
 
-    console.log(
-        "✅ CURRENT USER:",
-        currentUser
-    );
-
-    console.log(
-        "✅ CART COUNT:",
-        Array.isArray(cart)
-            ? cart.length
-            : 0
-    );
-
-    console.log(
-        "✅ ORDERS COUNT:",
-        Array.isArray(orders)
-            ? orders.length
-            : 0
-    );
-
-    console.log(
-        "================================="
-    );
+    console.log("RishtaBox application initialized");
 }
-/* =========================================================
-   DOM READY
-========================================================= */
+
+// DOMContentLoaded must remain outside both functions
 document.addEventListener("DOMContentLoaded", () => {
-    loadData();
-    const sortBy =
-        document.getElementById("sortBy");
-    const priceRange =
-        document.getElementById("priceRange");
-    const brandFilter =
-        document.getElementById("brandFilter");
-    if (sortBy) {
-        sortBy.addEventListener(
-            "change",
-            applyFilters
-        );
-    }
-    if (priceRange) {
-        priceRange.addEventListener(
-            "input",
-            applyFilters
-        );
-    }
-    if (brandFilter) {
-        brandFilter.addEventListener(
-            "change",
-            applyFilters
-        );
-    }
-}
-);
+    console.log("RishtaBox startup started");
 
+    loadData();
+
+    const sortBy = document.getElementById("sortBy");
+    const priceRange = document.getElementById("priceRange");
+    const brandFilter = document.getElementById("brandFilter");
+
+    if (sortBy) {
+        sortBy.addEventListener("change", applyFilters);
+    }
+
+    if (priceRange) {
+        priceRange.addEventListener("input", applyFilters);
+    }
+
+    if (brandFilter) {
+        brandFilter.addEventListener("change", applyFilters);
+    }
+});
 /* =========================================================
    SHOW PAGE
 ========================================================= */
+
+/* =========================================================
+   SHOW PAGE — FIXED
+========================================================= */
+
 function showPage(pageId) {
 
-    const pages =
-        document.querySelectorAll(".page");
-
-    pages.forEach(function (page) {
-        page.classList.add("hidden");
-    });
-
     const pageMap = {
-
         home: "homePage",
         cart: "cartPage",
         orders: "ordersPage",
@@ -933,122 +615,83 @@ function showPage(pageId) {
         product: "productPage",
         order: "orderPage",
         login: "loginPage",
-
-        // BLOG
         blogsPage: "blogsPage"
-
     };
 
-    const targetPage =
-        document.getElementById(pageMap[pageId]);
+    // Accept either a logical page name or an HTML element ID
+    const targetId = pageMap[pageId] || pageId;
 
+    const targetPage = document.getElementById(targetId);
+
+    // Validate before hiding the currently visible page
     if (!targetPage) {
-
         console.error(
             "Page not found:",
-            pageMap[pageId]
+            pageId,
+            "| Resolved ID:",
+            targetId
         );
-
         return;
     }
+
+    // Hide all pages only after confirming the target exists
+    document.querySelectorAll(".page").forEach(function (page) {
+        page.classList.add("hidden");
+    });
 
     targetPage.classList.remove("hidden");
 
     switch (pageId) {
 
         case "home":
-
-            renderCategories();
-
+        case "homePage":
+            if (typeof renderCategories === "function") {
+                renderCategories();
+            }
             break;
-
 
         case "cart":
-
-            if (
-                typeof renderCart === "function"
-            ) {
-
+        case "cartPage":
+            if (typeof renderCart === "function") {
                 renderCart();
-
             }
-
             break;
-
 
         case "orders":
-
-            if (
-                typeof renderOrders === "function"
-            ) {
-
+        case "ordersPage":
+            if (typeof renderOrders === "function") {
                 renderOrders();
-
             }
-
             break;
-
 
         case "order":
-
+        case "orderPage":
             currentOrderSteps = 1;
-
-            if (
-                typeof renderOrderSteps === "function"
-            ) {
-
+            if (typeof renderOrderSteps === "function") {
                 renderOrderSteps();
-
             }
-
             break;
-
 
         case "account":
-
-            if (
-                typeof loadUserAccountPage === "function"
-            ) {
-
+        case "accountPage":
+            if (typeof loadUserAccountPage === "function") {
                 loadUserAccountPage();
-
             }
-
             break;
-
-
-        case "category":
-
-            // DO NOTHING
-
-            break;
-
-
-        // =========================
-        // BLOG PAGE
-        // =========================
 
         case "blogsPage":
-
-            if (
-                typeof loadBlogs === "function"
-            ) {
-
+            if (typeof loadBlogs === "function") {
                 loadBlogs();
-
             }
-
             break;
     }
-
-
-    // Scroll to top
 
     window.scrollTo({
         top: 0,
         behavior: "smooth"
     });
 }
+
 function toggleSidebar() {
     const sidebar = document.querySelector(".sidebar");
     const overlay = document.querySelector(".sidebar-overlay");
@@ -1134,6 +777,7 @@ function searchProducts() {
         "searchProductGrid"
     );
 }
+
 /* =====/* =====================================================
    IMAGE PATH
 ========================================================= */
@@ -1161,6 +805,46 @@ function getImagePath(image) {
 
     return "images/" + image;
 }
+
+/* =========================================================
+   IMAGE LOAD RECOVERY
+   Retries a failed image once, then uses the local logo.
+   This helps transient network/cache failures; backend
+   Content-Length errors must still be fixed on the server.
+========================================================= */
+function handleImageLoadError(img) {
+    if (!img || img.dataset.rbFallbackApplied === "1") return;
+
+    const originalSrc = img.dataset.rbOriginalSrc || img.currentSrc || img.src;
+    if (!img.dataset.rbOriginalSrc) img.dataset.rbOriginalSrc = originalSrc;
+
+    if (img.dataset.rbRetried !== "1" && /^https?:/i.test(originalSrc)) {
+        img.dataset.rbRetried = "1";
+        try {
+            const retryUrl = new URL(originalSrc);
+            retryUrl.searchParams.set("_rb_retry", String(Date.now()));
+            img.src = retryUrl.href;
+            return;
+        } catch (_) {
+            // Fall through to the local fallback.
+        }
+    }
+
+    img.dataset.rbFallbackApplied = "1";
+    img.onerror = null;
+    img.src = "images/logo.jpeg";
+}
+
+function prepareStoreImage(img, { eager = false, priority = "auto" } = {}) {
+    if (!img) return;
+    img.decoding = "async";
+    img.loading = eager ? "eager" : "lazy";
+    if ("fetchPriority" in img) img.fetchPriority = priority;
+    img.addEventListener("error", function () {
+        handleImageLoadError(img);
+    }, { once: false });
+}
+
 // ================= SEARCH ENTER KEY SUPPORT =================
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -1461,9 +1145,9 @@ function renderHomepageSliders() {
                             class="
                                 hero-slide
                                 ${index === 0
-                            ? "active"
-                            : ""
-                        }
+                        ? "active"
+                        : ""
+                    }
                             ">
 
 
@@ -1473,20 +1157,20 @@ function renderHomepageSliders() {
 
                             <img
                                 src="${escapeHtml(
-                            image
-                        )}"
+                        image
+                    )}"
 
                                 alt="${escapeHtml(
-                            title ||
-                            "RishtaBox Gifts"
-                        )}"
+                        title ||
+                        "RishtaBox Gifts"
+                    )}"
 
                                 class="hero-image"
-
+                                decoding="async"
                                 ${index === 0
-                            ? 'loading="eager"'
-                            : 'loading="lazy"'
-                        }
+                        ? 'loading="eager" fetchpriority="high"'
+                        : 'loading="lazy" fetchpriority="low"'
+                    }
                             >
 
 
@@ -1504,50 +1188,50 @@ function renderHomepageSliders() {
                             ========================== -->
 
                             ${title ||
-                            subtitle
-                            ? `
+                    subtitle
+                        ? `
 
                                         <div
                                             class="hero-content">
 
 
                                             ${title
-                                ? `
+                            ? `
 
                                                         <h1>
 
                                                             ${escapeHtml(
-                                    title
-                                )}
+                                title
+                            )}
 
                                                         </h1>
 
                                                     `
-                                : ""
-                            }
+                            : ""
+                        }
 
 
                                             ${subtitle
-                                ? `
+                            ? `
 
                                                         <p>
 
                                                             ${escapeHtml(
-                                    subtitle
-                                )}
+                                subtitle
+                            )}
 
                                                         </p>
 
                                                     `
-                                : ""
-                            }
+                            : ""
+                        }
 
 
                                         </div>
 
                                     `
-                            : ""
-                        }
+                        : ""
+                    }
 
 
                             <!-- =========================
@@ -1559,8 +1243,8 @@ function renderHomepageSliders() {
 
                                 <a
                                     href="${escapeHtml(
-                            link
-                        )}"
+                        link
+                    )}"
 
                                     class="hero-btn">
 
@@ -1600,9 +1284,9 @@ function renderHomepageSliders() {
                             class="
                                 slider-dot
                                 ${index === 0
-                            ? "active"
-                            : ""
-                        }
+                        ? "active"
+                        : ""
+                    }
                             "
 
                             onclick="
@@ -1611,7 +1295,7 @@ function renderHomepageSliders() {
 
                             aria-label="
                                 Go to slide ${index + 1
-                        }
+                    }
                             ">
                         </button>
 
@@ -1924,50 +1608,12 @@ function updateActiveSlide() {
 ========================================================= */
 
 function startSliderAutoPlay() {
-
-    /* =====================================================
-       CLEAR OLD TIMER
-    ===================================================== */
-
-    if (
-        sliderInterval
-    ) {
-
-        clearInterval(
-            sliderInterval
-        );
-
+    // Auto-play disabled to avoid timer-related page jank.
+    // Manual hero controls remain available.
+    if (sliderInterval) {
+        clearInterval(sliderInterval);
+        sliderInterval = null;
     }
-
-
-    /* =====================================================
-       ONLY ONE SLIDE
-    ===================================================== */
-
-    if (
-        !heroSliders ||
-        heroSliders.length <= 1
-    ) {
-
-        return;
-
-    }
-
-
-    /* =====================================================
-       EVERY 5 SECONDS
-    ===================================================== */
-
-    sliderInterval =
-        setInterval(
-            function () {
-
-                changeSlide(1);
-
-            },
-            5000
-        );
-
 }
 
 
@@ -2135,6 +1781,7 @@ function escapeHtml(
         );
 
 }
+
 /* =========================================================
    LOAD CATEGORIES FROM BACKEND
 ========================================================= */
@@ -2164,6 +1811,7 @@ async function loadCategories() {
         console.error("Category loading error:", error);
     }
 }
+
 /* =========================================================
    RENDER CATEGORIES
 ========================================================= */
@@ -2183,6 +1831,7 @@ function renderCategories() {
         "category"
     );
 }
+
 /* =========================================================
    RENDER PRODUCTS
 ========================================================= */
@@ -2223,15 +1872,10 @@ function renderProducts(
         gridId
     );
 
-    console.log(
-        "PRODUCTS TO RENDER:",
-        productsToRender
-    );
-
-    console.log(
-        "COUNT:",
-        productsToRender?.length
-    );
+    // Avoid logging entire product arrays on every render; large console
+    // object dumps can make filtering and scrolling feel sluggish.
+    // Keep a lightweight count for diagnostics.
+    console.debug("Product count:", productsToRender?.length || 0);
 
     // =====================================================
     // NO PRODUCTS FOUND
@@ -2316,19 +1960,25 @@ function renderProducts(
 
             <div class="product-card-image-wrapper">
 
-                <img
-                    src="${getImagePath(product.image)}"
-                    alt="${product.name || "Product"}"
-                >
+        <img
+        src="${getImagePath(product.image)}"
+        alt="${escapeHtml(product.name || "Product")}"
+        loading="${productsToRender.indexOf(product) < 6 ? "eager" : "lazy"}"
+        fetchpriority="${productsToRender.indexOf(product) < 3 ? "high" : "auto"}"
+        decoding="async"
+        onerror="handleImageLoadError(this)"
+            >
+       
+
 
                 ${!isAvailable
-                ? `
+            ? `
                             <span class="out-of-stock-badge">
                                 Out of Stock
                             </span>
                           `
-                : ""
-            }
+            : ""
+        }
 
             </div>
 
@@ -2375,22 +2025,22 @@ function renderProducts(
                     </span>
 
                     ${product.originalPrice
-                ? `
+            ? `
                                 <span class="original-price">
                                     ₹${product.originalPrice}
                                 </span>
                               `
-                : ""
-            }
+            : ""
+        }
 
                     ${product.discount
-                ? `
+            ? `
                                 <span class="discount">
                                     ${product.discount}% OFF
                                 </span>
                               `
-                : ""
-            }
+            : ""
+        }
 
                 </div>
 
@@ -2400,17 +2050,17 @@ function renderProducts(
                 <div class="product-stock-status">
 
                     ${isAvailable
-                ? `
+            ? `
                                 <span class="in-stock">
                                     In Stock: ${stock}
                                 </span>
                               `
-                : `
+            : `
                                 <span class="out-of-stock">
                                     Out of Stock
                                 </span>
                               `
-            }
+        }
 
                 </div>
 
@@ -2422,6 +2072,7 @@ function renderProducts(
         );
     });
 }
+
 /*SHOW CATEGORY
 ========================================================= */
 
@@ -2584,8 +2235,8 @@ function showCategory(categoryId) {
             function (category) {
 
                 return String(category.id || "")
-                    .trim()
-                    .toLowerCase() ===
+                        .trim()
+                        .toLowerCase() ===
                     selectedId;
 
             }
@@ -2625,11 +2276,6 @@ function showCategory(categoryId) {
             function (product) {
 
                 if (!product.category) {
-                    console.log(
-                        "NO CATEGORY:",
-                        product.name
-                    );
-
                     return false;
                 }
 
@@ -2687,15 +2333,6 @@ function showCategory(categoryId) {
                         .toLowerCase();
 
 
-                console.log(
-                    "PRODUCT:",
-                    product.name,
-                    "| CATEGORY ID:",
-                    productCategoryId,
-                    "| SELECTED:",
-                    selectedId
-                );
-
 
                 // -----------------------------------------
                 // MATCH CATEGORY
@@ -2720,11 +2357,6 @@ function showCategory(categoryId) {
     // =====================================================
 
     console.log("=================================");
-
-    console.log(
-        "FILTERED PRODUCTS:",
-        filteredProducts
-    );
 
     console.log(
         "FILTERED PRODUCT COUNT:",
@@ -2797,6 +2429,7 @@ function populateFilters() {
         );
     });
 }
+
 /* =========================================================
    APPLY SORTING AND FILTERS
 ========================================================= */
@@ -2954,9 +2587,7 @@ function applyFilters() {
                     productRelationshipId =
                         product.relationship.id || "";
 
-                }
-
-                else {
+                } else {
 
                     productRelationshipId =
                         product.relationship;
@@ -3039,8 +2670,8 @@ function applyFilters() {
 
                 }
 
-                // -----------------------------------------
-                // STRING FORMAT
+                    // -----------------------------------------
+                    // STRING FORMAT
                 // -----------------------------------------
 
                 else {
@@ -3062,15 +2693,6 @@ function applyFilters() {
                         .trim()
                         .toLowerCase();
 
-
-                console.log(
-                    "FESTIVAL PRODUCT:",
-                    product.name,
-                    "| FESTIVAL:",
-                    productFestivalId,
-                    "| SELECTED:",
-                    festivalId
-                );
 
 
                 // -----------------------------------------
@@ -3094,11 +2716,6 @@ function applyFilters() {
     console.log(
         "BASE PRODUCTS:",
         baseProducts.length
-    );
-
-    console.log(
-        "BASE PRODUCT DATA:",
-        baseProducts
     );
 
 
@@ -3270,11 +2887,6 @@ function applyFilters() {
     );
 
     console.log(
-        "FINAL PRODUCTS:",
-        filteredProducts
-    );
-
-    console.log(
         "FINAL COUNT:",
         filteredProducts.length
     );
@@ -3401,6 +3013,9 @@ function showProduct(productId) {
                 src="${getImagePath(product.image)}"
                 alt="${product.name || ""}"
                 class="product-image"
+                loading="eager"
+                fetchpriority="high"
+                decoding="async"
             >
 
         </div>
@@ -3455,22 +3070,22 @@ function showProduct(productId) {
                 </span>
 
                 ${product.originalPrice
-            ? `
+        ? `
                             <span class="original-price">
                                 ₹${product.originalPrice}
                             </span>
                           `
-            : ""
-        }
+        : ""
+    }
 
                 ${product.discount
-            ? `
+        ? `
                             <span class="discount">
                                 ${product.discount}% OFF
                             </span>
                           `
-            : ""
-        }
+        : ""
+    }
 
             </div>
 
@@ -3482,17 +3097,17 @@ function showProduct(productId) {
             <div class="stock-status">
 
                 ${isAvailable
-            ? `
+        ? `
                             <span class="in-stock">
                                 In Stock: ${stock}
                             </span>
                           `
-            : `
+        : `
                             <span class="out-of-stock">
                                 Out of Stock
                             </span>
                           `
-        }
+    }
 
             </div>
 
@@ -3515,7 +3130,7 @@ function showProduct(productId) {
             <div class="product-option">
 
                 ${colors.length > 0
-            ? `
+        ? `
                             <div class="option-group">
 
                                 <label>
@@ -3525,27 +3140,27 @@ function showProduct(productId) {
                                 <select id="selectedColor">
 
                                     ${colors
-                .map(
-                    color => `
+            .map(
+                color => `
                                                 <option
                                                     value="${color}"
                                                 >
                                                     ${color}
                                                 </option>
                                             `
-                )
-                .join("")}
+            )
+            .join("")}
 
                                 </select>
 
                             </div>
                           `
-            : ""
-        }
+        : ""
+    }
 
 
                 ${sizes.length > 0
-            ? `
+        ? `
                             <div class="option-group">
 
                                 <label>
@@ -3555,23 +3170,23 @@ function showProduct(productId) {
                                 <select id="selectedSize">
 
                                     ${sizes
-                .map(
-                    size => `
+            .map(
+                size => `
                                                 <option
                                                     value="${size}"
                                                 >
                                                     ${size}
                                                 </option>
                                             `
-                )
-                .join("")}
+            )
+            .join("")}
 
                                 </select>
 
                             </div>
                           `
-            : ""
-        }
+        : ""
+    }
 
             </div>
 
@@ -3587,7 +3202,7 @@ function showProduct(productId) {
                 </h3>
 
                 ${currentUser && currentUser.address
-            ? `
+        ? `
                             <p>
                                 ${currentUser.address}
                             </p>
@@ -3599,7 +3214,7 @@ function showProduct(productId) {
                                 Change Address
                             </button>
                           `
-            : `
+        : `
                             <p>
                                 No address added
                             </p>
@@ -3611,7 +3226,7 @@ function showProduct(productId) {
                                 Add Address
                             </button>
                           `
-        }
+    }
 
             </div>
 
@@ -3649,7 +3264,7 @@ function showProduct(productId) {
             <div class="product-actions">
 
                 ${isAvailable
-            ? `
+        ? `
                             <button
                                 class="btn-primary"
                                 onclick='addToCart(${JSON.stringify(product.id)})'
@@ -3664,7 +3279,7 @@ function showProduct(productId) {
                                 Buy Now
                             </button>
                           `
-            : `
+        : `
                             <button
                                 class="btn-primary"
                                 disabled
@@ -3687,7 +3302,7 @@ function showProduct(productId) {
                                 Unavailable
                             </button>
                           `
-        }
+    }
 
             </div>
 
@@ -3834,6 +3449,7 @@ function showProduct(productId) {
     loadProductReviews(product.id);
 
 }
+
 /* =========================================================
    ADD TO CART
 ========================================================= */
@@ -4082,7 +3698,7 @@ async function addToCart(productId, showSuccessAlert = true) {
             cart.push({
 
                 id:
-                    product.id,
+                product.id,
 
                 name:
                     product.name || "",
@@ -4105,10 +3721,10 @@ async function addToCart(productId, showSuccessAlert = true) {
                     product.image || "",
 
                 color:
-                    selectedColor,
+                selectedColor,
 
                 size:
-                    selectedSize,
+                selectedSize,
 
                 quantity: 1
             });
@@ -4154,6 +3770,7 @@ async function addToCart(productId, showSuccessAlert = true) {
         return false;
     }
 }
+
 /* =========================================================
    BUY NOW
 ========================================================= */
@@ -4188,6 +3805,7 @@ async function buyNow(productId) {
 
     return true;
 }
+
 /* =========================================================
    RENDER CART
 ========================================================= */
@@ -4269,43 +3887,43 @@ function renderCart() {
                         ${item.brand || ""}
                     </div>
                     ${item.color
-                    ? `
+                ? `
                                 <p>
                                     Color:
                                     ${item.color}
                                 </p>
                             `
-                    : ""
-                }
+                : ""
+            }
                     ${item.size
-                    ? `
+                ? `
                                 <p>
                                     Size:
                                     ${item.size}
                                 </p>
                             `
-                    : ""
-                }
+                : ""
+            }
                     <div class="product-price">
                         <span class="current-price">
                             ₹${price}
                         </span>
                         ${originalPrice > price
-                    ? `
+                ? `
                                     <span class="original-price">
                                         ₹${originalPrice}
                                     </span>
                                 `
-                    : ""
-                }
+                : ""
+            }
                         ${item.discount
-                    ? `
+                ? `
                                     <span class="discount">
                                         ${item.discount}% OFF
                                     </span>
                                 `
-                    : ""
-                }
+                : ""
+            }
                     </div>
                     <div class="quantity-controls">
                         <button
@@ -4391,8 +4009,8 @@ function renderCart() {
             </span>
             <span>
                 ₹${totalOriginal -
-        totalDiscounted
-        }
+    totalDiscounted
+    }
             </span>
         </div>
         <div class="summary-row">
@@ -4401,10 +4019,10 @@ function renderCart() {
             </span>
             <span>
                 ${deliveryCharges === 0
-            ? "FREE"
-            : "₹" +
-            deliveryCharges
-        }
+        ? "FREE"
+        : "₹" +
+        deliveryCharges
+    }
             </span>
         </div>
         <div class="summary-divider"></div>
@@ -4429,6 +4047,7 @@ function renderCart() {
 
     `;
 }
+
 /* =========================================================
    UPDATE QUANTITY
 ========================================================= */
@@ -4455,6 +4074,7 @@ function updateQuantity(index, change, newValue = null) {
     saveCartData();
     renderCart();
 }
+
 // ======================================================
 // SAVE USER DETAILS
 // ======================================================
@@ -4738,6 +4358,7 @@ function saveOrderDetails() {
         "=== SAVE ORDER DETAILS COMPLETE ==="
     );
 }
+
 // ======================================================
 // GO TO PAYMENT
 // ======================================================
@@ -4747,13 +4368,33 @@ function proceedToPayment() {
 
     renderOrderSteps();
 }
+
 // ======================================================
 // PLACE ORDER
 // ======================================================
+// Prevent duplicate order submissions
+let isPlacingOrder = false;
+
+
+// ======================================================
+// PLACE ORDER - DUPLICATE PROTECTION
+// ======================================================
+
 async function placeOrder() {
 
     // ==========================================
-    // 1. CHECK PAYMENT METHOD
+    // 1. PREVENT DUPLICATE SUBMISSION
+    // ==========================================
+
+    if (isPlacingOrder) {
+        console.warn(
+            "Order submission already in progress."
+        );
+        return;
+    }
+
+    // ==========================================
+    // 2. CHECK PAYMENT METHOD
     // ==========================================
 
     const selectedPayment = document.querySelector(
@@ -4765,34 +4406,28 @@ async function placeOrder() {
         return;
     }
 
+    // ==========================================
+    // 3. CHECK LOGIN / USER
+    // ==========================================
 
-    // ==========================================
-    // 2. CHECK LOGIN / USER
-    // ==========================================
     if (!currentUser || !currentUser.id) {
 
         localStorage.setItem(
             "pendingBuyNowProductId",
-            String(productId)
-        );
-
-        console.log(
-            "Pending Buy Now product:",
-            productId
+            String(
+                typeof productId !== "undefined"
+                    ? productId
+                    : ""
+            )
         );
 
         alert("Please login first.");
-
         showPage("login");
-
-        return false;
+        return;
     }
-    console.log("Current User:", currentUser);
-    console.log("User ID:", currentUser.id);
-
 
     // ==========================================
-    // 3. CHECK CART
+    // 4. CHECK CART
     // ==========================================
 
     if (!Array.isArray(cart) || cart.length === 0) {
@@ -4800,9 +4435,8 @@ async function placeOrder() {
         return;
     }
 
-
     // ==========================================
-    // 4. CHECK CUSTOMER DETAILS
+    // 5. CHECK CUSTOMER DETAILS
     // ==========================================
 
     if (
@@ -4817,107 +4451,79 @@ async function placeOrder() {
 
         currentOrderSteps = 1;
         renderOrderSteps();
-
         return;
     }
 
-
     // ==========================================
-    // 5. GET PAYMENT METHOD
+    // 6. GET PAYMENT METHOD
     // ==========================================
 
-    const frontendPaymentMethod = selectedPayment.value;
-
-    console.log(
-        "Frontend Payment:",
-        frontendPaymentMethod
-    );
-
+    const frontendPaymentMethod =
+        selectedPayment.value;
 
     let backendPaymentMethod;
-
 
     if (
         frontendPaymentMethod === "Cash on Delivery" ||
         frontendPaymentMethod === "COD"
     ) {
-
         backendPaymentMethod = "COD";
 
     } else if (
         frontendPaymentMethod === "Online Payment" ||
         frontendPaymentMethod === "RAZORPAY"
     ) {
-
         backendPaymentMethod = "RAZORPAY";
 
     } else {
-
         alert("Invalid payment method.");
         return;
     }
 
-
-    console.log(
-        "Backend Payment:",
-        backendPaymentMethod
-    );
-
-
     // ==========================================
-    // 6. CALCULATE TOTAL
+    // 7. CALCULATE TOTAL
     // ==========================================
 
     const cartTotal = cart.reduce(
         (total, item) => {
-
             return total +
                 Number(item.price || 0) *
                 Number(item.quantity || 0);
-
         },
         0
     );
 
-
     const deliveryCharges =
         cartTotal >= 500 ? 0 : 50;
-
 
     const finalTotal =
         cartTotal + deliveryCharges;
 
-
-    console.log(
-        "Cart Total:",
-        cartTotal
-    );
-
-    console.log(
-        "Delivery Charges:",
-        deliveryCharges
-    );
-
-    console.log(
-        "Frontend Final Total:",
-        finalTotal
-    );
-
-
     // ==========================================
-    // 7. CREATE ORDER IN MYSQL
+    // 8. LOCK BEFORE FIRST ASYNC REQUEST
     // ==========================================
+
+    isPlacingOrder = true;
 
     try {
 
         const token =
             localStorage.getItem("token");
 
+        if (!token) {
+            alert("Your login session has expired. Please log in again.");
+            showPage("login");
+            return;
+        }
 
         console.log(
-            "Creating database order..."
+            "Creating order:",
+            backendPaymentMethod
         );
 
+        // ==========================================
+        // 9. CREATE BACKEND ORDER
+        // ==========================================
 
         const orderResponse = await fetch(
             "http://localhost:8080/api/orders",
@@ -4926,290 +4532,180 @@ async function placeOrder() {
 
                 headers: {
                     "Content-Type": "application/json",
-
-                    "Authorization":
-                        `Bearer ${token}`
+                    "Authorization": `Bearer ${token}`
                 },
 
                 body: JSON.stringify({
-
-                    userId:
-                        currentUser.id,
-
-                    paymentMethod:
-                        backendPaymentMethod,
-
-                    shippingAddress:
-                        currentUser.address,
-
-                    shippingCity:
-                        currentUser.city,
-
-                    shippingState:
-                        currentUser.state,
-
-                    shippingPincode:
-                        currentUser.pincode
+                    userId: currentUser.id,
+                    paymentMethod: backendPaymentMethod,
+                    shippingAddress: currentUser.address,
+                    shippingCity: currentUser.city,
+                    shippingState: currentUser.state,
+                    shippingPincode: currentUser.pincode
                 })
             }
         );
 
-
-        // ==========================================
-        // 8. READ ORDER RESPONSE
-        // ==========================================
-
         const orderText =
             await orderResponse.text();
 
-
         let orderData = {};
 
-
         try {
-
-            orderData =
-                JSON.parse(orderText);
-
-        } catch (e) {
-
+            orderData = JSON.parse(orderText);
+        } catch (error) {
             console.error(
-                "Order response is not JSON:",
+                "Could not parse order response:",
                 orderText
             );
         }
 
-
         console.log(
-            "Order API Status:",
+            "Order API status:",
             orderResponse.status
         );
 
-
         console.log(
-            "Order API Response:",
+            "Order API response:",
             orderData
         );
 
-
         // ==========================================
-        // 9. CHECK ORDER API
+        // 10. HANDLE BACKEND FAILURE
         // ==========================================
 
         if (!orderResponse.ok) {
-
             alert(
                 "Order failed: " +
                 (
                     orderData.message ||
                     orderText ||
-                    "Backend could not create order."
+                    "Backend could not create the order."
                 )
             );
-
             return;
         }
-
-
-        // ==========================================
-        // 10. GET DATABASE ORDER ID
-        // ==========================================
 
         const backendOrderId =
             orderData.id;
 
-
-        console.log(
-            "Database Order ID:",
-            backendOrderId
-        );
-
-
-        // ==========================================
-        // 11. CHECK DATABASE ORDER ID
-        // ==========================================
-
         if (!backendOrderId) {
-
-            alert(
-                "Order created but database Order ID was not received."
+            console.error(
+                "Order response did not contain an ID."
             );
 
+            alert(
+                "The server response did not contain an order ID. Check your order history before retrying."
+            );
             return;
         }
 
-
         // ==========================================
-        // 12. RAZORPAY PAYMENT
+        // 11. RAZORPAY PAYMENT
         // ==========================================
 
-        if (
-            backendPaymentMethod === "RAZORPAY"
-        ) {
+        if (backendPaymentMethod === "RAZORPAY") {
 
             console.log(
-                "Starting Razorpay for Order:",
+                "Starting Razorpay for order:",
                 backendOrderId
             );
-
 
             await payWithRazorpay(
                 backendOrderId,
                 orderData
             );
 
-
-            // IMPORTANT:
-            // Razorpay function will handle
-            // payment verification and success.
-
+            // Razorpay function handles payment verification.
             return;
         }
 
-
         // ==========================================
-        // 13. COD ORDER SUCCESS
+        // 12. PREPARE COD ORDER DISPLAY
         // ==========================================
 
         const orderId =
-            "ORD" +
-            Date.now() +
-            Math.floor(
-                Math.random() * 1000
+            orderData.orderNumber ||
+            orderData.order_number ||
+            (
+                "ORD" +
+                Date.now() +
+                Math.floor(Math.random() * 1000)
             );
 
+        const orderDate = new Date();
 
-        const orderDate =
-            new Date();
-
-
-        const deliveryDate =
-            new Date();
-
-
+        const deliveryDate = new Date();
         deliveryDate.setDate(
             deliveryDate.getDate() + 7
         );
 
-
-        // ==========================================
-        // 14. CREATE FRONTEND COD ORDER
-        // ==========================================
-
         const order = {
 
-            id:
-                orderId,
+            id: orderId,
 
-            backendOrderId:
-                backendOrderId,
+            backendOrderId: backendOrderId,
 
-            items:
-                cart.map(item => ({
-                    ...item
-                })),
+            items: cart.map(item => ({
+                ...item
+            })),
 
-            total:
-                cartTotal,
+            total: cartTotal,
 
-            deliveryCharges:
-                deliveryCharges,
+            deliveryCharges: deliveryCharges,
 
-            finalTotal:
-                finalTotal,
+            finalTotal: finalTotal,
 
-            paymentMethod:
-                frontendPaymentMethod,
+            paymentMethod: "Cash on Delivery",
 
-            paymentStatus:
-                "PENDING",
+            paymentStatus: "PENDING",
 
-            orderDate:
-                orderDate.toISOString(),
+            orderDate: orderDate.toISOString(),
 
-            deliveryDate:
-                deliveryDate.toISOString(),
+            deliveryDate: deliveryDate.toISOString(),
 
-            status:
-                "confirmed",
+            status: "confirmed",
 
-            name:
-                currentUser.name,
+            name: currentUser.name,
 
-            email:
-                currentUser.email,
+            email: currentUser.email,
 
-            phone:
-                currentUser.phone,
+            phone: currentUser.phone,
 
-            address:
-                currentUser.address,
+            address: currentUser.address,
 
-            city:
-                currentUser.city,
+            city: currentUser.city,
 
-            state:
-                currentUser.state,
+            state: currentUser.state,
 
-            pincode:
-                currentUser.pincode
+            pincode: currentUser.pincode
         };
 
-
-        console.log(
-            "Frontend COD Order:",
-            order
-        );
-
-
         // ==========================================
-        // 15. SAVE COD ORDER
+        // 13. SAVE LOCAL ORDER ONLY IF BACKEND
+        //     ORDER HISTORY IS NOT THE SOURCE
         // ==========================================
 
-        orders.push(order);
-
-        saveOrdersData();
-
+        /*
+         * Do not push this order into local storage here
+         * if loadOrdersFromBackend() supplies order history.
+         *
+         * Otherwise, the same order may appear twice:
+         * once from the backend and once from local storage.
+         */
 
         // ==========================================
-        // 16. CLEAR FRONTEND CART
+        // 14. CLEAR CART AFTER COD ORDER CREATION
         // ==========================================
 
         cart = [];
 
         saveCartData();
-
         updateCartCount();
 
-
         // ==========================================
-        // 17. SHOW SUCCESS
+        // 15. SHOW SUCCESS
         // ==========================================
-
-        console.log(
-            "========== BEFORE COD SUCCESS PAGE =========="
-        );
-
-        console.log(
-            "orderId:",
-            orderId
-        );
-
-        console.log(
-            "finalTotal:",
-            finalTotal
-        );
-
-        console.log(
-            "deliveryDate:",
-            deliveryDate
-        );
-
-        console.log(
-            "showOrderSuccess:",
-            typeof showOrderSuccess
-        );
-
 
         showOrderSuccess(
             orderId,
@@ -5218,33 +4714,30 @@ async function placeOrder() {
             deliveryDate
         );
 
+        // Refresh backend order history if available.
+        if (typeof loadOrdersFromBackend === "function") {
+            await loadOrdersFromBackend();
+        }
+
+        if (typeof renderOrders === "function") {
+            renderOrders();
+        }
 
     } catch (error) {
 
         console.error(
-            "========== FRONTEND ORDER ERROR =========="
-        );
-
-        console.error(
-            "Error:",
+            "Order processing error:",
             error
         );
 
-        console.error(
-            "Message:",
-            error.message
-        );
-
-        console.error(
-            "Stack:",
-            error.stack
-        );
-
-
         alert(
-            "Payment successful, but frontend display failed.\n\n" +
-            "Error: " + error.message
+            "We could not confirm the order status. Please check My Orders before trying again."
         );
+
+    } finally {
+
+        // Release lock after processing finishes.
+        isPlacingOrder = false;
     }
 }
 // ======================================================
@@ -5661,10 +5154,10 @@ function renderOrders() {
                                 "",
 
                             quantity:
-                                itemQuantity,
+                            itemQuantity,
 
                             price:
-                                itemPrice
+                            itemPrice
                         };
                     }
                 );
@@ -5773,15 +5266,15 @@ function renderOrders() {
                         <div class="cart-item">
 
                             ${image
-                            ? `
+                        ? `
                                     <img
                                         src="${image}"
                                         alt="${item.name}"
                                         onerror="this.style.display='none';"
                                     >
                                     `
-                            : ""
-                        }
+                        : ""
+                    }
 
                             <div class="cart-item-details">
 
@@ -5794,24 +5287,24 @@ function renderOrders() {
                                 </div>
 
                                 ${item.color
-                            ? `
+                        ? `
                                         <p>
                                             Color:
                                             ${item.color}
                                         </p>
                                         `
-                            : ""
-                        }
+                        : ""
+                    }
 
                                 ${item.size
-                            ? `
+                        ? `
                                         <p>
                                             Size:
                                             ${item.size}
                                         </p>
                                         `
-                            : ""
-                        }
+                        : ""
+                    }
 
                                 <p>
                                     Quantity:
@@ -5821,9 +5314,9 @@ function renderOrders() {
                                 <p>
                                     Price:
                                     ₹${(
-                            item.price *
-                            item.quantity
-                        ).toFixed(2)}
+                        item.price *
+                        item.quantity
+                    ).toFixed(2)}
                                 </p>
 
                             </div>
@@ -5872,7 +5365,7 @@ function renderOrders() {
                             ${formatDate(
                 rawOrderDate
             )
-                }
+            }
 
                         </p>
 
@@ -5897,9 +5390,9 @@ function renderOrders() {
                             ${orderItems.length}
 
                             ${orderItems.length !== 1
-                    ? " items"
-                    : " item"
-                }
+                ? " items"
+                : " item"
+            }
 
                         </p>
 
@@ -5933,11 +5426,11 @@ function renderOrders() {
                             </strong>
 
                             ${deliveryDate
-                    ? formatDate(
-                        deliveryDate
-                    )
-                    : "Not available"
-                }
+                ? formatDate(
+                    deliveryDate
+                )
+                : "Not available"
+            }
 
                         </p>
 
@@ -5961,37 +5454,37 @@ function renderOrders() {
 
 
                             ${customerName
-                    ? `
+                ? `
                                     <p>
                                         ${customerName}
                                     </p>
                                     `
-                    : ""
-                }
+                : ""
+            }
 
 
                             ${customerPhone
-                    ? `
+                ? `
                                     <p>
                                         ${customerPhone}
                                     </p>
                                     `
-                    : ""
-                }
+                : ""
+            }
 
 
                             ${fullAddress
-                    ? `
+                ? `
                                     <p>
                                         ${fullAddress}
                                     </p>
                                     `
-                    : `
+                : `
                                     <p>
                                         Address not available
                                     </p>
                                     `
-                }
+            }
 
                         </div>
 
@@ -6002,12 +5495,12 @@ function renderOrders() {
 
 
                         ${orderItemsHtml ||
-                `
+            `
                             <p>
                                 No item information available.
                             </p>
                             `
-                }
+            }
 
 
                         <div class="cart-summary">
@@ -6035,10 +5528,10 @@ function renderOrders() {
                                 <span>
 
                                     ${deliveryCharges === 0
-                    ? "FREE"
-                    : "₹" +
-                    deliveryCharges.toFixed(2)
-                }
+                ? "FREE"
+                : "₹" +
+                deliveryCharges.toFixed(2)
+            }
 
                                 </span>
 
@@ -6064,8 +5557,8 @@ function renderOrders() {
                             <div class="order-actions">
 
                                 ${!isDelivered &&
-                    !isCancelled
-                    ? `
+            !isCancelled
+                ? `
                                         <button
                                             type="button"
                                             class="cancel-order-btn"
@@ -6077,12 +5570,12 @@ function renderOrders() {
                                             ❌ Cancel Order
                                         </button>
                                         `
-                    : ""
-                }
+                : ""
+            }
 
 
                                 ${!isCancelled
-                    ? `
+                ? `
                                         <button
                                             type="button"
                                             class="track-order-btn"
@@ -6094,8 +5587,8 @@ function renderOrders() {
                                             🚚 Track Order
                                         </button>
                                         `
-                    : ""
-                }
+                : ""
+            }
 
                             </div>
 
@@ -6122,6 +5615,7 @@ function renderOrders() {
         }
     );
 }
+
 function showOrderTracking(orderId) {
 
     const order =
@@ -6703,8 +6197,10 @@ function showOrderTracking(orderId) {
     trackingElement.style.display =
         "block";
 }
+
 /*--------------------------------------------------*/
 /* CANCEL ORDER */
+
 /*--------------------------------------------------*/
 
 async function cancelOrder(orderId) {
@@ -6945,6 +6441,7 @@ function toggleOrderDetails(orderId) {
         }
     }
 }
+
 function validateName(name) {
     name = String(name || "").trim();
     return /^[A-Za-z\s]{2,50}$/.test(name);
@@ -6959,6 +6456,7 @@ function validatePhone(phone) {
     phone = String(phone || "").trim();
     return /^[6-9]\d{9}$/.test(phone);
 }
+
 function saveUserInfo() {
 
     const name = document.getElementById("userName").value.trim();
@@ -7032,6 +6530,7 @@ function removeFromCart(index) {
 
     renderCart();
 }
+
 /* =========================================================
    PROCEED TO CHECKOUT
 ========================================================= */
@@ -7045,6 +6544,7 @@ function proceedToCheckout() {
     currentOrderSteps = 1;
     showPage("order");
 }
+
 // ================= RENDER ORDER STEPS =================
 // ======================================================
 // ORDER CHECKOUT STEPS
@@ -7338,8 +6838,8 @@ function renderOrderSteps() {
 
                                 <strong>
                                     ₹${Number(item.price || 0) *
-            Number(item.quantity || 0)
-            }
+        Number(item.quantity || 0)
+        }
                                 </strong>
 
                             </div>
@@ -7372,9 +6872,9 @@ function renderOrderSteps() {
 
                             <span>
                                 ${deliveryCharges === 0
-                ? "FREE"
-                : "₹" + deliveryCharges
-            }
+            ? "FREE"
+            : "₹" + deliveryCharges
+        }
                             </span>
 
                         </div>
@@ -7525,9 +7025,9 @@ function renderOrderSteps() {
 
                             <span>
                                 ${deliveryCharges === 0
-                ? "FREE"
-                : "₹" + deliveryCharges
-            }
+            ? "FREE"
+            : "₹" + deliveryCharges
+        }
                             </span>
 
                         </div>
@@ -7730,6 +7230,7 @@ async function footerSubscribe(event) {
             "Subscribe";
     }
 }
+
 /* =========================================================
    INITIALIZE FOOTER
 ========================================================= */
@@ -7833,6 +7334,7 @@ document.addEventListener(
         initFooter();
     }
 );
+
 /* =========================================================
    PANEL / SECONDARY NAVIGATION
 ========================================================= */
@@ -7936,7 +7438,6 @@ document.addEventListener(
 );
 
 
-
 /* =========================================================
    SHOW FESTIVAL
 ========================================================= */
@@ -7965,6 +7466,7 @@ function renderFestivals() {
         pinnedFestivals
     );
 }
+
 async function loadFestivals() {
     try {
         const response = await fetch(
@@ -7982,7 +7484,9 @@ async function loadFestivals() {
     } catch (error) {
         console.error("Festival loading error:", error);
     }
-} function showFestivalProducts(festivalId) {
+}
+
+function showFestivalProducts(festivalId) {
 
     console.log("=================================");
     console.log("FESTIVAL CLICK");
@@ -8006,8 +7510,8 @@ async function loadFestivals() {
         festivals.find(function (f) {
 
             return String(f.id || "")
-                .trim()
-                .toLowerCase() ===
+                    .trim()
+                    .toLowerCase() ===
                 window.currentFestivalId;
 
         });
@@ -8030,6 +7534,7 @@ async function loadFestivals() {
 
     applyFilters();
 }
+
 document.addEventListener("DOMContentLoaded", function () {
 
     loadCategories();
@@ -8041,12 +7546,12 @@ let testimonials = [];
 function initFooter() {
     console.log("Footer initialized");
 }
+
 function renderTestimonials() {
 
     const container = document.getElementById("testimonialsContainer");
 
     if (!container) return;
-
 
 
     container.innerHTML = testimonials.map(testimonial => {
@@ -8097,6 +7602,10 @@ function renderTestimonials() {
 let publishedBlogs = [];
 let currentBlogId = null;
 
+// Progressive rendering for the full blogs page keeps large blog lists light.
+const BLOG_INFINITE_BATCH_SIZE = 3;
+let blogInfiniteObserver = null;
+
 
 /* =========================================================
    LOAD PUBLISHED BLOGS FROM BACKEND
@@ -8128,7 +7637,7 @@ async function loadBlogs() {
                 `${API_BASE_URL}/api/blogs`,
                 {
                     method: "GET",
-                    cache: "no-store"
+                    cache: "default"
                 }
             );
 
@@ -8277,47 +7786,111 @@ function renderBlogs() {
 
     if (container) {
 
-        container.innerHTML =
-            publishedBlogs
-                .map(function (blog) {
-
-                    return createBlogCard(blog);
-
-                })
-                .join("");
-
-
-        /*
-         * Start auto scroll only
-         * after cards are rendered.
-         */
+        // Homepage blog carousel renders a small first batch, then appends
+        // more cards when the carousel reaches its current end.
+        container.innerHTML = "";
+        container.dataset.blogNextIndex = "0";
+        appendNextBlogBatch(container);
 
         setTimeout(function () {
-
             startBlogAutoScroll();
-
         }, 100);
 
     }
 
 
     /* =====================================================
-       ALL BLOGS
+       ALL BLOGS — INFINITE SCROLL
+       Load a small batch first, then append more as the visitor
+       reaches the bottom of the full blogs list.
     ===================================================== */
 
     if (allContainer) {
-
-        allContainer.innerHTML =
-            publishedBlogs
-                .map(function (blog) {
-
-                    return createBlogCard(blog);
-
-                })
-                .join("");
-
+        setupBlogInfiniteScroll(allContainer);
     }
 
+}
+
+
+function setupBlogInfiniteScroll(container) {
+
+    if (blogInfiniteObserver) {
+        blogInfiniteObserver.disconnect();
+        blogInfiniteObserver = null;
+    }
+
+    const oldSentinel = document.getElementById("blogInfiniteScrollSentinel");
+    if (oldSentinel) oldSentinel.remove();
+
+    container.innerHTML = "";
+    container.dataset.blogNextIndex = "0";
+    appendNextBlogBatch(container);
+
+    const sentinel = document.createElement("div");
+    sentinel.id = "blogInfiniteScrollSentinel";
+    sentinel.className = "infinite-scroll-sentinel blog-infinite-scroll-sentinel";
+    sentinel.setAttribute("aria-hidden", "true");
+    sentinel.style.width = "100%";
+    sentinel.style.height = "1px";
+    container.insertAdjacentElement("afterend", sentinel);
+
+    if (Number(container.dataset.blogNextIndex) >= publishedBlogs.length) {
+        sentinel.remove();
+        return;
+    }
+
+    if (!("IntersectionObserver" in window)) {
+        // Compatibility fallback: load another batch when scrolling near the page bottom.
+        const fallback = function () {
+            if (!document.getElementById("blogInfiniteScrollSentinel")) {
+                window.removeEventListener("scroll", fallback);
+                return;
+            }
+            const rect = sentinel.getBoundingClientRect();
+            if (rect.top < window.innerHeight + 250) {
+                appendNextBlogBatch(container);
+                if (Number(container.dataset.blogNextIndex) >= publishedBlogs.length) {
+                    sentinel.remove();
+                    window.removeEventListener("scroll", fallback);
+                }
+            }
+        };
+        window.addEventListener("scroll", fallback, { passive: true });
+        fallback();
+        return;
+    }
+
+    blogInfiniteObserver = new IntersectionObserver(function (entries) {
+        if (!entries.some(entry => entry.isIntersecting)) return;
+
+        appendNextBlogBatch(container);
+
+        if (Number(container.dataset.blogNextIndex) >= publishedBlogs.length) {
+            blogInfiniteObserver.disconnect();
+            blogInfiniteObserver = null;
+            sentinel.remove();
+        }
+    }, { root: null, rootMargin: "250px 0px", threshold: 0 });
+
+    blogInfiniteObserver.observe(sentinel);
+}
+
+
+function appendNextBlogBatch(container) {
+
+    if (!container) return;
+
+    const start = Number(container.dataset.blogNextIndex || 0);
+    const end = Math.min(start + BLOG_INFINITE_BATCH_SIZE, publishedBlogs.length);
+
+    if (start >= end) return;
+
+    const html = publishedBlogs.slice(start, end).map(function (blog, offset) {
+        return createBlogCard(blog, start + offset);
+    }).join("");
+
+    container.insertAdjacentHTML("beforeend", html);
+    container.dataset.blogNextIndex = String(end);
 }
 
 
@@ -8325,7 +7898,7 @@ function renderBlogs() {
    CREATE BLOG CARD
 ========================================================= */
 
-function createBlogCard(blog) {
+function createBlogCard(blog, index = 0) {
 
     const blogId =
         Number(blog.id);
@@ -8379,12 +7952,10 @@ function createBlogCard(blog) {
                     src="${escapeBlogHTML(imageUrl)}"
                     alt="${title}"
                     class="blog-image"
-                    loading="lazy"
+                    loading="${index < 2 ? "eager" : "lazy"}"
+                    fetchpriority="${index === 0 ? "high" : "auto"}"
                     decoding="async"
-                    onerror="
-                        this.onerror=null;
-                        this.src='images/logo.jpeg';
-                    "
+                    onerror="handleImageLoadError(this)"
                 >
 
             </div>
@@ -8456,112 +8027,50 @@ let blogScrollPaused = false;
 
 
 function startBlogAutoScroll() {
+    const container = document.getElementById("blogsContainer");
+    if (!container) return;
 
-    const container =
-        document.getElementById(
-            "blogsContainer"
-        );
+    // Prevent duplicate timers when blogs are re-rendered or the visitor returns from hover.
+    stopBlogAutoScroll();
 
+    blogAutoScrollInterval = setInterval(function () {
+        if (document.hidden || blogScrollPaused) return;
 
-    if (!container) {
+        const currentContainer = document.getElementById("blogsContainer");
+        if (!currentContainer || !currentContainer.isConnected) return;
 
-        return;
+        const cards = currentContainer.querySelectorAll(".blog-card");
+        if (!cards.length) return;
 
-    }
+        const firstCard = cards[0];
+        const cardStyle = window.getComputedStyle(firstCard);
+        const marginRight = parseFloat(cardStyle.marginRight) || 0;
+        const gap = parseFloat(window.getComputedStyle(currentContainer).columnGap ||
+            window.getComputedStyle(currentContainer).gap) || 0;
+        const step = Math.max(1, firstCard.getBoundingClientRect().width + Math.max(gap, marginRight));
+        const maxScroll = currentContainer.scrollWidth - currentContainer.clientWidth;
 
-
-    if (blogAutoScrollInterval) {
-
-        clearInterval(
-            blogAutoScrollInterval
-        );
-
-    }
-
-
-    blogAutoScrollInterval =
-        setInterval(function () {
-
-            if (blogScrollPaused) {
-
-                return;
-
+        // If more published blogs exist, append the next small batch before reaching the end.
+        if (currentContainer.scrollLeft + currentContainer.clientWidth >= currentContainer.scrollWidth - 40) {
+            const nextIndex = Number(currentContainer.dataset.blogNextIndex || 0);
+            if (nextIndex < publishedBlogs.length) {
+                const oldWidth = currentContainer.scrollWidth;
+                appendNextBlogBatch(currentContainer);
+                if (currentContainer.scrollWidth > oldWidth) {
+                    currentContainer.scrollBy({ left: step, behavior: "smooth" });
+                    return;
+                }
             }
 
-
-            const cards =
-                container.querySelectorAll(
-                    ".blog-card"
-                );
-
-
-            if (cards.length <= 3) {
-
-                return;
-
+            // All blogs have been shown: smoothly return to the beginning and loop.
+            if (maxScroll > 0) {
+                currentContainer.scrollTo({ left: 0, behavior: "smooth" });
             }
+            return;
+        }
 
-
-            const firstCard =
-                cards[0];
-
-
-            if (!firstCard) {
-
-                return;
-
-            }
-
-
-            const gap =
-                parseFloat(
-                    window
-                        .getComputedStyle(
-                            container
-                        )
-                        .gap
-                ) || 0;
-
-
-            const cardWidth =
-                firstCard
-                    .getBoundingClientRect()
-                    .width +
-                gap;
-
-
-            const maxScroll =
-                container.scrollWidth -
-                container.clientWidth;
-
-
-            if (
-                container.scrollLeft <
-                maxScroll - 5
-            ) {
-
-                container.scrollBy({
-
-                    left: cardWidth,
-
-                    behavior: "smooth"
-
-                });
-
-            } else {
-
-                container.scrollTo({
-
-                    left: 0,
-
-                    behavior: "smooth"
-
-                });
-
-            }
-
-        }, 3000);
-
+        currentContainer.scrollBy({ left: step, behavior: "smooth" });
+    }, 4000);
 }
 
 
@@ -8797,10 +8306,8 @@ async function openBlog(blogId) {
         if (!response.ok) {
 
             throw new Error(
-
                 data.message ||
                 `Blog not found (${response.status})`
-
             );
 
         }
@@ -9202,7 +8709,6 @@ function formatBlogDate(date) {
 
 
     return parsedDate.toLocaleDateString(
-
         "en-IN",
 
         {
@@ -9210,7 +8716,6 @@ function formatBlogDate(date) {
             month: "long",
             year: "numeric"
         }
-
     );
 
 }
@@ -9378,8 +8883,8 @@ function showRelationshipProducts(relationshipId) {
         relationships.find(function (r) {
 
             return String(r.id || "")
-                .trim()
-                .toLowerCase() ===
+                    .trim()
+                    .toLowerCase() ===
                 window.currentRelationshipId;
 
         });
@@ -9431,7 +8936,6 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
-
 /* =========================================================
    API BASE URL
 ========================================================= */
@@ -9440,7 +8944,7 @@ window.RISHTABOX_API_BASE_URL =
     window.RISHTABOX_API_BASE_URL ||
     (
         window.location.hostname === "localhost" ||
-            window.location.hostname === "127.0.0.1"
+        window.location.hostname === "127.0.0.1"
             ? "http://localhost:8080"
             : ""
     );
@@ -9689,7 +9193,7 @@ async function sendEmailOtp() {
                     body: JSON.stringify({
 
                         email:
-                            signupData.email
+                        signupData.email
                     })
                 }
             );
@@ -9931,10 +9435,10 @@ async function verifyEmailOtp() {
                     body: JSON.stringify({
 
                         email:
-                            signupData.email,
+                        signupData.email,
 
                         otp:
-                            otp
+                        otp
                     })
                 }
             );
@@ -10197,16 +9701,16 @@ async function createAccount() {
     signupData = {
 
         name:
-            name,
+        name,
 
         mobile:
-            mobile,
+        mobile,
 
         email:
-            email,
+        email,
 
         password:
-            password,
+        password,
 
         emailVerified:
             true
@@ -10280,7 +9784,7 @@ async function createVerifiedAccount() {
                     body: JSON.stringify({
 
                         name:
-                            signupData.name,
+                        signupData.name,
 
                         /*
                          * Mobile number is stored
@@ -10289,13 +9793,13 @@ async function createVerifiedAccount() {
                          * NO mobile OTP.
                          */
                         phone:
-                            signupData.mobile,
+                        signupData.mobile,
 
                         email:
-                            signupData.email,
+                        signupData.email,
 
                         password:
-                            signupData.password
+                        signupData.password
                     })
                 }
             );
@@ -10615,7 +10119,7 @@ async function sendLoginOtp() {
                     body: JSON.stringify({
 
                         email:
-                            window.loginOtpEmail
+                        window.loginOtpEmail
                     })
                 }
             );
@@ -10868,10 +10372,10 @@ async function verifyLoginOtp() {
                     body: JSON.stringify({
 
                         email:
-                            email,
+                        email,
 
                         otp:
-                            otp
+                        otp
                     })
                 }
             );
@@ -10998,7 +10502,6 @@ async function verifyLoginOtp() {
     }
 }
 
-
 /* =========================================================
    LOGIN WITH PASSWORD
 ========================================================= */
@@ -11017,7 +10520,6 @@ async function loginWithPassword() {
     const message =
         document.getElementById("loginMessage");
 
-
     const email =
         loginEmailInput?.value
             .trim()
@@ -11026,46 +10528,34 @@ async function loginWithPassword() {
     const password =
         passwordInput?.value || "";
 
-
     /* =====================================================
-       EMAIL
+       EMAIL VALIDATION
     ===================================================== */
 
     if (!email) {
-
         showLoginError(
             "Please enter your registered email."
         );
-
         return;
     }
 
-
-    if (
-        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-    ) {
-
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         showLoginError(
             "Please enter a valid email address."
         );
-
         return;
     }
 
-
     /* =====================================================
-       OTP EMAIL
+       OTP EMAIL CHECK
     ===================================================== */
 
     if (!window.loginOtpEmail) {
-
         showLoginError(
             "Please request an email OTP first."
         );
-
         return;
     }
-
 
     /* =====================================================
        SAME EMAIL CHECK
@@ -11073,56 +10563,42 @@ async function loginWithPassword() {
 
     if (
         email !==
-        window.loginOtpEmail.toLowerCase()
+        String(window.loginOtpEmail).toLowerCase()
     ) {
-
         window.loginOtpVerified = false;
 
         showLoginError(
             "Email changed. Please request a new OTP."
         );
-
         return;
     }
 
-
     /* =====================================================
-       OTP VERIFIED
+       OTP VERIFIED CHECK
     ===================================================== */
 
     if (!window.loginOtpVerified) {
-
         showLoginError(
             "Please verify your email OTP first."
         );
-
         return;
     }
 
-
     /* =====================================================
-       PASSWORD
+       PASSWORD VALIDATION
     ===================================================== */
 
     if (!password) {
-
         showLoginError(
             "Please enter your password."
         );
-
         return;
     }
 
-
     if (message) {
-
-        message.textContent =
-            "Signing in...";
-
-        message.className =
-            "auth-message";
+        message.textContent = "Signing in...";
+        message.className = "auth-message";
     }
-
 
     try {
 
@@ -11130,127 +10606,158 @@ async function loginWithPassword() {
            LOGIN API
         ================================================= */
 
-        const response =
-            await fetch(
-                rbApiUrl(
-                    "/api/auth/login/password"
-                ),
-                {
-                    method: "POST",
+        const response = await fetch(
+            rbApiUrl("/api/auth/login/password"),
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    email: email,
+                    password: password
+                })
+            }
+        );
 
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    body: JSON.stringify({
-
-                        email: email,
-
-                        password: password
-                    })
-                }
-            );
-
-
-        const data =
-            await response
-                .json()
-                .catch(() => ({}));
-
+        const data = await response
+            .json()
+            .catch(() => ({}));
 
         if (!response.ok) {
-
             throw new Error(
                 data.message ||
                 "Invalid email or password."
             );
         }
 
-
         console.log(
             "LOGIN API RESPONSE:",
             data
         );
 
+        /* =================================================
+           EXTRACT USER DATA
+        ================================================= */
+
+        // Supports responses containing either a direct user
+        // object or a nested user object.
+        const userData =
+            data.user && typeof data.user === "object"
+                ? data.user
+                : data;
+
+        const token =
+            data.token ||
+            data.accessToken ||
+            userData.token;
+
+        const userId =
+            userData.id ??
+            userData.userId ??
+            data.userId;
 
         /* =================================================
-           SAVE USER DATA
+           VALIDATE LOGIN RESPONSE
+        ================================================= */
+
+        if (
+            userId === undefined ||
+            userId === null ||
+            userId === ""
+        ) {
+            console.error(
+                "Login response is missing the user ID:",
+                data
+            );
+
+            throw new Error(
+                "Login response did not contain a user ID. Please check the backend login response."
+            );
+        }
+
+        if (!token) {
+            console.error(
+                "Login response is missing the JWT token."
+            );
+
+            throw new Error(
+                "Authentication token was not received. Please check the backend login response."
+            );
+        }
+
+        /* =================================================
+           BUILD CURRENT USER
+        ================================================= */
+
+        currentUser = {
+            ...userData,
+
+            id: userId,
+
+            name:
+                userData.name ||
+                userData.fullName ||
+                "",
+
+            email:
+                userData.email ||
+                email,
+
+            phone:
+                userData.phone ||
+                userData.mobile ||
+                "",
+
+            address:
+                userData.address ||
+                "",
+
+            city:
+                userData.city ||
+                "",
+
+            state:
+                userData.state ||
+                "",
+
+            pincode:
+                userData.pincode ||
+                "",
+
+            role:
+                userData.role ||
+                "USER"
+        };
+
+        /* =================================================
+           SAVE AUTHENTICATION DATA
         ================================================= */
 
         localStorage.setItem(
             "userData",
-            JSON.stringify(data)
+            JSON.stringify(currentUser)
         );
 
         localStorage.setItem(
             "rishtaBoxCurrentUser",
-            JSON.stringify(data)
+            JSON.stringify(currentUser)
         );
 
+        localStorage.setItem(
+            "token",
+            token
+        );
 
-        /* =================================================
-           SAVE JWT
-        ================================================= */
-
-        if (data.token) {
-
-            localStorage.setItem(
-                "token",
-                data.token
-            );
-
-            localStorage.setItem(
-                "jwtToken",
-                data.token
-            );
-        }
-
+        localStorage.setItem(
+            "jwtToken",
+            token
+        );
 
         localStorage.setItem(
             "rishtaBoxLoggedIn",
             "true"
         );
-
-
-        /* =================================================
-           SET CURRENT USER
-           IMPORTANT
-        ================================================= */
-
-        currentUser = {
-
-            id:
-                data.id ??
-                data.userId,
-
-            name:
-                data.name || "",
-
-            email:
-                data.email || email,
-
-            phone:
-                data.phone ||
-                data.mobile ||
-                "",
-
-            address:
-                data.address || "",
-
-            city:
-                data.city || "",
-
-            state:
-                data.state || "",
-
-            pincode:
-                data.pincode || "",
-
-            role:
-                data.role || "USER"
-        };
-
 
         console.log(
             "CURRENT USER AFTER LOGIN:",
@@ -11262,80 +10769,36 @@ async function loginWithPassword() {
             currentUser.id
         );
 
-        console.log(
-            "CURRENT TOKEN:",
-            localStorage.getItem("token")
-        );
-
-
-        /* =================================================
-           SAFETY CHECK
-        ================================================= */
-
-        if (!currentUser.id) {
-
-            console.error(
-                "Login succeeded but USER ID is missing.",
-                data
-            );
-
-            throw new Error(
-                "Login successful, but user ID was not received."
-            );
-        }
-
-
-        if (
-            !localStorage.getItem("token")
-        ) {
-
-            console.error(
-                "Login succeeded but JWT token is missing."
-            );
-
-            throw new Error(
-                "Login successful, but authentication token was not received."
-            );
-        }
-
-
         /* =================================================
            REMEMBER ME
         ================================================= */
 
-        if (
-            rememberMe &&
-            rememberMe.checked
-        ) {
-
+        if (rememberMe?.checked) {
             localStorage.setItem(
                 "rishtaBoxRememberMe",
                 "true"
             );
-
         } else {
-
             localStorage.removeItem(
                 "rishtaBoxRememberMe"
             );
         }
 
-
         /* =================================================
-           UPDATE ACCOUNT UI
+           UPDATE ACCOUNT NAVIGATION
         ================================================= */
 
-        updateAccountNav(
-            currentUser
-        );
-
+        if (
+            typeof updateAccountNav === "function"
+        ) {
+            updateAccountNav(currentUser);
+        }
 
         /* =================================================
            SUCCESS MESSAGE
         ================================================= */
 
         if (message) {
-
             message.textContent =
                 "Login successful!";
 
@@ -11343,48 +10806,49 @@ async function loginWithPassword() {
                 "auth-message success";
         }
 
-
         /* =================================================
            RESET OTP STATE
         ================================================= */
 
         window.loginOtpEmail = null;
-
         window.loginOtpVerified = false;
-
-        window.loginOtpVerificationRunning =
-            false;
+        window.loginOtpVerificationRunning = false;
 
         /* =================================================
-           LOAD CURRENT USER CART + ORDERS AFTER LOGIN
+           LOAD USER CART
         ================================================= */
 
         console.log(
-            "Loading data for logged-in user:",
+            "Loading cart for user:",
             currentUser.id
         );
 
-        // =====================================================
-        // LOAD CART
-        // =====================================================
-
-        await loadCartFromBackend();
+        if (
+            typeof loadCartFromBackend === "function"
+        ) {
+            await loadCartFromBackend();
+        }
 
         console.log(
             "CART AFTER LOGIN:",
             cart
         );
 
-        // =====================================================
-        // LOAD ORDERS
-        // =====================================================
+        /* =================================================
+           LOAD USER ORDERS
+        ================================================= */
 
-        await loadOrdersFromBackend();
+        if (
+            typeof loadOrdersFromBackend === "function"
+        ) {
+            await loadOrdersFromBackend();
+        }
 
         console.log(
             "ORDERS AFTER LOGIN:",
             orders
         );
+
         /* =================================================
            CHECK PENDING BUY NOW
         ================================================= */
@@ -11394,12 +10858,10 @@ async function loginWithPassword() {
                 "pendingBuyNowProductId"
             );
 
-
         console.log(
             "PENDING BUY NOW PRODUCT:",
             pendingBuyNowProductId
         );
-
 
         /* =================================================
            CONTINUE BUY NOW
@@ -11407,30 +10869,33 @@ async function loginWithPassword() {
 
         if (pendingBuyNowProductId) {
 
-            // Remove immediately so it cannot
-            // create an infinite login loop.
-
+            // Remove the pending item before continuing.
             localStorage.removeItem(
                 "pendingBuyNowProductId"
             );
-
 
             console.log(
                 "Continuing Buy Now for product:",
                 pendingBuyNowProductId
             );
 
+            if (
+                typeof addToCart !== "function"
+            ) {
+                throw new Error(
+                    "Unable to continue Buy Now: addToCart() is unavailable."
+                );
+            }
 
             const success =
                 await addToCart(
                     pendingBuyNowProductId
                 );
 
-
             if (success) {
 
                 console.log(
-                    "BUY NOW SUCCESS - OPENING CART"
+                    "BUY NOW SUCCESS — OPENING CART"
                 );
 
                 showPage("cart");
@@ -11441,20 +10906,17 @@ async function loginWithPassword() {
                     "BUY NOW FAILED AFTER LOGIN"
                 );
 
-                showPage("homePage");
+                showPage("home");
             }
-
 
             return;
         }
 
-
         /* =================================================
-           NORMAL LOGIN
+           NORMAL LOGIN — OPEN HOME PAGE
         ================================================= */
 
-        showPage("homePage");
-
+        showPage("home");
 
     } catch (error) {
 
@@ -11463,9 +10925,7 @@ async function loginWithPassword() {
             error
         );
 
-
         if (message) {
-
             message.textContent =
                 error.message ||
                 "Login failed.";
@@ -11684,7 +11144,6 @@ function forgotPassword(event) {
 }
 
 
-
 /* =========================================================
    LOGOUT
 ========================================================= */
@@ -11700,7 +11159,7 @@ function logout() {
 
     const loggedOutUserId =
         currentUser &&
-            currentUser.id
+        currentUser.id
             ? Number(currentUser.id)
             : null;
 
@@ -11939,8 +11398,8 @@ document.addEventListener(
 
         }
 
-        // =========================================
-        // LOGGED-OUT USER
+            // =========================================
+            // LOGGED-OUT USER
         // =========================================
 
         else {
@@ -12002,6 +11461,7 @@ document.addEventListener(
         );
     }
 );
+
 async function payWithRazorpay(backendOrderId, orderData) {
 
     console.log("===== RAZORPAY PAYMENT START =====");
@@ -12047,7 +11507,7 @@ async function payWithRazorpay(backendOrderId, orderData) {
     // =====================================================
 
     const paidCart = Array.isArray(cart)
-        ? cart.map(item => ({ ...item }))
+        ? cart.map(item => ({...item}))
         : [];
 
 
@@ -13100,6 +12560,7 @@ async function payWithRazorpay(backendOrderId, orderData) {
         );
     }
 }
+
 function showOrderSuccess(
     orderId,
     paymentMethod,
@@ -13276,6 +12737,7 @@ function showOrderSuccess(
         "Congratulations page opened successfully."
     );
 }
+
 function trackShipment() {
 
     const courier = document.getElementById("trackingCourier").value;
@@ -13298,6 +12760,7 @@ function trackShipment() {
     }
 
 }
+
 // =====================================================
 // SIGNUP
 // =====================================================
@@ -13459,9 +12922,9 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 });
-    // =====================================================
-    // LOGIN
-    // =====================================================
+// =====================================================
+// LOGIN
+// =====================================================
 // =====================================================
 // LOGIN
 // =====================================================
@@ -13946,6 +13409,7 @@ function closeMobileMenus() {
 /* =========================================================
    3. MOBILE DROPDOWN POSITION
 ========================================================= */
+
 /* =========================================================
    OPEN RESPONSIVE MENU
 ========================================================= */
@@ -14000,122 +13464,65 @@ function openMobileMenu(button, menu) {
 
     console.log("RESPONSIVE MENU OPEN:", menu.id);
 }
+
 /* =========================================================
    4. DROPDOWN BUTTON CLICK
+   Desktop, tablet and mobile: CLICK ONLY
 ========================================================= */
 
-document.addEventListener(
-    "click",
-    function (event) {
+document.addEventListener("click", function (event) {
 
-        const button =
-            event.target.closest(".dropdown-btn");
+    const button = event.target.closest(".dropdown-btn");
 
-        // Not a dropdown button
-        if (!button) {
-            return;
-        }
+    if (!button) return;
 
+    event.preventDefault();
+    event.stopPropagation();
 
-        /*
-         * DESKTOP
-         *
-         * Above 1024px:
-         * CSS hover handles dropdown.
-         */
-        if (window.innerWidth > 1024) {
-            return;
-        }
+    const dropdown = button.closest(".nav-dropdown");
+    if (!dropdown) return;
 
+    const menu = dropdown.querySelector(".dropdown-menu");
+    if (!menu) return;
 
-        /*
-         * TABLET + MOBILE
-         *
-         * 1024px and below:
-         * click handles dropdown.
-         */
+    const alreadyOpen = menu.classList.contains("mobile-open");
 
-        event.preventDefault();
-        event.stopPropagation();
+    // Close all menus first
+    closeMobileMenus();
 
+    // Clicking the open button closes it
+    if (alreadyOpen) return;
 
-        const dropdown =
-            button.closest(".nav-dropdown");
+    // Open the selected menu
+    menu.classList.add("mobile-open");
 
-        if (!dropdown) {
-            console.error(
-                "nav-dropdown not found"
-            );
-            return;
-        }
-
-
-        const menu =
-            dropdown.querySelector(".dropdown-menu");
-
-        if (!menu) {
-            console.error(
-                "dropdown-menu not found"
-            );
-            return;
-        }
-
-
-        const alreadyOpen =
-            menu.classList.contains("mobile-open");
-
-
-        // Close all dropdowns first
-        closeMobileMenus();
-
-
-        // If the same menu was already open,
-        // leave it closed.
-        if (alreadyOpen) {
-            return;
-        }
-
-
-        // Open selected menu
-        openMobileMenu(
-            button,
-            menu
-        );
-
+    // Desktop: position menu below its own dropdown button
+    if (window.innerWidth > 1024) {
+        menu.style.position = "absolute";
+        menu.style.top = "100%";
+        menu.style.left = "0";
+        menu.style.right = "auto";
+        menu.style.transform = "none";
+    } else {
+        // Tablet/mobile: use existing responsive positioning
+        openMobileMenu(button, menu);
     }
-);
+
+    console.log("CLICK MENU OPEN:", menu.id);
+});
 
 
 /* =========================================================
    5. CLICK OUTSIDE → CLOSE
 ========================================================= */
 
-document.addEventListener(
-    "click",
-    function (event) {
+document.addEventListener("click", function (event) {
 
-        // Only tablet + mobile
-        if (window.innerWidth > 1024) {
-            return;
-        }
+    if (event.target.closest(".nav-dropdown")) return;
 
+    closeMobileMenus();
 
-        // Click was inside dropdown
-        if (
-            event.target.closest(
-                ".nav-dropdown"
-            )
-        ) {
-            return;
-        }
-
-
-        closeMobileMenus();
-
-    }
-);
-
-
+});
 /* =========================================================
    6. CLOSE ON SCROLL
 ========================================================= */
@@ -14256,6 +13663,7 @@ document.addEventListener(
 
     }
 );
+
 function calculateDiscount(originalPrice, price) {
 
     if (
@@ -14420,6 +13828,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 });
+
 /* =====================================================
    BOTTOM NAVIGATION SEARCH
    ===================================================== */
@@ -14480,6 +13889,7 @@ document.addEventListener("DOMContentLoaded", function () {
     updateBottomCartCount();
 
 });
+
 /* =========================================================
    FIX: DYNAMIC HEADER SPACING FOR MOBILE + TABLET
 ========================================================= */
@@ -14508,21 +13918,54 @@ function updateHeaderSpacing() {
     }
 }
 
+// =========================================================
+// IMAGE LOADING OPTIMIZATION
+// - Decode images asynchronously so rendering stays responsive.
+// - Prioritize only images near the initial viewport.
+// - Keep below-the-fold images lazy to avoid network congestion.
+// =========================================================
+function optimizeVisibleImages() {
+    const images = document.querySelectorAll("img");
+    const viewportLimit = (window.innerHeight || 800) * 1.35;
+
+    images.forEach((img) => {
+        img.decoding = "async";
+
+        const rect = img.getBoundingClientRect();
+        const nearViewport = rect.bottom >= 0 && rect.top <= viewportLimit;
+        const isHero = img.classList.contains("hero-image") ||
+            img.classList.contains("product-image") ||
+            img.closest(".hero-slide.active");
+
+        if (isHero) {
+            img.loading = "eager";
+            img.fetchPriority = "high";
+        } else if (nearViewport) {
+            img.loading = "eager";
+            img.fetchPriority = "auto";
+        } else {
+            img.loading = "lazy";
+            img.fetchPriority = "low";
+        }
+    });
+}
+
+document.addEventListener("DOMContentLoaded", optimizeVisibleImages, { once: true });
+window.addEventListener("load", optimizeVisibleImages, { once: true });
+window.addEventListener("resize", optimizeVisibleImages, { passive: true });
+
 window.addEventListener("load", updateHeaderSpacing);
 window.addEventListener("resize", updateHeaderSpacing);
 
 document.addEventListener("DOMContentLoaded", () => {
     updateHeaderSpacing();
 });
-function createShopCard(item, type) {
 
+
+function createShopCard(item, type) {
     const card = document.createElement("div");
 
-
-    /* =========================================================
-       CARD TYPE
-    ========================================================= */
-
+    // 1. Card type
     card.className =
         type === "relationship"
             ? "relationship-card shop-card"
@@ -14530,233 +13973,171 @@ function createShopCard(item, type) {
                 ? "festival-card shop-card"
                 : "category-card shop-card";
 
+    // 2. Data
+    const image = getImagePath(item.image);
+    const name = item.name || "";
+    const description = item.description || "";
 
-    /* =========================================================
-       DATA
-    ========================================================= */
+    // 3. Click function
+    const clickFunction =
+        type === "relationship"
+            ? "showRelationshipProducts"
+            : type === "festival"
+                ? "showFestival"
+                : "showCategory";
 
-    const image =
-        getImagePath(item.image);
+    // 4. Create image
+    const img = document.createElement("img");
 
-    const name =
-        item.name || "";
+    img.alt = name;
+    img.loading = "lazy";
+    img.decoding = "async";
+    img.fetchPriority = "auto";
 
-    const description =
-        item.description || "";
+    // Image loading error handler
+    img.addEventListener("error", function () {
+        const retries = Number(img.dataset.retryCount || 0);
 
+        // Retry a maximum of 2 times
+        if (retries < 2 && img.dataset.originalUrl) {
+            img.dataset.retryCount = String(retries + 1);
 
-    /* =========================================================
-       CLICK FUNCTION
-    ========================================================= */
+            const originalUrl = img.dataset.originalUrl;
+            const separator = originalUrl.includes("?") ? "&" : "?";
 
-    let clickFunction = "";
+            img.src =
+                originalUrl +
+                separator +
+                "retry=" +
+                Date.now();
+        } else if (typeof handleImageLoadError === "function") {
+            // Use existing fallback handler after retries
+            handleImageLoadError(img);
+        }
+    });
 
-    if (type === "relationship") {
+    // 5. Card content
+    const content = document.createElement("div");
+    content.className = "category-card-content";
 
-        clickFunction =
-            "showRelationshipProducts";
+    const heading = document.createElement("h3");
+    heading.textContent = name;
+    content.appendChild(heading);
 
-    } else if (type === "festival") {
-
-        clickFunction =
-            "showFestival";
-
-    } else {
-
-        clickFunction =
-            "showCategory";
-
+    if (description) {
+        const paragraph = document.createElement("p");
+        paragraph.textContent = description;
+        content.appendChild(paragraph);
     }
 
+    // 6. View Products button
+    const viewButton = document.createElement("a");
+    viewButton.href = "#";
+    viewButton.className = "category-btn";
+    viewButton.textContent = "View Products";
 
-    /* =========================================================
-       CARD HTML
-    ========================================================= */
+    viewButton.addEventListener("click", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
 
-    card.innerHTML = `
+        window[clickFunction]?.(item.id);
+    });
 
-        <img
-            src="${image}"
-            alt="${name}"
-            loading="lazy"
-        >
+    // 7. Card click
+    card.addEventListener("click", function () {
+        window[clickFunction]?.(item.id);
+    });
 
-        <div class="category-card-content">
+    // 8. Assemble card before starting image loading
+    card.append(img, content, viewButton);
 
-            <h3>
-                ${name}
-            </h3>
-
-            ${description
-            ? `
-                        <p>
-                            ${description}
-                        </p>
-                    `
-            : ""
-        }
-
-        </div>
-
-
-        <a
-            href="#"
-            class="category-btn"
-        >
-            View Products
-        </a>
-
-    `;
-
-
-    /* =========================================================
-       VIEW PRODUCTS BUTTON
-    ========================================================= */
-
-    const viewButton =
-        card.querySelector(".category-btn");
-
-
-    viewButton.addEventListener(
-        "click",
-        function (event) {
-
-            event.preventDefault();
-            event.stopPropagation();
-
-            window[clickFunction]?.(
-                item.id
-            );
-
-        }
-    );
-
-
-    /* =========================================================
-       CARD CLICK
-    ========================================================= */
-
-    card.addEventListener(
-        "click",
-        function () {
-
-            window[clickFunction]?.(
-                item.id
-            );
-
-        }
-    );
-
+    // 9. Set image source last
+    if (image) {
+        img.dataset.originalUrl = image;
+        img.src = image;
+    }
 
     return card;
 }
-function renderPinnedAndSlider(
-    grid,
-    items,
-    type
-) {
+
+function renderPinnedAndSlider(grid, items, type) {
     if (!grid) return;
 
-    grid.innerHTML = "";
-
     if (!Array.isArray(items) || items.length === 0) {
-
         grid.innerHTML = `
             <p class="empty-shop-message">
                 No items available
             </p>
         `;
-
         return;
     }
 
+    const fragment = document.createDocumentFragment();
 
-    /* =========================================================
-       ADMIN PINNED ITEMS
-    ========================================================= */
-
-    const pinnedItems = items.filter(function (item) {
-
-        return item.pinned === true;
-
-    });
-
-
-    /* =========================================================
-       PINNED SECTION
-    ========================================================= */
+    // 1. Admin-pinned items
+    const pinnedItems = items
+        .filter(item => item.pinned === true)
+        .slice(0, 4);
 
     if (pinnedItems.length > 0) {
+        const pinnedSection = document.createElement("div");
+        pinnedSection.className = "pinned-shop-grid";
 
-        const pinnedSection =
-            document.createElement("div");
+        pinnedItems.forEach(item => {
+            pinnedSection.appendChild(
+                createShopCard(item, type)
+            );
+        });
 
-        pinnedSection.className =
-            "pinned-shop-grid";
-
-
-        pinnedItems
-            .slice(0, 4)
-            .forEach(function (item) {
-
-                pinnedSection.appendChild(
-                    createShopCard(item, type)
-                );
-
-            });
-
-
-        grid.appendChild(pinnedSection);
-
+        fragment.appendChild(pinnedSection);
     }
 
+    // 2. Slider
+    const sliderWrapper = document.createElement("div");
+    sliderWrapper.className = "shop-slider-wrapper";
 
-    /* =========================================================
-       SLIDER
-    ========================================================= */
+    const sliderTrack = document.createElement("div");
+    sliderTrack.className = "shop-slider-track";
 
-    const sliderWrapper =
-        document.createElement("div");
+    // Keep the existing duplicated items for slider animation.
+    // Use a fragment to reduce repeated DOM insertions.
+    const sliderFragment = document.createDocumentFragment();
 
-    sliderWrapper.className =
-        "shop-slider-wrapper";
+    [...items, ...items].forEach((item, index) => {
+        const card = createShopCard(item, type);
 
+        // If createShopCard returns a card containing an image,
+        // defer off-screen image loading.
+        const img = card.querySelector("img");
 
-    const sliderTrack =
-        document.createElement("div");
+        if (img) {
+            img.decoding = "async";
 
-    sliderTrack.className =
-        "shop-slider-track";
+            if (index < 4) {
+                // Load the first visible slider cards immediately.
+                img.loading = "eager";
+                img.fetchPriority = index === 0 ? "high" : "auto";
+            } else {
+                // Avoid downloading every off-screen/duplicated card at once.
+                img.loading = "lazy";
+                img.fetchPriority = "low";
+            }
+        }
 
-
-    /*
-     * All items are shown in slider.
-     * Pinned items are also included.
-     */
-
-    const sliderItems = [
-        ...items,
-        ...items
-    ];
-
-
-    sliderItems.forEach(function (item) {
-
-        sliderTrack.appendChild(
-            createShopCard(item, type)
-        );
-
+        sliderFragment.appendChild(card);
     });
 
+    sliderTrack.appendChild(sliderFragment);
+    sliderWrapper.appendChild(sliderTrack);
+    fragment.appendChild(sliderWrapper);
 
-    sliderWrapper.appendChild(
-        sliderTrack
-    );
-
-    grid.appendChild(
-        sliderWrapper
-    );
+    // Replace the section in one DOM operation.
+    grid.replaceChildren(fragment);
 }
+document.querySelectorAll("*").forEach(el => {
+    el.style.setProperty("animation-play-state", "paused", "important");
+    el.style.setProperty("transition", "none", "important");
+});
 /* =========================================================
    PRODUCT REVIEWS - LOAD FROM BACKEND
 ========================================================= */
@@ -14896,13 +14277,13 @@ function renderProductReviews(reviews) {
                 </p>
 
                 ${review.verifiedPurchaser
-                ? `
+            ? `
                             <span class="verified-review">
                                 ✓ Verified Purchaser
                             </span>
                           `
-                : ""
-            }
+            : ""
+        }
 
             </div>
         `;
@@ -15188,7 +14569,7 @@ async function submitReview(event, productId) {
             } else {
                 const errorMessage =
                     typeof result === "object" &&
-                        result?.message
+                    result?.message
                         ? result.message
                         : `Review failed (${response.status}).`;
 
@@ -15283,12 +14664,17 @@ function escapeReviewHTML(value) {
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
 }
+
 /* =========================================================
    CUSTOMER TESTIMONIALS
 ========================================================= */
 
 const TESTIMONIAL_API_URL =
     "http://localhost:8080/api/testimonials";
+
+const TESTIMONIAL_BATCH_SIZE = 3;
+let allCustomerTestimonials = [];
+let renderedTestimonialsCount = 0;
 
 
 async function loadCustomerTestimonials() {
@@ -15361,112 +14747,93 @@ async function loadCustomerTestimonials() {
         `;
     }
 }
+
 function renderCustomerTestimonials(testimonials) {
 
-    const container =
-        document.getElementById(
-            "testimonialsContainer"
-        );
+    const container = document.getElementById("testimonialsContainer");
 
     if (!container) {
-
-        console.error(
-            "testimonialsContainer not found."
-        );
-
+        console.error("testimonialsContainer not found.");
         return;
     }
 
-    if (
-        !Array.isArray(testimonials) ||
-        testimonials.length === 0
-    ) {
-
+    if (!Array.isArray(testimonials) || testimonials.length === 0) {
+        allCustomerTestimonials = [];
+        renderedTestimonialsCount = 0;
         container.innerHTML = `
             <div class="testimonial-empty">
-                <p>
-                    No customer testimonials available yet.
-                </p>
+                <p>No customer testimonials available yet.</p>
             </div>
         `;
-
+        stopTestimonialAutoSlide();
         return;
     }
 
-    container.innerHTML =
-        testimonials.map(testimonial => {
-
-            const name =
-                testimonial.customerName ||
-                "Happy Customer";
-
-            const image =
-                testimonial.customerImage ||
-                "https://i.pravatar.cc/100";
-
-            const rating = Math.min(
-                5,
-                Math.max(
-                    0,
-                    Number(testimonial.rating || 0)
-                )
-            );
-
-            const message =
-                testimonial.message ||
-                "";
-
-            const stars =
-                "★".repeat(rating) +
-                "☆".repeat(5 - rating);
-
-            return `
-                <div class="testimonial-card">
-
-                    <div class="customer-info">
-
-                        <img
-                            src="${escapeHTMLTestimonial(image)}"
-                            alt="${escapeHTMLTestimonial(name)}"
-                            loading="lazy"
-                        >
-
-                        <div>
-
-                            <h3>
-                                ${escapeHTMLTestimonial(name)}
-                            </h3>
-
-                            <div class="rating">
-                                ${stars}
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                    <p class="testimonial-text">
-                        "${escapeHTMLTestimonial(message)}"
-                    </p>
-
-                    <span class="verified">
-                        ✓ Verified Customer
-                    </span>
-
-                </div>
-            `;
-
-        }).join("");
+    allCustomerTestimonials = testimonials;
+    renderedTestimonialsCount = 0;
     testimonialCurrentIndex = 0;
+    container.innerHTML = "";
 
-    setTimeout(() => {
-
-        updateTestimonialSlider();
-
-        startTestimonialAutoSlide();
-
-    }, 100);
+    appendNextTestimonialBatch();
+    updateTestimonialSlider();
+    startTestimonialAutoSlide();
 }
+
+
+function createTestimonialCard(testimonial, index = 0) {
+
+    const name = testimonial.customerName || "Happy Customer";
+    const image = testimonial.customerImage
+        ? (/^https?:\/\//i.test(testimonial.customerImage)
+            ? testimonial.customerImage
+            : `http://localhost:8080/${testimonial.customerImage.replace(/^\/+/, "")}`)
+        : "https://i.pravatar.cc/100";
+    const rating = Math.min(5, Math.max(0, Number(testimonial.rating || 0)));
+    const message = testimonial.message || "";
+    const stars = "★".repeat(rating) + "☆".repeat(5 - rating);
+
+    return `
+        <div class="testimonial-card">
+            <div class="customer-info">
+                <img
+                    src="${escapeHTMLTestimonial(image)}"
+                    alt="${escapeHTMLTestimonial(name)}"
+                    loading="${index < 2 ? "eager" : "lazy"}"
+                    fetchpriority="${index === 0 ? "high" : "auto"}"
+                    decoding="async"
+                    onerror="handleImageLoadError(this)"
+                >
+                <div>
+                    <h3>${escapeHTMLTestimonial(name)}</h3>
+                    <div class="rating">${stars}</div>
+                </div>
+            </div>
+            <p class="testimonial-text">"${escapeHTMLTestimonial(message)}"</p>
+            <span class="verified">✓ Verified Customer</span>
+        </div>
+    `;
+}
+
+
+function appendNextTestimonialBatch() {
+
+    const container = document.getElementById("testimonialsContainer");
+    if (!container || renderedTestimonialsCount >= allCustomerTestimonials.length) {
+        return false;
+    }
+
+    const start = renderedTestimonialsCount;
+    const end = Math.min(start + TESTIMONIAL_BATCH_SIZE, allCustomerTestimonials.length);
+    const html = allCustomerTestimonials.slice(start, end).map(function (testimonial, offset) {
+        return createTestimonialCard(testimonial, start + offset);
+    }).join("");
+
+    container.insertAdjacentHTML("beforeend", html);
+    renderedTestimonialsCount = end;
+    return true;
+}
+
+
 /* =========================================================
    TESTIMONIAL AUTO SLIDER
    ALWAYS 3 CARDS
@@ -15541,37 +14908,26 @@ function updateTestimonialSlider() {
 
 function moveTestimonialSlide() {
 
-    const container =
-        document.getElementById(
-            "testimonialsContainer"
-        );
+    const container = document.getElementById("testimonialsContainer");
+    if (!container) return;
 
-    if (!container) {
-        return;
+    let cards = container.querySelectorAll(".testimonial-card");
+    if (!cards.length) return;
+
+    let maxIndex = Math.max(0, cards.length - 3);
+
+    // Add the next small batch when the carousel reaches its current end.
+    if (testimonialCurrentIndex >= maxIndex &&
+        renderedTestimonialsCount < allCustomerTestimonials.length) {
+        appendNextTestimonialBatch();
+        cards = container.querySelectorAll(".testimonial-card");
+        maxIndex = Math.max(0, cards.length - 3);
     }
 
-    const cards =
-        container.querySelectorAll(
-            ".testimonial-card"
-        );
-
-    if (!cards.length) {
-        return;
-    }
-
-    const maxIndex =
-        Math.max(
-            0,
-            cards.length - 3
-        );
-
-    testimonialCurrentIndex++;
-
-    if (
-        testimonialCurrentIndex >
-        maxIndex
-    ) {
+    if (testimonialCurrentIndex >= maxIndex) {
         testimonialCurrentIndex = 0;
+    } else {
+        testimonialCurrentIndex++;
     }
 
     updateTestimonialSlider();
@@ -15614,9 +14970,9 @@ function updateTestimonialDots(
             <button
                 type="button"
                 class="testimonial-dot ${i === currentIndex
-                ? "active"
-                : ""
-            }"
+            ? "active"
+            : ""
+        }"
                 onclick="goToTestimonialSlide(${i})"
             ></button>
         `;
@@ -15644,15 +15000,18 @@ function goToTestimonialSlide(index) {
 ========================================================= */
 
 function startTestimonialAutoSlide() {
+    const container = document.getElementById("testimonialsContainer");
+    if (!container) return;
 
+    // Clear the previous timer so re-rendering never creates multiple moving loops.
     stopTestimonialAutoSlide();
 
-    testimonialAutoSlide =
-        setInterval(() => {
-
-            moveTestimonialSlide();
-
-        }, 4000);
+    testimonialAutoSlide = setInterval(function () {
+        if (document.hidden) return;
+        const currentContainer = document.getElementById("testimonialsContainer");
+        if (!currentContainer || !currentContainer.isConnected) return;
+        moveTestimonialSlide();
+    }, 4000);
 }
 
 
@@ -15680,11 +15039,23 @@ function stopTestimonialAutoSlide() {
 window.addEventListener(
     "resize",
     () => {
-
         updateTestimonialSlider();
-
     }
 );
+
+// Pause testimonial movement while a visitor is interacting with the cards.
+document.addEventListener("DOMContentLoaded", function () {
+    const testimonialContainer = document.getElementById("testimonialsContainer");
+    if (!testimonialContainer) return;
+
+    testimonialContainer.addEventListener("mouseenter", stopTestimonialAutoSlide);
+    testimonialContainer.addEventListener("mouseleave", startTestimonialAutoSlide);
+    testimonialContainer.addEventListener("touchstart", stopTestimonialAutoSlide, { passive: true });
+    testimonialContainer.addEventListener("touchend", function () {
+        setTimeout(startTestimonialAutoSlide, 1200);
+    }, { passive: true });
+});
+
 function escapeHTMLTestimonial(value) {
 
     return String(value || "")
@@ -15694,6 +15065,7 @@ function escapeHTMLTestimonial(value) {
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
 }
+
 document.addEventListener("DOMContentLoaded", function () {
 
     // Existing code...
@@ -15701,6 +15073,7 @@ document.addEventListener("DOMContentLoaded", function () {
     loadCustomerTestimonials();
 
 });
+
 /* =========================================================
    ACCOUNT
 ========================================================= */
@@ -15799,6 +15172,7 @@ function logoutUser() {
 
     }, 100);
 }
+
 function showPriceProducts(maxPrice) {
 
     const filteredProducts = products.filter(function (product) {
@@ -15809,6 +15183,11 @@ function showPriceProducts(maxPrice) {
 
     renderProducts(filteredProducts);
 }
+document.addEventListener("scroll", function () {
+    if (window.innerWidth <= 1024) {
+        closeMobileMenus();
+    }
+}, true);
 /* =========================================================
    NAVIGATION HORIZONTAL SCROLL
 ========================================================= */
@@ -15845,6 +15224,7 @@ function scrollNavBack() {
         behavior: "smooth"
     });
 }
+
 /* =========================================================
    FORCE DROPDOWN TO OPEN DIRECTLY BELOW ITS BUTTON
 ========================================================= */
@@ -16017,34 +15397,6 @@ function scrollNavBack() {
     const nav =
         document.querySelector(".shop-nav-scroll");
 
-    if (nav) {
-
-        const observer =
-            new MutationObserver(function () {
-
-                forceAllOpenDropdowns();
-
-            });
-
-        observer.observe(nav, {
-            subtree: true,
-            attributes: true,
-            attributeFilter: [
-                "class",
-                "style"
-            ]
-        });
-    }
-
-
-    /*
-     * FINAL continuous correction while dropdown
-     * is open. This is the FORCE part.
-     */
-    setInterval(function () {
-        forceAllOpenDropdowns();
-    }, 100);
-
 })();
 
 // ======================================================
@@ -16067,9 +15419,8 @@ async function loadOrdersFromBackend() {
         !currentUser.id
     ) {
 
-        console.error(
-            "❌ Orders loading skipped: currentUser missing.",
-            currentUser
+        console.info(
+            "Orders skipped: no signed-in user is available yet."
         );
 
         orders = [];
@@ -16262,9 +15613,7 @@ async function loadOrdersFromBackend() {
             backendOrders =
                 data;
 
-        }
-
-        else if (
+        } else if (
             data &&
             Array.isArray(
                 data.orders
@@ -16274,9 +15623,7 @@ async function loadOrdersFromBackend() {
             backendOrders =
                 data.orders;
 
-        }
-
-        else if (
+        } else if (
             data &&
             Array.isArray(
                 data.content
@@ -16286,9 +15633,7 @@ async function loadOrdersFromBackend() {
             backendOrders =
                 data.content;
 
-        }
-
-        else {
+        } else {
 
             console.error(
                 "❌ Unknown orders response format:",
@@ -16425,11 +15770,11 @@ async function loadOrdersFromBackend() {
 
 
                                     quantity:
-                                        quantity,
+                                    quantity,
 
 
                                     price:
-                                        price,
+                                    price,
 
 
                                     subtotal:
@@ -16529,7 +15874,7 @@ async function loadOrdersFromBackend() {
                     return {
 
                         id:
-                            order.id,
+                        order.id,
 
 
                         orderNumber:
@@ -16538,23 +15883,23 @@ async function loadOrdersFromBackend() {
 
 
                         orderDate:
-                            createdAt,
+                        createdAt,
 
 
                         createdAt:
-                            createdAt,
+                        createdAt,
 
 
                         deliveryDate:
-                            deliveryDate,
+                        deliveryDate,
 
 
                         status:
-                            orderStatus,
+                        orderStatus,
 
 
                         orderStatus:
-                            orderStatus,
+                        orderStatus,
 
 
                         paymentMethod:
@@ -16568,47 +15913,47 @@ async function loadOrdersFromBackend() {
 
 
                         total:
-                            totalAmount,
+                        totalAmount,
 
 
                         totalAmount:
-                            totalAmount,
+                        totalAmount,
 
 
                         deliveryCharges:
-                            deliveryCharges,
+                        deliveryCharges,
 
 
                         items:
-                            frontendItems,
+                        frontendItems,
 
 
                         name:
-                            customerName,
+                        customerName,
 
 
                         phone:
-                            customerPhone,
+                        customerPhone,
 
 
                         address:
-                            shippingAddress,
+                        shippingAddress,
 
 
                         shippingAddress:
-                            shippingAddress,
+                        shippingAddress,
 
 
                         city:
-                            shippingCity,
+                        shippingCity,
 
 
                         state:
-                            shippingState,
+                        shippingState,
 
 
                         pincode:
-                            shippingPincode,
+                        shippingPincode,
 
 
                         courierName:
@@ -16709,9 +16054,9 @@ async function loadOrdersFromBackend() {
     }
 
 
-    // ==================================================
-    // ERROR
-    // ==================================================
+        // ==================================================
+        // ERROR
+        // ==================================================
 
     catch (error) {
 
@@ -16986,11 +16331,11 @@ async function loadCartFromBackend() {
 
                         // Cart database ID
                         cartItemId:
-                            item.id,
+                        item.id,
 
                         // Product database ID
                         id:
-                            productId,
+                        productId,
 
                         name:
                             product.name ||
@@ -17003,7 +16348,7 @@ async function loadCartFromBackend() {
                             "",
 
                         price:
-                            price,
+                        price,
 
                         originalPrice:
                             Number(
@@ -17033,7 +16378,7 @@ async function loadCartFromBackend() {
                             "",
 
                         quantity:
-                            quantity,
+                        quantity,
 
                         stock:
                             Number(

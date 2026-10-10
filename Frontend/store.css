@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-
-:root {
-    --primary-color: #e35486;
+    :root {
+        --primary-color: #e35486;
+        --primary-dark: #fa6d9f;
     --primary-dark: #fa6d9f;
     --primary-light: #fc6fa1;
 
@@ -8851,7 +8851,7 @@ body {
 }
 
 /* =========================================================
-   DYNAMIC CONTENT SPACING
+DYNAMIC CONTENT SPACING
 ========================================================= */
 
 :root {
@@ -8860,7 +8860,6 @@ body {
 }
 
 @media screen and (max-width: 1024px) {
-
     .page {
         padding-top: var(--header-height) !important;
         padding-bottom: var(--bottom-nav-height) !important;
@@ -8868,11 +8867,14 @@ body {
         z-index: 1;
     }
 
+
     .main-content {
-        padding-top: 0 !important;
-        padding-bottom: 10px !important;
-        min-height: calc(50vh - var(--header-height) - var(--bottom-nav-height));
-    }
+    padding-top: 0 !important;
+    padding-bottom: 10px !important;
+    min-height: calc(
+            50vh - var(--header-height) - var(--bottom-nav-height)
+    );
+}
 
     .bottom-nav {
         z-index: 9999;
@@ -8881,29 +8883,8 @@ body {
     .header {
         z-index: 10000;
     }
-}
 
-@media screen and (max-width: 600px) {
-
-    .page {
-        padding-top: var(--header-height) !important;
-        padding-bottom: var(--bottom-nav-height) !important;
-    }
-
-    .main-content {
-        width: 100%;
-        max-width: 100%;
-        box-sizing: border-box;
-    }
-}
-
-/* =========================================================
-   HOME PAGE ONLY - REMOVE EXTRA TOP GAP
-   TABLET + MOBILE
-========================================================= */
-
-@media screen and (max-width: 1024px) {
-
+    /* Home page spacing */
     #homePage {
         padding-top: 120px !important;
         margin-top: 0 !important;
@@ -8920,43 +8901,105 @@ body {
         margin-top: 0 !important;
     }
 
+
 }
 
-/* =====================================================
-   PREMIUM PINNED CARDS + AUTO SLIDER
-===================================================== */
+@media screen and (max-width: 600px) {
+    .page {
+        padding-top: var(--header-height) !important;
+        padding-bottom: var(--bottom-nav-height) !important;
+    }
+
+
+    .main-content {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+
+}
+
+/* =========================================================
+HOMEPAGE CATEGORY / RELATIONSHIP / FESTIVAL CONTAINERS
+========================================================= */
+
+#relationshipGrid,
+#festivalGrid,
+#categoryGrid {
+    display: block !important;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+/* =========================================================
+PINNED CARDS — FIRST ROW
+========================================================= */
 
 .pinned-shop-grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 12px;
     width: 100%;
     max-width: 1240px;
-    margin: 0 auto 38px;
-
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 24px;
+    margin: 0 auto 25px;
+    box-sizing: border-box;
 }
 
+.pinned-shop-grid .shop-card {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+/* =========================================================
+AUTO SLIDER — SECOND ROW
+========================================================= */
+
 .shop-slider-wrapper {
+    display: block !important;
+    position: relative;
+    clear: both;
     width: 100%;
     max-width: 1240px;
     margin: 0 auto;
-
     overflow: hidden;
-    position: relative;
 
-    mask-image: linear-gradient(to right,
+
+    -webkit-mask-image: linear-gradient(
+            to right,
             transparent,
-            black 4%,
-            black 96%,
-            transparent);
+            #000 4%,
+            #000 96%,
+            transparent
+    );
+
+    mask-image: linear-gradient(
+            to right,
+            transparent,
+            #000 4%,
+            #000 96%,
+            transparent
+    );
+
+
 }
 
 .shop-slider-track {
-    display: flex;
+    display: flex !important;
+    flex-wrap: nowrap !important;
     width: max-content;
     gap: 24px;
 
+
     animation: shopAutoSlide 45s linear infinite;
+    will-change: transform;
+
+
 }
 
 .shop-slider-track:hover {
@@ -8964,36 +9007,41 @@ body {
 }
 
 .shop-slider-track .shop-card {
-    flex: 0 0 270px;
-    width: 270px;
+    flex: 0 0 220px !important;
+    width: 220px !important;
+    min-width: 220px !important;
 }
 
+/* =========================================================
+SHARED CARD DESIGN
+========================================================= */
+
 .shop-card {
-    background: #ffffff;
+    background: #fff;
     border: 1px solid rgba(227, 84, 134, 0.12);
     border-radius: 18px;
     overflow: hidden;
 
-    box-shadow:
-        0 8px 24px rgba(0, 0, 0, 0.07);
+
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.07);
 
     transition:
-        transform 0.3s ease,
-        box-shadow 0.3s ease;
+            transform 0.3s ease,
+            box-shadow 0.3s ease;
+
+
 }
 
 .shop-card:hover {
     transform: translateY(-7px);
-
-    box-shadow:
-        0 14px 35px rgba(227, 84, 134, 0.18);
+    box-shadow: 0 14px 35px rgba(227, 84, 134, 0.18);
 }
 
 .shop-card img {
-    width: 100%;
-    height: 185px;
-    object-fit: cover;
     display: block;
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
 }
 
 .shop-card .category-card-content {
@@ -9003,7 +9051,6 @@ body {
 
 .shop-card .category-card-content h3 {
     margin: 0 0 8px;
-
     color: #292929;
     font-size: 18px;
     font-weight: 700;
@@ -9011,8 +9058,7 @@ body {
 
 .shop-card .category-card-content p {
     margin: 0;
-
-    color: #777777;
+    color: #777;
     font-size: 13px;
     line-height: 1.5;
 }
@@ -9020,22 +9066,22 @@ body {
 .shop-card .category-btn {
     display: block;
     margin: 0 18px 18px;
+    padding: 11px 14px;
+
 
     text-align: center;
     text-decoration: none;
 
-    background: linear-gradient(135deg,
-            #e35486,
-            #c9366d);
-
-    color: #ffffff;
+    background: linear-gradient(135deg, #e35486, #c9366d);
+    color: #fff;
     border-radius: 10px;
-    padding: 11px 14px;
 
     font-size: 13px;
     font-weight: 600;
 
     transition: opacity 0.3s ease;
+
+
 }
 
 .shop-card .category-btn:hover {
@@ -9043,35 +9089,41 @@ body {
 }
 
 .empty-shop-message {
-    text-align: center;
     width: 100%;
     padding: 30px;
-    color: #777777;
+    text-align: center;
+    color: #777;
 }
+
+/* =========================================================
+CONTINUOUS SLIDER ANIMATION
+========================================================= */
 
 @keyframes shopAutoSlide {
     from {
-        transform: translateX(0);
+        transform: translate3d(0, 0, 0);
     }
 
-    to {
-        transform: translateX(calc(-50% - 12px));
-    }
+to {
+    transform: translate3d(calc(-50% - 12px), 0, 0);
 }
 
-/* =====================================================
-   RESPONSIVE
-===================================================== */
 
-@media (max-width: 992px) {
+}
+
+/* =========================================================
+TABLET
+========================================================= */
+
+@media (min-width: 651px) and (max-width: 992px) {
     .pinned-shop-grid {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
         gap: 14px;
     }
 
+
     .shop-card img {
-        height: 150px;
-    }
+    height: 150px;
+}
 
     .shop-card .category-card-content {
         padding: 12px;
@@ -9090,40 +9142,64 @@ body {
         padding: 9px 8px;
         font-size: 11px;
     }
+
+
 }
+
+/* =========================================================
+MOBILE — FOUR PINNED CARDS + SAME SLIDER SPEED
+========================================================= */
 
 @media (max-width: 650px) {
     .pinned-shop-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 14px;
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+        gap: 5px;
+        margin-bottom: 20px;
     }
 
+
+    .pinned-shop-grid .shop-card {
+    border-radius: 8px;
+}
+
     .pinned-shop-grid .shop-card img {
-        height: 145px;
+        height: 85px;
+    }
+
+    .pinned-shop-grid .shop-card h3 {
+        font-size: 10px;
+        line-height: 1.2;
+        text-align: center;
+        overflow-wrap: anywhere;
+    }
+
+    .pinned-shop-grid .shop-card p {
+        font-size: 9px;
+    }
+
+    .pinned-shop-grid .shop-card button,
+    .pinned-shop-grid .shop-card a {
+        padding: 5px 2px;
+        font-size: 9px;
     }
 
     .shop-slider-track {
         gap: 14px;
-        animation-duration: 35s;
+        animation-duration: 45s;
     }
 
     .shop-slider-track .shop-card {
-        flex-basis: 220px;
-        width: 220px;
+        flex: 0 0 150px !important;
+        width: 150px !important;
+        min-width: 150px !important;
     }
 
     .shop-slider-track .shop-card img {
         height: 145px;
     }
-}
 
-@media (max-width: 380px) {
-    .pinned-shop-grid {
-        gap: 10px;
-    }
-
-    .pinned-shop-grid .shop-card img {
-        height: 120px;
+    .shop-card .category-card-content {
+        padding: 12px;
     }
 
     .shop-card .category-card-content h3 {
@@ -9135,48 +9211,30 @@ body {
     }
 
     .shop-card .category-btn {
-        font-size: 10px;
-        padding: 8px 5px;
+        margin: 0 12px 12px;
+        padding: 8px;
+        font-size: 11px;
     }
+
+
 }
 
-/* First row: exactly 4 cards on every screen */
-.pinned-shop-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 10px;
-    width: 100%;
-}
+/* =========================================================
+VERY SMALL MOBILE SCREENS
+========================================================= */
 
-/* Card should fit inside its column */
-.pinned-shop-grid .shop-card {
-    min-width: 0;
-    width: 100%;
-    overflow: hidden;
-}
-
-/* Mobile */
-@media (max-width: 600px) {
+@media (max-width: 380px) {
     .pinned-shop-grid {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 5px;
+        gap: 3px;
     }
 
-    .pinned-shop-grid .shop-card {
-        border-radius: 8px;
-    }
 
     .pinned-shop-grid .shop-card img {
-        width: 100%;
-        height: 75px;
-        object-fit: cover;
-    }
+    height: 60px;
+}
 
     .pinned-shop-grid .shop-card h3 {
-        font-size: 10px;
-        line-height: 1.2;
-        text-align: center;
-        word-break: break-word;
+        font-size: 8px;
     }
 
     .pinned-shop-grid .shop-card p {
@@ -9185,125 +9243,11 @@ body {
 
     .pinned-shop-grid .shop-card button,
     .pinned-shop-grid .shop-card a {
-        font-size: 9px;
         padding: 4px 2px;
-    }
-}
-
-/* Very small mobile screens */
-@media (max-width: 380px) {
-    .pinned-shop-grid {
-        gap: 3px;
-    }
-
-    .pinned-shop-grid .shop-card img {
-        height: 60px;
-    }
-
-    .pinned-shop-grid .shop-card h3 {
         font-size: 8px;
     }
+
 }
-
-/* =========================================
-   FIX: PINNED ROW + SLIDER TWO ROW LAYOUT
-========================================= */
-
-/* Main container must contain two separate rows */
-#relationshipGrid,
-#festivalGrid,
-#categoryGrid {
-    display: block !important;
-    width: 100%;
-    max-width: 100%;
-    overflow: hidden;
-}
-
-/* First row: exactly 4 cards */
-.pinned-shop-grid {
-    display: grid !important;
-    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-    gap: 12px;
-    width: 100%;
-    margin-bottom: 25px;
-}
-
-/* Second row must start below first row */
-.shop-slider-wrapper {
-    display: block !important;
-    width: 100%;
-    max-width: 100%;
-    overflow: hidden;
-    position: relative;
-    clear: both;
-}
-
-/* Horizontal slider */
-.shop-slider-track {
-    display: flex !important;
-    flex-wrap: nowrap !important;
-    gap: 15px;
-    width: max-content;
-}
-
-/* Slider cards */
-.shop-slider-track .shop-card {
-    flex: 0 0 220px !important;
-    width: 220px !important;
-    min-width: 220px !important;
-}
-
-/* Pinned cards */
-.pinned-shop-grid .shop-card {
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100%;
-    overflow: hidden;
-}
-
-/* Pinned images */
-.pinned-shop-grid .shop-card img {
-    display: block;
-    width: 100%;
-    height: 180px;
-    object-fit: cover;
-}
-
-/* Mobile: still exactly 4 cards */
-@media (max-width: 600px) {
-
-    .pinned-shop-grid {
-        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-        gap: 5px;
-        margin-bottom: 20px;
-    }
-
-    .pinned-shop-grid .shop-card img {
-        height: 85px;
-    }
-
-    .pinned-shop-grid .shop-card h3 {
-        font-size: 10px;
-        line-height: 1.2;
-        overflow-wrap: anywhere;
-    }
-
-    .pinned-shop-grid .shop-card p {
-        font-size: 9px;
-    }
-
-    .pinned-shop-grid .shop-card button {
-        font-size: 9px;
-        padding: 5px 2px;
-    }
-
-    .shop-slider-track .shop-card {
-        flex: 0 0 150px !important;
-        width: 150px !important;
-        min-width: 150px !important;
-    }
-}
-
 
 
 /* =========================================
@@ -13062,4 +13006,72 @@ body {
     color: #ffffff !important;
     font-weight: 700 !important;
     opacity: 1 !important;
+}
+       /* Fix unwanted page jumping during content updates */
+   html {
+       overflow-anchor: none !important;
+   }
+
+body {
+    scroll-behavior: auto !important;
+}
+
+
+/* Dropdown opens only after clicking */
+.nav-dropdown:hover > .dropdown-menu:not(.mobile-open) {
+    display: none !important;
+}
+
+/* Position dropdown relative to its own button */
+.nav-dropdown {
+    position: relative;
+}
+
+.nav-dropdown > .dropdown-menu.mobile-open {
+    display: block !important;
+    z-index: 99999;
+}
+
+/* Desktop dropdown placement */
+@media (min-width: 1025px) {
+    .nav-dropdown > .dropdown-menu.mobile-open {
+        top: 100% !important;
+        left: 0 !important;
+        right: auto !important;
+        transform: none !important;
+    }
+}
+/* Same animation speed for all homepage sliders */
+.relationship-card,
+.festival-card,
+.category-card {
+    /* Do not set slider speed on cards */
+}
+
+
+/* RishtaBox: reduce slider-related scroll stutter */
+.shop-slider-wrapper {
+    overflow: hidden;
+    max-width: 100%;
+    contain: layout paint;
+}
+
+.shop-slider-track {
+    will-change: transform;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}
+
+/* Pause animation when the slider is hovered */
+.shop-slider-wrapper:hover .shop-slider-track {
+    animation-play-state: paused;
+}
+
+/* Disable continuous motion when user prefers reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .shop-slider-track {
+        animation: none !important;
+        transform: none !important;
+        will-change: auto;
+    }
 }
